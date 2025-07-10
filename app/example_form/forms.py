@@ -5,11 +5,11 @@ from ..widgets import PageHeadingInput
 
 
 class ExampleForm(BaseForm):
-    title = "Form Title"
+    title = "Your full name"
     url = "example-form"
 
     full_name = StringField(
-        "Your full name",
+        title,
         widget=PageHeadingInput(hint="This should include any middle names."),
         validators=[
             InputRequired(message="Enter your name"),
