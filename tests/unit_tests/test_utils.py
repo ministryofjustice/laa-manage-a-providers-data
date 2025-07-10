@@ -33,7 +33,7 @@ class TestRegisterFormView:
                 methods=["GET", "POST"]
             )
             mock_view_class.as_view.assert_called_once_with(
-                "mockform_view", 
+                "test_form",
                 form_class=MockForm
             )
 
@@ -51,7 +51,7 @@ class TestRegisterFormView:
                 methods=["GET", "POST"]
             )
             mock_view_class.as_view.assert_called_once_with(
-                "mockform_view",
+                "test_form",
                 form_class=MockForm
             )
 
@@ -69,7 +69,7 @@ class TestRegisterFormView:
                 methods=["GET", "POST"]
             )
             mock_custom_view.as_view.assert_called_once_with(
-                "mockform_view",
+                "test_form",
                 form_class=MockForm
             )
 
@@ -90,7 +90,7 @@ class TestRegisterFormView:
             methods=["GET", "POST"]
         )
         mock_custom_view.as_view.assert_called_once_with(
-            "mockform_view",
+            "test_form",
             form_class=MockForm
         )
 
@@ -127,7 +127,7 @@ class TestRegisterFormView:
             register_form_view(VeryLongFormClassName)
             
             mock_view_class.as_view.assert_called_once_with(
-                "verylongformclassname_view",
+                "test",
                 form_class=VeryLongFormClassName
             )
 
@@ -181,7 +181,7 @@ class TestRegisterFormViewIntegration:
         
         # Verify the view class was called correctly
         mock_view_class.as_view.assert_called_once_with(
-            "mockform_view",
+            "test_form",
             form_class=MockForm
         )
 
@@ -219,7 +219,7 @@ class TestRegisterFormViewIntegration:
             register_form_view(FormWithNumbers123, blueprint=mock_blueprint)
             
             mock_view_class.as_view.assert_called_once_with(
-                "formwithnumbers123_view",
+                "special_form",
                 form_class=FormWithNumbers123
             )
 

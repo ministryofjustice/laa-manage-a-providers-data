@@ -19,7 +19,7 @@ def register_form_view(
     if view_class is None:
         view_class = BaseFormView
 
-    if form_class is not None:
+    if form_class is not None and hasattr(form_class, 'template'):
         view_class.template = form_class.template
 
     route_name = form_class.url.lower().replace("-", "_")
