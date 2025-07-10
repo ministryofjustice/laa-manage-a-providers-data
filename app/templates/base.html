@@ -1,0 +1,66 @@
+{% extends 'govuk_frontend_jinja/template.html' %}
+{%  set cspNonce = csp_nonce() %}
+{%  set govukRebrand = True %}
+
+{%- from 'govuk_frontend_jinja/components/error-summary/macro.html' import govukErrorSummary-%}
+{%- from 'govuk_frontend_jinja/components/notification-banner/macro.html' import govukNotificationBanner -%}
+{%- from 'govuk_frontend_jinja/components/phase-banner/macro.html' import govukPhaseBanner -%}
+{%- from 'govuk_frontend_jinja/components/service-navigation/macro.html' import govukServiceNavigation -%}
+
+{% set assetPath = url_for('static', filename='').rstrip('/') %}
+
+{% block pageTitle %}{{config['SERVICE_NAME']}} – GOV.UK{% endblock %}
+
+{% block head %}
+  <meta name="description" content="{{config['SERVICE_NAME']}}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='govuk-frontend-5.7.1.min.css') }}" />
+  <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" nonce="{{ csp_nonce() }}" />
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    'classes': 'govuk-header--full-width-border',
+    'homepageUrl': 'https://www.gov.uk/'
+  }) }}
+
+  {{ govukServiceNavigation({
+    'serviceName': config['SERVICE_NAME'],
+    'serviceUrl': url_for('main.index'),
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({
+    'tag': {
+      'text': config['SERVICE_PHASE'],
+    },
+    'html': 'This is a new service. Help us improve it and <a class="govuk-link" href="#">give your feedback by email</a>.'
+  }) }}
+{% endblock %}
+
+{% block content %}
+  {% if form and form.errors %}
+    {{ govukErrorSummary(wtforms_errors(form)) }}
+  {% endif %}
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+          {{ govukNotificationBanner({'type': category, 'html': message}) }}
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+{% endblock %}
+
+{% block footer %}
+  {{ govukFooter({
+    'meta': {
+      'items': [],
+      'html': 'Built by <a href="' + config['DEPARTMENT_URL'] +'" class="govuk-footer__link">' + config['DEPARTMENT_NAME'] + '</a>'
+    }
+  }) }}
+{% endblock %}
+
+{% block bodyEnd %}
+  <script src="{{ url_for('static', filename='scripts.js') }}" nonce="{{ csp_nonce() }}"></script>
+{% endblock %}

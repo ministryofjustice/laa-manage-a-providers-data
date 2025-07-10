@@ -1,0 +1,28 @@
+services:
+  assert-watcher:
+    container_name: asset-watcher
+    build:
+      dockerfile: node.Dockerfile
+      context: .
+    restart: always
+    volumes:
+      - ./app/static:/home/node/app/static
+
+  web:
+    container_name: manage-a-providers-data
+    build:
+      context: .
+      args:
+        BASE_IMAGE: python:3.13-bookworm
+        REQUIREMENTS_FILE: "requirements-development.txt"
+      target: development
+    restart: always
+    environment:
+      - SECRET_KEY=CHANGE_ME
+      - FLASK_RUN_PORT=8020
+      - SENTRY_DSN=${SENTRY_DSN:-}
+    ports:
+      - "8020:8020"
+    volumes:
+      - ./app:/home/app/manage-a-providers-data/app
+      - ./tests:/home/app/manage-a-providers-data/tests

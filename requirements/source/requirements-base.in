@@ -1,0 +1,7 @@
+Flask
+flask-talisman
+Flask-WTF
+govuk-frontend-wtf
+python-dotenv
+requests
+sentry-sdk[flask]
