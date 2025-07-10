@@ -9,21 +9,23 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <form method="post" novalidate>
-      {{ form.hidden_tag() }}
-      
-      {% if not form | has_page_heading %}
-        <h1 class="govuk-heading-xl">{{ title }}</h1>
-      {% endif %}
-      
-      {% for field in form %}
-        {% if field.type != 'CSRFToken' and field.type != 'HiddenField' %}
-          {{ field }}
-        {% endif %}
-      {% endfor %}
-      
-      {{ govukButton({
-        'text': 'Continue'
-      }) }}
+        {% block form %}
+          {{ form.hidden_tag() }}
+
+          {% if not form | has_page_heading %}
+            <h1 class="govuk-heading-xl">{{ title }}</h1>
+          {% endif %}
+
+          {% for field in form %}
+            {% if field.type != 'CSRFToken' and field.type != 'HiddenField' %}
+              {{ field }}
+            {% endif %}
+          {% endfor %}
+
+          {{ govukButton({
+            'text': 'Continue'
+          }) }}
+        {% endblock %}
     </form>
   </div>
 </div>

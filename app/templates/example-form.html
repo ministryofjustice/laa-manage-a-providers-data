@@ -1,0 +1,16 @@
+{% extends 'form.html' %}
+
+{% block form %}
+    {{ form.hidden_tag() }}
+
+    {{ form.full_name(params={
+        "label": {
+            "isPageHeading": True,
+            "classes": "govuk-label--l"
+        }
+    }) }}
+
+    {{ govukButton({
+        'text': 'Continue'
+    }) }}
+{% endblock %}
