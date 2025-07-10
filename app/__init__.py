@@ -116,9 +116,15 @@ def create_app(config_class=Config):
 
     WTFormsHelpers(app)
 
+    # Register custom template filters
+    from app.template_filters import register_template_filters
+    register_template_filters(app)
+
     # Register blueprints
     from app.main import bp as main_bp
+    from app.example_form import bp as example_form_bp
 
     app.register_blueprint(main_bp)
+    app.register_blueprint(example_form_bp)
 
     return app
