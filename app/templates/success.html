@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{%- from 'govuk_frontend_jinja/components/panel/macro.html' import govukPanel -%}
+
+{% block content %}
+    {{ super() }}
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            {% set panelHTML %}
+                Your name is
+                <br>
+                <strong>{{ name }}</strong>
+            {% endset %}
+
+            {{ govukPanel({
+                "titleText": "Form completed",
+                "html": panelHTML
+              }) }}
+        </div>
+    </div>
+
+{% endblock %}
