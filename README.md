@@ -152,11 +152,3 @@ To format all files in the directory, run:
 ```shell
 ruff format
 ```
-
-### Manually running secret detection
-The trufflehog3 package looks for any exposed secrets in your project.
-
-To use trufflehog on your current project, run:
-```shell
-trufflehog3 filesystem .
-```
