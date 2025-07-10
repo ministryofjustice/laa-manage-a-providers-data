@@ -3,6 +3,8 @@
 
 {%- from 'govuk_frontend_jinja/components/button/macro.html' import govukButton -%}
 
+{% block pageTitle %}{{ title }} – GOV.UK{% endblock %}
+
 {% block content %}
 {{ super() }}
 

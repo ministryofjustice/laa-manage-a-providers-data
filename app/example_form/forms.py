@@ -6,11 +6,11 @@ from ..forms import BaseForm
 
 class ExampleForm(BaseForm):
     template = "example-form.html"
-    title = "Form Title"
+    title = "Your full name"
     url = "example-form"
 
     full_name = StringField(
-        "Your full name",
+        title,
         widget=GovTextInput(),
         validators=[
             InputRequired(message="Enter your name"),
