@@ -30,11 +30,9 @@ metadata:
       SecDefaultAction "phase:2,pass,log,tag:github_team=laa-get-access"
 spec:
   ingressClassName: {{ .Values.ingress.className }}
-  {{- if .Values.ingress.tls }}
   tls:
     - hosts:
        - "{{ .Values.ingress.host }}"
-  {{- end }}
   rules:
     - host: "{{ .Values.ingress.host }}"
       http:
