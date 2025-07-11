@@ -62,11 +62,11 @@ jobs:
         env:
           IMAGE_TAG: ${{ github.sha }}
           REGISTRY: ${{ secrets.ECR_REGISTRY }}
-          REPOSITORY: ${{ inputs.ACCESS_ECR_REPOSITORY }}
+          REPOSITORY: ${{ inputs.ECR_REPOSITORY }}
           HELM_DIR: "helm_deploy/laa-manage-a-providers-data"
           SHARED_IP_RANGES_LAA: ${{ env.SHARED_IP_RANGES_LAA }}
         run: |
-          helm upgrade laa-access-civil-legal-aid \
+          helm upgrade laa-manage-a-providers-data \
           ${HELM_DIR} \
           --namespace=${{ secrets.KUBE_NAMESPACE }} \
           --values ${HELM_DIR}/values/values-${{ inputs.environment }}.yaml \
