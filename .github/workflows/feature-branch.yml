@@ -29,8 +29,8 @@ jobs:
     secrets:
       ECR_ROLE_TO_ASSUME: ${{ secrets.ECR_ROLE_TO_ASSUME }}
 
-  deploy-dev:
-     name: Ephemeral Deployment
+  deploy-ephemeral:
+     name: Ephemeral
      uses: ./.github/workflows/deploy-ephemeral.yml
      needs: build-and-push
      with:
