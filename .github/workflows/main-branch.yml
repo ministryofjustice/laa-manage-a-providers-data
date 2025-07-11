@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - main
+      - MAPD-4-ci-cd-pipeline
 
 jobs:
   test:
