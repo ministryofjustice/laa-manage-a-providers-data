@@ -34,7 +34,7 @@ jobs:
     name: Deploy
     environment:
       name: ${{ inputs.environment }}
-      url: ${{ env.DEPLOYMENT_URL }}
+      url: ${{ vars.DEPLOYMENT_URL }}
     runs-on: ubuntu-latest
     permissions:
       id-token: write # This is required for requesting the JWT
