@@ -63,7 +63,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
           REGISTRY: ${{ secrets.ECR_REGISTRY }}
           REPOSITORY: ${{ inputs.ACCESS_ECR_REPOSITORY }}
-          HELM_DIR: "helm_deploy/laa-access-civil-legal-aid"
+          HELM_DIR: "helm_deploy/laa-manage-a-providers-data"
           SHARED_IP_RANGES_LAA: ${{ env.SHARED_IP_RANGES_LAA }}
         run: |
           helm upgrade laa-access-civil-legal-aid \
