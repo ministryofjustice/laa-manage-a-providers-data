@@ -31,7 +31,7 @@ jobs:
 
   deploy-dev:
      name: Ephemeral Deployment
-     uses: ./.github/workflows/deploy-ephermal.yml
+     uses: ./.github/workflows/deploy-ephemeral.yml
      needs: build-and-push
      with:
        environment: uat
