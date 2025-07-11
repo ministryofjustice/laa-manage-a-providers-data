@@ -19,7 +19,7 @@ jobs:
 
   static-analysis:
     name: Static Analysis
-    needs: test
+    # needs: test
     uses: ./.github/workflows/static-analysis.yml
 
   build-and-push:
