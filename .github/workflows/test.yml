@@ -1,14 +1,6 @@
 name: Test
 
-on:
-  workflow_call:
-    inputs:
-      ECR_REGION:
-        required: true
-        type: string
-    secrets:
-      ECR_ROLE_TO_ASSUME:
-        required: true
+on: workflow_call
 env:
   SECRET_KEY: "TEST_KEY"
 
@@ -53,18 +45,6 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v4
-
-      - name: Assume role in Cloud Platform
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.ECR_ROLE_TO_ASSUME }}
-          aws-region: ${{ inputs.ACCESS_ECR_REGION }}
-
-      - name: Login to container repository
-        uses: aws-actions/amazon-ecr-login@v2
-        id: login-ecr
-        with:
-          mask-password: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
