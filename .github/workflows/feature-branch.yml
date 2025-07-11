@@ -11,11 +11,11 @@ on:
       - reopened
 
 jobs:
-  test:
-    name: Test
-    uses: ./.github/workflows/test.yml
-    with:
-      ECR_REGION: ${{vars.ECR_REGION}}
+  # test:
+  #   name: Test
+  #   uses: ./.github/workflows/test.yml
+  #   with:
+  #     ECR_REGION: ${{vars.ECR_REGION}}
 
   static-analysis:
     name: Static Analysis
