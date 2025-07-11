@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{%- from 'govuk_frontend_jinja/components/button/macro.html' import govukButton -%}
+
+{% block content %}
+    {{ super() }}
+    <h1 class="govuk-heading-xl">Manage a Provider's Data</h1>
+
+    {{ govukButton({
+      "text": "Start now",
+      "href": url_for("example_form.example_form"),
+      "isStartButton": true
+    }) }}
+
+{% endblock %}

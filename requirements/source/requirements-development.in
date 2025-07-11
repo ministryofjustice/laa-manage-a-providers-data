@@ -1,0 +1,9 @@
+-r requirements-base.in
+isort
+pytest-flask
+pytest-playwright
+pytest-mock
+pytest-xdist
+axe-core-python
+freezegun
+pre-commit
