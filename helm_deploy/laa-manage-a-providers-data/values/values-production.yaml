@@ -3,7 +3,7 @@ replicaCount: 4
 
 ingress:
   enabled: true
-  host: "manage-a-providers-data.cloud-platform.service.justice.gov.uk"
+  host: "manage-a-providers-data.apps.cloud-platform.service.justice.gov.uk"
   tls:
     secretName: "tls-certificate"
 
