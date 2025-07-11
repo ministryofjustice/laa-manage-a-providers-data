@@ -7,3 +7,6 @@ ingress:
 
 whitelist:
   enabled: true
+
+pdb:
+  enabled: false
