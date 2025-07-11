@@ -73,7 +73,6 @@ jobs:
           export HOST_NAME=${CLEANED_BRANCH_NAME}-${DEV_HOST}
           export DEPLOYMENT_URL="https://${HOST_NAME}"
           echo "DEPLOYMENT_URL=https://${HOST_NAME}" >> $GITHUB_ENV
-          echo "DEPLOYMENT_URL=https://${HOST_NAME}" >> $GITHUB_OUTPUT
 
           helm upgrade ${CLEANED_BRANCH_NAME} \
           ${HELM_DIR} \
@@ -87,12 +86,3 @@ jobs:
           --set pingdomIPs=$PINGDOM_IPS \
           --force \
           --install
-  compute-url:
-      needs: deploy
-      runs-on: ubuntu-latest
-      environment:
-        name: dev
-        url: ${{ needs.deploy.outputs.deployment-url }}
-      steps:
-        - name: Deploy using URL
-          run: echo "Deploying to ${{ needs.deploy.outputs.deployment-url }}"
