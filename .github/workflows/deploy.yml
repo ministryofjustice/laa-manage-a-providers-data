@@ -43,7 +43,7 @@ jobs:
       contents: read  # This is required for actions/checkout
     steps:
       - name: Debug URL input
-        run: echo "DEPLOYMENT_URL=${{ inputs.DEPLOYMENT_URL }}
+        run: echo "DEPLOYMENT_URL=${{ inputs.DEPLOYMENT_URL }}"
       - name: Checkout GitHub repository
         uses: actions/checkout@v4
 
