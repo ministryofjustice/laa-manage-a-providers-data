@@ -64,7 +64,7 @@ jobs:
        KUBE_TOKEN: ${{ secrets.KUBE_TOKEN }}
 
   deploy-staging:
-    name: UAT
+    name: Staging
     uses: ./.github/workflows/deploy.yml
     needs: deploy-uat
     with:
@@ -80,7 +80,7 @@ jobs:
       KUBE_TOKEN: ${{ secrets.KUBE_TOKEN }}
 
   deploy-production:
-    name: production
+    name: Production
     uses: ./.github/workflows/deploy.yml
     needs: deploy-staging
     with:
