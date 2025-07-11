@@ -1,0 +1,11 @@
+environment: "production"
+replicaCount: 4
+
+ingress:
+  enabled: true
+  host: "manage-a-providers-data.cloud-platform.service.justice.gov.uk"
+  tls:
+    secretName: "tls-certificate"
+
+whitelist:
+  enabled: true
