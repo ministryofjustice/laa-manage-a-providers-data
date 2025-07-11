@@ -4,7 +4,7 @@ on:
 
 jobs:
   pip-compile:
-    name: pre-commit hooks
+    name: pip-compile
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the repository
