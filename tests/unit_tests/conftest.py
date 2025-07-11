@@ -1,7 +1,6 @@
 import pytest
 from app.config import Config
 from app import create_app
-from unittest.mock import patch
 
 
 class TestConfig(Config):

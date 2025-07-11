@@ -112,6 +112,7 @@ def create_app(config_class=Config):
 
     # Register custom template filters
     from app.filters import register_template_filters
+
     register_template_filters(app)
 
     # Register blueprints

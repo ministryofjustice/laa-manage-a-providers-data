@@ -19,5 +19,5 @@ class ExampleFormView(BaseFormView):
     def get_context_data(self, form):
         # Add custom context data to be passed to the template.
         context = super().get_context_data(form)
-        context['custom_data'] = 'Your custom data here'
+        context["custom_data"] = "Your custom data here"
         return context
