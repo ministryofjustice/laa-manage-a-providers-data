@@ -1,0 +1,9 @@
+environment: "uat"
+replicaCount: 1
+
+ingress:
+  enabled: true
+  host: "uat.manage-a-providers-data.cloud-platform.service.justice.gov.uk"
+
+whitelist:
+  enabled: true

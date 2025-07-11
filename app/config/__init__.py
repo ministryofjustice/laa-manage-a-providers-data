@@ -7,7 +7,7 @@ load_dotenv()
 
 
 class Config(object):
-    ENVIRONMENT = os.environ.get("ENVIRONMENT", "production")
+    ENVIRONMENT = os.environ.get("MAPD_ENVIRONMENT", "production")
     CONTACT_EMAIL = os.environ.get("CONTACT_EMAIL", "")
     CONTACT_PHONE = os.environ.get("CONTACT_PHONE", "")
     DEPARTMENT_NAME = os.environ.get("DEPARTMENT_NAME", "MOJ Digital")
