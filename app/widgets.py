@@ -23,25 +23,89 @@ from govuk_frontend_wtf.wtforms_widgets import (
 
 class LabelParams(TypedDict, total=False):
     text: str
+    html: str
+    for_: str  # Maps to 'for' attribute
     isPageHeading: bool
     classes: str
-
-
-class FieldsetParams(TypedDict, total=False):
-    legend: dict[str, Any]
+    attributes: dict[str, Any]
 
 
 class HintParams(TypedDict, total=False):
     text: str
+    html: str
+    id: str
+    classes: str
+    attributes: dict[str, Any]
+
+
+class ErrorMessageParams(TypedDict, total=False):
+    text: str
+    html: str
+    id: str
+    classes: str
+    attributes: dict[str, Any]
+
+
+class PrefixParams(TypedDict, total=False):
+    text: str
+    html: str
+    classes: str
+    attributes: dict[str, Any]
+
+
+class SuffixParams(TypedDict, total=False):
+    text: str
+    html: str
+    classes: str
+    attributes: dict[str, Any]
+
+
+class BeforeAfterInputParams(TypedDict, total=False):
+    text: str
+    html: str
+
+
+class FormGroupParams(TypedDict, total=False):
+    classes: str
+    attributes: dict[str, Any]
+    beforeInput: BeforeAfterInputParams
+    afterInput: BeforeAfterInputParams
+
+
+class InputWrapperParams(TypedDict, total=False):
+    classes: str
+    attributes: dict[str, Any]
+
+
+class FieldsetParams(TypedDict, total=False):
+    legend: dict[str, Any]
+    classes: str
+    attributes: dict[str, Any]
 
 
 class GovUKParams(TypedDict, total=False):
     """GOV.UK widget parameters with proper type hints."""
+    id: str
+    name: str
+    type: str
+    inputmode: str
+    value: str
+    disabled: bool
+    describedBy: str
     label: LabelParams
-    fieldset: FieldsetParams
     hint: HintParams
+    errorMessage: ErrorMessageParams
+    prefix: PrefixParams
+    suffix: SuffixParams
+    formGroup: FormGroupParams
     classes: str
+    autocomplete: str
+    pattern: str
+    spellcheck: bool
+    autocapitalize: str
+    inputWrapper: InputWrapperParams
     attributes: dict[str, Any]
+    fieldset: FieldsetParams  # For radios/checkboxes
 
 
 class ParameterOverrideMixin:
@@ -56,6 +120,15 @@ class ParameterOverrideMixin:
         *,
         classes: str | None = None,
         hint: str | None = None,
+        prefix: str | None = None,
+        suffix: str | None = None,
+        disabled: bool | None = None,
+        describedBy: str | None = None,
+        inputmode: str | None = None,
+        spellcheck: bool | None = None,
+        autocomplete: str | None = None,
+        autocapitalize: str | None = None,
+        pattern: str | None = None,
         **kwargs: Any
     ) -> None:
         """
@@ -64,14 +137,32 @@ class ParameterOverrideMixin:
         Args:
             classes: CSS classes to add
             hint: Hint text to display
+            prefix: Prefix text or HTML
+            suffix: Suffix text or HTML
+            disabled: Whether the input is disabled
+            describedBy: Space-separated list of element IDs for aria-describedby
+            inputmode: Input mode for mobile keyboards
+            spellcheck: Enable/disable spellcheck
+            autocomplete: Autocomplete attribute value
+            autocapitalize: Text capitalization behavior
+            pattern: Regular expression pattern for validation
             **kwargs: Additional parameters passed to parent widget
         """
         self.extra_classes = classes
         self.hint_text = hint
+        self.prefix_text = prefix
+        self.suffix_text = suffix
+        self.disabled = disabled
+        self.described_by = describedBy
+        self.inputmode = inputmode
+        self.spellcheck = spellcheck
+        self.autocomplete = autocomplete
+        self.autocapitalize = autocapitalize
+        self.pattern = pattern
         super().__init__(**kwargs)
     
     def map_gov_params(self, field: Any, **kwargs: Any) -> dict[str, Any]:
-        """Add extra classes and hint text to default parameters."""
+        """Add all configured parameters to the widget params."""
         params = super().map_gov_params(field, **kwargs)
         
         if self.extra_classes:
@@ -83,6 +174,33 @@ class ParameterOverrideMixin:
         if self.hint_text:
             params['hint'] = {'text': self.hint_text}
         
+        if self.prefix_text:
+            params['prefix'] = {'text': self.prefix_text}
+        
+        if self.suffix_text:
+            params['suffix'] = {'text': self.suffix_text}
+        
+        if self.disabled is not None:
+            params['disabled'] = self.disabled
+        
+        if self.described_by:
+            params['describedBy'] = self.described_by
+        
+        if self.inputmode:
+            params['inputmode'] = self.inputmode
+        
+        if self.spellcheck is not None:
+            params['spellcheck'] = self.spellcheck
+        
+        if self.autocomplete:
+            params['autocomplete'] = self.autocomplete
+        
+        if self.pattern:
+            params['pattern'] = self.pattern
+        
+        if self.autocapitalize:
+            params['autocapitalize'] = self.autocapitalize
+        
         return params
 
 
@@ -93,7 +211,11 @@ class GovTextInput(ParameterOverrideMixin, BaseGovTextInput):
     Example usage:
         StringField("Name", widget=GovTextInput(
             classes="govuk-input--width-20",
-            hint="Enter your full name"
+            hint="Enter your full name",
+            prefix="Dr.",
+            autocomplete="name",
+            pattern="[A-Za-z ]+",
+            describedBy="name-hint"
         ))
     """
     pass
@@ -105,7 +227,9 @@ class GovPasswordInput(ParameterOverrideMixin, BaseGovPasswordInput):
     
     Example usage:
         PasswordField("Password", widget=GovPasswordInput(
-            classes="govuk-input--width-20"
+            classes="govuk-input--width-20",
+            autocomplete="current-password",
+            spellcheck=False
         ))
     """
     pass
@@ -165,8 +289,9 @@ class GovFileInput(ParameterOverrideMixin, BaseGovFileInput):
     
     Example usage:
         FileField("Upload", widget=GovFileInput(
-            multiple=True,
-            classes="govuk-file-upload--drag-drop"
+            classes="govuk-file-upload",
+            hint="Select a file to upload",
+            disabled=False
         ))
     """
     pass
@@ -191,7 +316,9 @@ class GovTextArea(ParameterOverrideMixin, BaseGovTextArea):
     Example usage:
         TextAreaField("Description", widget=GovTextArea(
             classes="govuk-textarea--large",
-            hint="Provide as much detail as possible"
+            hint="Provide as much detail as possible",
+            spellcheck=True,
+            describedBy="description-hint"
         ))
     """
     pass
@@ -315,10 +442,17 @@ class CharacterCountTextArea(GovCharacterCount):
 
 __all__ = [
     'LabelParams',
-    'FieldsetParams', 
     'HintParams',
+    'ErrorMessageParams',
+    'PrefixParams',
+    'SuffixParams',
+    'BeforeAfterInputParams',
+    'FormGroupParams',
+    'InputWrapperParams',
+    'FieldsetParams', 
     'GovUKParams',
     
+    'ParameterOverrideMixin',
     'GovTextInput',
     'GovPasswordInput',
     'GovCheckboxInput',
