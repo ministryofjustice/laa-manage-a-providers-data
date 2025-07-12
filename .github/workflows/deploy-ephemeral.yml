@@ -103,6 +103,6 @@ jobs:
           ### 🔗 **[View Live Site](${{ env.DEPLOYMENT_URL }})**
           
           ---
-          *Deployed to ${{ inputs.environment }} by @${{ github.actor }} • [View Workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})* • [\`${SHORT_SHA}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) • ${COMMIT_MSG}"
+          *Deployed to ${{ inputs.environment }} by ${{ github.actor }} • [View Workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})* • [\`${SHORT_SHA}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) • ${COMMIT_MSG}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
