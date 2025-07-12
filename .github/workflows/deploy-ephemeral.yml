@@ -86,3 +86,26 @@ jobs:
           --set pingdomIPs=$PINGDOM_IPS \
           --force \
           --install
+
+      - name: Post deployment comment
+        run: |
+          # Get short commit SHA
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          
+          # Get commit message
+          COMMIT_MSG=$(git log -1 --pretty=format:"%s" ${{ github.sha }} 2>/dev/null || echo "Latest changes")
+          
+          # Create comment
+          gh pr comment ${{ github.event.number }} --body "## 🚀 Deployment Successful
+      
+          **Build:** [\`${SHORT_SHA}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) • ${COMMIT_MSG}
+          
+          **Environment:** ${{ inputs.environment }}
+          
+          ### Preview Environment
+          🔗 **[View Deployment](${{ env.DEPLOYMENT_URL }})**
+          
+          ---
+          *Deployed by @${{ github.actor }} • [View Workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
