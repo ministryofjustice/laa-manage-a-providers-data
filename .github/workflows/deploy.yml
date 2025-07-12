@@ -94,15 +94,10 @@ jobs:
           
           # Create comment
           gh pr comment ${{ github.event.number }} --body "## 🚀 Deployment Successful
-      
-          **Build:** [\`${SHORT_SHA}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) • ${COMMIT_MSG}
           
-          **Environment:** ${{ inputs.environment }}
-          
-          ### Preview Environment
-          🔗 **[View Deployment](${{ vars.DEPLOYMENT_URL }})**
+          ### 🔗 **[View Live Site](${{ vars.DEPLOYMENT_URL }})**
           
           ---
-          *Deployed by @${{ github.actor }} • [View Workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*"
+          *Deployed to ${{ inputs.environment }} by @${{ github.actor }} • [View Workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})* • [\`${SHORT_SHA}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) • ${COMMIT_MSG}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
