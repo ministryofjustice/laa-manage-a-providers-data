@@ -89,7 +89,7 @@ jobs:
           --install
 
       - name: Post deployment comment
-        if: github.event.number  # Only run for pull requests - skips direct pushes, manual runs, etc.
+        if: github.event.number != '' # Only run for pull requests - skips direct pushes, manual runs, etc.
         run: |
           # Get short commit SHA
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
