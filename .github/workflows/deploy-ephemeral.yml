@@ -106,6 +106,6 @@ jobs:
           🔗 **[View Deployment](${{ env.DEPLOYMENT_URL }})**
           
           ---
-          *Deployed by @${{ github.actor }} • [View Workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*
+          *Deployed by @${{ github.actor }} • [View Workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
