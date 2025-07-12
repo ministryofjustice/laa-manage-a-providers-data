@@ -90,12 +90,6 @@ jobs:
 
       - name: Post deployment comment
         run: |
-          # Only run for pull requests - skips direct pushes, manual runs, etc.
-          if [ -z "${{ github.event.number }}" ]; then
-            echo "ℹ️ No PR number available, skipping comment"
-            exit 0
-          fi
-        
           # Get short commit SHA
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
           
