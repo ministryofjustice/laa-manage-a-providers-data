@@ -99,6 +99,8 @@ jobs:
           # Create comment
           gh pr comment ${{ github.event.number }} --body "## 🚀 Ephermal Deployment Successful
           
+          **Build:** [\`${SHORT_SHA}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) • ${COMMIT_MSG}
+          
           ### 🔗 **[View Live Site](${{ env.DEPLOYMENT_URL }})**
           
           ---
