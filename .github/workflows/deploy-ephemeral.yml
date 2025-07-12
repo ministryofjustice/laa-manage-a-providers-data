@@ -12,7 +12,7 @@ on:
         required: true
         type: string
     secrets:
-      ECR_REGISTRY:
+      ECR_REGISTRY_URL:
         required: true
       ECR_ROLE_TO_ASSUME:
         required: true
@@ -62,7 +62,7 @@ jobs:
       - name: Upgrade the Helm chart
         env:
           IMAGE_TAG: ${{ github.sha }}
-          REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          REGISTRY: ${{ secrets.ECR_REGISTRY_URL }}
           REPOSITORY: ${{ inputs.ECR_REPOSITORY }}
           HELM_DIR: "helm_deploy/laa-manage-a-providers-data"
           SHARED_IP_RANGES_LAA: ${{ env.SHARED_IP_RANGES_LAA }}
@@ -97,7 +97,7 @@ jobs:
           COMMIT_MSG=$(git log -1 --pretty=format:"%s" ${{ github.sha }} 2>/dev/null || echo "Latest changes")
           
           # Create comment
-          gh pr comment ${{ github.event.number }} --body "## 🚀 Deployment Successful
+          gh pr comment ${{ github.event.number }} --body "## 🚀 Ephermeral Deployment Successful
       
           **Build:** [\`${SHORT_SHA}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) • ${COMMIT_MSG}
           
