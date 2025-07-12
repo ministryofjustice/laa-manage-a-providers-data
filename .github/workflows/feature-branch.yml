@@ -53,7 +53,7 @@ jobs:
        environment: uat
        ECR_REGION: ${{vars.ECR_REGION}}
        ECR_REPOSITORY: ${{vars.ECR_REPOSITORY}}
-       DEPLOYMENT_URL: ${{vars.DEPLOYMENT_URL}}
+       DEPLOYMENT_URL: "https://laa-manage-a-providers-data-uat.cloud-platform.service.justice.gov.uk"
      secrets:
        ECR_REGISTRY_URL: ${{ secrets.ECR_REGISTRY_URL }}
        ECR_ROLE_TO_ASSUME: ${{ secrets.ECR_ROLE_TO_ASSUME }}
