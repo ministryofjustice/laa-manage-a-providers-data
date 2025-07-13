@@ -1,5 +1,5 @@
 services:
-  assert-watcher:
+  asset-watcher:
     container_name: asset-watcher
     build:
       dockerfile: node.Dockerfile
