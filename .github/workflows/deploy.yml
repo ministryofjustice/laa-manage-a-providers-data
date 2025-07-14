@@ -96,7 +96,7 @@ jobs:
           
           **Build:** [\`${SHORT_SHA}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) • ${COMMIT_MSG}
           
-          **View live site:** ${{ inputs.deployment_url }}
+          **View live site:** ${{ vars.DEPLOYMENT_URL }}
           
           ---
           *Deployed to ${{ inputs.environment }} by ${{ github.actor }} • [View Workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*"
