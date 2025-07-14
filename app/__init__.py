@@ -1,11 +1,12 @@
+import sentry_sdk
 from flask import Flask
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
 from govuk_frontend_wtf.main import WTFormsHelpers
 from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
-from app.config.logging import configure_logging
-import sentry_sdk
+
 from app.config import Config
+from app.config.logging import configure_logging
 
 csrf = CSRFProtect()
 talisman = Talisman()
@@ -116,8 +117,8 @@ def create_app(config_class=Config):
     register_template_filters(app)
 
     # Register blueprints
-    from app.main import bp as main_bp
     from app.example_form import bp as example_form_bp
+    from app.main import bp as main_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(example_form_bp)

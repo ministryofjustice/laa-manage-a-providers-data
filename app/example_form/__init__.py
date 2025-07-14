@@ -1,5 +1,7 @@
 from flask import Blueprint
+
 from app.utils import register_form_view
+
 from .forms import ExampleForm
 from .views import ExampleFormView
 
