@@ -14,11 +14,6 @@ on:
       ECR_REPOSITORY:
         required: true
         type: string
-      DEPLOYMENT_URL:
-        description: 'Deployment URL'
-        required: false
-        type: string
-        default: "https://laa-manage-a-providers-data-uat.cloud-platform.service.justice.gov.uk"
     secrets:
       ECR_REGISTRY_URL:
         required: true
