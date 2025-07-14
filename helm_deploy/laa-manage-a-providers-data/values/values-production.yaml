@@ -1,0 +1,13 @@
+environment: "production"
+replicaCount: 4
+
+ingress:
+  enabled: true
+  host: "laa-manage-a-providers-data.cloud-platform.service.justice.gov.uk"
+
+whitelist:
+  enabled: true
+
+pdb:
+  enabled: true
+  minAvailable: 2

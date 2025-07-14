@@ -1,0 +1,109 @@
+name: Create an ephemeral deployment
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      ECR_REGION:
+        required: true
+        type: string
+      ECR_REPOSITORY:
+        required: true
+        type: string
+    secrets:
+      ECR_REGISTRY_URL:
+        required: true
+      ECR_ROLE_TO_ASSUME:
+        required: true
+      KUBE_CERT:
+        required: true
+      KUBE_CLUSTER:
+        required: true
+      KUBE_NAMESPACE:
+        required: true
+      KUBE_TOKEN:
+        required: true
+
+
+jobs:
+  deploy:
+    name: Deploy
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # This is required for requesting the JWT
+      contents: read  # This is required for actions/checkout
+      pull-requests: write  # This is required to post the PR comment
+    steps:
+      - name: Checkout GitHub repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to the cluster
+        env:
+          KUBE_NAMESPACE: ${{ secrets.KUBE_NAMESPACE }}
+          KUBE_CLUSTER: ${{ secrets.KUBE_CLUSTER }}
+        run: |
+          echo "${{ secrets.KUBE_CERT }}" > ca.crt
+          kubectl config set-cluster ${KUBE_CLUSTER} --certificate-authority=./ca.crt --server=https://${KUBE_CLUSTER}
+          kubectl config set-credentials deploy-user --token=${{ secrets.KUBE_TOKEN }}
+          kubectl config set-context ${KUBE_CLUSTER} --cluster=${KUBE_CLUSTER} --user=deploy-user --namespace=${KUBE_NAMESPACE}
+          kubectl config use-context ${KUBE_CLUSTER}
+
+      - name: Fetch and set SHARED_IP_RANGES_LAA environment variable
+        run: |
+          # Pull ranges from shared LAA IP ranges and then remove spaces,
+          # replace linebreaks with commas, remove last comma, and escape commas for helm input
+          SHARED_IP_RANGES_LAA=$(curl -s https://raw.githubusercontent.com/ministryofjustice/laa-ip-allowlist/main/cidrs.txt | tr -d ' ' | tr '\n' ',' | sed 's/,/\\,/g' | sed 's/\\,$//')
+          PINGDOM_IPS=$(curl -s  https://my.pingdom.com/probes/ipv4 | tr -d ' ' | tr '\n' ',' | sed 's/,/\\,/g' | sed 's/\\,$//')
+          echo "PINGDOM_IPS=$PINGDOM_IPS" >> $GITHUB_ENV
+          echo "SHARED_IP_RANGES_LAA=$SHARED_IP_RANGES_LAA" >> $GITHUB_ENV
+
+      - name: Upgrade the Helm chart
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          REGISTRY: ${{ secrets.ECR_REGISTRY_URL }}
+          REPOSITORY: ${{ inputs.ECR_REPOSITORY }}
+          HELM_DIR: "helm_deploy/laa-manage-a-providers-data"
+          SHARED_IP_RANGES_LAA: ${{ env.SHARED_IP_RANGES_LAA }}
+          DEV_HOST: "manage-a-providers-data.cloud-platform.service.justice.gov.uk"
+          # head_ref is set if the workflow was triggered by a PR, ref_name is used if the workflow was trigged by a push.
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+        run: |
+          export CLEANED_BRANCH_NAME=$(echo ${BRANCH_NAME} | sed 's/^feature[-/]//' | sed 's:^\w*\/::' | tr -s ' _/[]().' '-' | tr '[:upper:]' '[:lower:]' | cut -c1-28 | sed 's/-$//')
+          export HOST_NAME=${CLEANED_BRANCH_NAME}-${DEV_HOST}
+          export DEPLOYMENT_URL="https://${HOST_NAME}"
+          echo "DEPLOYMENT_URL=https://${HOST_NAME}" >> $GITHUB_ENV
+
+          helm upgrade ${CLEANED_BRANCH_NAME} \
+          ${HELM_DIR} \
+          --namespace=${{ secrets.KUBE_NAMESPACE }} \
+          --values ${HELM_DIR}/values/values-${{ inputs.environment }}.yaml \
+          --set image.repository=${REGISTRY}/${REPOSITORY} \
+          --set image.tag=${IMAGE_TAG} \
+          --set fullnameOverride=${CLEANED_BRANCH_NAME} \
+          --set ingress.host=${HOST_NAME} \
+          --set sharedIPRangesLAA=$SHARED_IP_RANGES_LAA \
+          --set pingdomIPs=$PINGDOM_IPS \
+          --force \
+          --install
+
+      - name: Post deployment comment
+        run: |
+          # Get short commit SHA
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          
+          # Get commit message
+          COMMIT_MSG=$(git log -1 --pretty=format:"%s" ${{ github.sha }} 2>/dev/null || echo "Latest changes")
+          
+          # Create comment
+          gh pr comment ${{ github.event.number }} --body "## 🚀 Ephermal Deployment Successful
+          
+          **Build:** [\`${SHORT_SHA}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) • ${COMMIT_MSG}
+          
+          **View live site:** ${{ env.DEPLOYMENT_URL }}
+          
+          ---
+          *Deployed to ${{ inputs.environment }} by ${{ github.actor }} • [View Workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

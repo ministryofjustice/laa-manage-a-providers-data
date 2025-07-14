@@ -21,7 +21,7 @@ if Config.SENTRY_DSN:
         # We recommend adjusting this value in production.
         profiles_sample_rate=0.2,
         # This can either be dev, uat, staging, or production.
-        # It is set by CLA_ENVIRONMENT in the helm charts.
+        # It is set by MAPD_ENVIRONMENT in the helm charts.
         environment=Config.ENVIRONMENT,
     )
 
@@ -112,6 +112,7 @@ def create_app(config_class=Config):
 
     # Register custom template filters
     from app.filters import register_template_filters
+
     register_template_filters(app)
 
     # Register blueprints
