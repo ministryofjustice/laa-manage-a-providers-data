@@ -1,7 +1,9 @@
 from unittest.mock import Mock, patch
+
 from flask import Blueprint
 from flask_wtf import FlaskForm
 from wtforms import StringField
+
 from app.utils import register_form_view
 from app.views import BaseFormView
 

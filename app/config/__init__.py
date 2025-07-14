@@ -1,6 +1,7 @@
 import os
-from dotenv import load_dotenv
 from datetime import timedelta
+
+from dotenv import load_dotenv
 
 # Allows .env to be used in project for local development.
 load_dotenv()
