@@ -1,23 +1,26 @@
 {% extends 'govuk_frontend_jinja/template.html' %}
-{%  set cspNonce = csp_nonce() %}
+{%  set cspNonce = "fkjdjfijdjfj" %}
 {%  set govukRebrand = True %}
 
 {%- from 'govuk_frontend_jinja/components/error-summary/macro.html' import govukErrorSummary-%}
 {%- from 'govuk_frontend_jinja/components/notification-banner/macro.html' import govukNotificationBanner -%}
 {%- from 'govuk_frontend_jinja/components/phase-banner/macro.html' import govukPhaseBanner -%}
 {%- from 'govuk_frontend_jinja/components/service-navigation/macro.html' import govukServiceNavigation -%}
-{%- from 'components/header.html' import mojHeader %}
+{%- from 'govuk_frontend_jinja/components/warning-text/macro.html' import govukWarningText -%}
 
 {% block pageTitle %}{{config['SERVICE_NAME']}} – GOV.UK{% endblock %}
 
 {% block head %}
   <meta name="description" content="{{config['SERVICE_NAME']}}">
-  <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" nonce="{{ csp_nonce() }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='govuk-frontend-5.7.1.min.css') }}" />
+  <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" />
 {% endblock %}
 
 {% block header %}
-  {# Pass the user into the header here once we have an authenticated user. #}
-  {{ mojHeader(user=user) }}
+  {{ govukHeader({
+    'classes': 'govuk-header--full-width-border',
+    'homepageUrl': 'https://www.gov.uk/'
+  }) }}
 
   {{ govukServiceNavigation({
     'serviceName': config['SERVICE_NAME'],
@@ -35,6 +38,17 @@
 {% endblock %}
 
 {% block content %}
+
+   {% if user %}
+      {% set logged_in_text %}
+            Logged in as {{ user.get("name") }} - {{ user.get("preferred_username") }}
+      {% endset %}
+
+      {{ govukWarningText({
+        "text": logged_in_text
+      }) }}
+  {% endif %}
+
   {% if form and form.errors %}
     {{ govukErrorSummary(wtforms_errors(form)) }}
   {% endif %}
@@ -58,5 +72,5 @@
 {% endblock %}
 
 {% block bodyEnd %}
-  <script src="{{ url_for('static', filename='scripts.js') }}" nonce="{{ csp_nonce() }}"></script>
+  <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 {% endblock %}

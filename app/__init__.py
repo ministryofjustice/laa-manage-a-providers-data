@@ -1,13 +1,26 @@
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
-from flask import Flask
+from flask import Flask, session
+from flask_session import Session
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
 from govuk_frontend_wtf.main import WTFormsHelpers
 from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
 
+from identity.flask import Auth
+from app.config.authentication import AuthenticationConfig
 from app.config import Config
-from app.config.logging import configure_logging
+
+
+# Create auth instance that can be imported
+auth = Auth(
+    app=None,
+    authority=AuthenticationConfig.AUTHORITY,
+    client_id=AuthenticationConfig.CLIENT_ID,
+    client_credential=AuthenticationConfig.CLIENT_SECRET,
+    redirect_uri=AuthenticationConfig.REDIRECT_URI,
+)
+
 
 csrf = CSRFProtect()
 talisman = Talisman()
@@ -46,9 +59,6 @@ def create_app(config_class=Config):
             ),
         ]
     )
-
-    if not app.config["TESTING"]:
-        configure_logging()
 
     # Set content security policy
     csp = {
@@ -99,6 +109,7 @@ def create_app(config_class=Config):
 
     # Initialise app extensions
     csrf.init_app(app)
+    Session(app)
 
     talisman.init_app(
         app,
@@ -111,6 +122,12 @@ def create_app(config_class=Config):
         session_cookie_samesite="Strict",
     )
 
+    # Initialize auth with the Flask app
+    auth.init_app(app)
+
+    # Store auth instance for access
+    app.extensions["auth"] = auth
+
     WTFormsHelpers(app)
 
     # Register custom template filters
@@ -121,7 +138,9 @@ def create_app(config_class=Config):
     # Register blueprints
     from app.example_form import bp as example_form_bp
     from app.main import bp as main_bp
+    from app.auth_routes import bp as auth_bp
 
+    app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(example_form_bp)
 

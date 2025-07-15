@@ -21,6 +21,16 @@ class Config(object):
     SENTRY_DSN = os.environ.get("SENTRY_DSN")
     SENTRY_TRACES_SAMPLE_RATE = float(os.environ.get("SENTRY_TRACES_SAMPLE_RATE", "0.01"))
     SENTRY_PROFILES_SAMPLE_RATE = float(os.environ.get("SENTRY_TRACES_SAMPLE_RATE", "0.2"))
+    SESSION_TYPE = 'redis'
+    SESSION_REDIS_URL = os.environ.get("REDIS_URL", "redis://redis:6379/0")
+    SESSION_PERMANENT = True
+    PERMANENT_SESSION_LIFETIME = timedelta(hours=24)
+
     SESSION_TIMEOUT = timedelta(minutes=30)
     SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_DOMAIN = None  # Don't set domain for localhost
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_NAME = 'session'
+
     TESTING = False
