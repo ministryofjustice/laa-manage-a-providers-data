@@ -6,7 +6,8 @@ from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
 from govuk_frontend_wtf.main import WTFormsHelpers
 from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
-
+import sentry_sdk
+from app.config import Config
 from identity.flask import Auth
 from app.config.authentication import AuthenticationConfig
 from app.config import Config
