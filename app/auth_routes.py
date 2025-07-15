@@ -12,8 +12,7 @@ def login():
     # Set session as permanent BEFORE starting OAuth
     session.permanent = True
     state = str(uuid.uuid4())
-    session['oauth_state'] = state
-    return auth.login(state=state, next_link="/blah")
+    return auth.login(state="I AM A TEST STATE", next_link=)
 
 
 @bp.route("/logout")

@@ -6,9 +6,53 @@ from govuk_frontend_wtf.main import WTFormsHelpers
 from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
 import sentry_sdk
 from app.config import Config
-from identity.flask import Auth
+from identity.flask import Auth as BaseAuth
 from app.config.authentication import AuthenticationConfig
 
+
+from typing import List, Optional  # Needed in Python 3.7 & 3.8
+from flask import Flask, render_template, url_for
+
+
+class Auth(BaseAuth):
+    def login(
+        self,
+        *,
+        next_link: Optional[str] = None,
+        scopes: Optional[List[str]] = None,
+        state: Optional[str] = None,
+    ) -> str:
+        config_error = self._get_configuration_error()
+        if config_error:
+            return self._render_auth_error(
+                error="configuration_error", error_description=config_error)
+        assert self._auth, "_auth should have been initialized"  # And mypy needs this
+        log_in_result: dict = self._auth.log_in(
+            scopes=scopes,  # Have user consent to scopes (if any) during log-in
+            redirect_uri=self._redirect_uri,
+            prompt="select_account",  # Optional. More values defined in  https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest
+            next_link=next_link,
+            state=state,
+            )
+        if "error" in log_in_result:
+            return self._render_auth_error(
+                error=log_in_result["error"],
+                error_description=log_in_result.get("error_description"),
+                )
+        return render_template("identity/login.html", **dict(
+            log_in_result,
+            reset_password_url=self._get_reset_password_url(),
+            auth_response_url=url_for(f"{self._endpoint_prefix}.auth_response"),
+            ))
+
+    def auth_response(self):
+        result = self._auth.complete_log_in(request.args)
+        if "error" in result:
+            return self._render_auth_error(
+                error=result["error"],
+                error_description=result.get("error_description"),
+                )
+        return redirect(result.get("next_link") or "/")
 # Create auth instance that can be imported
 auth = Auth(
     app=None,
