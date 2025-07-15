@@ -85,6 +85,7 @@ jobs:
           --install
 
       - name: Post deployment comment
+        if: github.ref != 'refs/heads/main'
         run: |
           # Get short commit SHA
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
