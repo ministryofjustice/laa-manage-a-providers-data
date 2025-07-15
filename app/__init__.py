@@ -1,11 +1,22 @@
-from flask import Flask
+from flask import Flask, session
+from flask_session import Session
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
 from govuk_frontend_wtf.main import WTFormsHelpers
 from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
-from app.config.logging import configure_logging
 import sentry_sdk
 from app.config import Config
+from identity.flask import Auth
+from app.config.authentication import AuthenticationConfig
+
+# Create auth instance that can be imported
+auth = Auth(
+    app=None,
+    authority=AuthenticationConfig.AUTHORITY,
+    client_id=AuthenticationConfig.CLIENT_ID,
+    client_credential=AuthenticationConfig.CLIENT_SECRET,
+    redirect_uri=AuthenticationConfig.REDIRECT_URI,
+)
 
 csrf = CSRFProtect()
 talisman = Talisman()
@@ -43,9 +54,6 @@ def create_app(config_class=Config):
             ),
         ]
     )
-
-    if not app.config["TESTING"]:
-        configure_logging()
 
     # Set content security policy
     csp = {
@@ -96,17 +104,21 @@ def create_app(config_class=Config):
 
     # Initialise app extensions
     csrf.init_app(app)
+    Session(app)
 
-    talisman.init_app(
-        app,
-        content_security_policy=csp if not Config.TESTING else None,
-        permissions_policy=permissions_policy,
-        content_security_policy_nonce_in=["script-src", "style-src"],
-        force_https=False,
-        session_cookie_secure=True,
-        session_cookie_http_only=Config.SESSION_COOKIE_HTTP_ONLY,
-        session_cookie_samesite="Strict",
-    )
+    #talisman.init_app(
+    #    app,
+    #    content_security_policy=csp if not Config.TESTING else None,
+    #    permissions_policy=permissions_policy,
+    #    content_security_policy_nonce_in=["script-src", "style-src"],
+    #    force_https=True,
+    #)
+
+    # Initialize auth with the Flask app
+    auth.init_app(app)
+
+    # Store auth instance for access in decorators
+    app.extensions["auth"] = auth
 
     WTFormsHelpers(app)
 
@@ -118,8 +130,10 @@ def create_app(config_class=Config):
     # Register blueprints
     from app.main import bp as main_bp
     from app.example_form import bp as example_form_bp
+    from app.auth_routes import bp as auth_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(example_form_bp)
+    app.register_blueprint(auth_bp)
 
     return app
