@@ -8,8 +8,6 @@
 {%- from 'govuk_frontend_jinja/components/service-navigation/macro.html' import govukServiceNavigation -%}
 {%- from 'components/header.html' import mojHeader %}
 
-{% set user = {"email": "fake.email@justice.gov.uk"} %}
-
 {% block pageTitle %}{{config['SERVICE_NAME']}} – GOV.UK{% endblock %}
 
 {% block head %}
@@ -18,7 +16,7 @@
 {% endblock %}
 
 {% block header %}
-  {{ mojHeader(organisationName="Legal Aid Agency", user=user) }}
+  {{ mojHeader(organisationName="Legal Aid Agency", user=None) }}
 
   {{ govukServiceNavigation({
     'serviceName': config['SERVICE_NAME'],
