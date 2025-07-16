@@ -16,7 +16,7 @@
 {% endblock %}
 
 {% block header %}
-  {{ mojHeader(organisationName="Legal Aid Agency", user=None) }}
+  {{ mojHeader(user=None) }}
 
   {{ govukServiceNavigation({
     'serviceName': config['SERVICE_NAME'],

@@ -1,4 +1,4 @@
-{% macro mojHeader(organisationName, serviceName=None, user=None) %}
+{% macro mojHeader(organisationName="Legal Aid Agency", organisationLink="https://www.gov.uk/government/organisations/legal-aid-agency", serviceName=None, serviceLink="#", user=None) %}
 <header class="moj-header" role="banner">
 
   <div class="moj-header__container">
@@ -7,10 +7,10 @@
 
       {% include "components/moj_crest.html" %}
 
-      <a class="moj-header__link moj-header__link--organisation-name" href="#">{{ organisationName }}</a>
+      <a class="moj-header__link moj-header__link--organisation-name" href="{{ organisationLink }}">{{ organisationName }}</a>
 
       {% if serviceName %}
-        <a class="moj-header__link moj-header__link--service-name" href="#">{{ serviceName }}</a>
+        <a class="moj-header__link moj-header__link--service-name" href="{{ serviceLink }}">{{ serviceName }}</a>
       {% endif %}
     </div>
 
