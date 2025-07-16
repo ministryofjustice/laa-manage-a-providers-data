@@ -16,6 +16,7 @@ def test_header(page: Page):
     moj_crest = header.locator("svg.moj-header__logotype-crest")
     expect(moj_crest).to_be_visible()
 
+
 @pytest.mark.usefixtures("live_server")
 def test_service_navigation(page: Page):
     service_navigation = page.get_by_role("region", name="Service information")
