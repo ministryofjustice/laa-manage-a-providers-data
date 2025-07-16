@@ -1,39 +1,35 @@
-{% macro mojHeader(organisationName="Legal Aid Agency", organisationLink="https://www.gov.uk/government/organisations/legal-aid-agency", serviceName=None, serviceLink="#", user=None) %}
-<header class="moj-header" role="banner">
+{% macro mojHeader(user=None) %}
+  <header class="moj-header" role="banner">
 
-  <div class="moj-header__container">
+    <div class="moj-header__container">
 
-    <div class="moj-header__logo">
+      <div class="moj-header__logo">
 
-      {% include "components/moj_crest.html" %}
+        {% include "components/moj_crest.html" %}
 
-      <a class="moj-header__link moj-header__link--organisation-name" href="{{ organisationLink }}">{{ organisationName }}</a>
+        <a class="moj-header__link moj-header__link--organisation-name"
+           href="https://www.gov.uk/government/organisations/legal-aid-agency">Legal Aid Agency</a>
 
-      {% if serviceName %}
-        <a class="moj-header__link moj-header__link--service-name" href="{{ serviceLink }}">{{ serviceName }}</a>
+      </div>
+
+      {% if user %}
+        <div class="moj-header__content">
+
+          <nav class="moj-header__navigation" aria-label="Account navigation">
+
+            <ul class="moj-header__navigation-list">
+              <li class="moj-header__navigation-item">{{ user.email }}</li>
+
+              <li class="moj-header__navigation-item">
+                <a class="moj-header__navigation-link" href="#">Sign out</a>
+              </li>
+            </ul>
+
+          </nav>
+
+        </div>
       {% endif %}
     </div>
 
-    {% if user %}
-    <div class="moj-header__content">
-
-      <nav class="moj-header__navigation" aria-label="Account navigation">
-
-        <ul class="moj-header__navigation-list">
-          <li class="moj-header__navigation-item">
-            <a class="moj-header__navigation-link" href="#" aria-current="page">{{ user.email }}</a>
-          </li>
-
-          <li class="moj-header__navigation-item">
-            <a class="moj-header__navigation-link" href="#">Sign out</a>
-          </li>
-        </ul>
-
-      </nav>
-
-    </div>
-    {% endif %}
-  </div>
-
-</header>
+  </header>
 {% endmacro %}

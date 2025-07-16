@@ -16,7 +16,7 @@
 {% endblock %}
 
 {% block header %}
-  {{ mojHeader(user=None) }}
+  {{ mojHeader(user={"email": "test"}) }}
 
   {{ govukServiceNavigation({
     'serviceName': config['SERVICE_NAME'],
