@@ -1,7 +1,9 @@
 """Utility functions for the main module."""
 
+from typing import Optional, Type
+
 from flask import Blueprint
-from typing import Type, Optional
+
 from .forms import BaseForm
 from .views import BaseFormView
 

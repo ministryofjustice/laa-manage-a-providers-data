@@ -1,7 +1,9 @@
 from typing import Any
-from flask import Response, render_template, redirect, url_for
+
+from flask import Response, redirect, render_template, url_for
 from flask.views import MethodView
 from flask_wtf import FlaskForm
+
 from app.forms import BaseForm
 
 

@@ -1,7 +1,7 @@
 import pytest
-from app import Config
-from app import create_app
 from flask import url_for
+
+from app import Config, create_app
 
 
 @pytest.fixture(scope="session")
