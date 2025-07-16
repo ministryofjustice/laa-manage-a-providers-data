@@ -6,20 +6,19 @@
 {%- from 'govuk_frontend_jinja/components/notification-banner/macro.html' import govukNotificationBanner -%}
 {%- from 'govuk_frontend_jinja/components/phase-banner/macro.html' import govukPhaseBanner -%}
 {%- from 'govuk_frontend_jinja/components/service-navigation/macro.html' import govukServiceNavigation -%}
+{%- from 'components/header.html' import mojHeader %}
+
+{% set user = {"email": "fake.email@justice.gov.uk"} %}
 
 {% block pageTitle %}{{config['SERVICE_NAME']}} – GOV.UK{% endblock %}
 
 {% block head %}
   <meta name="description" content="{{config['SERVICE_NAME']}}">
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='govuk-frontend-5.7.1.min.css') }}" />
   <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" nonce="{{ csp_nonce() }}" />
 {% endblock %}
 
 {% block header %}
-  {{ govukHeader({
-    'classes': 'govuk-header--full-width-border',
-    'homepageUrl': 'https://www.gov.uk/'
-  }) }}
+  {{ mojHeader(organisationName="Legal Aid Agency", user=user) }}
 
   {{ govukServiceNavigation({
     'serviceName': config['SERVICE_NAME'],

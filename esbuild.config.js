@@ -7,7 +7,10 @@ const isProduction = process.env.MAPD_ENVIRONMENT === 'production';
 async function build(should_watch) {
     const context = {
         plugins: [sassPlugin({
-            quietDeps: true
+            quietDeps: true,
+            loadPaths: [
+                '.'
+            ],
         })],
         entryPoints: [
             "app/static/src/js/scripts.js",

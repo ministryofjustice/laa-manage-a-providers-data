@@ -1,5 +1,6 @@
 /* Import GOVUK frontend SCSS to be compiled to CSS */
-@use "govuk-frontend/dist/govuk/index";
+@use "node_modules/govuk-frontend/dist/govuk" as *;
+@forward "node_modules/@ministryofjustice/frontend/moj/all";
 
 
 /* Import your custom SCSS below to be compiled into one */
