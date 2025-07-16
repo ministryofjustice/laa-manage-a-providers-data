@@ -146,3 +146,18 @@ To format all files in the directory, run:
 ```shell
 ruff format
 ```
+
+## Dependency management
+Requirements listed in the `requirements/source/*.in` files should not be pinned by default.
+
+If a release is incompatible then this can be specified using `requirement!=1.0.5`, or `requirement<2.0`.
+
+Using this method allows for `pip-tools` to resolve the latest compatible versions of all dependencies, making dependency updates easier.
+
+### How to update dependencies
+```bash
+make update-deps
+```
+This will update the pinned version of the all the requirements in `requirements/generated/*.txt` using the latest version
+allowed by the corresponding `requirements/source/*.in` file.
+By pinning every dependency in these generated files we can be sure all environments are using the same dependency versions.
