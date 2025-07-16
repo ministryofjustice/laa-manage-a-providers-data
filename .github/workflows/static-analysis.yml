@@ -61,7 +61,7 @@ jobs:
           name: coverage-xml-report
           path: coverage
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@master
+        uses: SonarSource/sonarqube-scan-action@2500896589ef8f7247069a56136f8dc177c27ccf
         with:
           args: >
             -Dsonar.python.version=3.13
