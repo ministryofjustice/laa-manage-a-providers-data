@@ -1,7 +1,9 @@
 from unittest.mock import Mock, patch
+
 from flask import url_for
-from app.views import BaseFormView
+
 from app.forms import BaseForm
+from app.views import BaseFormView
 
 
 class MockFormClass:

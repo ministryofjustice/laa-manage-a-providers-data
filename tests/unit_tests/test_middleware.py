@@ -1,6 +1,8 @@
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
+
 from flask import Response
-from app.main.middleware import add_noindex_header, add_no_cache_headers
+
+from app.main.middleware import add_no_cache_headers, add_noindex_header
 
 
 class TestAddNoindexHeader:
