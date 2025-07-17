@@ -14,7 +14,7 @@ class Config(object):
     DEPARTMENT_NAME = os.environ.get("DEPARTMENT_NAME", "MOJ Digital")
     DEPARTMENT_URL = os.environ.get("DEPARTMENT_URL", "https://mojdigital.blog.gov.uk/")
     SECRET_KEY = os.environ["SECRET_KEY"]
-    SERVICE_NAME = "Manage a Provider's Data"
+    SERVICE_NAME = "Manage a provider's data"
     SERVICE_PHASE = os.environ.get("SERVICE_PHASE", "Beta")
     SERVICE_URL = os.environ.get("SERVICE_URL", "")
     SESSION_COOKIE_HTTP_ONLY = ENVIRONMENT != "local"
