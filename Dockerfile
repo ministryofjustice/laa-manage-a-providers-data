@@ -1,6 +1,6 @@
 ARG BASE_IMAGE=python:3.13-slim
 
-FROM node:lts-iron as node_build
+FROM node:lts-iron AS node_build
 WORKDIR /home/node
 COPY esbuild.config.js package.json package-lock.json ./
 COPY app/static/src app/static/src
@@ -17,7 +17,8 @@ RUN apt-get install --only-upgrade perl-base -y
 
 # Set environment variables
 ENV FLASK_RUN_HOST=0.0.0.0
-ENV FLASK_RUN_PORT=${FLASK_RUN_PORT:-8000}
+ARG FLASK_RUN_PORT=8000
+ENV FLASK_RUN_PORT=${FLASK_RUN_PORT}
 ENV PYTHONUNBUFFERED=1
 
 # Create a non-root user
@@ -49,7 +50,7 @@ EXPOSE $FLASK_RUN_PORT
 
 # Run the Flask application for production
 FROM base AS production
-CMD gunicorn --bind "$FLASK_RUN_HOST:$FLASK_RUN_PORT" "app:create_app()"
+CMD ["sh", "-c", "gunicorn --bind \"$FLASK_RUN_HOST:$FLASK_RUN_PORT\" \"app:create_app()\""]
 
 # Run the Flask application for development
 FROM base AS development
