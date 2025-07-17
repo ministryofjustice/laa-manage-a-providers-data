@@ -45,7 +45,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Scan for vulnerabilities (informative, non-breaking)
-        uses: aquasecurity/trivy-action@aws-actions/configure-aws-credentials
+        uses: aquasecurity/trivy-action@77137e9dc3ab1b329b7c8a38c2eb7475850a14e8
         with:
           image-ref: ${{ secrets.ECR_REGISTRY_URL }}/${{ inputs.ECR_REPOSITORY }}:${{ github.sha }}
           format: 'table'
