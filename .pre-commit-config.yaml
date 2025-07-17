@@ -12,12 +12,16 @@ repos:
         name: pip-compile requirements-production.in
         files: requirements-(base|production).in
         args: [requirements/source/requirements-production.in, "--output-file", requirements/generated/requirements-production.txt, "--no-annotate"]
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.27.2
+    hooks:
+      - id: gitleaks
   - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
+    rev: 6.0.1
     hooks:
       - id: isort
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.3
+    rev: v0.12.3
     hooks:
       - id: ruff
         args: [ --fix ]

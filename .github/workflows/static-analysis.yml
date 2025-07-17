@@ -30,6 +30,16 @@ jobs:
         echo "pip-compile failed because the compilation of requirements/source do not match of that in requirements/generated." >&2
         exit 1
 
+  name: gitleaks
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - uses: gitleaks/gitleaks-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   lint:
     name: Ruff
     runs-on: ubuntu-latest

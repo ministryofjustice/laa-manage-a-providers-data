@@ -161,3 +161,14 @@ make update-deps
 This will update the pinned version of the all the requirements in `requirements/generated/*.txt` using the latest version
 allowed by the corresponding `requirements/source/*.in` file.
 By pinning every dependency in these generated files we can be sure all environments are using the same dependency versions.
+
+
+## Secret scanning
+We use Gitleaks for secret scanning. Gitleaks is installed as a pre-commit hook and runs as part of the static-analysis job in the CI pipeline.
+
+If you wish to knowingly commit a test secret please add `#gitleaks:allow` to the end of the line.
+For example
+```python
+class CustomClass:
+    client_secret = "8dyfuiRyq=vVc3RRr_edRk-fK__JItpZ"  #gitleaks:allow
+```
