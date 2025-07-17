@@ -1,4 +1,5 @@
 import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
 from flask import Flask
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
@@ -13,6 +14,7 @@ talisman = Talisman()
 
 if Config.SENTRY_DSN:
     sentry_sdk.init(
+        integrations=[FlaskIntegration(transaction_style="url")],
         dsn=Config.SENTRY_DSN,
         # Set traces_sample_rate to 1.0 to capture 100%
         # of transactions for tracing.
@@ -24,6 +26,9 @@ if Config.SENTRY_DSN:
         # This can either be dev, uat, staging, or production.
         # It is set by MAPD_ENVIRONMENT in the helm charts.
         environment=Config.ENVIRONMENT,
+        # Add data like request headers and IP for users,
+        # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+        send_default_pii=True,
     )
 
 
