@@ -31,6 +31,16 @@ jobs:
     secrets:
       ECR_ROLE_TO_ASSUME: ${{ secrets.ECR_ROLE_TO_ASSUME }}
 
+  scan-image:
+    uses: ./.github/workflows/trivy-image-scan.yml
+    needs: build-and-push
+    with:
+      ECR_REPOSITORY: ${{vars.ECR_REPOSITORY}}
+      ECR_REGION: ${{vars.ECR_REGION}}
+    secrets:
+      ECR_REGISTRY_URL: ${{ secrets.ECR_REGISTRY_URL }}
+      ECR_ROLE_TO_ASSUME: ${{ secrets.ECR_ROLE_TO_ASSUME }}
+
   deploy-ephemeral:
      name: Ephemeral
      uses: ./.github/workflows/deploy-ephemeral.yml
