@@ -65,3 +65,9 @@ envVars:
       name: secret-key
       key: value
       optional: false
+  SENTRY_DSN:
+    secret:
+      name: sentry
+      key: dsn
+  SENTRY_TRACES_SAMPLE_RATE:
+    value: "0.01"
