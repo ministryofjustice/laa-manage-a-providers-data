@@ -26,9 +26,6 @@ if Config.SENTRY_DSN:
         # This can either be dev, uat, staging, or production.
         # It is set by MAPD_ENVIRONMENT in the helm charts.
         environment=Config.ENVIRONMENT,
-        # Add data like request headers and IP for users,
-        # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
-        send_default_pii=True,
     )
 
 
