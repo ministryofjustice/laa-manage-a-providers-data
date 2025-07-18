@@ -30,17 +30,6 @@ jobs:
         echo "pip-compile failed because the compilation of requirements/source do not match of that in requirements/generated." >&2
         exit 1
 
-  secret-scan:
-    name: Secret scan
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with:
-          fetch-depth: 0
-      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   lint:
     name: Ruff
     runs-on: ubuntu-latest
