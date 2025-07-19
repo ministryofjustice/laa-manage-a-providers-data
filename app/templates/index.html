@@ -6,9 +6,11 @@
     {{ super() }}
     <h1 class="govuk-heading-xl">Manage a Provider's Data</h1>
 
+    <p class="govuk-body">Surfaces Firm, Office, Contract & Schedule information from the Provider Data API's {{ config.get("PDA_ENVIRONMENT") }} environment.</p>
+
     {{ govukButton({
       "text": "Start now",
-      "href": url_for("example_form.example_form"),
+      "href": url_for("main.providers"),
       "isStartButton": true
     }) }}
 

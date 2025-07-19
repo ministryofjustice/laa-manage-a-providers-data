@@ -1,0 +1,106 @@
+{% macro mojPagination(currentPage=1,numShownPerPage=20, numResults=100) %}
+  {%- set startResult = ((currentPage - 1) * numShownPerPage) + 1 %}
+  {%- set endResult = [currentPage * numShownPerPage, numResults] | min %}
+  {%- set maxPage = (numResults / numShownPerPage)|round(method='ceil')|int %}
+  {%- set showDots = maxPage > 7 %}
+  {%- set pageRange = 3 %}
+
+  <nav class="moj-pagination" aria-label="Pagination navigation">
+    <ul class="moj-pagination__list">
+
+      {% if currentPage > 1 %}
+      <li class="moj-pagination__item moj-pagination__item--prev">
+        <a class="moj-pagination__link" href="{{ baseUrl }}?page={{ currentPage - 1 }}">
+          Previous<span class="govuk-visually-hidden"> page</span>
+        </a>
+      </li>
+      {% endif %}
+
+      {% if not showDots %}
+        {% for page in range(1, maxPage + 1) %}
+          {% if page == currentPage %}
+          <li class="moj-pagination__item moj-pagination__item--active"
+              aria-label="Page {{ page }} of {{ maxPage }}"
+              aria-current="page">{{ page }}</li>
+          {% else %}
+          <li class="moj-pagination__item">
+            <a class="moj-pagination__link"
+               href="{{ baseUrl }}?page={{ page }}"
+               aria-label="Page {{ page }} of {{ maxPage }}">{{ page }}</a>
+          </li>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+
+        {% if currentPage == 1 %}
+        <li class="moj-pagination__item moj-pagination__item--active"
+            aria-label="Page 1 of {{ maxPage }}"
+            aria-current="page">1</li>
+        {% else %}
+        <li class="moj-pagination__item">
+          <a class="moj-pagination__link"
+             href="{{ baseUrl }}?page=1"
+             aria-label="Page 1 of {{ maxPage }}">1</a>
+        </li>
+        {% endif %}
+
+        {% if currentPage > pageRange + 2 %}
+        <li class="moj-pagination__item moj-pagination__item--dots">…</li>
+        {% endif %}
+
+        {% set startPage = [2, currentPage - pageRange] | max %}
+        {% set endPage = [maxPage - 1, currentPage + pageRange] | min %}
+
+        {% for page in range(startPage, endPage + 1) %}
+          {% if page != 1 and page != maxPage %}
+            {% if page == currentPage %}
+            <li class="moj-pagination__item moj-pagination__item--active"
+                aria-label="Page {{ page }} of {{ maxPage }}"
+                aria-current="page">{{ page }}</li>
+            {% else %}
+            <li class="moj-pagination__item">
+              <a class="moj-pagination__link"
+                 href="{{ baseUrl }}?page={{ page }}"
+                 aria-label="Page {{ page }} of {{ maxPage }}">{{ page }}</a>
+            </li>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
+        {% if currentPage < maxPage - pageRange - 1 %}
+        <li class="moj-pagination__item moj-pagination__item--dots">…</li>
+        {% endif %}
+
+        {% if maxPage > 1 %}
+          {% if currentPage == maxPage %}
+          <li class="moj-pagination__item moj-pagination__item--active"
+              aria-label="Page {{ maxPage }} of {{ maxPage }}"
+              aria-current="page">{{ maxPage }}</li>
+          {% else %}
+          <li class="moj-pagination__item">
+            <a class="moj-pagination__link"
+               href="{{ baseUrl }}?page={{ maxPage }}"
+               aria-label="Page {{ maxPage }} of {{ maxPage }}">{{ maxPage }}</a>
+          </li>
+          {% endif %}
+        {% endif %}
+      {% endif %}
+
+      {% if currentPage < maxPage %}
+      <li class="moj-pagination__item moj-pagination__item--next">
+        <a class="moj-pagination__link" href="{{ baseUrl }}?page={{ currentPage + 1 }}">
+          Next<span class="govuk-visually-hidden"> page</span>
+        </a>
+      </li>
+      {% endif %}
+
+    </ul>
+
+
+    {% if numResults > 0 %}
+    <p class="moj-pagination__results">
+      Showing <b>{{ startResult }}</b> to <b>{{ endResult }}</b> of <b>{{ numResults }}</b> results
+    </p>
+    {% endif %}
+  </nav>
+{% endmacro %}

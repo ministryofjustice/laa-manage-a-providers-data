@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
+{%- from 'components/moj-pagination.html' import mojPagination -%}
+{%- from 'components/back_link.html' import govukBackLink -%}
+
+{% block beforeContent %}
+  {{ super() }}
+  {{ govukBackLink() }}
+{% endblock %}
+
+{% block content %}
+  {{ super() }}
+
+  <h1 class="govuk-heading-xl">Providers</h1>
+
+  <div class="moj-scrollable-pane">
+    {{ govukTable({"attributes": {"data-module": "moj-sortable-table"},
+                  "head": table.get_headings(), "rows": table.get_rows()}) }}
+  </div>
+
+  {{ mojPagination(currentPage=current_page, numShownPerPage=num_shown_per_page, numResults=num_results) }}
+
+{% endblock %}
