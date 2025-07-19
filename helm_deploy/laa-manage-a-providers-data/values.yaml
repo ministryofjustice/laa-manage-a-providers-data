@@ -77,3 +77,7 @@ envVars:
     secret:
       name: provider-data-api
       key: api_key
+  PASSWORD:
+    secret:
+      name: password
+      key: value

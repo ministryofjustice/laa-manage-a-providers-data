@@ -3,6 +3,7 @@ import math
 from flask import abort, render_template, request, url_for
 
 from app import provider_data_api as pda
+from app.auth import requires_authentication
 from app.main import bp
 from app.main.table import Column, DataTable
 from app.main.utils import get_full_info_html
@@ -22,6 +23,7 @@ def status():
 
 
 @bp.get("/providers")
+@requires_authentication
 def providers():
     def firm_name_html(row_data: dict[str, str]) -> str:
         _firm_id = row_data.get("firmId", "")
@@ -62,6 +64,7 @@ def providers():
 
 
 @bp.get("/provider/<int:firm_id>/offices")
+@requires_authentication
 def offices(firm_id: int):
     def firm_office_html(row_data: dict[str, str]) -> str:
         _office_code = row_data.get("firmOfficeCode", "")
@@ -87,6 +90,7 @@ def offices(firm_id: int):
 
 
 @bp.get("/provider/<int:firm_id>/office/<string:office_code>/contracts")
+@requires_authentication
 def contracts(firm_id: int, office_code: str):
     columns: list[Column] = [
         {"text": "Category of Law", "id": "categoryOfLaw"},
@@ -114,6 +118,7 @@ def contracts(firm_id: int, office_code: str):
 
 
 @bp.get("/provider/<int:firm_id>/office/<string:office_code>/schedules")
+@requires_authentication
 def schedules(firm_id: int, office_code: str):
     columns = [
         {"text": "Contract Description", "id": "contractDescription"},
@@ -145,6 +150,7 @@ def schedules(firm_id: int, office_code: str):
 
 
 @bp.get("/provider/<int:firm_id>/office/<string:office_code>/bank-details")
+@requires_authentication
 def bank_details(firm_id: int, office_code: str):
     columns = [
         {"text": "Bank Branch Name", "id": "bankBranchName"},

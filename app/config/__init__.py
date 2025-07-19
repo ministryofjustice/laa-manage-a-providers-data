@@ -27,3 +27,4 @@ class Config(object):
     PDA_URL = os.environ.get("PDA_URL")
     PDA_ENVIRONMENT = os.environ.get("PDA_ENVIRONMENT")
     PDA_API_KEY = os.environ.get("PDA_API_KEY")
+    PASSWORD = os.environ.get("PASSWORD")
