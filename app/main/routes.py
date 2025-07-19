@@ -1,6 +1,6 @@
 import math
 
-from flask import abort, render_template, request, session, url_for
+from flask import abort, render_template, request, url_for
 
 from app import provider_data_api as pda
 from app.auth import requires_authentication
@@ -14,7 +14,6 @@ def index():
     """Directs the user to the start page of the service
     This is the endpoint directed to from the header text, clicking this link will reset the users' session.
     """
-    session.clear()
     return render_template("index.html")
 
 
