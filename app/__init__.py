@@ -6,10 +6,11 @@ from govuk_frontend_wtf.main import WTFormsHelpers
 from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
 
 from app.config import Config
-from app.config.logging import configure_logging
+from app.pda.api import ProviderDataApi
 
 csrf = CSRFProtect()
 talisman = Talisman()
+provider_data_api = ProviderDataApi()
 
 if Config.SENTRY_DSN:
     sentry_sdk.init(
@@ -45,8 +46,7 @@ def create_app(config_class=Config):
         ]
     )
 
-    if not app.config["TESTING"]:
-        configure_logging()
+    app.logger.level = app.config["LOGGING_LEVEL"]
 
     # Set content security policy
     csp = {
@@ -108,6 +108,8 @@ def create_app(config_class=Config):
         session_cookie_http_only=Config.SESSION_COOKIE_HTTP_ONLY,
         session_cookie_samesite="Strict",
     )
+
+    provider_data_api.init_app(app, base_url=app.config["PDA_URL"], api_key=app.config["PDA_API_KEY"])
 
     WTFormsHelpers(app)
 

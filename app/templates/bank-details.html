@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
+{%- from "govuk_frontend_jinja//components/warning-text/macro.html" import govukWarningText %}
+{%- from 'components/moj_sub_navigation.html' import mojSubNavigation %}
+{%- from 'components/back_link.html' import govukBackLink -%}
+
+{% block beforeContent %}
+  {{ super() }}
+  {{ govukBackLink() }}
+{% endblock %}
+
+{% block content %}
+  {{ super() }}
+
+  <span class="govuk-caption-xl">{{ office_code }}</span>
+  <h1 class="govuk-heading-xl">{{ office_name }}</h1>
+
+  {{ mojSubNavigation({
+    "label": "Sub navigation",
+    "items": [{
+      "text": "Contracts",
+      "href": url_for("main.contracts", firm_id=firm_id, office_code=office_code)
+    }, {
+      "text": "Schedules",
+      "href": url_for("main.schedules", firm_id=firm_id, office_code=office_code)
+    }, {
+      "text": "Bank Details",
+      "href": url_for("main.bank_details", firm_id=firm_id, office_code=office_code),
+      "active": true
+    }]
+  }) }}
+
+  {{ govukTable({"attributes": {"data-module": "moj-sortable-table"},
+                "classes": "govuk-table--small-text-until-tablet",
+                "head": headings, "rows": rows}) }}
+
+  {{ govukWarningText({
+    "text": "We do not currently have permission to receive provider's bank details",
+    "iconFallbackText": "Warning"
+  }) }}
+
+{% endblock %}

@@ -1,3 +1,4 @@
+import logging
 import os
 from datetime import timedelta
 
@@ -9,6 +10,7 @@ load_dotenv()
 
 class Config(object):
     ENVIRONMENT = os.environ.get("MAPD_ENVIRONMENT", "production")
+    LOGGING_LEVEL = os.environ.get("LOGGING_LEVEL", logging.INFO)
     CONTACT_EMAIL = os.environ.get("CONTACT_EMAIL", "")
     CONTACT_PHONE = os.environ.get("CONTACT_PHONE", "")
     DEPARTMENT_NAME = os.environ.get("DEPARTMENT_NAME", "MOJ Digital")
@@ -22,3 +24,6 @@ class Config(object):
     SESSION_TIMEOUT = timedelta(minutes=30)
     SESSION_COOKIE_SECURE = True
     TESTING = False
+    PDA_URL = os.environ.get("PDA_URL")
+    PDA_ENVIRONMENT = os.environ.get("PDA_ENVIRONMENT")
+    PDA_API_KEY = os.environ.get("PDA_API_KEY")
