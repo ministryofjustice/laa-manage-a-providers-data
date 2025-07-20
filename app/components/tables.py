@@ -1,15 +1,17 @@
 from collections.abc import Callable
-from typing import Any, TypedDict
+from typing import Any, Literal, TypedDict
 
 DEFAULT_TABLE_CLASSES = "govuk-table--small-text-until-tablet"
 SORTABLE_TABLE_MODULE = "moj-sortable-table"
+
+CellFormat = Literal["numeric"]  # Currently numeric is the only valid cell format option
 
 
 class TableStructure(TypedDict, total=False):
     text: str  # Display text of the header
     id: str | None  # ID of the data to be displayed in the table i.e. firmId
     format_text: Callable[[str], str] | None  # Function used to the format the data i.e. lambda x: x.title()
-    format: str | None  # Format of the table cell, "numeric" is the only valid option
+    format: CellFormat | None  # Format of the table cell, "numeric" wil right align the cell
     classes: str | None  # CSS classes to add to the table column, as comma separated class names.
     html: Callable[[dict[str, str]], str] | None  # Function that takes row data, returns HTML string
 
@@ -17,15 +19,15 @@ class TableStructure(TypedDict, total=False):
 class Cell(TypedDict, total=False):
     """Represents a single table cell in the rendered output."""
 
-    text: str  # The display text for the cell
-    html: str | None  # HTML content (takes precedence over text)
-    format: str | None  # Cell format, currently only supports "numeric"
-    classes: str | None  # CSS classes to add to the table column, as comma separated class names.
-    attributes: dict[str, str] | None  # Additional HTML attributes
+    text: str
+    html: str | None  # HTML takes precedence over text if present
+    format: str | None
+    classes: str | None
+    attributes: dict[str, str] | None
 
 
 Row = list[Cell]
-RowData = dict[str, str]
+RowData = dict[str, str]  # Key value pairs of data e.g. {"sortCode": "01-02-03"}.
 Data = list[RowData]
 
 
