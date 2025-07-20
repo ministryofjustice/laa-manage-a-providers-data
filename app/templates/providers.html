@@ -15,8 +15,7 @@
   <h1 class="govuk-heading-xl">Providers</h1>
 
   <div class="moj-scrollable-pane">
-    {{ govukTable({"attributes": {"data-module": "moj-sortable-table"},
-                  "head": table.get_headings(), "rows": table.get_rows()}) }}
+    {{ govukTable(table.to_govuk_params()) }}
   </div>
 
   {{ mojPagination(currentPage=current_page, numShownPerPage=num_shown_per_page, numResults=num_results) }}

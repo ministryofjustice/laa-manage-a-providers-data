@@ -31,13 +31,11 @@
     }]
   }) }}
 
-  {{ govukTable({"attributes": {"data-module": "moj-sortable-table"},
-                "classes": "govuk-table--small-text-until-tablet",
-                "head": headings, "rows": rows}) }}
-
-  {{ govukWarningText({
-    "text": "We do not currently have permission to receive provider's bank details",
+    {{ govukWarningText({
+    "text": "We do not currently have permission to receive provider's bank details, the below is just example data.",
     "iconFallbackText": "Warning"
   }) }}
+
+  {{ govukTable(table.to_govuk_params()) }}
 
 {% endblock %}

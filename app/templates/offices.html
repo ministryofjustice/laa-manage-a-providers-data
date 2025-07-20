@@ -15,9 +15,7 @@
   <h1 class="govuk-heading-xl">Offices</h1>
 
   <div class="moj-scrollable-pane">
-    {{ govukTable({"attributes": {"data-module": "moj-sortable-table"},
-                  "classes": "govuk-table--small-text-until-tablet",
-                  "head": table.get_headings(), "rows": table.get_rows()}) }}
+    {{ govukTable(table.to_govuk_params()) }}
   </div>
 
 {% endblock %}
