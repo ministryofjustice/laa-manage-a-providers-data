@@ -109,7 +109,8 @@ def create_app(config_class=Config):
         session_cookie_samesite="Strict",
     )
 
-    provider_data_api.init_app(app, base_url=app.config["PDA_URL"], api_key=app.config["PDA_API_KEY"])
+    if not app.config["TESTING"]:
+        provider_data_api.init_app(app, base_url=app.config["PDA_URL"], api_key=app.config["PDA_API_KEY"])
 
     WTFormsHelpers(app)
 
