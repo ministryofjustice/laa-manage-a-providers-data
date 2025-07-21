@@ -71,3 +71,5 @@ envVars:
       key: dsn
   SENTRY_TRACES_SAMPLE_RATE:
     value: "0.01"
+  SENTRY_PROFILES_SAMPLE_RATE:
+    value: "0.2"

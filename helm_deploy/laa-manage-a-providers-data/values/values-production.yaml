@@ -11,3 +11,7 @@ whitelist:
 pdb:
   enabled: true
   minAvailable: 2
+
+envVars:
+  SENTRY_PROFILES_SAMPLE_RATE:
+    value: "1"
