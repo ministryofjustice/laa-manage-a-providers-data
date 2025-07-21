@@ -1,6 +1,6 @@
 import math
 
-from flask import abort, render_template, request, url_for, current_app
+from flask import abort, current_app, render_template, request, url_for
 
 from app.auth import requires_authentication
 from app.components.tables import DataTable, TableStructure, TransposedDataTable
@@ -29,9 +29,9 @@ def providers():
         _firm_name = row_data.get("firmName", "")
         return f"<a class='govuk-link', href={url_for('main.offices', firm_id=_firm_id)}>{_firm_name}"
 
-    providers_shown_per_page = 50647
+    providers_shown_per_page = 20
 
-    start_provider_firm_num = 0
+    start_provider_firm_num = 50647
 
     pda = current_app.extensions["pda"]
     data = pda.get_all_provider_firms()
@@ -72,6 +72,7 @@ def offices(firm_id: int):
         _office_code = row_data.get("firmOfficeCode", "")
         return f"<a class='govuk-link' href='{url_for('main.contracts', firm_id=firm_id, office_code=_office_code)}'>{_office_code}</a>"
 
+    pda = current_app.extensions["pda"]
     data = pda.get_provider_offices(firm_id)
     office_data = data["offices"]
     provider_name = data["firm"]["firmName"]
@@ -104,6 +105,7 @@ def contracts(firm_id: int, office_code: str):
         {"text": "Full info", "html": get_full_info_html},
     ]
 
+    pda = current_app.extensions["pda"]
     data = pda.get_office_contract_details(firm_id, office_code)
 
     contract_data = data["contracts"] if "contracts" in data else []
@@ -137,6 +139,7 @@ def schedules(firm_id: int, office_code: str):
         {"text": "Full info", "html": get_full_info_html},
     ]
 
+    pda = current_app.extensions["pda"]
     data = pda.get_office_schedule_details(firm_id, office_code)
     schedule_data = data["schedules"] if "schedules" in data else []
     if len(schedule_data) != 0:
@@ -174,6 +177,7 @@ def bank_details(firm_id: int, office_code: str):
         {"text": "Full info", "html": get_full_info_html},
     ]
 
+    pda = current_app.extensions["pda"]
     office_name = pda.get_provider_office(office_code)["office"]["officeName"].lstrip(f"{office_code},")
 
     example_data = {
