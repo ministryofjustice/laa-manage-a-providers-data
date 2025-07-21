@@ -54,49 +54,49 @@ class ProviderDataApi:
         if response.status_code != 200:
             raise ConnectionError(f"Failed to establish connection to PDA API: {response}")
 
-    def get_provider_firm(self, firm_id: int) -> list[dict[str, str]] | None:
+    def get_provider_firm(self, firm_id: int) -> dict[str, str] | None:
         response = self.get(f"/provider-firms/{firm_id}")
-        if response.status_code == 204:
-            return None
-        return response.json()
-
-    def get_all_provider_firms(self) -> list[dict[str, str]]:
-        response = self.get("/provider-firms")
         if response.status_code == 204:
             return {}
         return response.json()
 
-    def get_provider_office(self, office_code: str) -> list[dict[str, str]]:
+    def get_all_provider_firms(self) -> list[dict[str, str | None]]:
+        response = self.get("/provider-firms")
+        if response.status_code == 204:
+            return []
+        return response.json()
+
+    def get_provider_office(self, office_code: str) -> dict[str, str | None]:
         response = self.get(f"/provider-offices/{office_code}")
         if response.status_code == 204:
             return {}
         return response.json()
 
-    def get_provider_offices(self, firm_id: int) -> list[dict[str, str]]:
+    def get_provider_offices(self, firm_id: int) -> list[dict[str, str | None]]:
         response = self.get(f"/provider-firms/{firm_id}/provider-offices")
         if response.status_code == 204:
-            return {}
+            return []
         return response.json()
 
-    def get_provider_users(self, firm_id: str) -> list[dict[str, str]]:
+    def get_provider_users(self, firm_id: str) -> list[dict[str, str] | None]:
         response = self.get(f"/provider-firms/{firm_id}/provider-users")
         if response.status_code == 204:
             return {}
         return response.json()
 
-    def get_office_contract_details(self, firm_id: int, office_code: str) -> dict[str, str]:
+    def get_office_contract_details(self, firm_id: int, office_code: str) -> dict[str, str | None]:
         response = self.get(f"/provider-firms/{firm_id}/provider-offices/{office_code}/office-contract-details")
         if response.status_code == 204:
             return {}
         return response.json()
 
-    def get_office_schedule_details(self, firm_id: int, office_code: str) -> dict[str, str]:
+    def get_office_schedule_details(self, firm_id: int, office_code: str) -> dict[str, str | None]:
         response = self.get(f"/provider-firms/{firm_id}/provider-offices/{office_code}/schedules")
         if response.status_code == 204:
             return {}
         return response.json()
 
-    def get_office_bank_details(self, firm_id: int, office_code: str) -> dict[str, str]:
+    def get_office_bank_details(self, firm_id: int, office_code: str) -> dict[str, str | None]:
         response = self.get(f"/provider-firms/{firm_id}/provider-offices/{office_code}/bank-account-details")
         if response.status_code == 204:
             return {}

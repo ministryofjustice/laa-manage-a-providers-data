@@ -32,7 +32,7 @@ def providers():
 
     providers_shown_per_page = 10
 
-    start_provider_firm_num = 50647
+    start_provider_firm_num = 0
 
     data = pda.get_all_provider_firms()
     provider_data = data["firms"][start_provider_firm_num:]
