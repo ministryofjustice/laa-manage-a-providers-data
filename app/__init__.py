@@ -10,7 +10,6 @@ from app.pda.api import ProviderDataApi
 
 csrf = CSRFProtect()
 talisman = Talisman()
-provider_data_api = ProviderDataApi()
 
 
 if Config.SENTRY_DSN:
@@ -29,7 +28,7 @@ if Config.SENTRY_DSN:
     )
 
 
-def create_app(config_class=Config, mock_pda=None):
+def create_app(config_class=Config):
     app: Flask = Flask(__name__, static_url_path="/assets", static_folder="static/dist")
     app.url_map.strict_slashes = False  # This allows www.host.gov.uk/category to be routed to www.host.gov.uk/category/
     app.config.from_object(config_class)
@@ -110,9 +109,9 @@ def create_app(config_class=Config, mock_pda=None):
         session_cookie_samesite="Strict",
     )
 
-    if not app.config["TESTING"]:
-        provider_data_api.init_app(app, base_url=app.config["PDA_URL"], api_key=app.config["PDA_API_KEY"])
-        pass
+    if not Config.TESTING:
+        pda = ProviderDataApi()
+        pda.init_app(app, base_url=app.config["PDA_URL"], api_key=app.config["PDA_API_KEY"])
 
     WTFormsHelpers(app)
 

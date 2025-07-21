@@ -1,8 +1,7 @@
 import math
 
-from flask import abort, render_template, request, url_for
+from flask import abort, render_template, request, url_for, current_app
 
-from app import provider_data_api as pda
 from app.auth import requires_authentication
 from app.components.tables import DataTable, TableStructure, TransposedDataTable
 from app.main import bp
@@ -34,6 +33,7 @@ def providers():
 
     start_provider_firm_num = 0
 
+    pda = current_app.extensions["pda"]
     data = pda.get_all_provider_firms()
     provider_data = data["firms"][start_provider_firm_num:]
 
