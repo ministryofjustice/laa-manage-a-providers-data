@@ -111,7 +111,7 @@ def create_app(config_class=Config, mock_pda=None):
     )
 
     if not app.config["TESTING"]:
-        # provider_data_api.init_app(app, base_url=app.config["PDA_URL"], api_key=app.config["PDA_API_KEY"])
+        provider_data_api.init_app(app, base_url=app.config["PDA_URL"], api_key=app.config["PDA_API_KEY"])
         pass
     else:
         global provider_data_api
