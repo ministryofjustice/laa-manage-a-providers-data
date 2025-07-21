@@ -30,7 +30,7 @@ def providers():
         _firm_name = row_data.get("firmName", "")
         return f"<a class='govuk-link', href={url_for('main.offices', firm_id=_firm_id)}>{_firm_name}"
 
-    providers_shown_per_page = 10
+    providers_shown_per_page = 50647
 
     start_provider_firm_num = 0
 
