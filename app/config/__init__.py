@@ -21,6 +21,8 @@ class Config(object):
     SERVICE_URL = os.environ.get("SERVICE_URL", "")
     SESSION_COOKIE_HTTP_ONLY = ENVIRONMENT != "local"
     SENTRY_DSN = os.environ.get("SENTRY_DSN")
+    SENTRY_TRACES_SAMPLE_RATE = float(os.environ.get("SENTRY_TRACES_SAMPLE_RATE", "0.01"))
+    SENTRY_PROFILES_SAMPLE_RATE = float(os.environ.get("SENTRY_TRACES_SAMPLE_RATE", "0.2"))
     SESSION_TIMEOUT = timedelta(minutes=30)
     SESSION_COOKIE_SECURE = True
     TESTING = False
