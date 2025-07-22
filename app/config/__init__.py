@@ -25,7 +25,7 @@ class Config(object):
     SENTRY_PROFILES_SAMPLE_RATE = float(os.environ.get("SENTRY_TRACES_SAMPLE_RATE", "0.2"))
     SESSION_TIMEOUT = timedelta(minutes=30)
     SESSION_COOKIE_SECURE = True
-    TESTING = os.environ.get("TESTING", "False") == "True"
+    TESTING = os.environ.get("TESTING", "False").lower() == "true"
     PDA_URL = os.environ.get("PDA_URL")
     PDA_ENVIRONMENT = os.environ.get("PDA_ENVIRONMENT")
     PDA_API_KEY = os.environ.get("PDA_API_KEY")
