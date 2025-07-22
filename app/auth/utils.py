@@ -1,3 +1,5 @@
+"""Temporary auth logic, to be replaced by Entra ID"""
+
 from functools import wraps
 
 from flask import current_app, redirect, request, session, url_for

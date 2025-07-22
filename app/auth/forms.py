@@ -1,3 +1,5 @@
+"""Temporary auth logic, to be replaced by Entra ID"""
+
 from flask import current_app
 from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired, ValidationError

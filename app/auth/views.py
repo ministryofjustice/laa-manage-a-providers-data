@@ -1,3 +1,5 @@
+"""Temporary auth logic, to be replaced by Entra ID"""
+
 from flask import Response, session
 from flask_wtf import FlaskForm
 

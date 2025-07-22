@@ -13,7 +13,9 @@ def mock_provider_data_api():
     # All your mock setup here...
     mock_api.get_provider_firm.return_value = {"id": 1, "name": "Test Firm", "status": "active"}
 
-    mock_api.get_all_provider_firms.return_value = {"firms": [{"id": 1, "name": "Test Firm 1"}, {"id": 2, "name": "Test Firm 2"}]}
+    mock_api.get_all_provider_firms.return_value = {
+        "firms": [{"id": 1, "name": "Test Firm 1"}, {"id": 2, "name": "Test Firm 2"}]
+    }
 
     mock_api.get_provider_office.return_value = {"code": "TEST001", "name": "Test Office", "address": "123 Test St"}
 
@@ -47,7 +49,7 @@ class TestConfig(Config):
     PDA_BASE_URL = "http://mock-api.test"
     PDA_API_KEY = "test-key"
     # Ensure these are not set to avoid conflicts
-    SERVER_NAME = None
+    SERVER_NAME = "localhost"
 
 
 @pytest.fixture(scope="session")
@@ -58,4 +60,3 @@ def app(mock_provider_data_api, config=TestConfig):
     app.extensions["pda"] = mock_provider_data_api
 
     return app
-

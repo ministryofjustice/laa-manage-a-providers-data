@@ -1,3 +1,5 @@
+"""Temporary auth logic, to be replaced by Entra ID"""
+
 from flask import Blueprint, redirect, session, url_for
 
 from app.auth.forms import AuthenticationForm
