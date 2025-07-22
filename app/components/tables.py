@@ -126,7 +126,7 @@ class TransposedDataTable(DataTable):
         super().__init__(structure, data)
 
         if headings is not None:
-            expected_heading_count = len(data) + 1
+            expected_heading_count = len(self.data) + 1
             if len(headings) != expected_heading_count:
                 raise ValueError(
                     f"Headings length ({len(headings)}) must match data length + 1 ({expected_heading_count})"
