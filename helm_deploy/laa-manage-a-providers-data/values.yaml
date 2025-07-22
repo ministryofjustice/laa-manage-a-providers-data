@@ -81,3 +81,18 @@ envVars:
     secret:
       name: password
       key: value
+  SENTRY_DSN:
+    secret:
+      name: sentry
+      key: dsn
+  SENTRY_TRACES_SAMPLE_RATE:
+    configmap:
+      name: sentry-config
+      key: traces_sample_rate
+      optional: true
+  SENTRY_PROFILES_SAMPLE_RATE:
+    configmap:
+      name: sentry-config
+      key: profiles_sample_rate
+      optional: true
+

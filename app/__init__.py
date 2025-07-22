@@ -1,4 +1,5 @@
 import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
 from flask import Flask
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
@@ -15,14 +16,15 @@ talisman = Talisman()
 
 if Config.SENTRY_DSN:
     sentry_sdk.init(
+        integrations=[FlaskIntegration(transaction_style="url")],
         dsn=Config.SENTRY_DSN,
         # Set traces_sample_rate to 1.0 to capture 100%
         # of transactions for tracing.
-        traces_sample_rate=0.01,
+        traces_sample_rate=Config.SENTRY_TRACES_SAMPLE_RATE,
         # Set profiles_sample_rate to 1.0 to profile 100%
         # of sampled transactions.
         # We recommend adjusting this value in production.
-        profiles_sample_rate=0.2,
+        profiles_sample_rate=Config.SENTRY_PROFILES_SAMPLE_RATE,
         # This can either be dev, uat, staging, or production.
         # It is set by MAPD_ENVIRONMENT in the helm charts.
         environment=Config.ENVIRONMENT,
