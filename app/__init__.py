@@ -1,10 +1,10 @@
 import sentry_sdk
-from sentry_sdk.integrations.flask import FlaskIntegration
 from flask import Flask
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
 from govuk_frontend_wtf.main import WTFormsHelpers
 from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 from app.config import Config
 from app.pda.api import ProviderDataApi
@@ -112,7 +112,7 @@ def create_app(config_class=Config):
         session_cookie_samesite="Strict",
     )
 
-    if not Config.TESTING:
+    if not app.config["TESTING"]:
         pda = ProviderDataApi()
         pda.init_app(app, base_url=app.config["PDA_URL"], api_key=app.config["PDA_API_KEY"])
     else:
