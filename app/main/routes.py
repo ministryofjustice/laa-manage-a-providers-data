@@ -31,7 +31,10 @@ def providers():
 
     providers_shown_per_page = 20
 
-    start_provider_firm_num = 50647
+    start_provider_firm_num = 0
+
+    if not current_app.config["TESTING"]:
+        start_provider_firm_num = 50647
 
     pda = current_app.extensions["pda"]
     data = pda.get_all_provider_firms()
@@ -110,9 +113,9 @@ def contracts(firm_id: int, office_code: str):
 
     contract_data = data["contracts"] if "contracts" in data else []
     if len(contract_data) != 0:
-        office_name = data["office"]["officeName"].lstrip(f"{office_code},")
+        office_name = data["office"]["officeName"]
     else:
-        office_name = pda.get_provider_office(office_code)["office"]["officeName"].lstrip(f"{office_code},")
+        office_name = pda.get_provider_office(office_code)["office"]["officeName"]
 
     table = DataTable(structure=columns, data=contract_data)
 
@@ -143,9 +146,9 @@ def schedules(firm_id: int, office_code: str):
     data = pda.get_office_schedule_details(firm_id, office_code)
     schedule_data = data["schedules"] if "schedules" in data else []
     if len(schedule_data) != 0:
-        office_name = data["office"]["officeName"].lstrip(f"{office_code},")
+        office_name = data["office"]["officeName"]
     else:
-        office_name = pda.get_provider_office(office_code)["office"]["officeName"].lstrip(f"{office_code},")
+        office_name = pda.get_provider_office(office_code)["office"]["officeName"]
 
     table = DataTable(structure=columns, data=schedule_data)
 
@@ -178,7 +181,7 @@ def bank_details(firm_id: int, office_code: str):
     ]
 
     pda = current_app.extensions["pda"]
-    office_name = pda.get_provider_office(office_code)["office"]["officeName"].lstrip(f"{office_code},")
+    office_name = pda.get_provider_office(office_code)["office"]["officeName"]
 
     example_data = {
         "vendorSiteId": "0",

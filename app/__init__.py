@@ -7,6 +7,7 @@ from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
 
 from app.config import Config
 from app.pda.api import ProviderDataApi
+from tests.fixture.pda import mock_provider_data_api
 
 csrf = CSRFProtect()
 talisman = Talisman()
@@ -112,6 +113,9 @@ def create_app(config_class=Config):
     if not Config.TESTING:
         pda = ProviderDataApi()
         pda.init_app(app, base_url=app.config["PDA_URL"], api_key=app.config["PDA_API_KEY"])
+    else:
+        pda = mock_provider_data_api()
+        app.extensions["pda"] = pda
 
     WTFormsHelpers(app)
 
