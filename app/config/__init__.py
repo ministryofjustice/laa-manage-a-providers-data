@@ -23,7 +23,7 @@ class Config(object):
     SENTRY_DSN = os.environ.get("SENTRY_DSN")
     SESSION_TIMEOUT = timedelta(minutes=30)
     SESSION_COOKIE_SECURE = True
-    TESTING = True
+    TESTING = False
     PDA_URL = os.environ.get("PDA_URL")
     PDA_ENVIRONMENT = os.environ.get("PDA_ENVIRONMENT")
     PDA_API_KEY = os.environ.get("PDA_API_KEY")
