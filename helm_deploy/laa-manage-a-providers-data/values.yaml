@@ -79,3 +79,23 @@ envVars:
       name: sentry-config
       key: profiles_sample_rate
       optional: true
+  CLIENT_ID:
+    secret:
+      name: entra-id
+      key: client_id
+  CLIENT_SECRET:
+    secret:
+      name: entra-id
+      key: client_secret
+  CLIENT_SECRET_THUMBPRINT:
+    secret:
+      name: entra-id
+      key: client_secret_thumbprint
+  AUTHORITY:
+    secret:
+      name: entra-id
+      key: authority
+  REDIRECT_URI:
+    secret:
+      name: entra-id
+      key: redirect_uri
