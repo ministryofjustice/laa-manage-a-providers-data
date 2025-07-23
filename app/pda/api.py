@@ -3,7 +3,6 @@ from typing import Any, Dict, List, Optional, Union
 
 import requests
 from requests.adapters import HTTPAdapter
-from typer import params
 from urllib3 import Retry
 
 
@@ -126,7 +125,7 @@ class ProviderDataApi:
 
         url = f"{self.base_url}/{endpoint.lstrip('/')}"
 
-        if params:
+        if params := kwargs.get("params"):
             self.logger.debug(f"{method} request to {url} with params: {params}")
         else:
             self.logger.debug(f"{method} request to {url}")
