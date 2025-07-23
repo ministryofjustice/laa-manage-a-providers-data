@@ -4,7 +4,7 @@ on:
     secrets:
       SONAR_TOKEN:
         required: true
-      GITLEAKS_LICENCE:
+      GITLEAKS_LICENSE:
         required: true
 jobs:
   pip-compile:
@@ -42,7 +42,7 @@ jobs:
       - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITLEAKS_LICENCE: ${{ secrets.GITLEAKS_LICENCE }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
 
   lint:
     name: Ruff

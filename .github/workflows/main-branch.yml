@@ -18,7 +18,7 @@ jobs:
     uses: ./.github/workflows/static-analysis.yml
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      GITLEAKS_LICENCE: ${{ secrets.GITLEAKS_LICENCE }}
+      GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
 
   build-and-push:
     name: Build
