@@ -1,12 +1,11 @@
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
-from flask import Flask, session
+from flask import Flask
 from flask_session import Session
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
 from govuk_frontend_wtf.main import WTFormsHelpers
 from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
-import sentry_sdk
 from app.config import Config
 from identity.flask import Auth
 from app.config.authentication import AuthenticationConfig
@@ -110,7 +109,6 @@ def create_app(config_class=Config):
 
     # Initialise app extensions
     csrf.init_app(app)
-    Session(app)
 
     talisman.init_app(
         app,
@@ -118,9 +116,9 @@ def create_app(config_class=Config):
         permissions_policy=permissions_policy,
         content_security_policy_nonce_in=["script-src", "style-src"],
         force_https=False,
-        session_cookie_secure=True,
+        session_cookie_secure=Config.SESSION_COOKIE_SECURE,
         session_cookie_http_only=Config.SESSION_COOKIE_HTTP_ONLY,
-        session_cookie_samesite="Strict",
+        session_cookie_samesite=Config.SESSION_COOKIE_SAMESITE,
     )
 
     # Initialize auth with the Flask app
@@ -130,6 +128,8 @@ def create_app(config_class=Config):
     app.extensions["auth"] = auth
 
     WTFormsHelpers(app)
+
+    Session(app)
 
     # Register custom template filters
     from app.filters import register_template_filters

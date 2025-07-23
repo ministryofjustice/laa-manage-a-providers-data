@@ -6,6 +6,16 @@ from app import auth
 bp = Blueprint("auth", __name__)
 
 
+@bp.app_context_processor
+def user_context_processor():
+    if current_user := session.get("_logged_in_user"):
+        current_user = {
+            "name": current_user["name"],
+            "email": current_user["preferred_username"],
+        }
+    return dict(user=current_user)
+
+
 @bp.route("/login")
 def login():
     """Initiate login process."""
