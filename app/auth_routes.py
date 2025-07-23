@@ -13,7 +13,7 @@ def user_context_processor():
             "name": current_user["name"],
             "email": current_user["preferred_username"],
         }
-    return dict(user=current_user)
+    return dict(current_user=current_user)
 
 
 @bp.route("/login")
