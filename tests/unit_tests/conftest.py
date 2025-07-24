@@ -1,15 +1,7 @@
 import pytest
 
 from app import create_app
-from app.config import Config
-
-
-class TestConfig(Config):
-    TESTING = True
-    DEBUG = True
-    SERVER_NAME = "localhost"
-    SECRET_KEY = "TEST_KEY"
-    WTF_CSRF_ENABLED = False
+from tests.config import TestConfig
 
 
 @pytest.fixture(scope="session")
