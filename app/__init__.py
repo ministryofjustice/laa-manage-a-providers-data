@@ -1,13 +1,47 @@
+from functools import wraps
+
 import sentry_sdk
-from sentry_sdk.integrations.flask import FlaskIntegration
-from flask import Flask
+from flask import Flask, session, url_for
+from flask_session import Session
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
 from govuk_frontend_wtf.main import WTFormsHelpers
+from identity.flask import Auth as BaseAuth
 from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 from app.config import Config
-from app.config.logging import configure_logging
+from app.config.authentication import AuthenticationConfig
+
+
+class Auth(BaseAuth):
+    def login_required(self, function=None, *args, **kwargs):
+        if AuthenticationConfig.SKIP_AUTH:
+
+            @wraps(function)
+            def wrapper(*args, **kwargs):
+                return function(*args, context={"user": AuthenticationConfig.TEST_USER}, **kwargs)
+
+            return wrapper
+        else:
+            return super().login_required(function, *args, **kwargs)
+
+    def logout(self):
+        session.clear()
+        scheme = "https" if Config.ENVIRONMENT.lower() != "local" else "http"
+        url = url_for("main.index", _external=True, _scheme=scheme)
+        return self.__class__._redirect(self._auth.log_out(url))
+
+
+# Create auth instance that can be imported
+auth = Auth(
+    app=None,
+    authority=AuthenticationConfig.AUTHORITY,
+    client_id=AuthenticationConfig.CLIENT_ID,
+    client_credential=AuthenticationConfig.CLIENT_SECRET,
+    redirect_uri=AuthenticationConfig.REDIRECT_URI,
+)
+
 
 csrf = CSRFProtect()
 talisman = Talisman()
@@ -46,9 +80,6 @@ def create_app(config_class=Config):
             ),
         ]
     )
-
-    if not app.config["TESTING"]:
-        configure_logging()
 
     # Set content security policy
     csp = {
@@ -106,12 +137,20 @@ def create_app(config_class=Config):
         permissions_policy=permissions_policy,
         content_security_policy_nonce_in=["script-src", "style-src"],
         force_https=False,
-        session_cookie_secure=True,
+        session_cookie_secure=Config.SESSION_COOKIE_SECURE,
         session_cookie_http_only=Config.SESSION_COOKIE_HTTP_ONLY,
-        session_cookie_samesite="Strict",
+        session_cookie_samesite=Config.SESSION_COOKIE_SAMESITE,
     )
 
+    # Initialize auth with the Flask app
+    auth.init_app(app)
+
+    # Store auth instance for access
+    app.extensions["auth"] = auth
+
     WTFormsHelpers(app)
+
+    Session(app)
 
     # Register custom template filters
     from app.filters import register_template_filters

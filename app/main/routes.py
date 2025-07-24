@@ -1,6 +1,16 @@
-from flask import render_template
+from flask import render_template, session
 
 from app.main import bp
+
+
+@bp.app_context_processor
+def user_context_processor():
+    if current_user := session.get("_logged_in_user"):
+        current_user = {
+            "name": current_user["name"],
+            "email": current_user["preferred_username"],
+        }
+    return dict(current_user=current_user)
 
 
 @bp.get("/")

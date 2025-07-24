@@ -55,7 +55,7 @@ class TestBaseFormView:
         view = BaseFormView(form_class=MockFormClass)
         form = Mock()
 
-        context = view.get_context_data(form)
+        context = view.get_context_data(form, context={})
 
         assert context["form"] == form
         assert context["title"] == "Test Form"
@@ -67,7 +67,7 @@ class TestBaseFormView:
         view = BaseFormView(form_class=FormWithoutTitle)
         form = Mock()
 
-        context = view.get_context_data(form)
+        context = view.get_context_data(form, context={})
 
         assert context["form"] == form
         assert context["title"] == "Form"
