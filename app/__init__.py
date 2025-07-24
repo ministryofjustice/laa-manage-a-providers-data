@@ -1,16 +1,23 @@
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
-from flask import Flask
+from flask import Flask, url_for
 from flask_session import Session
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
 from govuk_frontend_wtf.main import WTFormsHelpers
 from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
 from app.config import Config
-from identity.flask import Auth
+from identity.flask import Auth as BaseAuth
 from app.config.authentication import AuthenticationConfig
 from app.config import Config
 
+
+class Auth(BaseAuth):
+    def logout(self):
+        url = url_for("main.index", _external=True, _scheme="https")
+        return self.__class__._redirect(
+            self._auth.log_out(url)
+        )
 
 # Create auth instance that can be imported
 auth = Auth(

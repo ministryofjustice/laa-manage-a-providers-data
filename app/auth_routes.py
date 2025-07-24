@@ -24,8 +24,8 @@ def login():
     return auth.login()
 
 
-@bp.route("/logout")
-def logout():
+@bp.route("/sign-out")
+def sign_out():
     """Log out the current user."""
     session.clear()
-    return auth.logout(url_for("main.index", _external=True))
+    return auth.logout()

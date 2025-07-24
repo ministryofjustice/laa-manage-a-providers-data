@@ -12,7 +12,7 @@
             <ul class="moj-header__navigation-list">
               <li class="moj-header__navigation-item">{{ user.email }}</li>
               <li class="moj-header__navigation-item">
-                <a class="moj-header__navigation-link govuk-!-font-weight-bold" href="/logout">Sign out</a>
+                <a class="moj-header__navigation-link govuk-!-font-weight-bold" href="{{   url_for("auth.sign_out") }}">Sign out</a>
               </li>
             </ul>
           </nav>
