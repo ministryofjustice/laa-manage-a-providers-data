@@ -23,7 +23,7 @@ class Config(object):
     SENTRY_PROFILES_SAMPLE_RATE = float(os.environ.get("SENTRY_TRACES_SAMPLE_RATE", "0.2"))
 
     SESSION_TYPE = 'redis'
-    SESSION_REDIS_URL = os.environ.get("REDIS_URL", "redis://redis:6379/0")
+    SESSION_REDIS = os.environ.get("REDIS_URL", "redis://redis:6379/0")
     SESSION_PERMANENT = True
     PERMANENT_SESSION_LIFETIME = timedelta(hours=24)
 
