@@ -1,24 +1,27 @@
 from functools import wraps
+
 import sentry_sdk
-from sentry_sdk.integrations.flask import FlaskIntegration
-from flask import Flask, url_for, session
+from flask import Flask, session, url_for
 from flask_session import Session
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
 from govuk_frontend_wtf.main import WTFormsHelpers
-from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
-from app.config import Config
 from identity.flask import Auth as BaseAuth
-from app.config.authentication import AuthenticationConfig
+from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
+from sentry_sdk.integrations.flask import FlaskIntegration
+
 from app.config import Config
+from app.config.authentication import AuthenticationConfig
 
 
 class Auth(BaseAuth):
     def login_required(self, function=None, *args, **kwargs):
         if AuthenticationConfig.SKIP_AUTH:
+
             @wraps(function)
             def wrapper(*args, **kwargs):
                 return function(*args, context={"user": AuthenticationConfig.TEST_USER}, **kwargs)
+
             return wrapper
         else:
             return super().login_required(function, *args, **kwargs)
@@ -27,9 +30,7 @@ class Auth(BaseAuth):
         session.clear()
         scheme = "https" if Config.ENVIRONMENT.lower() != "local" else "http"
         url = url_for("main.index", _external=True, _scheme=scheme)
-        return self.__class__._redirect(
-            self._auth.log_out(url)
-        )
+        return self.__class__._redirect(self._auth.log_out(url))
 
 
 # Create auth instance that can be imported
@@ -157,9 +158,9 @@ def create_app(config_class=Config):
     register_template_filters(app)
 
     # Register blueprints
+    from app.auth_routes import bp as auth_bp
     from app.example_form import bp as example_form_bp
     from app.main import bp as main_bp
-    from app.auth_routes import bp as auth_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)

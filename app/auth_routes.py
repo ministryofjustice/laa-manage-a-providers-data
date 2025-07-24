@@ -1,6 +1,5 @@
-import uuid
+from flask import Blueprint, session
 
-from flask import Blueprint, session, url_for
 from app import auth
 
 bp = Blueprint("auth", __name__)
@@ -22,4 +21,3 @@ def login():
     # Set session as permanent BEFORE starting OAuth
     session.permanent = True
     return auth.login()
-
