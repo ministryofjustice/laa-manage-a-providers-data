@@ -79,23 +79,27 @@ envVars:
       name: sentry-config
       key: profiles_sample_rate
       optional: true
-  CLIENT_ID:
+  REDIS_URL:
+    secret:
+      name: elasticache-redis
+      key: url
+  ENTRA_ID_CLIENT_ID:
     secret:
       name: entra-id
       key: client_id
-  CLIENT_SECRET:
+  ENTRA_ID_CLIENT_SECRET:
     secret:
       name: entra-id
       key: client_secret
-  CLIENT_SECRET_THUMBPRINT:
+  ENTRA_ID_CLIENT_SECRET_THUMBPRINT:
     secret:
       name: entra-id
       key: client_secret_thumbprint
-  AUTHORITY:
+  ENTRA_ID_AUTHORITY:
     secret:
       name: entra-id
       key: authority
-  REDIRECT_URI:
+  ENTRA_ID_REDIRECT_URI:
     secret:
       name: entra-id
       key: redirect_uri
