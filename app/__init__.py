@@ -158,11 +158,9 @@ def create_app(config_class=Config):
     register_template_filters(app)
 
     # Register blueprints
-    from app.auth_routes import bp as auth_bp
     from app.example_form import bp as example_form_bp
     from app.main import bp as main_bp
 
-    app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(example_form_bp)
 
