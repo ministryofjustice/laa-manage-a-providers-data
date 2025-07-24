@@ -19,6 +19,7 @@ def browser_context_args(browser_context_args):
 @pytest.fixture(scope="session")
 def app():
     from app.config.authentication import AuthenticationConfig
+
     AuthenticationConfig.SKIP_AUTH = True
     app = create_app(TestConfig)
     return app

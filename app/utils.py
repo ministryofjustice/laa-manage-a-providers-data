@@ -4,20 +4,22 @@ from typing import Optional, Type
 
 from flask import Blueprint
 
+from app import auth
+
 from .forms import BaseForm
 from .views import BaseFormView
-from app import auth
 
 
 def register_form_view(
-    form_class: Type[BaseForm], 
-    view_class: Optional[Type[BaseFormView]] = None, 
+    form_class: Type[BaseForm],
+    view_class: Optional[Type[BaseFormView]] = None,
     blueprint: Optional[Blueprint] = None,
-    login_required: bool = True
+    login_required: bool = True,
 ) -> None:
     """Register a view class for a form with GET and POST methods."""
     if blueprint is None:
         from app.main import bp
+
         blueprint = bp
 
     if view_class is None:
@@ -27,10 +29,10 @@ def register_form_view(
         view_class.template = form_class.template
 
     route_name = form_class.url.lower().replace("-", "_")
-    
+
     # Create the view function
     view_func = view_class.as_view(f"{route_name}", form_class=form_class)
-    
+
     # Apply authentication decorator if needed
     if login_required:
         view_func = auth.login_required(view_func)

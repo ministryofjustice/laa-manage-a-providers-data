@@ -43,7 +43,7 @@ class BaseFormView(MethodView):
             "form": form,
             "title": getattr(self.get_form_class(), "title", "Form"),
             **(context.get("context", {}) if context else {}),
-            **kwargs
+            **kwargs,
         }
 
     def form_valid(self, form: FlaskForm) -> Response:

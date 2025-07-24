@@ -184,7 +184,9 @@ class TestRegisterFormViewIntegration:
         mock_view_class.as_view.return_value = "mock_view_func"
 
         # This should not raise any type errors if the function signature is correct
-        register_form_view(form_class=MockForm, view_class=mock_view_class, blueprint=mock_blueprint, login_required=False)
+        register_form_view(
+            form_class=MockForm, view_class=mock_view_class, blueprint=mock_blueprint, login_required=False
+        )
 
         # Verify it was called
         mock_blueprint.add_url_rule.assert_called_once()
