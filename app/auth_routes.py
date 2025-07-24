@@ -1,6 +1,6 @@
 import uuid
 
-from flask import Blueprint, session
+from flask import Blueprint, session, url_for
 from app import auth
 
 bp = Blueprint("auth", __name__)
@@ -28,4 +28,4 @@ def login():
 def logout():
     """Log out the current user."""
     session.clear()
-    return auth.logout()
+    return auth.logout(url_for("main.index", _external=True))
