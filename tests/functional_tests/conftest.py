@@ -24,8 +24,11 @@ class TestConfig(Config):
 
 
 @pytest.fixture(scope="session")
-def app(config=TestConfig):
-    return create_app(config)
+def app():
+    from app.config.authentication import AuthenticationConfig
+    AuthenticationConfig.SKIP_AUTH = True
+    app = create_app(TestConfig)
+    return app
 
 
 @pytest.fixture()

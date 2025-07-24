@@ -18,7 +18,7 @@ class Auth(BaseAuth):
         if AuthenticationConfig.SKIP_AUTH:
             @wraps(function)
             def wrapper(*args, **kwargs):
-                return function(*args, context={}, **kwargs)
+                return function(*args, context={"user": AuthenticationConfig.TEST_USER}, **kwargs)
             return wrapper
         else:
             return super().login_required(function, *args, **kwargs)
