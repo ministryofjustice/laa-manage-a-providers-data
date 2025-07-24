@@ -83,6 +83,8 @@ envVars:
     secret:
       name: elasticache-redis
       key: url
+  ENTRA_ID_SKIP_AUTH:
+    value: "True"
   ENTRA_ID_CLIENT_ID:
     secret:
       name: entra-id

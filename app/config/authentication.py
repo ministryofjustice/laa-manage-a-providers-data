@@ -3,6 +3,7 @@ import os
 
 class AuthenticationConfig:
     """Configuration class for Entra ID authentication settings."""
+    SKIP_AUTH = os.environ.get('ENTRA_ID_SKIP_AUTH', "false").lower() == "true"
     CLIENT_ID = os.getenv("ENTRA_ID_CLIENT_ID")
     CLIENT_SECRET_THUMBPRINT = os.environ.get("ENTRA_ID_CLIENT_SECRET_THUMBPRINT")
     if CLIENT_SECRET_THUMBPRINT:

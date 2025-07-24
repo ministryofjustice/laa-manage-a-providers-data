@@ -23,9 +23,3 @@ def login():
     session.permanent = True
     return auth.login()
 
-
-@bp.route("/sign-out")
-def sign_out():
-    """Log out the current user."""
-    session.clear()
-    return auth.logout()

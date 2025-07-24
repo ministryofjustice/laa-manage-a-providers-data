@@ -1,6 +1,7 @@
+from functools import wraps
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
-from flask import Flask, url_for
+from flask import Flask, url_for, session
 from flask_session import Session
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
@@ -13,11 +14,23 @@ from app.config import Config
 
 
 class Auth(BaseAuth):
+    def login_required(self, function=None, *args, **kwargs):
+        if AuthenticationConfig.SKIP_AUTH:
+            @wraps(function)
+            def wrapper(*args, **kwargs):
+                return function(*args, context={}, **kwargs)
+            return wrapper
+        else:
+            return super().login_required(function, *args, **kwargs)
+
     def logout(self):
-        url = url_for("main.index", _external=True, _scheme="https")
+        session.clear()
+        scheme = "https" if Config.ENVIRONMENT.lower() != "local" else "http"
+        url = url_for("main.index", _external=True, _scheme=scheme)
         return self.__class__._redirect(
             self._auth.log_out(url)
         )
+
 
 # Create auth instance that can be imported
 auth = Auth(
