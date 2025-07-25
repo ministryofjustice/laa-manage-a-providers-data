@@ -8,7 +8,6 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 
 from app.config import Config
 from app.pda.api import ProviderDataApi
-from tests.fixture.pda import mock_provider_data_api
 
 csrf = CSRFProtect()
 talisman = Talisman()
@@ -31,7 +30,7 @@ if Config.SENTRY_DSN:
     )
 
 
-def create_app(config_class=Config):
+def create_app(config_class=Config, pda_class=ProviderDataApi):
     app: Flask = Flask(__name__, static_url_path="/assets", static_folder="static/dist")
     app.url_map.strict_slashes = False  # This allows www.host.gov.uk/category to be routed to www.host.gov.uk/category/
     app.config.from_object(config_class)
@@ -112,12 +111,8 @@ def create_app(config_class=Config):
         session_cookie_samesite="Strict",
     )
 
-    if not app.config["TESTING"]:
-        pda = ProviderDataApi()
-        pda.init_app(app, base_url=app.config["PDA_URL"], api_key=app.config["PDA_API_KEY"])
-    else:
-        pda = mock_provider_data_api()
-        app.extensions["pda"] = pda
+    pda = pda_class()
+    pda.init_app(app, base_url=app.config["PDA_URL"], api_key=app.config["PDA_API_KEY"])
 
     WTFormsHelpers(app)
 

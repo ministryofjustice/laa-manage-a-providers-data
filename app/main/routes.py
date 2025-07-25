@@ -38,6 +38,7 @@ def providers():
 
     pda = current_app.extensions["pda"]
     data = pda.get_all_provider_firms()
+  
     provider_data = data["firms"][start_provider_firm_num:]
 
     columns: list[TableStructure] = [
