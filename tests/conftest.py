@@ -23,9 +23,6 @@ class TestConfig(Config):
 
 @pytest.fixture(scope="session")
 def app(mock_pda, config=TestConfig):
-    app = create_app(config)
-
-    # Replace the real API instance with our mock after app creation
-    app.extensions["pda"] = mock_pda
+    app = create_app(config, mock_pda)
 
     return app

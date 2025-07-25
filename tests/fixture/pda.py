@@ -3,8 +3,15 @@
 from unittest.mock import MagicMock
 
 
+class MockPDA(MagicMock):
+    def init_app(self, app, **kwargs):
+        if not hasattr(app, "extensions"):
+            app.extensions = {}
+        app.extensions["pda"] = self
+
+
 def mock_provider_data_api():
-    mock_api = MagicMock()
+    mock_api = MockPDA()
 
     mock_api.get_provider_firm.return_value = {"id": 1, "name": "Test Firm", "status": "active"}
 
