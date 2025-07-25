@@ -1,8 +1,6 @@
 import pytest
 from flask import url_for
 
-from app import Config, create_app
-
 
 @pytest.fixture(scope="session")
 def browser_context_args(browser_context_args):
@@ -13,19 +11,6 @@ def browser_context_args(browser_context_args):
             "height": 1080,
         },
     }
-
-
-class TestConfig(Config):
-    TESTING = True
-    DEBUG = True
-    SERVER_NAME = "localhost"
-    RATELIMIT_ENABLED = False
-    SECRET_KEY = "TEST_KEY"
-
-
-@pytest.fixture(scope="session")
-def app(config=TestConfig):
-    return create_app(config)
 
 
 @pytest.fixture()
