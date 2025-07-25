@@ -1,3 +1,4 @@
+import sentry_sdk
 from flask import request, session
 
 from app.main import bp
@@ -32,3 +33,16 @@ def user_context_processor():
             "email": current_user["preferred_username"],
         }
     return dict(current_user=current_user)
+
+
+@bp.before_app_request
+def set_sentry_user():
+    if current_user := session.get("_logged_in_user"):
+        sentry_sdk.set_user(
+            {
+                "name": current_user["name"],
+                "email": current_user.get("preferred_username"),
+            }
+        )
+    else:
+        sentry_sdk.set_user(None)
