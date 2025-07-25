@@ -9,6 +9,7 @@ class TestConfig(Config):
     DEBUG = True
     RATELIMIT_ENABLED = False
     SECRET_KEY = "TEST_KEY"
+    # Provide valid config to avoid API initialization errors
     PDA_URL = "http://mock-api.test"
     PDA_API_KEY = "test-key"
     # Ensure these are not set to avoid conflicts

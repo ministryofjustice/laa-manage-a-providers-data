@@ -34,11 +34,11 @@ def providers():
     start_provider_firm_num = 0
 
     if not current_app.config["TESTING"]:
-        start_provider_firm_num = 50647
+        start_provider_firm_num = 50647  # ID where the test data begins in PDA UAT.
 
     pda = current_app.extensions["pda"]
     data = pda.get_all_provider_firms()
-  
+
     provider_data = data["firms"][start_provider_firm_num:]
 
     columns: list[TableStructure] = [
