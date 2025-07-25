@@ -14,11 +14,9 @@ class TestConfig(Config):
     # Ensure these are not set to avoid conflicts
     SERVER_NAME = "localhost"
 
- 
+
+@pytest.fixture(scope="session")
 def app(config=TestConfig):
-    app = create_app(config, mock_provider_data_api
-                    
-    # Replace the real API instance with our mock after app creation
-    app.extensions["pda"] = mock_pda
+    app = create_app(config, mock_provider_data_api)
 
     return app

@@ -93,7 +93,3 @@ class MockProviderDataApi:
     def add_mock_office(self, office_code: str, office_data: Dict[str, Any]) -> None:
         """Add a mock office to the test data."""
         self._mock_data["offices"][office_code] = office_data
-
-    def add_mock_users(self, firm_id: int, users_data: List[Dict[str, Any]]) -> None:
-        """Add mock users for a firm."""
-        self._mock_data["users"][firm_id] = users_data
