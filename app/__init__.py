@@ -28,8 +28,7 @@ class Auth(BaseAuth):
 
     def logout(self):
         session.clear()
-        scheme = "https" if Config.ENVIRONMENT.lower() != "local" else "http"
-        url = url_for("main.index", _external=True, _scheme=scheme)
+        url = url_for("main.index", _external=True)
         return self.__class__._redirect(self._auth.log_out(url))
 
 

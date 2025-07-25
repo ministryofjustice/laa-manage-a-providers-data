@@ -36,3 +36,4 @@ class Config(object):
     SESSION_COOKIE_NAME = "session"
 
     TESTING = False
+    PREFERRED_URL_SCHEME = os.environ.get("PREFERRED_URL_SCHEME", "https")
