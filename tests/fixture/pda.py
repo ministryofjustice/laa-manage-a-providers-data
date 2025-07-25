@@ -5,8 +5,6 @@ from unittest.mock import MagicMock
 
 class MockPDA(MagicMock):
     def init_app(self, app, **kwargs):
-        if not hasattr(app, "extensions"):
-            app.extensions = {}
         app.extensions["pda"] = self
 
 
@@ -147,9 +145,6 @@ def mock_provider_data_api():
 
     mock_api.get_office_bank_details.return_value = {"account_number": "12345678", "bank_name": "Test Bank"}
 
-    # Mock the status and init_app methods
-    mock_api.status.return_value = None
-    mock_api.init_app.return_value = None
     mock_api.base_url = "http://mock-api.test"
 
     return mock_api

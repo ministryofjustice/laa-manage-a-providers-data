@@ -4,11 +4,6 @@ from app import Config, create_app
 from tests.fixture.pda import mock_provider_data_api
 
 
-@pytest.fixture(scope="session", autouse=True)
-def mock_pda():
-    return mock_provider_data_api()
-
-
 class TestConfig(Config):
     TESTING = True
     DEBUG = True
@@ -22,7 +17,7 @@ class TestConfig(Config):
 
 
 @pytest.fixture(scope="session")
-def app(mock_pda, config=TestConfig):
-    app = create_app(config, mock_pda)
+def app(config=TestConfig):
+    app = create_app(config, mock_provider_data_api)
 
     return app
