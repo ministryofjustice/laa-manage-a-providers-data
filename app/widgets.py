@@ -119,6 +119,7 @@ class ParameterOverrideMixin:
         self,
         *,
         classes: str | None = None,
+        heading_class: str = "govuk-fieldset__legend--s",
         hint: str | None = None,
         prefix: str | None = None,
         suffix: str | None = None,
@@ -136,6 +137,7 @@ class ParameterOverrideMixin:
 
         Args:
             classes: CSS classes to add
+            heading_class: Overrides the title of an input
             hint: Hint text to display
             prefix: Prefix text or HTML
             suffix: Suffix text or HTML
@@ -159,6 +161,7 @@ class ParameterOverrideMixin:
         self.autocomplete = autocomplete
         self.autocapitalize = autocapitalize
         self.pattern = pattern
+        self.heading_class = heading_class
         super().__init__(**kwargs)
 
     def map_gov_params(self, field: Any, **kwargs: Any) -> dict[str, Any]:
@@ -200,6 +203,14 @@ class ParameterOverrideMixin:
 
         if self.autocapitalize:
             params["autocapitalize"] = self.autocapitalize
+
+        if self.heading_class:
+            label_class = self.heading_class
+            if "fieldset" in params:
+                params["fieldset"]["legend"]["classes"] = label_class
+            else:
+                params["label"]["classes"] = label_class
+            return params
 
         return params
 
