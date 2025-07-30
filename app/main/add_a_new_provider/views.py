@@ -12,4 +12,3 @@ class AddProviderFormView(BaseFormView):
 
         # Call parent method for redirect
         return super().form_valid(form)
-

@@ -1,6 +1,6 @@
 from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired
-from ..forms import BaseForm
+from ...forms import BaseForm
 from app.widgets import GovRadioInput, GovTextInput
 from wtforms import RadioField
 
@@ -9,8 +9,8 @@ class AddProviderForm(BaseForm):
     url = "add-provider"
 
     next_step_mapping = {
-        "advocate": "main.index",
         "barrister": "main.index",
+        "advocate": "main.index",
         "chambers": "main.index",
         "legalservicesprovider": "main.index",
     }
@@ -28,8 +28,8 @@ class AddProviderForm(BaseForm):
         widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
         validators=[InputRequired(message=("Select a provider type"))],
         choices=[
-            ("advocate", "Advocate"),
             ("barrister", "Barrister"),
+            ("advocate", "Advocate"),
             ("chambers", "Chambers"),
             ("lsp", "Legal services provider"),
         ],
