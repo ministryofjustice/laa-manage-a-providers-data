@@ -4,6 +4,7 @@ from ...forms import BaseForm
 from app.widgets import GovRadioInput, GovTextInput
 from wtforms import RadioField
 
+
 class AddProviderForm(BaseForm):
     title = "Add a new provider"
     url = "add-provider"
@@ -16,7 +17,7 @@ class AddProviderForm(BaseForm):
     }
 
     provider_name = StringField(
-        'Provider name',
+        "Provider name",
         widget=GovTextInput(heading_class="govuk-fieldset__legend--m"),
         validators=[
             InputRequired(message="Enter the provider name"),
@@ -24,7 +25,7 @@ class AddProviderForm(BaseForm):
     )
 
     provider_type = RadioField(
-        'Provider type',
+        "Provider type",
         widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
         validators=[InputRequired(message=("Select a provider type"))],
         choices=[
@@ -35,13 +36,16 @@ class AddProviderForm(BaseForm):
         ],
     )
 
+
 class LspDetailsForm(BaseForm):
     title = "Legal services provider details"
     url = "add-provider/lsp-details"
 
+
 class ChambersDetailsForm(BaseForm):
     title = "Chambers details"
     url = "add-provider/chambers-details"
+
 
 class ParentProviderForm(BaseForm):
     title = "Assign to parent provider"
