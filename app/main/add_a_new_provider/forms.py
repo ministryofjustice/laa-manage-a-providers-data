@@ -12,7 +12,7 @@ class AddProviderForm(BaseForm):
         "barrister": "main.add_provider/assign_parent_provider",
         "advocate": "main.add_provider/assign_parent_provider",
         "chambers": "main.add_provider/chambers_details",
-        "legalservicesprovider": "main.add_provider/lsp_details",
+        "lsp": "main.add_provider/lsp_details",
     }
 
     provider_name = StringField(

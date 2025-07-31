@@ -1,10 +1,12 @@
-from flask import session
+from flask import session, redirect, url_for, render_template
 
+from .forms import AddProviderForm
 from app.views import BaseFormView
 
 
 class AddProviderFormView(BaseFormView):
     """Form view for the add provider"""
+    template = "templates/form.html"
 
     def form_valid(self, form):
         session["provider_name"] = form.data.get("provider_name")
@@ -12,6 +14,14 @@ class AddProviderFormView(BaseFormView):
 
         # Call parent method for redirect
         return super().form_valid(form)
+    
+    def dispatch_request(self):
+        form = AddProviderForm()
+        if form.validate_on_submit():
+          provider_type = form.data.get("provider_type")
+          next_page = form.next_step_mapping.get(provider_type)
+          return redirect(url_for(next_page))
+        return render_template(self.template, form=form)
     
 class LspDetailsFormView(BaseFormView):
     """Form view for the Legal services provider details"""

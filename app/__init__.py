@@ -130,12 +130,4 @@ def create_app(config_class=Config, pda_class=ProviderDataApi):
     app.register_blueprint(example_form_bp)
     app.register_blueprint(auth_bp)
 
-    if app.debug:
-            with app.app_context():
-                print("\n🔍 Registered Routes:")
-                for rule in app.url_map.iter_rules():
-                    methods = ', '.join(sorted(rule.methods - {'HEAD', 'OPTIONS'}))
-                    print(f"{methods:10s} {rule.rule:30s} -> {rule.endpoint}")
-                print()
-
     return app
