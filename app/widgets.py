@@ -119,7 +119,7 @@ class ParameterOverrideMixin:
         self,
         *,
         classes: str | None = None,
-        heading_class: str = "govuk-fieldset__legend--s",
+        heading_class: str | None = None,
         hint: str | None = None,
         prefix: str | None = None,
         suffix: str | None = None,
@@ -205,12 +205,10 @@ class ParameterOverrideMixin:
             params["autocapitalize"] = self.autocapitalize
 
         if self.heading_class:
-            label_class = self.heading_class
             if "fieldset" in params:
-                params["fieldset"]["legend"]["classes"] = label_class
+                params["fieldset"]["legend"]["classes"] = self.heading_class
             else:
-                params["label"]["classes"] = label_class
-            return params
+                params["label"]["classes"] = self.heading_class
 
         return params
 
