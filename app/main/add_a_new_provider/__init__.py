@@ -1,7 +1,7 @@
 from app.utils import register_form_view
 from .forms import AddProviderForm, LspDetailsForm, ChambersDetailsForm, ParentProviderForm
 from .views import AddProviderFormView, LspDetailsFormView, ChambersDetailsFormView, ParentProviderFormView
-from app.main import bp
+from .. import bp
 
 
 def register_views():
