@@ -1,16 +1,17 @@
 import sentry_sdk
-from sentry_sdk.integrations.flask import FlaskIntegration
 from flask import Flask
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
 from govuk_frontend_wtf.main import WTFormsHelpers
 from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 from app.config import Config
-from app.config.logging import configure_logging
+from app.pda.api import ProviderDataApi
 
 csrf = CSRFProtect()
 talisman = Talisman()
+
 
 if Config.SENTRY_DSN:
     sentry_sdk.init(
@@ -29,7 +30,7 @@ if Config.SENTRY_DSN:
     )
 
 
-def create_app(config_class=Config):
+def create_app(config_class=Config, pda_class=ProviderDataApi):
     app: Flask = Flask(__name__, static_url_path="/assets", static_folder="static/dist")
     app.url_map.strict_slashes = False  # This allows www.host.gov.uk/category to be routed to www.host.gov.uk/category/
     app.config.from_object(config_class)
@@ -47,8 +48,7 @@ def create_app(config_class=Config):
         ]
     )
 
-    if not app.config["TESTING"]:
-        configure_logging()
+    app.logger.level = app.config["LOGGING_LEVEL"]
 
     # Set content security policy
     csp = {
@@ -111,6 +111,9 @@ def create_app(config_class=Config):
         session_cookie_samesite="Strict",
     )
 
+    pda = pda_class()
+    pda.init_app(app, base_url=app.config["PDA_URL"], api_key=app.config["PDA_API_KEY"])
+
     WTFormsHelpers(app)
 
     # Register custom template filters
@@ -119,10 +122,12 @@ def create_app(config_class=Config):
     register_template_filters(app)
 
     # Register blueprints
+    from app.auth import bp as auth_bp
     from app.example_form import bp as example_form_bp
     from app.main import bp as main_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(example_form_bp)
+    app.register_blueprint(auth_bp)
 
     return app
