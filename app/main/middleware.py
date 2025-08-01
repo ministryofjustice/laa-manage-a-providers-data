@@ -1,6 +1,6 @@
 from flask import request
 
-from . import bp
+from app.main import bp
 
 
 @bp.after_app_request
