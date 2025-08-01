@@ -1,8 +1,10 @@
+from wtforms import RadioField
 from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired
-from ...forms import BaseForm
+
 from app.widgets import GovRadioInput, GovTextInput
-from wtforms import RadioField
+
+from ...forms import BaseForm
 
 
 class AddProviderForm(BaseForm):

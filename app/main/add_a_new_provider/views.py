@@ -1,7 +1,8 @@
-from flask import session, redirect, url_for, render_template
+from flask import redirect, render_template, session, url_for
+
+from app.views import BaseFormView
 
 from .forms import AddProviderForm
-from app.views import BaseFormView
 
 
 class AddProviderFormView(BaseFormView):
