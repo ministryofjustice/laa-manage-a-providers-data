@@ -55,16 +55,16 @@ class ParentProviderForm(BaseForm):
 
 
 class AddParentProviderForm(BaseForm):
-    title = "Add a new parent provider"
+    title = "Assign to a parent provider"
     url = "add-parent-provider"
 
     search_term = StringField(
         "Search for parent provider",
         widget=GovTextInput(
-            heading_class="govuk-fieldset__legend--m", hint="Enter the name of the parent provider to search for"
+            heading_class="govuk-fieldset__legend--m", hint="You can search by name or account numbe"
         ),
         validators=[
-            InputRequired(message="Enter a search term for the parent provider"),
+            InputRequired(message="YPlease enter a name or account number"),
         ],
     )
 
