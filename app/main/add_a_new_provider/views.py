@@ -2,7 +2,7 @@ from flask import redirect, render_template, session, url_for
 
 from app.views import BaseFormView
 
-from .forms import AddProviderForm
+from .forms import AddProviderForm, AddParentProviderForm
 
 
 class AddProviderFormView(BaseFormView):
@@ -47,4 +47,39 @@ class ParentProviderFormView(BaseFormView):
 
     def form_valid(self, form):
         # Call parent method for redirect
+        return super().form_valid(form)
+
+
+class AddParentProviderFormView(BaseFormView):
+    """Form view for the Add Parent Provider"""
+
+    template = "templates/form.html"
+
+    def dispatch_request(self):
+        form = AddParentProviderForm()
+        search_results = []
+
+        if form.validate_on_submit():
+            search_term = form.data.get("search_term")
+            if search_term:
+                # TODO: Implement actual search logic here
+                # For now, return mock results
+                search_results = self.search_parent_providers(search_term)
+                session["search_term"] = search_term
+                session["search_results"] = search_results
+
+        return render_template(self.template, form=form, search_results=search_results)
+
+    def search_parent_providers(self, search_term):
+        """Search for parent providers - placeholder implementation"""
+        # TODO: Replace with actual database/API search
+        # Mock results for now
+        mock_results = [
+            {"id": 1, "name": f"Mock Chambers matching '{search_term}'", "type": "chambers"},
+            {"id": 2, "name": f"Mock Advocate matching '{search_term}'", "type": "advocate"},
+        ]
+        return mock_results
+
+    def form_valid(self, form):
+        # This method is called by the parent class but we handle form processing in dispatch_request
         return super().form_valid(form)

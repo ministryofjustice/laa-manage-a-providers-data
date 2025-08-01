@@ -1,4 +1,4 @@
-from wtforms import RadioField
+from wtforms import RadioField, SubmitField
 from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired
 
@@ -12,9 +12,9 @@ class AddProviderForm(BaseForm):
     url = "add-provider"
 
     next_step_mapping = {
-        "barrister": "main.add_provider/assign_parent_provider",
-        "advocate": "main.add_provider/assign_parent_provider",
-        "chambers": "main.add_provider/chambers_details",
+        "barrister": "main.add_parent_provider",
+        "advocate": "main.add_parent_provider",
+        "chambers": "main.add_parent_provider",
         "lsp": "main.add_provider/lsp_details",
     }
 
@@ -52,3 +52,20 @@ class ChambersDetailsForm(BaseForm):
 class ParentProviderForm(BaseForm):
     title = "Assign to parent provider"
     url = "add-provider/assign-parent-provider"
+
+
+class AddParentProviderForm(BaseForm):
+    title = "Add a new parent provider"
+    url = "add-parent-provider"
+
+    search_term = StringField(
+        "Search for parent provider",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m", hint="Enter the name of the parent provider to search for"
+        ),
+        validators=[
+            InputRequired(message="Enter a search term for the parent provider"),
+        ],
+    )
+
+    search_button = SubmitField("Search")
