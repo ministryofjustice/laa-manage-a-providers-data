@@ -4,8 +4,8 @@ from flask import abort, current_app, render_template, request, url_for
 
 from app.auth import requires_authentication
 from app.components.tables import DataTable, TableStructure, TransposedDataTable
-from app.main import bp
 from app.main.utils import get_full_info_html
+from app.main import bp
 
 
 @bp.get("/")
@@ -39,7 +39,6 @@ def providers():
     pda = current_app.extensions["pda"]
     data = pda.get_all_provider_firms()
 
-    print(pda.get_all_provider_firms()["firms"])
     provider_data = data["firms"][start_provider_firm_num:]
 
     columns: list[TableStructure] = [

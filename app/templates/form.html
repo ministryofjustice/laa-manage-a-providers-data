@@ -15,7 +15,7 @@
           {{ form.hidden_tag() }}
 
           {% if not form | has_page_heading %}
-            <h1 class="govuk-heading-xl">{{ title }}</h1>
+            <h1 class="govuk-heading-xl">{{ form.title }}</h1>
           {% endif %}
 
           {% for field in form %}
