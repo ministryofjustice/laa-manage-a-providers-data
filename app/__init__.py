@@ -113,7 +113,6 @@ def create_app(config_class=Config, pda_class=ProviderDataApi):
         session_cookie_samesite=Config.SESSION_COOKIE_SAMESITE,
     )
 
-    # Initialize auth with the Flask app
     auth.init_app(app)
 
     # Store auth instance for access

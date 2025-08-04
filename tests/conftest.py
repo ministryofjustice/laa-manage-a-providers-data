@@ -1,5 +1,4 @@
 import pytest
-from flask import url_for
 
 from app import Config, create_app
 from tests.fixture.pda import mock_provider_data_api
@@ -23,8 +22,3 @@ class TestConfig(Config):
 def app(config=TestConfig):
     app = create_app(config, mock_provider_data_api)
     return app
-
-
-@pytest.fixture(scope="function", autouse=True)
-def startup(app, page):
-    page.goto(url_for("main.index", _external=True))
