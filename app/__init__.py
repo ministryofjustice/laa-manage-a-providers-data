@@ -1,8 +1,7 @@
 from functools import wraps
 
 import sentry_sdk
-from flask import Flask, session, url_for
-from flask_session import Session
+from flask import Flask, current_app, session, url_for
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
 from govuk_frontend_wtf.main import WTFormsHelpers
@@ -12,6 +11,7 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 
 from app.config import Config
 from app.config.authentication import AuthenticationConfig
+from flask_session import Session
 
 
 class Auth(BaseAuth):
@@ -28,7 +28,8 @@ class Auth(BaseAuth):
 
     def logout(self):
         session.clear()
-        url = url_for("main.index", _external=True)
+        scheme = "http" if current_app.config["ENVIRONMENT"] == "local" else "https"
+        url = url_for("main.index", _external=True, _scheme=scheme)
         return self.__class__._redirect(self._auth.log_out(url))
 
 
@@ -135,7 +136,6 @@ def create_app(config_class=Config):
         content_security_policy=csp if not Config.TESTING else None,
         permissions_policy=permissions_policy,
         content_security_policy_nonce_in=["script-src", "style-src"],
-        force_https=False,
         session_cookie_secure=Config.SESSION_COOKIE_SECURE,
         session_cookie_http_only=Config.SESSION_COOKIE_HTTP_ONLY,
         session_cookie_samesite=Config.SESSION_COOKIE_SAMESITE,
