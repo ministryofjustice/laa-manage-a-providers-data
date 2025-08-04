@@ -4,7 +4,6 @@ import os
 class AuthenticationConfig:
     """Configuration class for Entra ID authentication settings."""
 
-    SKIP_AUTH = os.environ.get("ENTRA_ID_SKIP_AUTH", "false").lower() == "true"
     # Used when SKIP_AUTH is True
     TEST_USER = {
         "name": "Test User",

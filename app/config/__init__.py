@@ -40,6 +40,8 @@ class Config(object):
     TESTING = os.environ.get("TESTING", "False").lower() == "true"
     PREFERRED_URL_SCHEME = os.environ.get("PREFERRED_URL_SCHEME", "https")
 
+    SKIP_AUTH = os.environ.get("ENTRA_ID_SKIP_AUTH", "false").lower() == "true"
+
     PDA_URL = os.environ.get("PDA_URL")
     PDA_ENVIRONMENT = os.environ.get("PDA_ENVIRONMENT")
     PDA_API_KEY = os.environ.get("PDA_API_KEY")

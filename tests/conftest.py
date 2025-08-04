@@ -14,6 +14,8 @@ class TestConfig(Config):
     PDA_API_KEY = "test-key"
     # Ensure these are not set to avoid conflicts
     SERVER_NAME = "localhost"
+    PREFERRED_URL_SCHEME = "http"
+    ENTRA_ID_SKIP_AUTH = True
 
 
 @pytest.fixture(scope="session")

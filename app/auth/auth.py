@@ -1,14 +1,22 @@
 from functools import wraps
 
-from flask import current_app, session, url_for
+from flask import session, url_for
 from identity.flask import Auth as BaseAuth
 
 from app.config.authentication import AuthenticationConfig
 
 
 class Auth(BaseAuth):
+    def __init__(self, *args, **kwargs):
+        self.skip_auth = False
+        super(Auth, self).__init__(*args, **kwargs)
+
+    def init_app(self, app):
+        self.skip_auth = app.config.get("SKIP_AUTH", False)
+        super(Auth, self).init_app(app)
+
     def login_required(self, function=None, *args, **kwargs):
-        if AuthenticationConfig.SKIP_AUTH:
+        if self.skip_auth:
 
             @wraps(function)
             def wrapper(*args, **kwargs):
@@ -20,6 +28,5 @@ class Auth(BaseAuth):
 
     def logout(self):
         session.clear()
-        scheme = "http" if current_app.config["ENVIRONMENT"] == "local" else "https"
-        url = url_for("main.index", _external=True, _scheme=scheme)
+        url = url_for("main.index", _external=True)
         return self.__class__._redirect(self._auth.log_out(url))
