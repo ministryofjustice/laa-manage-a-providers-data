@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, patch
 
-from app import Auth
+from app.auth import Auth
 from app.config.authentication import AuthenticationConfig
 
 

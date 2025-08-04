@@ -1,48 +1,15 @@
-from functools import wraps
-
 import sentry_sdk
-from flask import Flask, current_app, session, url_for
+from flask import Flask
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
 from govuk_frontend_wtf.main import WTFormsHelpers
-from identity.flask import Auth as BaseAuth
 from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
 from sentry_sdk.integrations.flask import FlaskIntegration
 
+from app.auth import authentication as auth
 from app.config import Config
-from app.config.authentication import AuthenticationConfig
 from app.pda.api import ProviderDataApi
 from flask_session import Session
-
-
-class Auth(BaseAuth):
-    def login_required(self, function=None, *args, **kwargs):
-        if AuthenticationConfig.SKIP_AUTH:
-
-            @wraps(function)
-            def wrapper(*args, **kwargs):
-                return function(*args, context={"user": AuthenticationConfig.TEST_USER}, **kwargs)
-
-            return wrapper
-        else:
-            return super().login_required(function, *args, **kwargs)
-
-    def logout(self):
-        session.clear()
-        scheme = "http" if current_app.config["ENVIRONMENT"] == "local" else "https"
-        url = url_for("main.index", _external=True, _scheme=scheme)
-        return self.__class__._redirect(self._auth.log_out(url))
-
-
-# Create auth instance that can be imported
-auth = Auth(
-    app=None,
-    authority=AuthenticationConfig.AUTHORITY,
-    client_id=AuthenticationConfig.CLIENT_ID,
-    client_credential=AuthenticationConfig.CLIENT_SECRET,
-    redirect_uri=AuthenticationConfig.REDIRECT_URI,
-)
-
 
 csrf = CSRFProtect()
 talisman = Talisman()
@@ -140,6 +107,7 @@ def create_app(config_class=Config, pda_class=ProviderDataApi):
         content_security_policy=csp if not Config.TESTING else None,
         permissions_policy=permissions_policy,
         content_security_policy_nonce_in=["script-src", "style-src"],
+        force_https=False,
         session_cookie_secure=Config.SESSION_COOKIE_SECURE,
         session_cookie_http_only=Config.SESSION_COOKIE_HTTP_ONLY,
         session_cookie_samesite=Config.SESSION_COOKIE_SAMESITE,
@@ -164,12 +132,10 @@ def create_app(config_class=Config, pda_class=ProviderDataApi):
     register_template_filters(app)
 
     # Register blueprints
-    from app.auth import bp as auth_bp
     from app.example_form import bp as example_form_bp
     from app.main import bp as main_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(example_form_bp)
-    app.register_blueprint(auth_bp)
 
     return app

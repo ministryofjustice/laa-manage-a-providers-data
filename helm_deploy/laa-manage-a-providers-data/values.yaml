@@ -77,10 +77,6 @@ envVars:
     secret:
       name: provider-data-api
       key: api_key
-  PASSWORD:
-    secret:
-      name: password
-      key: value
   SENTRY_DSN:
     secret:
       name: sentry
