@@ -17,6 +17,7 @@ def test_skip_auth(app):
 
 
 def test_not_skipping_auth(app):
+    default_value = auth.skip_auth
     auth.skip_auth = False
 
     mock_view = MagicMock()
@@ -24,3 +25,5 @@ def test_not_skipping_auth(app):
         decorated = auth.login_required(mock_view)
         decorated()
         super_login_required.assert_called()
+
+    auth.skip_auth = default_value

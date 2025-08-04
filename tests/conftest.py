@@ -4,6 +4,17 @@ from app import Config, create_app
 from tests.fixture.pda import mock_provider_data_api
 
 
+@pytest.fixture(scope="session")
+def browser_context_args(browser_context_args):
+    return {
+        **browser_context_args,
+        "viewport": {
+            "width": 1920,
+            "height": 1080,
+        },
+    }
+
+
 class TestConfig(Config):
     TESTING = True
     DEBUG = True
@@ -22,3 +33,13 @@ class TestConfig(Config):
 def app(config=TestConfig):
     app = create_app(config, mock_provider_data_api)
     return app
+
+
+@pytest.fixture()
+def client(app):
+    return app.test_client()
+
+
+@pytest.fixture()
+def runner(app):
+    return app.test_cli_runner()
