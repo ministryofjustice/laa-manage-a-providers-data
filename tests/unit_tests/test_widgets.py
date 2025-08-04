@@ -44,9 +44,14 @@ class TestParameterOverrideMixin:
         assert widget.autocapitalize == "words"
         assert widget.pattern == "[A-Za-z]+"
 
+    def test_init_with_heading_class(self):
+        widget = GovTextInput(heading_class="heading-class")
+        assert widget.heading_class == "heading-class"
+
     def test_init_with_all_params(self):
         widget = GovTextInput(
             classes="custom-class",
+            heading_class="heading-class",
             hint="Test hint",
             prefix="Dr.",
             suffix="PhD",
@@ -59,6 +64,7 @@ class TestParameterOverrideMixin:
             pattern="[A-Za-z ]+",
         )
         assert widget.extra_classes == "custom-class"
+        assert widget.heading_class == "heading-class"
         assert widget.hint_text == "Test hint"
         assert widget.prefix_text == "Dr."
         assert widget.suffix_text == "PhD"
@@ -135,7 +141,7 @@ class TestParameterOverrideMixin:
             assert params.get("classes") == "existing-class custom-class"
 
     def test_map_gov_params_skips_none_values(self):
-        widget = GovTextInput(classes=None, hint=None, prefix=None, disabled=None, spellcheck=None)
+        widget = GovTextInput(classes=None, hint=None, prefix=None, disabled=None, spellcheck=None, heading_class=None)
         field = Mock()
 
         with pytest.MonkeyPatch().context() as m:
@@ -146,6 +152,7 @@ class TestParameterOverrideMixin:
             assert "prefix" not in params
             assert "disabled" not in params
             assert "spellcheck" not in params
+            assert "heading_class" not in params
 
 
 class TestPageHeadingMixin:
