@@ -10,8 +10,13 @@ class AddProviderFormView(BaseFormView):
     template = "templates/form.html"
 
     next_step_mapping = {
+<<<<<<< HEAD
         "barrister": "main.assign_chambers",
         "advocate": "main.assign_chambers",
+=======
+        "barrister": "main.add_provider/assign_parent_provider",
+        "advocate": "main.add_provider/assign_parent_provider",
+>>>>>>> 4501bbd (MAPD-43: Move next_step_mapping to views.py)
         "chambers": "main.add_provider/chambers_details",
         "lsp": "main.add_provider/lsp_details",
     }

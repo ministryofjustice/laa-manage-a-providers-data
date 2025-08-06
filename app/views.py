@@ -32,7 +32,11 @@ class BaseFormView(MethodView):
     def get_template(self) -> str:
         return self.template
 
+<<<<<<< HEAD
     def get_success_url(self, form: BaseForm | None = None) -> str:
+=======
+    def get_success_url(self, form) -> str:
+>>>>>>> 4501bbd (MAPD-43: Move next_step_mapping to views.py)
         if self.success_endpoint:
             return url_for(self.success_endpoint)
         return url_for("main.index")
@@ -45,7 +49,11 @@ class BaseFormView(MethodView):
             **kwargs,
         }
 
+<<<<<<< HEAD
     def form_valid(self, form: BaseForm) -> Response:
+=======
+    def form_valid(self, form: FlaskForm) -> Response:
+>>>>>>> 4501bbd (MAPD-43: Move next_step_mapping to views.py)
         return redirect(self.get_success_url(form))
 
     def form_invalid(self, form: BaseForm, **kwargs) -> str:
