@@ -1,5 +1,6 @@
 import sentry_sdk
 from flask import Flask
+from flask_session import Session
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
 from govuk_frontend_wtf.main import WTFormsHelpers
@@ -8,8 +9,8 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 
 from app.auth import authentication as auth
 from app.config import Config
+from app.config.logging import configure_logging
 from app.pda.api import ProviderDataApi
-from flask_session import Session
 
 csrf = CSRFProtect()
 talisman = Talisman()
@@ -36,6 +37,9 @@ def create_app(config_class=Config, pda_class=ProviderDataApi):
     app: Flask = Flask(__name__, static_url_path="/assets", static_folder="static/dist")
     app.url_map.strict_slashes = False  # This allows www.host.gov.uk/category to be routed to www.host.gov.uk/category/
     app.config.from_object(config_class)
+
+    configure_logging(app)
+
     app.jinja_env.lstrip_blocks = True
     app.jinja_env.trim_blocks = True
     app.jinja_loader = ChoiceLoader(
