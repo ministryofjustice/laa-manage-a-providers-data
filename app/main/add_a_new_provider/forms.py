@@ -41,9 +41,43 @@ class LspDetailsForm(BaseForm):
 
 
 class ChambersDetailsForm(BaseForm):
+# TODO: Add back button at top of page 
+# TODO: Add a subheader above the title with the provider_name from the input on the previous page
     title = "Chambers details"
     url = "add-provider/chambers-details"
 
+# TODO: Check yes/no component button and error message. Buttons should also be horizontal, not vertical. 
+    solicitor_advocate = RadioField(
+        "Is the provider a solicitor advocate?",
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
+        validators=[InputRequired(message=("Select yes or no"))],
+        choices=[
+            ("yes", "Yes"),
+            ("no", "No"),
+        ],
+    )
+
+    advocate_level = RadioField(
+        "Advocate level",
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
+        validators=[InputRequired(message=("Select an advocate level"))],
+        choices=[
+            ("pupil", "Pupil"),
+            ("junior", "Junior"),
+            ("king's counsel", "King's Counsel (KC, previously QC)"),
+        ],
+    )
+
+# TODO: Add limits on this field. Is it only numbers? If it is, should it still be a 'stringfield'? Is there a min or max numbers that this field should contain?
+# TODO: Adjust width of field to 3/4?
+    bar_council_number = StringField(
+        "Bar Council roll number",
+        widget=GovTextInput(heading_class="govuk-fieldset__legend--m"),
+        validators=[
+            InputRequired(message="Enter the Bar Council roll number"),
+        ],
+    )
+# TODO: Header and Footer on this page does not match Figma design. 
 
 class AssignChambersForm(BaseForm):
     title = "Assign to a chambers"
