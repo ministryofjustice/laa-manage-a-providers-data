@@ -16,7 +16,7 @@ class Config(object):
     CONTACT_PHONE = os.environ.get("CONTACT_PHONE", "")
     DEPARTMENT_NAME = os.environ.get("DEPARTMENT_NAME", "MOJ Digital")
     DEPARTMENT_URL = os.environ.get("DEPARTMENT_URL", "https://mojdigital.blog.gov.uk/")
-    SECRET_KEY = os.environ["SECRET_KEY"]
+    SECRET_KEY = os.environ.get("SECRET_KEY", "Change me")
     SERVICE_NAME = "Manage a provider's data"
     SERVICE_PHASE = os.environ.get("SERVICE_PHASE", "Beta")
     SERVICE_URL = os.environ.get("SERVICE_URL", "")
@@ -28,7 +28,7 @@ class Config(object):
     SESSION_TYPE = "redis"
     SESSION_REDIS = redis.Redis.from_url(os.environ.get("REDIS_URL", "redis://redis:6379/0"))
     SESSION_PERMANENT = True
-    PERMANENT_SESSION_LIFETIME = timedelta(hours=24)
+    PERMANENT_SESSION_LIFETIME = timedelta(minutes=30)
 
     SESSION_TIMEOUT = timedelta(minutes=30)
     SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "true").lower() == "true"
