@@ -40,6 +40,11 @@
       {% if form and form.errors %}
         {{ govukErrorSummary(wtforms_errors(form)) }}
       {% endif %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if form and form.errors %}
+        {{ govukErrorSummary(wtforms_errors(form)) }}
+      {% endif %}
 
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -50,7 +55,7 @@
       {% endwith %}
 
       {% block pageContent %}{% endblock %}
-    </div>
+    </div> 
   </div>
 {% endblock %}
 
