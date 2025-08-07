@@ -1,9 +1,16 @@
-{% macro mojPagination(currentPage=1,numShownPerPage=20, numResults=100) %}
+{% macro mojPagination(currentPage=1,numShownPerPage=20, numResults=100, searchTerm="") %}
   {%- set startResult = ((currentPage - 1) * numShownPerPage) + 1 %}
   {%- set endResult = [currentPage * numShownPerPage, numResults] | min %}
   {%- set maxPage = (numResults / numShownPerPage)|round(method='ceil')|int %}
   {%- set showDots = maxPage > 7 %}
   {%- set pageRange = 3 %}
+
+  {%- set queryString = '' %}
+
+  {%- if searchTerm %}
+    {# If you need to preserve additional query string args add them here #}
+    {%- set queryString = '&search=' + searchTerm | urlencode %}
+  {%- endif %}
 
   <nav class="moj-pagination" aria-label="Pagination navigation">
     <ul class="moj-pagination__list">
@@ -25,7 +32,7 @@
           {% else %}
           <li class="moj-pagination__item">
             <a class="moj-pagination__link"
-               href="{{ baseUrl }}?page={{ page }}"
+               href="{{ baseUrl }}?page={{ page }}{{ queryString }}"
                aria-label="Page {{ page }} of {{ maxPage }}">{{ page }}</a>
           </li>
           {% endif %}
@@ -39,7 +46,7 @@
         {% else %}
         <li class="moj-pagination__item">
           <a class="moj-pagination__link"
-             href="{{ baseUrl }}?page=1"
+             href="{{ baseUrl }}?page=1{{ queryString }}"
              aria-label="Page 1 of {{ maxPage }}">1</a>
         </li>
         {% endif %}
@@ -60,7 +67,7 @@
             {% else %}
             <li class="moj-pagination__item">
               <a class="moj-pagination__link"
-                 href="{{ baseUrl }}?page={{ page }}"
+                 href="{{ baseUrl }}?page={{ page }}{{ queryString }}"
                  aria-label="Page {{ page }} of {{ maxPage }}">{{ page }}</a>
             </li>
             {% endif %}
@@ -79,7 +86,7 @@
           {% else %}
           <li class="moj-pagination__item">
             <a class="moj-pagination__link"
-               href="{{ baseUrl }}?page={{ maxPage }}"
+               href="{{ baseUrl }}?page={{ maxPage }}{{ queryString }}"
                aria-label="Page {{ maxPage }} of {{ maxPage }}">{{ maxPage }}</a>
           </li>
           {% endif %}
@@ -88,14 +95,13 @@
 
       {% if currentPage < maxPage %}
       <li class="moj-pagination__item moj-pagination__item--next">
-        <a class="moj-pagination__link" href="{{ baseUrl }}?page={{ currentPage + 1 }}">
+        <a class="moj-pagination__link" href="{{ baseUrl }}?page={{ currentPage + 1 }}{{ queryString }}">
           Next<span class="govuk-visually-hidden"> page</span>
         </a>
       </li>
       {% endif %}
 
     </ul>
-
 
     {% if numResults > 0 %}
     <p class="moj-pagination__results">

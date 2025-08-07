@@ -10,13 +10,13 @@ from app.forms import BaseForm
 class BaseFormView(MethodView):
     """Base view class for handling forms with GET and POST methods."""
 
-    form_class: type[FlaskForm] = BaseForm
+    form_class: type[BaseForm] = BaseForm
     template: str = "form.html"
     success_endpoint: str = "main.index"
 
     def __init__(
         self,
-        form_class: type[FlaskForm] | None = None,
+        form_class: type[BaseForm] | None = None,
         template: str | None = None,
         success_endpoint: str | None = None,
     ) -> None:
@@ -27,13 +27,13 @@ class BaseFormView(MethodView):
         if success_endpoint is not None:
             self.success_endpoint = success_endpoint
 
-    def get_form_class(self) -> type[FlaskForm]:
+    def get_form_class(self) -> type[BaseForm]:
         return self.form_class
 
     def get_template(self) -> str:
         return self.template
 
-    def get_success_url(self) -> str:
+    def get_success_url(self, form) -> str:
         if self.success_endpoint:
             return url_for(self.success_endpoint)
         return url_for("main.index")
@@ -43,7 +43,7 @@ class BaseFormView(MethodView):
         return context
 
     def form_valid(self, form: FlaskForm) -> Response:
-        return redirect(self.get_success_url())
+        return redirect(self.get_success_url(form))
 
     def form_invalid(self, form: FlaskForm) -> str:
         return render_template(self.get_template(), **self.get_context_data(form))

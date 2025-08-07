@@ -156,3 +156,76 @@ class TransposedDataTable(DataTable):
 
     def get_headings(self) -> list[dict[str, str]]:
         return [{"text": heading, "classes": ""} for heading in self.headings]
+
+
+class RadioDataTable(DataTable):
+    """Extended DataTable that adds radio button functionality."""
+
+    first_cell_is_header = False
+    sortable_table = False  # Disable sorting when using radio buttons
+
+    def __init__(
+        self, structure: list[TableStructure], data: Data | RowData, radio_field_name: str, radio_value_key: str
+    ) -> None:
+        """
+        Initialize RadioDataTable.
+
+        Args:
+            structure: Table structure definition
+            data: Table data
+            radio_field_name: Name attribute for radio buttons
+            radio_value_key: Key in row data to use as radio button value
+        """
+        super().__init__(structure, data)
+        self.radio_field_name = radio_field_name
+        self.radio_value_key = radio_value_key
+
+    def get_rows(self, selected_value: str = None) -> list[Row]:
+        """Generate table rows with radio buttons in first column."""
+        rows = []
+
+        for row_data in self.data:
+            # Get the base row from parent class
+            base_row = super()._get_row(row_data)
+
+            # Create radio button cell
+            radio_value = str(row_data.get(self.radio_value_key, ""))
+            radio_id = f"{self.radio_field_name}_{radio_value}"
+
+            # Build radio button HTML
+            checked_attr = 'checked="checked"' if selected_value and str(selected_value) == radio_value else ""
+
+            radio_html = f'''
+            <div class="govuk-radios__item govuk-radios--small">
+                <input class="govuk-radios__input" type="radio" name="{self.radio_field_name}" 
+                       value="{radio_value}" id="{radio_id}" {checked_attr}>
+                <label class="govuk-radios__label" for="{radio_id}">
+                    <span class="govuk-visually-hidden">Select this row</span>
+                </label>
+            </div>
+            '''
+
+            radio_cell = {"html": radio_html.strip(), "text": "", "classes": "govuk-table__cell--radio"}
+
+            # Prepend radio button cell to the row
+            rows.append([radio_cell] + base_row)
+
+        return rows
+
+    def get_headings(self) -> list[dict[str, str]]:
+        """Get headings with empty first column for radio buttons."""
+        base_headings = super().get_headings()
+        radio_heading = {"text": "", "classes": "govuk-table__header--radio", "id": ""}
+        return [radio_heading] + base_headings
+
+    def to_govuk_params(self, selected_value: str = None, **kwargs) -> dict[str, Any]:
+        """Convert table to dictionary for template rendering with radio buttons."""
+        params = {
+            "head": self.get_headings(),
+            "rows": self.get_rows(selected_value),
+            "firstCellIsHeader": self.first_cell_is_header,
+            "classes": f"{DEFAULT_TABLE_CLASSES} govuk-table--radio",
+        }
+        # Don't add sortable module for radio tables
+        params.update(kwargs)
+        return params
