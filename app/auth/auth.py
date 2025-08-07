@@ -71,5 +71,6 @@ class Auth(BaseAuth):
             self.logger.info("User logged out", **extra)
 
         session.clear()
-        url = url_for("main.index", _external=True)
+        url_scheme = current_app.config.get("PREFERRED_URL_SCHEME", "https")
+        url = url_for("main.index", _external=True, _scheme=url_scheme)
         return self.__class__._redirect(self._auth.log_out(url))
