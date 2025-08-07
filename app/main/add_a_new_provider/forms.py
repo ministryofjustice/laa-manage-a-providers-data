@@ -52,7 +52,7 @@ class ChambersDetailsForm(BaseForm):
     solicitor_advocate = RadioField(
         "Is the provider a solicitor advocate?",
         widget=GovRadioInput(heading_class="govuk-fieldset__legend--m", classes="govuk-radios--inline"),
-        validators=[InputRequired(message=("Select yes or no"))],
+        validators=[InputRequired(message=("Select yes if the provider is a solicitor advocate"))],
         choices=[
             ("yes", "Yes"),
             ("no", "No"),
@@ -62,7 +62,7 @@ class ChambersDetailsForm(BaseForm):
     advocate_level = RadioField(
         "Advocate level",
         widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
-        validators=[InputRequired(message=("Select an advocate level"))],
+        validators=[InputRequired(message=("Select the advocate level"))],
         choices=[
             ("pupil", "Pupil"),
             ("junior", "Junior"),
@@ -75,7 +75,7 @@ class ChambersDetailsForm(BaseForm):
         widget=GovTextInput(heading_class="govuk-fieldset__legend--m", classes="govuk-!-width-one-half"),
         validators=[
             InputRequired(message="Enter the Bar Council roll number"),
-            Length(max=15, message="The Bar Council roll number must be 15 characters or fewer"),
+            Length(max=15, message="The Bar Council roll number must be 15 characters or less"),
         ],
     )
 
