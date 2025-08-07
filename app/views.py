@@ -32,11 +32,7 @@ class BaseFormView(MethodView):
     def get_template(self) -> str:
         return self.template
 
-<<<<<<< HEAD
-    def get_success_url(self, form: BaseForm | None = None) -> str:
-=======
-    def get_success_url(self, form) -> str:
->>>>>>> 4501bbd (MAPD-43: Move next_step_mapping to views.py)
+    def get_success_url(self, form: FlaskForm | None = None) -> str:
         if self.success_endpoint:
             return url_for(self.success_endpoint)
         return url_for("main.index")
