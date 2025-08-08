@@ -21,7 +21,7 @@
   },
   {
     "firmNumber": "2",
-    "firmId": 2
+    "firmId": 2,
     "ccmsFirmId": 2,
     "parentFirmId": 0,
     "firmName": "Test Provider 2",

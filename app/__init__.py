@@ -111,7 +111,14 @@ def create_app(config_class=Config, pda_class=ProviderDataApi):
         session_cookie_samesite="Strict",
     )
 
-    pda = pda_class()
+    # Use mock API if configured
+    if app.config.get("USE_MOCK_API", False):
+        from app.pda.mock_api import MockProviderDataApi
+
+        pda = MockProviderDataApi()
+    else:
+        pda = pda_class()
+
     pda.init_app(app, base_url=app.config["PDA_URL"], api_key=app.config["PDA_API_KEY"])
 
     WTFormsHelpers(app)

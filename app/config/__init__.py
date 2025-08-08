@@ -30,3 +30,4 @@ class Config(object):
     PDA_ENVIRONMENT = os.environ.get("PDA_ENVIRONMENT")
     PDA_API_KEY = os.environ.get("PDA_API_KEY")
     PASSWORD = os.environ.get("PASSWORD")
+    USE_MOCK_API = os.environ.get("USE_MOCK_API", "False").lower() == "true"
