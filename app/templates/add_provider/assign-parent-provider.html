@@ -8,48 +8,44 @@
 
 {% block content %}
 
-<h1 class="govuk-heading-xl">{{ form.title }}</h1>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% if form and form.errors %}
+            {{ govukErrorSummary(wtforms_errors(form)) }}
+        {% endif %}
 
-<form method="get" class="govuk-!-margin-bottom-6">
-  <div class="govuk-form-group{% if form.search_term and form.num_results == 0 %} govuk-form-group--error{% endif %}">
-    <label class="govuk-label govuk-label--m govuk-!-margin-bottom-0" for="search">
-      Search for a parent provider
-    </label>
-    <div class="govuk-hint">
-      You can search by name or account number
-    </div>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+              {{ govukNotificationBanner({'type': category, 'html': message}) }}
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
 
-    {% if form.search_term and form.num_results == 0 %}
-      <p id="search-error" class="govuk-error-message">
-        <span class="govuk-visually-hidden">Error:</span>
-        No providers found. Check the spelling and search for something else.
-      </p>
-    {% endif %}
+      <h1 class="govuk-heading-xl">{{ form.title }}</h1>
 
-    <div style="display: flex; gap: 10px; align-items: flex-end;">
-      <input class="govuk-input govuk-input--width-30 provider-search{% if form.search_term and form.num_results == 0 %} govuk-input--error{% endif %}"
-             id="search"
-             name="search"
-             type="text"
-             value="{{ form.search_term or '' }}"
-             {% if form.search_term and form.num_results == 0 %}aria-describedby="search-error"{% endif %}>
-      {{ govukButton({'text': 'Search', 'classes': 'govuk-button--secondary'}) }}
+      <form method="get" class="govuk-!-margin-bottom-6">
+          <div class="govuk-form-group--search">
+            {{ form.search() }}
+            {{ govukButton({'text': 'Search', 'classes': 'govuk-button--secondary'}) }}
+          </div>
+      </form>
+
+      {# Selection form using POST #}
+      {% if form.num_results > 0 %}
+        <form method="post">
+          {{ form.hidden_tag() }}
+
+          {{ govukRadioTable(form.provider) }}
+          {{ mojPagination(currentPage=form.page, numShownPerPage=form.providers_shown_per_page, numResults=form.num_results, searchTerm=form.search_term) }}
+
+          <br>
+          <br>
+
+          {{ govukButton({'text': 'Continue'}) }}
+        </form>
+      {% endif %}
     </div>
   </div>
-</form>
 
-{# Selection form using POST #}
-{% if form.num_results > 0 %}
-  <form method="post">
-    {{ form.hidden_tag() }}
-
-    {{ govukRadioTable(form.provider) }}
-    {{ mojPagination(currentPage=form.page, numShownPerPage=form.providers_shown_per_page, numResults=form.num_results, searchTerm=form.search_term) }}
-
-    <br>
-    <br>
-
-    {{ govukButton({'text': 'Continue'}) }}
-  </form>
-{% endif %}
 {% endblock %}

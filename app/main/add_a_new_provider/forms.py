@@ -1,8 +1,9 @@
 from flask import current_app
 from wtforms import RadioField
 from wtforms.fields.simple import StringField
-from wtforms.validators import InputRequired
+from wtforms.validators import InputRequired, Length
 
+from app.validators import ValidateSearchResults
 from app.widgets import GovRadioInput, GovTextInput
 
 from ...components.tables import RadioDataTable
@@ -113,6 +114,17 @@ class ParentProviderForm(BaseForm):
     template = "add_provider/assign-parent-provider.html"
     success_url = "main.view_provider"
 
+    search = StringField(
+        "Search for a parent provider",
+        widget=GovTextInput(
+            form_group_classes="govuk-!-width-two-thirds",
+            heading_class="govuk-fieldset__legend--s",
+            classes="provider-search",
+            hint="You can search by name or account number",
+        ),
+        validators=[Length(max=100, message="Search term must be 100 characters or less"), ValidateSearchResults()],
+    )
+
     provider = GovUKTableRadioField(
         "",
         structure=[
@@ -122,6 +134,7 @@ class ParentProviderForm(BaseForm):
         ],
         choices=[],  # This will be set when the user sends a request.
         radio_value_key="firmId",
+        validators=[InputRequired(message="Select a parent provider")],
     )
 
     def __init__(self, search_term=None, page=1, *args, **kwargs):
@@ -135,8 +148,12 @@ class ParentProviderForm(BaseForm):
         # Advocates or Barristers can only have Chambers as their parent
         firms = [firm for firm in firms if firm["firmType"] == "Chambers"]
 
-        # Filter providers based on search term
+        # Set search field data
         self.search_term = search_term
+        if search_term:
+            self.search.data = search_term
+
+        # Filter providers based on search term
         if self.search_term:
             search_lower = self.search_term.lower()
             firms = [

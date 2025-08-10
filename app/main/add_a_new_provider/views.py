@@ -1,5 +1,6 @@
 from flask import Response, redirect, render_template, request, session, url_for
 
+from app.main.add_a_new_provider import ParentProviderForm
 from app.views import BaseFormView
 
 
@@ -57,7 +58,11 @@ class ParentProviderFormView(BaseFormView):
     def get(self):
         search_term = request.args.get("search", "").strip()
         page = int(request.args.get("page", 1))
-        form = self.get_form_class()(search_term=search_term, page=page)
+        form: ParentProviderForm = self.get_form_class()(search_term=search_term, page=page)
+
+        if search_term:
+            form.search.validate(form)
+
         return render_template(self.get_template(), **self.get_context_data(form))
 
     def post(self) -> Response | str:

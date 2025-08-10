@@ -123,6 +123,7 @@ class ParameterOverrideMixin:
         *,
         classes: str | None = None,
         heading_class: str | None = None,
+        form_group_classes: str | None = None,
         hint: str | None = None,
         prefix: str | None = None,
         suffix: str | None = None,
@@ -165,6 +166,7 @@ class ParameterOverrideMixin:
         self.autocapitalize = autocapitalize
         self.pattern = pattern
         self.heading_class = heading_class
+        self.form_group_classes = form_group_classes
         super().__init__(**kwargs)
 
     def map_gov_params(self, field: Any, **kwargs: Any) -> dict[str, Any]:
@@ -212,6 +214,12 @@ class ParameterOverrideMixin:
                 params["fieldset"]["legend"]["classes"] = self.heading_class
             else:
                 params["label"]["classes"] = self.heading_class
+
+        if self.form_group_classes:
+            if "formGroup" in params:
+                params["formGroup"]["classes"] = self.form_group_classes
+            else:
+                params["formGroup"] = {"classes": self.form_group_classes}
 
         return params
 
