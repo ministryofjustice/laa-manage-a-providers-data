@@ -226,6 +226,5 @@ class RadioDataTable(DataTable):
             "firstCellIsHeader": self.first_cell_is_header,
             "classes": f"{DEFAULT_TABLE_CLASSES} govuk-table--radio",
         }
-        # Don't add sortable module for radio tables
         params.update(kwargs)
         return params

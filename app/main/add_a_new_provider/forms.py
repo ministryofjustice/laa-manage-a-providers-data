@@ -6,8 +6,8 @@ from wtforms.validators import InputRequired, Length
 from app.validators import ValidateSearchResults
 from app.widgets import GovRadioInput, GovTextInput
 
-from ...components.tables import RadioDataTable
 from ...forms import BaseForm
+from .fields import GovUKTableRadioField
 
 
 class AddProviderForm(BaseForm):
@@ -43,69 +43,6 @@ class LspDetailsForm(BaseForm):
 class ChambersDetailsForm(BaseForm):
     title = "Chambers details"
     url = "add-provider/chambers-details"
-
-
-class GovUKTableRadioField(RadioField):
-    """A RadioField that generates GovUK table params for template rendering."""
-
-    def __init__(self, label=None, validators=None, structure=None, radio_value_key="id", **kwargs):
-        """
-        Initialize the field.
-
-        Args:
-            label: Field label (will be rendered as page heading in template)
-            validators: Field validators
-            structure: Table structure definition following your TableStructure format
-            radio_value_key: Key to use for radio button values
-            **kwargs: Additional field arguments
-        """
-        super().__init__(label, validators, **kwargs)
-
-        if structure is None:
-            raise ValueError("structure parameter is required")
-
-        self.structure = structure
-        self.radio_value_key = radio_value_key
-        # Use the field type for template detection
-        self.type = "GovUKTableRadioField"
-
-    def get_table_params(self, **kwargs):
-        """
-        Generate GovUK table params for use with your existing Jinja2 macro.
-
-        Usage in template: {{ govukTable(field.get_table_params()) }}
-
-        Args:
-            **kwargs: Additional parameters to pass to the table
-
-        Returns:
-            dict: GovUK table parameters ready for your macro
-        """
-        # Convert field choices to DataTable format
-        data = []
-        for choice_value, choice_data in self.choices:
-            if isinstance(choice_data, dict):
-                # If choice_data is already a dict, use it directly
-                row_data = choice_data.copy()
-                row_data[self.radio_value_key] = choice_value
-            elif isinstance(choice_data, (list, tuple)):
-                # Convert list/tuple to dict using structure IDs
-                row_data = {self.radio_value_key: choice_value}
-                for i, value in enumerate(choice_data):
-                    if i < len(self.structure):
-                        structure_id = self.structure[i].get("id", f"col_{i}")
-                        row_data[structure_id] = str(value)
-            else:
-                # Simple string value
-                row_data = {self.radio_value_key: choice_value, "label": str(choice_data)}
-            data.append(row_data)
-
-        # Create RadioDataTable
-        table = RadioDataTable(
-            structure=self.structure, data=data, radio_field_name=self.name, radio_value_key=self.radio_value_key
-        )
-
-        return table.to_govuk_params(selected_value=self.data, **kwargs)
 
 
 class ParentProviderForm(BaseForm):
