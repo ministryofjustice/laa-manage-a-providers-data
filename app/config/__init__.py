@@ -26,8 +26,8 @@ class Config(object):
     SESSION_TIMEOUT = timedelta(minutes=30)
     SESSION_COOKIE_SECURE = True
     TESTING = os.environ.get("TESTING", "False").lower() == "true"
+    PDA_USE_MOCK_API = os.environ.get("PDA_USE_MOCK_API", "False").lower() == "true"
     PDA_URL = os.environ.get("PDA_URL")
     PDA_ENVIRONMENT = os.environ.get("PDA_ENVIRONMENT")
     PDA_API_KEY = os.environ.get("PDA_API_KEY")
     PASSWORD = os.environ.get("PASSWORD")
-    USE_MOCK_API = os.environ.get("USE_MOCK_API", "False").lower() == "true"

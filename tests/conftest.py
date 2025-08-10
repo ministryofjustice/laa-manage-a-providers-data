@@ -1,7 +1,7 @@
 import pytest
 
 from app import Config, create_app
-from tests.fixture.pda import mock_provider_data_api
+from app.pda.mock_api import MockProviderDataApi
 
 
 class TestConfig(Config):
@@ -18,6 +18,6 @@ class TestConfig(Config):
 
 @pytest.fixture(scope="session")
 def app(config=TestConfig):
-    app = create_app(config, mock_provider_data_api)
+    app = create_app(config, MockProviderDataApi)
 
     return app

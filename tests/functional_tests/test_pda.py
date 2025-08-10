@@ -6,35 +6,35 @@ from playwright.sync_api import Page, expect
 @pytest.mark.usefixtures("live_server")
 def test_providers(page: Page):
     page.goto(url_for("main.providers", _external=True))
-    expect(page.get_by_role("link", name="Test Firm 1")).to_be_visible()
-    expect(page.get_by_role("link", name="Test Firm 2")).to_be_visible()
+    expect(page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.get_by_role("link", name="JOHNSON LEGAL SERVICES")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
 def test_offices(page: Page):
     test_providers(page)
-    test_firm_1 = page.get_by_role("link", name="Test Firm 1")
+    test_firm_1 = page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS")
     test_firm_1.click()
-    expect(page.get_by_role("link", name="TEST001")).to_be_visible()
-    expect(page.get_by_role("cell", name="Test Office 1")).to_be_visible()
-    expect(page.get_by_role("link", name="TEST002")).to_be_visible()
-    expect(page.get_by_role("cell", name="Test Office 2")).to_be_visible()
+    expect(page.get_by_role("link", name="1A001L", exact=True)).to_be_visible()
+    expect(page.get_by_role("cell", name="1A001L,1 Skyscraper")).to_be_visible()
+    expect(page.get_by_role("link", name="1A002L", exact=True)).to_be_visible()
+    expect(page.get_by_role("cell", name="1A002L,2 High Street")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
 def test_contracts(page: Page):
     test_offices(page)
-    page.get_by_role("link", name="TEST001").click()
-    expect(page.get_by_text("TEST001")).to_be_visible()
-    expect(page.get_by_role("heading", name="Test Office 1")).to_be_visible()
-    expect(page.get_by_role("cell", name="Family")).to_be_visible()
+    page.get_by_role("link", name="1A001L").click()
+    expect(page.get_by_text("1A001L", exact=True)).to_be_visible()
+    expect(page.get_by_role("heading", name="1A001L,1 Skyscraper")).to_be_visible()
+    expect(page.get_by_role("cell", name="MAT")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
 def test_schedules(page: Page):
     test_contracts(page)
     page.get_by_role("link", name="Schedules").click()
-    expect(page.get_by_role("cell", name="2022 Civil Contract")).to_be_visible()
+    expect(page.get_by_role("cell", name="2024 Standard Civil Contract")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")

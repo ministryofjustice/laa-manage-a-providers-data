@@ -112,7 +112,7 @@ def create_app(config_class=Config, pda_class=ProviderDataApi):
     )
 
     # Use mock API if configured
-    if app.config.get("USE_MOCK_API", False):
+    if app.config.get("PDA_USE_MOCK_API", False):
         from app.pda.mock_api import MockProviderDataApi
 
         pda = MockProviderDataApi()
