@@ -112,7 +112,7 @@ class ParentProviderForm(BaseForm):
     title = "Assign to parent provider"
     url = "assign-parent-provider"
     template = "add_provider/assign-parent-provider.html"
-    success_url = "main.view_provider"
+    success_url = "main.providers"
 
     search = StringField(
         "Search for a parent provider",
