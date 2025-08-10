@@ -33,7 +33,7 @@ class BaseFormView(MethodView):
     def get_template(self) -> str:
         return self.template
 
-    def get_success_url(self) -> str:
+    def get_success_url(self, form: BaseForm | None = None) -> str:
         if self.success_endpoint:
             return url_for(self.success_endpoint)
         return url_for("main.index")
@@ -43,7 +43,7 @@ class BaseFormView(MethodView):
         return context
 
     def form_valid(self, form: FlaskForm) -> Response:
-        return redirect(self.get_success_url())
+        return redirect(self.get_success_url(form))
 
     def form_invalid(self, form: FlaskForm) -> str:
         return render_template(self.get_template(), **self.get_context_data(form))

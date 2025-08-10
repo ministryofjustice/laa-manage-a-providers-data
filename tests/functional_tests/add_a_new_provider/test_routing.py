@@ -6,7 +6,7 @@ ROUTING = [
     {"link_text": "Barrister", "next_page_heading": "Assign to parent provider"},
     {"link_text": "Advocate", "next_page_heading": "Assign to parent provider"},
     {"link_text": "Chambers", "next_page_heading": "Chambers details"},
-    {"link_text": "Legal services provider", "next_page_heading": "Legal services provider details"},
+    {"link_text": "Legal services provider", "next_page_heading": "Additional details"},
 ]
 
 
