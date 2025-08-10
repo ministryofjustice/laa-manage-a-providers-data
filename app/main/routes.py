@@ -4,8 +4,8 @@ from flask import abort, current_app, render_template, request, url_for
 
 from app.auth import requires_authentication
 from app.components.tables import DataTable, TableStructure, TransposedDataTable
-from app.main import bp
 from app.main.utils import get_full_info_html
+from app.main import bp
 
 
 @bp.get("/")
