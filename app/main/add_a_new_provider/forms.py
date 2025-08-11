@@ -1,11 +1,11 @@
 from flask import session
 from wtforms import RadioField
-from wtforms.fields import DateField, SelectField
+from wtforms.fields import DateField
 from wtforms.fields.simple import StringField
 from wtforms.validators import DataRequired, InputRequired, Optional
 
 from app.validators import ValidateCompaniesHouseNumber, ValidatePastDate
-from app.widgets import GovDateInput, GovRadioInput, GovSelect, GovTextInput
+from app.widgets import GovDateInput, GovRadioInput, GovTextInput
 
 from ...forms import BaseForm
 
@@ -36,25 +36,24 @@ class AddProviderForm(BaseForm):
 
 
 class LspDetailsForm(BaseForm):
-    title = "Additional details"
+    title = "Legal services provider details"
     url = "additional-details-legal-services-provider"
 
     @property
     def caption(self):
         return session.get("provider_name")
 
-    constitutional_status = SelectField(
+    constitutional_status = RadioField(
         "Constitutional status",
-        widget=GovSelect(heading_class="govuk-fieldset__legend--m"),
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
         validators=[InputRequired(message="Select a constitutional status")],
         choices=[
-            ("", "Select constitutional status"),
-            ("sole practitioner", "Sole Practitioner"),
+            ("government funded organisation", "Government funded organisation"),
+            ("sole practitioner", "Sole practitioner"),
+            ("charity", "Charity"),
             ("partnership", "Partnership"),
-            ("limited company", "Limited Company"),
-            ("limited liability partnership", "Limited Liability Partnership"),
-            ("charity (incorporated)", "Charity (Incorporated)"),
-            ("charity (unincorporated)", "Charity (Unincorporated)"),
+            ("llp", "LLP"),
+            ("limited company", "Limited company"),
         ],
     )
 
@@ -65,29 +64,13 @@ class LspDetailsForm(BaseForm):
         validators=[Optional(), DataRequired(message="Date must be a real date"), ValidatePastDate()],
     )
 
-    non_profit_organisation = RadioField(
-        "Is the provider a not for profit organisation?",
-        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m", classes="govuk-radios--inline"),
-        validators=[InputRequired(message="Select yes if the provider is a not for profit organisation")],
-        choices=[
-            ("Yes", "Yes"),
-            ("No", "No"),
-        ],
-    )
-
-    high_risk_supplier = RadioField(
-        "Is the provider a high risk supplier? (optional)",
-        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m", classes="govuk-radios--inline"),
-        validators=[Optional()],
-        choices=[
-            ("Yes", "Yes"),
-            ("No", "No"),
-        ],
-    )
-
     companies_house_number = StringField(
         "Companies House number",
-        widget=GovTextInput(heading_class="govuk-fieldset__legend--m"),
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-!-width-one-half",
+            hint="Also known as Company Registration Number",
+        ),
         validators=[InputRequired(message="Enter the Companies House number"), ValidateCompaniesHouseNumber()],
     )
 

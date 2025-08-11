@@ -33,8 +33,6 @@ class LspDetailsFormView(BaseFormView):
 
     def form_valid(self, form):
         session["constitutional_status"] = form.data.get("constitutional_status")
-        session["non_profit_organisation"] = form.data.get("non_profit_organisation")
-        session["high_risk_supplier"] = form.data.get("high_risk_supplier")
         session["companies_house_number"] = form.data.get("companies_house_number")
 
         indemnity_date = form.data.get("indemnity_received_date")
