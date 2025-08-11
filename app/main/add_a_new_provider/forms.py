@@ -46,13 +46,13 @@ class ChambersDetailsForm(BaseForm):
 
 
 class ParentProviderForm(BaseForm):
-    title = "Assign to parent provider"
+    title = "Assign to a chambers"
     url = "assign-parent-provider"
     template = "add_provider/assign-parent-provider.html"
     success_url = "main.providers"
 
     search = StringField(
-        "Search for a parent provider",
+        "Search for a chambers",
         widget=GovTextInput(
             form_group_classes="govuk-!-width-two-thirds",
             heading_class="govuk-fieldset__legend--s",
