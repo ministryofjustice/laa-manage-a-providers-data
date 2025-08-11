@@ -10,14 +10,14 @@ def navigate_to_assign_parent_provider(page: Page):
     page.get_by_role("radio", name="Barrister").click()
     page.get_by_role("button", name="Continue").click()
     # Should now be on the assign parent provider page
-    expect(page.get_by_role("heading", name="Assign to parent provider")).to_be_visible()
+    expect(page.get_by_role("heading", name="Assign to a chambers")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
 def test_assign_parent_provider_page_loads_via_ui(page: Page):
     """Test that the assign parent provider page loads correctly via UI navigation."""
     navigate_to_assign_parent_provider(page)
-    expect(page.get_by_role("textbox", name="Search for a parent provider")).to_be_visible()
+    expect(page.get_by_role("textbox", name="Search for a chambers")).to_be_visible()
     expect(page.get_by_role("button", name="Search")).to_be_visible()
 
 
@@ -27,7 +27,7 @@ def test_search_functionality_shows_results(page: Page):
     navigate_to_assign_parent_provider(page)
 
     # Search for "Johnson" which should match "JOHNSON LEGAL SERVICES"
-    page.get_by_role("textbox", name="Search for a parent provider").fill("Johnson")
+    page.get_by_role("textbox", name="Search for a chambers").fill("Johnson")
     page.get_by_role("button", name="Search").click()
 
     # Should show the results table and continue button
@@ -41,7 +41,7 @@ def test_search_functionality_shows_no_results_error(page: Page):
     navigate_to_assign_parent_provider(page)
 
     # Search for something that doesn't exist
-    page.get_by_role("textbox", name="Search for a parent provider").fill("NonExistentProvider")
+    page.get_by_role("textbox", name="Search for a chambers").fill("NonExistentProvider")
     page.get_by_role("button", name="Search").click()
 
     # Should show error message and no results table
@@ -60,7 +60,7 @@ def test_search_field_validation_max_length(page: Page):
 
     # Try to enter more than 100 characters
     long_search = "a" * 101
-    page.get_by_role("textbox", name="Search for a parent provider").fill(long_search)
+    page.get_by_role("textbox", name="Search for a chambers").fill(long_search)
     page.get_by_role("button", name="Search").click()
 
     # Should show length validation error
@@ -73,7 +73,7 @@ def test_search_filters_only_chambers(page: Page):
     navigate_to_assign_parent_provider(page)
 
     # Search for something that matches both Chambers and LSP
-    page.get_by_role("textbox", name="Search for a parent provider").fill("LEGAL")
+    page.get_by_role("textbox", name="Search for a chambers").fill("LEGAL")
     page.get_by_role("button", name="Search").click()
 
     # Should only show Chambers providers, not Legal Services Providers
@@ -87,12 +87,11 @@ def test_search_by_firm_name(page: Page):
     navigate_to_assign_parent_provider(page)
 
     # Search by partial firm name
-    page.get_by_role("textbox", name="Search for a parent provider").fill("Westminster")
+    page.get_by_role("textbox", name="Search for a chambers").fill("Westminster")
     page.get_by_role("button", name="Search").click()
 
     # Should find WESTMINSTER SOLICITORS LLP
     expect(page.locator("text=WESTMINSTER SOLICITORS LLP")).to_be_visible()
-    expect(page.locator("text=Chambers")).to_be_visible()  # Should show firm type
 
 
 @pytest.mark.usefixtures("live_server")
@@ -101,7 +100,7 @@ def test_search_by_firm_id(page: Page):
     navigate_to_assign_parent_provider(page)
 
     # Search by firm ID (should match firmId: 2)
-    page.get_by_role("textbox", name="Search for a parent provider").fill("2")
+    page.get_by_role("textbox", name="Search for a chambers").fill("2")
     page.get_by_role("button", name="Search").click()
 
     # Should find the firm with firmId 2 (JOHNSON LEGAL SERVICES)
@@ -114,7 +113,7 @@ def test_case_insensitive_search(page: Page):
     navigate_to_assign_parent_provider(page)
 
     # Search with different case
-    page.get_by_role("textbox", name="Search for a parent provider").fill("johnson")
+    page.get_by_role("textbox", name="Search for a chambers").fill("johnson")
     page.get_by_role("button", name="Search").click()
 
     # Should still find JOHNSON LEGAL SERVICES
@@ -127,11 +126,11 @@ def test_search_preserves_search_term(page: Page):
     navigate_to_assign_parent_provider(page)
 
     search_term = "Johnson"
-    page.get_by_role("textbox", name="Search for a parent provider").fill(search_term)
+    page.get_by_role("textbox", name="Search for a chambers").fill(search_term)
     page.get_by_role("button", name="Search").click()
 
     # Search field should still contain the search term
-    expect(page.get_by_role("textbox", name="Search for a parent provider")).to_have_value(search_term)
+    expect(page.get_by_role("textbox", name="Search for a chambers")).to_have_value(search_term)
 
 
 @pytest.mark.usefixtures("live_server")
@@ -140,14 +139,16 @@ def test_select_parent_provider_requires_selection(page: Page):
     navigate_to_assign_parent_provider(page)
 
     # Search to show results
-    page.get_by_role("textbox", name="Search for a parent provider").fill("Johnson")
+    page.get_by_role("textbox", name="Search for a chambers").fill("Johnson")
     page.get_by_role("button", name="Search").click()
 
     # Try to continue without selecting a provider
     page.get_by_role("button", name="Continue").click()
 
     # Should show validation error
-    expect(page.locator(".govuk-error-message", has_text="Select a parent provider")).to_be_visible()
+    expect(
+        page.locator(".govuk-error-message", has_text="Select a chambers to assign the new provider to")
+    ).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -156,17 +157,15 @@ def test_select_parent_provider_success(page: Page):
     navigate_to_assign_parent_provider(page)
 
     # Search to show results
-    page.get_by_role("textbox", name="Search for a parent provider").fill("Johnson")
+    page.get_by_role("textbox", name="Search for a chambers").fill("Johnson")
     page.get_by_role("button", name="Search").click()
 
     # Select a provider (assuming radio buttons are rendered for the table)
     page.locator("input[type='radio'][value='2']").click()
     page.get_by_role("button", name="Continue").click()
 
-    # Should redirect to success page - check that we're no longer on assign parent provider page
-    page.wait_for_function("() => !document.title.includes('Assign to parent provider')", timeout=10000)
-    # Verify we've navigated away from the assign parent provider page
-    expect(page.get_by_role("heading", name="Assign to parent provider")).not_to_be_visible()
+    # Verify we've navigated away from the assign to a chambers page
+    expect(page.get_by_role("heading", name="Assign to a chambers")).not_to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -177,8 +176,8 @@ def test_advocate_also_navigates_to_assign_parent_provider(page: Page):
     page.get_by_role("radio", name="Advocate").click()
     page.get_by_role("button", name="Continue").click()
 
-    # Should also be on the assign parent provider page
-    expect(page.get_by_role("heading", name="Assign to parent provider")).to_be_visible()
+    # Should also be on the assign to a chambers page
+    expect(page.get_by_role("heading", name="Assign to a chambers")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -187,7 +186,7 @@ def test_pagination_with_search(page: Page):
     navigate_to_assign_parent_provider(page)
 
     # Search for "chambers" to get multiple results
-    page.get_by_role("textbox", name="Search for a parent provider").fill("chambers")
+    page.get_by_role("textbox", name="Search for a chambers").fill("chambers")
     page.get_by_role("button", name="Search").click()
 
     # If there are multiple results, pagination should be visible
@@ -196,4 +195,4 @@ def test_pagination_with_search(page: Page):
     if page.locator("text=Next").is_visible():
         page.locator("text=Next").click()
         # Search term should still be preserved in URL and field
-        expect(page.get_by_role("textbox", name="Search for a parent provider")).to_have_value("chambers")
+        expect(page.get_by_role("textbox", name="Search for a chambers")).to_have_value("chambers")

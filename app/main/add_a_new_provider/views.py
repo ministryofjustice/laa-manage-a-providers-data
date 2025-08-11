@@ -10,8 +10,8 @@ class AddProviderFormView(BaseFormView):
     template = "templates/form.html"
 
     next_step_mapping = {
-        "barrister": "main.assign_parent_provider",
-        "advocate": "main.assign_parent_provider",
+        "barrister": "main.assign_chambers",
+        "advocate": "main.assign_chambers",
         "chambers": "main.add_provider/chambers_details",
         "lsp": "main.add_provider/lsp_details",
     }
@@ -48,7 +48,7 @@ class ChambersDetailsFormView(BaseFormView):
 class ParentProviderFormView(BaseFormView):
     """Form view for the Assign to parent provider"""
 
-    template = "add_provider/assign-parent-provider.html"
+    template = "add_provider/assign-chambers.html"
     success_url = "main.providers"
 
     def form_valid(self, form):

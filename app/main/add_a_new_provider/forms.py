@@ -47,8 +47,8 @@ class ChambersDetailsForm(BaseForm):
 
 class ParentProviderForm(BaseForm):
     title = "Assign to a chambers"
-    url = "assign-parent-provider"
-    template = "add_provider/assign-parent-provider.html"
+    url = "assign-chambers"
+    template = "add_provider/assign-chambers.html"
     success_url = "main.providers"
 
     search = StringField(
@@ -71,7 +71,7 @@ class ParentProviderForm(BaseForm):
         ],
         choices=[],  # This will be set when the user sends a request.
         radio_value_key="firmId",
-        validators=[InputRequired(message="Select a parent provider")],
+        validators=[InputRequired(message="Select a chambers to assign the new provider to")],
     )
 
     def __init__(self, search_term=None, page=1, *args, **kwargs):
