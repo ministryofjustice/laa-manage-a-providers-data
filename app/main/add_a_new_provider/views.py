@@ -49,7 +49,7 @@ class ParentProviderFormView(BaseFormView):
     """Form view for the Assign to parent provider"""
 
     template = "add_provider/assign-parent-provider.html"
-    success_url = "main.view_provider"
+    success_url = "main.providers"
 
     def form_valid(self, form):
         session["parent_provider_id"] = form.data.get("provider")
