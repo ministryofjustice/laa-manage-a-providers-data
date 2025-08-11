@@ -12,7 +12,7 @@
     {%- set queryString = '&search=' + searchTerm | urlencode %}
   {%- endif %}
 
-  <nav class="moj-pagination" aria-label="Pagination navigation">
+  <nav class="moj-pagination govuk-!-padding-left-1" aria-label="Pagination navigation">
     <ul class="moj-pagination__list govuk-pagination__list">
       {% if maxPage > 1 %}
         {% if currentPage > 1 %}

@@ -31,15 +31,17 @@
           </div>
       </form>
 
+      {% if form.search_term %}
+        <h2 class="govuk-heading-m">{{ form.num_results }} search {{ "result" if form.num_results == 1 else "results" }} for ‘{{ form.search_term | upper }}’</h2>
+      {% endif %}
+
       {# Selection form using POST #}
       {% if form.num_results > 0 %}
         <form method="post">
           {{ form.hidden_tag() }}
 
-          {{ govukRadioTable(form.provider) }}
-          {{ mojPagination(currentPage=form.page, numShownPerPage=form.providers_shown_per_page, numResults=form.num_results, searchTerm=form.search_term) }}
+          {{ govukRadioTable(form.provider, pagination=mojPagination(currentPage=form.page, numShownPerPage=form.providers_shown_per_page, numResults=form.num_results, searchTerm=form.search_term)) }}
 
-          <br>
           <br>
 
           {{ govukButton({'text': 'Continue'}) }}
