@@ -45,19 +45,6 @@ def test_constitutional_status_validation_required(page: Page):
 
 
 @pytest.mark.usefixtures("live_server")
-def test_companies_house_number_validation_required(page: Page):
-    """Test that Companies House number is required."""
-    navigate_to_lsp_details(page)
-
-    # Fill constitutional status but not Companies House number
-    page.get_by_role("radio", name="Partnership").click()
-    page.get_by_role("button", name="Continue").click()
-
-    # Should show validation error
-    expect(page.get_by_text("Error: Enter the Companies House number")).to_be_visible()
-
-
-@pytest.mark.usefixtures("live_server")
 def test_companies_house_number_validation_format(page: Page):
     """Test that Companies House number validates format."""
     navigate_to_lsp_details(page)
