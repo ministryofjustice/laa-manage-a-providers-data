@@ -3,6 +3,8 @@ from datetime import date
 
 from wtforms import ValidationError
 
+from app.fields import GovDateField
+
 
 class ValidateGovDateField:
     """Validate GovDateField for incomplete dates and invalid real dates."""
@@ -11,9 +13,6 @@ class ValidateGovDateField:
         self.message = message
 
     def __call__(self, form, field):
-        # Skip validation if this is not a GovDateField
-        from app.fields import GovDateField
-
         if not isinstance(field, GovDateField):
             return
 
@@ -28,7 +27,8 @@ class ValidateGovDateField:
         # Validate real date (if field couldn't parse the date)
         self._validate_real_date(field, valuelist)
 
-    def _validate_incomplete_date(self, field, valuelist):
+    @staticmethod
+    def _validate_incomplete_date(field, valuelist):
         """Validate that all date components are present and valid format."""
         from wtforms.validators import Optional
 
@@ -78,7 +78,8 @@ class ValidateGovDateField:
 
             raise ValidationError(message)
 
-    def _validate_real_date(self, field, valuelist):
+    @staticmethod
+    def _validate_real_date(field, valuelist):
         """Validate that the date is a real date."""
         # If field couldn't parse the data but all components were present
         if field.data is None and valuelist:
