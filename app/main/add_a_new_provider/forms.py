@@ -46,7 +46,7 @@ class LspDetailsForm(BaseForm):
     constitutional_status = RadioField(
         "Constitutional status",
         widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
-        validators=[InputRequired(message="Select a constitutional status")],
+        validators=[InputRequired(message="Select the constitutional status")],
         choices=[
             ("government funded organisation", "Government funded organisation"),
             ("sole practitioner", "Sole practitioner"),
