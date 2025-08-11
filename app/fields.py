@@ -49,8 +49,25 @@ class GovDateField(DateField):
 
     def process_formdata(self, valuelist):
         if valuelist:
+            # Store the original raw data for validation later
+            self._original_raw_data = valuelist
+
             # Convert month strings to numbers before processing
             processed_valuelist = self._process_date_list(valuelist)
-            super().process_formdata(processed_valuelist)
+
+            try:
+                if len(processed_valuelist) == 3:
+                    day, month, year = processed_valuelist
+                    if day and month and year:
+                        from datetime import datetime
+
+                        self.data = datetime.strptime(f"{day} {month} {year}", "%d %m %Y").date()
+                    else:
+                        self.data = None
+                else:
+                    self.data = None
+            except (ValueError, TypeError):
+                self.data = None
         else:
-            super().process_formdata(valuelist)
+            self._original_raw_data = valuelist
+            self.data = None

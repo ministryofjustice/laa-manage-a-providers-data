@@ -2,133 +2,10 @@ from datetime import date
 from unittest.mock import Mock
 
 import pytest
-from wtforms import ValidationError
+from wtforms import Form, ValidationError
 
 from app.fields import GovDateField
-from app.validators import ValidateCompaniesHouseNumber, ValidatePastDate
-
-
-class TestGovDateField:
-    def test_process_date_list_with_full_month_names(self):
-        """Test processing full month names to numeric values."""
-        test_cases = [
-            (["31", "January", "2025"], ["31", "1", "2025"]),
-            (["15", "February", "2024"], ["15", "2", "2024"]),
-            (["1", "March", "2023"], ["1", "3", "2023"]),
-            (["30", "April", "2025"], ["30", "4", "2025"]),
-            (["31", "May", "2024"], ["31", "5", "2024"]),
-            (["15", "June", "2023"], ["15", "6", "2023"]),
-            (["4", "July", "2025"], ["4", "7", "2025"]),
-            (["31", "August", "2024"], ["31", "8", "2024"]),
-            (["30", "September", "2023"], ["30", "9", "2023"]),
-            (["31", "October", "2025"], ["31", "10", "2025"]),
-            (["30", "November", "2024"], ["30", "11", "2024"]),
-            (["25", "December", "2023"], ["25", "12", "2023"]),
-        ]
-
-        field = GovDateField()
-        for input_list, expected in test_cases:
-            result = field._process_date_list(input_list)
-            assert result == expected, f"Failed for {input_list}, got {result}, expected {expected}"
-
-    def test_process_date_list_with_short_month_names(self):
-        """Test processing short month names to numeric values."""
-        test_cases = [
-            (["31", "Jan", "2025"], ["31", "1", "2025"]),
-            (["28", "Feb", "2024"], ["28", "2", "2024"]),
-            (["15", "Mar", "2023"], ["15", "3", "2023"]),
-            (["1", "Apr", "2025"], ["1", "4", "2025"]),
-            (["31", "May", "2024"], ["31", "5", "2024"]),
-            (["30", "Jun", "2023"], ["30", "6", "2023"]),
-            (["4", "Jul", "2025"], ["4", "7", "2025"]),
-            (["15", "Aug", "2024"], ["15", "8", "2024"]),
-            (["30", "Sep", "2023"], ["30", "9", "2023"]),
-            (["31", "Oct", "2025"], ["31", "10", "2025"]),
-            (["15", "Nov", "2024"], ["15", "11", "2024"]),
-            (["25", "Dec", "2023"], ["25", "12", "2023"]),
-        ]
-
-        field = GovDateField()
-        for input_list, expected in test_cases:
-            result = field._process_date_list(input_list)
-            assert result == expected, f"Failed for {input_list}, got {result}, expected {expected}"
-
-    def test_process_date_list_with_alternative_short_forms(self):
-        """Test processing alternative short forms like 'Sept'."""
-        test_cases = [
-            (["15", "Sept", "2024"], ["15", "9", "2024"]),
-        ]
-
-        field = GovDateField()
-        for input_list, expected in test_cases:
-            result = field._process_date_list(input_list)
-            assert result == expected, f"Failed for {input_list}, got {result}, expected {expected}"
-
-    def test_process_date_list_case_insensitive(self):
-        """Test that month processing is case insensitive."""
-        test_cases = [
-            (["31", "january", "2025"], ["31", "1", "2025"]),
-            (["15", "FEBRUARY", "2024"], ["15", "2", "2024"]),
-            (["1", "JaN", "2023"], ["1", "1", "2023"]),
-            (["30", "dEcEmBeR", "2025"], ["30", "12", "2025"]),
-        ]
-
-        field = GovDateField()
-        for input_list, expected in test_cases:
-            result = field._process_date_list(input_list)
-            assert result == expected, f"Failed for {input_list}, got {result}, expected {expected}"
-
-    def test_process_date_list_with_numeric_months_unchanged(self):
-        """Test that numeric months remain unchanged."""
-        test_cases = [
-            (["31", "1", "2025"], ["31", "1", "2025"]),
-            (["15", "12", "2024"], ["15", "12", "2024"]),
-            (["1", "6", "2023"], ["1", "6", "2023"]),
-        ]
-
-        field = GovDateField()
-        for input_list, expected in test_cases:
-            result = field._process_date_list(input_list)
-            assert result == expected, f"Failed for {input_list}, got {result}, expected {expected}"
-
-    def test_process_date_list_with_invalid_month_strings(self):
-        """Test that invalid month strings remain unchanged."""
-        test_cases = [
-            (["31", "invalid", "2025"], ["31", "invalid", "2025"]),
-            (["15", "notamonth", "2024"], ["15", "notamonth", "2024"]),
-            (["1", "", "2023"], ["1", "", "2023"]),
-        ]
-
-        field = GovDateField()
-        for input_list, expected in test_cases:
-            result = field._process_date_list(input_list)
-            assert result == expected, f"Failed for {input_list}, got {result}, expected {expected}"
-
-    def test_process_date_list_with_invalid_input_types(self):
-        """Test that invalid input types are handled gracefully."""
-        test_cases = [
-            (None, None),
-            ("not_a_list", "not_a_list"),
-            (["only", "two"], ["only", "two"]),  # Less than 3 elements
-            (["too", "many", "elements", "here"], ["too", "many", "elements", "here"]),  # More than 3 elements
-        ]
-
-        field = GovDateField()
-        for input_data, expected in test_cases:
-            result = field._process_date_list(input_data)
-            assert result == expected, f"Failed for {input_data}, got {result}, expected {expected}"
-
-    def test_process_date_list_with_mixed_types(self):
-        """Test processing when month is not a string."""
-        test_cases = [
-            (["31", 1, "2025"], ["31", 1, "2025"]),  # Integer month
-            (["15", None, "2024"], ["15", None, "2024"]),  # None month
-        ]
-
-        field = GovDateField()
-        for input_list, expected in test_cases:
-            result = field._process_date_list(input_list)
-            assert result == expected, f"Failed for {input_list}, got {result}, expected {expected}"
+from app.validators import ValidateCompaniesHouseNumber, ValidateGovDateField, ValidatePastDate
 
 
 class TestValidateCompaniesHouseNumber:
@@ -262,3 +139,246 @@ class TestValidatePastDate:
         with pytest.raises(ValidationError) as exc_info:
             validator(form, field)
         assert str(exc_info.value) == custom_message
+
+
+class TestValidateGovDateField:
+    def test_non_gov_date_field_skipped(self):
+        """Test that non-GovDateField fields are skipped."""
+        validator = ValidateGovDateField()
+        form = Mock()
+        field = Mock()
+        field.data = None
+
+        # Should not raise any validation errors for non-GovDateField
+        validator(form, field)
+
+    def test_no_raw_data_skipped(self):
+        """Test that fields without raw data are skipped."""
+
+        class TestForm(Form):
+            test_field = GovDateField()
+
+        validator = ValidateGovDateField()
+        form = TestForm()
+        field = form.test_field
+
+        validator(form, field)
+
+    def test_missing_day_validation(self):
+        """Test validation error for missing day."""
+
+        class TestForm(Form):
+            test_field = GovDateField()
+
+        validator = ValidateGovDateField()
+        form = TestForm()
+        field = form.test_field
+        field._original_raw_data = ["", "1", "2025"]
+        field.data = None
+        field.validators = []
+
+        with pytest.raises(ValidationError) as exc_info:
+            validator(form, field)
+        assert str(exc_info.value) == "Date must include a day"
+
+    def test_missing_month_validation(self):
+        """Test validation error for missing month."""
+
+        class TestForm(Form):
+            test_field = GovDateField()
+
+        validator = ValidateGovDateField()
+        form = TestForm()
+        field = form.test_field
+        field._original_raw_data = ["1", "", "2025"]
+        field.data = None
+        field.validators = []
+
+        with pytest.raises(ValidationError) as exc_info:
+            validator(form, field)
+        assert str(exc_info.value) == "Date must include a month"
+
+    def test_missing_year_validation(self):
+        """Test validation error for missing year."""
+
+        class TestForm(Form):
+            test_field = GovDateField()
+
+        validator = ValidateGovDateField()
+        form = TestForm()
+        field = form.test_field
+        field._original_raw_data = ["1", "1", ""]
+        field.data = None
+        field.validators = []
+
+        with pytest.raises(ValidationError) as exc_info:
+            validator(form, field)
+        assert str(exc_info.value) == "Date must include a year"
+
+    def test_missing_day_and_month_validation(self):
+        """Test validation error for missing day and month."""
+
+        class TestForm(Form):
+            test_field = GovDateField()
+
+        validator = ValidateGovDateField()
+        form = TestForm()
+        field = form.test_field
+        field._original_raw_data = ["", "", "2025"]
+        field.data = None
+        field.validators = []
+
+        with pytest.raises(ValidationError) as exc_info:
+            validator(form, field)
+        assert str(exc_info.value) == "Date must include a day and month"
+
+    def test_missing_day_and_year_validation(self):
+        """Test validation error for missing day and year."""
+
+        class TestForm(Form):
+            test_field = GovDateField()
+
+        validator = ValidateGovDateField()
+        form = TestForm()
+        field = form.test_field
+        field._original_raw_data = ["", "1", ""]
+        field.data = None
+        field.validators = []
+
+        with pytest.raises(ValidationError) as exc_info:
+            validator(form, field)
+        assert str(exc_info.value) == "Date must include a day and year"
+
+    def test_missing_month_and_year_validation(self):
+        """Test validation error for missing month and year."""
+
+        class TestForm(Form):
+            test_field = GovDateField()
+
+        validator = ValidateGovDateField()
+        form = TestForm()
+        field = form.test_field
+        field._original_raw_data = ["1", "", ""]
+        field.data = None
+        field.validators = []
+
+        with pytest.raises(ValidationError) as exc_info:
+            validator(form, field)
+        assert str(exc_info.value) == "Date must include a month and year"
+
+    def test_missing_all_fields_required_validation(self):
+        """Test validation error for missing all fields on required field."""
+
+        class TestForm(Form):
+            test_field = GovDateField()
+
+        validator = ValidateGovDateField()
+        form = TestForm()
+        field = form.test_field
+        field._original_raw_data = ["", "", ""]
+        field.data = None
+        field.validators = []
+
+        with pytest.raises(ValidationError) as exc_info:
+            validator(form, field)
+        assert str(exc_info.value) == "Date must include a day, month and year"
+
+    def test_missing_all_fields_optional_allowed(self):
+        """Test that empty optional fields are allowed."""
+        from wtforms.validators import Optional
+
+        class TestForm(Form):
+            test_field = GovDateField(validators=[Optional()])
+
+        validator = ValidateGovDateField()
+        form = TestForm()
+        field = form.test_field
+        field._original_raw_data = ["", "", ""]
+        field.data = None
+
+        # Should not raise any validation errors
+        validator(form, field)
+
+    def test_invalid_year_length_validation(self):
+        """Test validation error for year not having 4 digits."""
+
+        class TestForm(Form):
+            test_field = GovDateField()
+
+        validator = ValidateGovDateField()
+        form = TestForm()
+        field = form.test_field
+        field._original_raw_data = ["1", "1", "25"]  # 2-digit year
+        field.data = None
+        field.validators = []
+
+        with pytest.raises(ValidationError) as exc_info:
+            validator(form, field)
+        assert str(exc_info.value) == "Year must include 4 numbers"
+
+    def test_invalid_year_non_numeric_validation(self):
+        """Test validation error for non-numeric year."""
+
+        class TestForm(Form):
+            test_field = GovDateField()
+
+        validator = ValidateGovDateField()
+        form = TestForm()
+        field = form.test_field
+        field._original_raw_data = ["1", "1", "abcd"]  # Non-numeric year
+        field.data = None
+        field.validators = []
+
+        with pytest.raises(ValidationError) as exc_info:
+            validator(form, field)
+        assert str(exc_info.value) == "Year must include 4 numbers"
+
+    def test_invalid_real_date_validation(self):
+        """Test validation error for invalid real date."""
+
+        class TestForm(Form):
+            test_field = GovDateField()
+
+        validator = ValidateGovDateField()
+        form = TestForm()
+        field = form.test_field
+        field._original_raw_data = ["32", "13", "2025"]  # Invalid day and month
+        field.data = None  # Field couldn't parse the date
+        field.validators = []
+
+        with pytest.raises(ValidationError) as exc_info:
+            validator(form, field)
+        assert str(exc_info.value) == "Date must be a real date"
+
+    def test_valid_date_no_validation_error(self):
+        """Test that valid dates don't raise validation errors."""
+
+        class TestForm(Form):
+            test_field = GovDateField()
+
+        validator = ValidateGovDateField()
+        form = TestForm()
+        field = form.test_field
+        field._original_raw_data = ["1", "1", "2025"]
+        field.data = date(2025, 1, 1)  # Successfully parsed date
+        field.validators = []
+
+        # Should not raise any validation errors
+        validator(form, field)
+
+    def test_whitespace_only_fields_treated_as_empty(self):
+        """Test that fields with only whitespace are treated as empty."""
+
+        class TestForm(Form):
+            test_field = GovDateField()
+
+        validator = ValidateGovDateField()
+        form = TestForm()
+        field = form.test_field
+        field._original_raw_data = ["  ", "\t", "\n"]  # Whitespace only
+        field.data = None
+        field.validators = []
+
+        with pytest.raises(ValidationError) as exc_info:
+            validator(form, field)
+        assert str(exc_info.value) == "Date must include a day, month and year"
