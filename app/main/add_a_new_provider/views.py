@@ -61,8 +61,8 @@ class ParentProviderFormView(BaseFormView):
     pass
 
 
-class ViewProviderView(MethodView):
-    template = "add_provider/view-provider.html"
+class ViewProvider(MethodView):
+    template = "view-provider.html"
 
     MAIN_SECTION_FIELDS = [
         {"session_key": "provider_name", "label": "Provider name", "formatter": None},
@@ -136,6 +136,6 @@ class ViewProviderView(MethodView):
             self.template,
             main_table=main_table,
             additional_table=additional_table,
-            provider_name=session.get("provider_name"),
-            provider_type=session.get("provider_type"),
+            provider_name=main_data.get("provider_name"),
+            provider_type=additional_data.get("provider_type"),
         )

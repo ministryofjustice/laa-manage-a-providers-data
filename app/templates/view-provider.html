@@ -15,8 +15,8 @@
 {% block content %}
   {{ super() }}
 
-  <span class="govuk-caption-xl">{{ provider_name or "Provider Name" }}</span>
-  <h1 class="govuk-heading-xl">{{ provider_name or "Unknown Provider" }}</h1>
+  <span class="govuk-caption-xl">{{ provider_type }}</span>
+  <h1 class="govuk-heading-xl">{{ provider_name }}</h1>
 
   {{ govukButton({
     "text": "Add an office",
