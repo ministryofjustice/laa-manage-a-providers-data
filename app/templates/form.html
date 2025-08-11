@@ -5,11 +5,7 @@
 
 {% block pageTitle %}{{ title }} – GOV.UK{% endblock %}
 
-{% block content %}
-{{ super() }}
-
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
+{% block pageContent %}
     <form method="post" novalidate>
         {% block form %}
           {{ form.hidden_tag() }}
