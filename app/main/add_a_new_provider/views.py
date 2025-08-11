@@ -10,7 +10,7 @@ class AddProviderFormView(BaseFormView):
 
     next_step_mapping = {
         "barrister": "main.add_provider/assign_parent_provider",
-        "advocate": "main.add_provider/assign_parent_provider",
+        "advocate": "main.advocate_details",
         "chambers": "main.add_provider/chambers_details",
         "lsp": "main.additional_details_legal_services_provider",
     }
@@ -38,6 +38,15 @@ class LspDetailsFormView(BaseFormView):
         indemnity_date = form.data.get("indemnity_received_date")
         if indemnity_date:
             session["indemnity_received_date"] = indemnity_date.isoformat()
+
+        return super().form_valid(form)
+
+
+class AdvocateDetailsFormView(BaseFormView):
+    def form_valid(self, form):
+        session["solicitor_advocate"] = form.data.get("solicitor_advocate")
+        session["advocate_level"] = form.data.get("advocate_level")
+        session["bar_council_roll_number"] = form.data.get("bar_council_roll_number")
 
         return super().form_valid(form)
 
