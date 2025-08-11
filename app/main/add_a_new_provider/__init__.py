@@ -1,8 +1,14 @@
+from app.main import bp
 from app.utils import register_form_view
 
 from .forms import AddProviderForm, ChambersDetailsForm, LspDetailsForm, ParentProviderForm
-from .views import AddProviderFormView, ChambersDetailsFormView, LspDetailsFormView, ParentProviderFormView
-from app.main import bp
+from .views import (
+    AddProviderFormView,
+    ChambersDetailsFormView,
+    LspDetailsFormView,
+    ParentProviderFormView,
+    ViewProviderView,
+)
 
 
 def register_views():
@@ -16,3 +22,4 @@ def register_views():
 
 
 register_views()
+bp.add_url_rule("/view-provider", view_func=ViewProviderView.as_view("view_provider"))
