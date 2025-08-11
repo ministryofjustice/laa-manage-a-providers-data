@@ -93,7 +93,7 @@ class AdvocateDetailsForm(BaseForm):
     advocate_level = RadioField(
         "Advocate level",
         widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
-        validators=[InputRequired(message="Select a constitutional status")],
+        validators=[InputRequired(message="Select the advocate level")],
         choices=[
             ("pupil", "Pupil"),
             ("junior", "Junior"),
@@ -107,7 +107,7 @@ class AdvocateDetailsForm(BaseForm):
             heading_class="govuk-fieldset__legend--m",
             classes="govuk-!-width-one-half",
         ),
-        validators=[Optional()],
+        validators=[InputRequired("Enter the Bar Council roll number")],
     )
 
 
