@@ -3,6 +3,7 @@ from wtforms import RadioField
 from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired, Optional
 
+from app.constants import CONSTITUTIONAL_STATUS_CHOICES, PROVIDER_TYPE_CHOICES
 from app.validators import ValidateCompaniesHouseNumber, ValidateGovDateField, ValidatePastDate
 from app.widgets import GovDateInput, GovRadioInput, GovTextInput
 
@@ -26,12 +27,7 @@ class AddProviderForm(BaseForm):
         "Provider type",
         widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
         validators=[InputRequired(message=("Select a provider type"))],
-        choices=[
-            ("barrister", "Barrister"),
-            ("advocate", "Advocate"),
-            ("chambers", "Chambers"),
-            ("lsp", "Legal services provider"),
-        ],
+        choices=PROVIDER_TYPE_CHOICES,
     )
 
 
@@ -47,14 +43,7 @@ class LspDetailsForm(BaseForm):
         "Constitutional status",
         widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
         validators=[InputRequired(message="Select a constitutional status")],
-        choices=[
-            ("government funded organisation", "Government funded organisation"),
-            ("sole practitioner", "Sole practitioner"),
-            ("charity", "Charity"),
-            ("partnership", "Partnership"),
-            ("llp", "LLP"),
-            ("limited company", "Limited company"),
-        ],
+        choices=CONSTITUTIONAL_STATUS_CHOICES,
     )
 
     indemnity_received_date = GovDateField(

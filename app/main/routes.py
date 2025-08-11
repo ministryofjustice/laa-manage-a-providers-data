@@ -4,8 +4,8 @@ from flask import abort, current_app, render_template, request, url_for
 
 from app.auth import requires_authentication
 from app.components.tables import DataTable, TableStructure, TransposedDataTable
-from app.main.utils import get_full_info_html
 from app.main import bp
+from app.main.utils import get_full_info_html
 
 
 @bp.get("/")
@@ -29,6 +29,8 @@ def providers():
         _firm_name = row_data.get("firmName", "")
         return f"<a class='govuk-link', href={url_for('main.offices', firm_id=_firm_id)}>{_firm_name}"
 
+    search_term = request.args.get("search", "")
+
     providers_shown_per_page = 20
 
     start_provider_firm_num = 0
@@ -38,12 +40,19 @@ def providers():
 
     provider_data = data["firms"][start_provider_firm_num:]
 
+    # Filter providers based on search term
+    if search_term:
+        search_lower = search_term.lower()
+        provider_data = [
+            firm
+            for firm in provider_data
+            if (search_lower in firm["firmName"].lower() or search_lower in str(firm["firmId"]).lower())
+        ]
+
     columns: list[TableStructure] = [
-        {"text": "Name", "id": "firmName", "html": firm_name_html},
-        {"text": "Type", "id": "firmType"},
-        {"text": "Constitutional status", "id": "constitutionalStatus"},
-        {"text": "Website", "id": "websiteUrl"},
-        {"text": "Full info", "html": get_full_info_html},
+        {"text": "Provider name", "id": "firmName", "html": firm_name_html},
+        {"text": "Account number", "id": "firmNumber"},
+        {"text": "Provider type", "id": "firmType"},
     ]
 
     page = request.args.get("page", 1, type=int)
@@ -60,6 +69,7 @@ def providers():
     return render_template(
         "providers.html",
         table=table,
+        search_term=search_term,
         current_page=page,
         num_shown_per_page=providers_shown_per_page,
         num_results=len(provider_data),

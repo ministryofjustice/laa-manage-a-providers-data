@@ -13,7 +13,35 @@
 {% block content %}
   {{ super() }}
 
-  <h1 class="govuk-heading-xl">Providers</h1>
+  <h1 class="govuk-heading-xl">Provider records</h1>
+
+  <form method="get" class="govuk-!-margin-bottom-6">
+  <div class="govuk-form-group{% if search_term and num_results == 0 %} govuk-form-group--error{% endif %}">
+    <label class="govuk-label govuk-label--m govuk-!-margin-bottom-0" for="search">
+      Find a provider
+    </label>
+    <div class="govuk-hint">
+      You can search by name, office or account number
+    </div>
+
+    {% if search_term and num_results == 0 %}
+      <p id="search-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span>
+        No providers found. Try a different search term.
+      </p>
+    {% endif %}
+
+    <div style="display: flex; gap: 10px; align-items: flex-end;">
+      <input class="govuk-input govuk-input--width-30 provider-search{% if search_term and num_results == 0 %} govuk-input--error{% endif %}"
+             id="search"
+             name="search"
+             type="text"
+             value="{{ search_term or '' }}"
+             {% if search_term and num_results == 0 %}aria-describedby="search-error"{% endif %}>
+      {{ govukButton({'text': 'Search'}) }}
+    </div>
+  </div>
+</form>
 
   {{ govukButton({
     "text": "Add a new provider",
