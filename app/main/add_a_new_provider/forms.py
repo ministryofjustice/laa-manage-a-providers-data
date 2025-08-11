@@ -75,6 +75,42 @@ class LspDetailsForm(BaseForm):
     )
 
 
+class AdvocateDetailsForm(BaseForm):
+    title = "Advocate details"
+    url = "advocate-details"
+
+    @property
+    def caption(self):
+        return session.get("provider_name")
+
+    solicitor_advocate = RadioField(
+        "Is the provider a solicitor advocate (optional)",
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m", classes="govuk-input--inline"),
+        choices=[("yes", "Yes"), ("no", "No")],
+        validators=[Optional()],
+    )
+
+    advocate_level = RadioField(
+        "Advocate level",
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
+        validators=[InputRequired(message="Select a constitutional status")],
+        choices=[
+            ("pupil", "Pupil"),
+            ("junior", "Junior"),
+            ("king's council", "King's Council (KC, previously QC)"),
+        ],
+    )
+
+    bar_council_roll_number = StringField(
+        "Bar Council roll number",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-!-width-one-half",
+        ),
+        validators=[Optional()],
+    )
+
+
 class ChambersDetailsForm(BaseForm):
     title = "Chambers details"
     url = "add-provider/chambers-details"
