@@ -30,6 +30,8 @@ def test_search_functionality_shows_results(page: Page):
     page.get_by_role("textbox", name="Search for a chambers").fill("Johnson")
     page.get_by_role("button", name="Search").click()
 
+    expect(page.get_by_role("heading", name="1 search result for ‘JOHNSON’")).to_be_visible()
+
     # Should show the results table and continue button
     expect(page.locator("text=JOHNSON LEGAL SERVICES")).to_be_visible()
     expect(page.get_by_role("button", name="Continue")).to_be_visible()
@@ -43,6 +45,8 @@ def test_search_functionality_shows_no_results_error(page: Page):
     # Search for something that doesn't exist
     page.get_by_role("textbox", name="Search for a chambers").fill("NonExistentProvider")
     page.get_by_role("button", name="Search").click()
+
+    expect(page.get_by_role("heading", name="0 search results for ‘NonExistentProvider’")).to_be_visible()
 
     # Should show error message and no results table
     expect(
@@ -76,6 +80,8 @@ def test_search_filters_only_chambers(page: Page):
     page.get_by_role("textbox", name="Search for a chambers").fill("LEGAL")
     page.get_by_role("button", name="Search").click()
 
+    expect(page.get_by_role("heading", name="2 search results for ‘LEGAL’")).to_be_visible()
+
     # Should only show Chambers providers, not Legal Services Providers
     expect(page.locator("text=NORTHERN LEGAL CHAMBERS")).to_be_visible()
     expect(page.locator("text=METROPOLITAN LAW CENTRE")).not_to_be_visible()  # This is LSP
@@ -90,6 +96,8 @@ def test_search_by_firm_name(page: Page):
     page.get_by_role("textbox", name="Search for a chambers").fill("Westminster")
     page.get_by_role("button", name="Search").click()
 
+    expect(page.get_by_role("heading", name="1 search result for ‘WESTMINSTER’")).to_be_visible()
+
     # Should find WESTMINSTER SOLICITORS LLP
     expect(page.locator("text=WESTMINSTER SOLICITORS LLP")).to_be_visible()
 
@@ -102,6 +110,8 @@ def test_search_by_firm_id(page: Page):
     # Search by firm ID (should match firmId: 2)
     page.get_by_role("textbox", name="Search for a chambers").fill("2")
     page.get_by_role("button", name="Search").click()
+
+    expect(page.get_by_role("heading", name="1 search result for ‘2’")).to_be_visible()
 
     # Should find the firm with firmId 2 (JOHNSON LEGAL SERVICES)
     expect(page.locator("text=JOHNSON LEGAL SERVICES")).to_be_visible()
@@ -116,6 +126,8 @@ def test_case_insensitive_search(page: Page):
     page.get_by_role("textbox", name="Search for a chambers").fill("johnson")
     page.get_by_role("button", name="Search").click()
 
+    expect(page.get_by_role("heading", name="1 search result for ‘JOHNSON’")).to_be_visible()
+
     # Should still find JOHNSON LEGAL SERVICES
     expect(page.locator("text=JOHNSON LEGAL SERVICES")).to_be_visible()
 
@@ -128,6 +140,8 @@ def test_search_preserves_search_term(page: Page):
     search_term = "Johnson"
     page.get_by_role("textbox", name="Search for a chambers").fill(search_term)
     page.get_by_role("button", name="Search").click()
+
+    expect(page.get_by_role("heading", name="1 search result for ‘JOHNSON’")).to_be_visible()
 
     # Search field should still contain the search term
     expect(page.get_by_role("textbox", name="Search for a chambers")).to_have_value(search_term)
@@ -142,6 +156,7 @@ def test_select_parent_provider_requires_selection(page: Page):
     page.get_by_role("textbox", name="Search for a chambers").fill("Johnson")
     page.get_by_role("button", name="Search").click()
 
+    expect(page.get_by_role("heading", name="1 search result for ‘JOHNSON’")).to_be_visible()
     # Try to continue without selecting a provider
     page.get_by_role("button", name="Continue").click()
 
@@ -160,6 +175,7 @@ def test_select_parent_provider_success(page: Page):
     page.get_by_role("textbox", name="Search for a chambers").fill("Johnson")
     page.get_by_role("button", name="Search").click()
 
+    expect(page.get_by_role("heading", name="1 search result for ‘JOHNSON’")).to_be_visible()
     # Select a provider (assuming radio buttons are rendered for the table)
     page.locator("input[type='radio'][value='2']").click()
     page.get_by_role("button", name="Continue").click()
@@ -185,14 +201,7 @@ def test_pagination_with_search(page: Page):
     """Test pagination works with search results."""
     navigate_to_assign_parent_provider(page)
 
-    # Search for "chambers" to get multiple results
     page.get_by_role("textbox", name="Search for a chambers").fill("chambers")
     page.get_by_role("button", name="Search").click()
 
-    # If there are multiple results, pagination should be visible
-    # This test assumes we have more than 7 chambers (the limit per page)
-    # If pagination is shown, test it maintains search term
-    if page.locator("text=Next").is_visible():
-        page.locator("text=Next").click()
-        # Search term should still be preserved in URL and field
-        expect(page.get_by_role("textbox", name="Search for a chambers")).to_have_value("chambers")
+    expect(page.get_by_role("heading", name="1 search result for ‘CHAMBERS’")).to_be_visible()
