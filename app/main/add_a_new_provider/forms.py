@@ -4,7 +4,7 @@ from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired, Optional
 
 from app.constants import CONSTITUTIONAL_STATUS_CHOICES, PROVIDER_TYPE_CHOICES
-from app.validators import ValidateCompaniesHouseNumber, ValidatePastDate
+from app.validators import ValidateCompaniesHouseNumber, ValidateGovDateField, ValidatePastDate
 from app.widgets import GovDateInput, GovRadioInput, GovTextInput
 
 from ...fields import GovDateField
