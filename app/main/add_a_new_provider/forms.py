@@ -65,13 +65,13 @@ class LspDetailsForm(BaseForm):
     )
 
     companies_house_number = StringField(
-        "Companies House number",
+        "Companies House number (optional)",
         widget=GovTextInput(
             heading_class="govuk-fieldset__legend--m",
             classes="govuk-!-width-one-half",
             hint="Also known as Company Registration Number",
         ),
-        validators=[InputRequired(message="Enter the Companies House number"), ValidateCompaniesHouseNumber()],
+        validators=[Optional(), ValidateCompaniesHouseNumber()],
     )
 
 
