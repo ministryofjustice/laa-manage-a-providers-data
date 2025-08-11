@@ -1,12 +1,12 @@
 from flask import session
 from wtforms import RadioField
-from wtforms.fields import DateField
 from wtforms.fields.simple import StringField
 from wtforms.validators import DataRequired, InputRequired, Optional
 
 from app.validators import ValidateCompaniesHouseNumber, ValidatePastDate
 from app.widgets import GovDateInput, GovRadioInput, GovTextInput
 
+from ...fields import GovDateField
 from ...forms import BaseForm
 
 
@@ -57,9 +57,11 @@ class LspDetailsForm(BaseForm):
         ],
     )
 
-    indemnity_received_date = DateField(
+    indemnity_received_date = GovDateField(
         "Indemnity received date (optional)",
-        widget=GovDateInput(heading_class="govuk-fieldset__legend--m"),
+        widget=GovDateInput(
+            heading_class="govuk-fieldset__legend--m", hint="For example, 27 January 2025 or 27 Jan 2025"
+        ),
         format="%d %m %Y",
         validators=[Optional(), DataRequired(message="Date must be a real date"), ValidatePastDate()],
     )
