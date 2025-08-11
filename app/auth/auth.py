@@ -1,4 +1,3 @@
-import hashlib
 from datetime import datetime, timezone
 from functools import wraps
 
@@ -13,12 +12,6 @@ class Auth(BaseAuth):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = structlog.get_logger("auth")
-
-    @staticmethod
-    def _hash_user_id(user_id: str) -> str:
-        if not user_id:
-            return "unknown"
-        return hashlib.sha256(f"user_{user_id}".encode()).hexdigest()[:12]
 
     def login_required(self, function=None, *args, **kwargs):
         @wraps(function)
@@ -41,7 +34,7 @@ class Auth(BaseAuth):
 
             self.logger.info(
                 "User logged in",
-                user_id_hash=self._hash_user_id(user_data["oid"]),
+                user_id=user_data.get("oid"),
                 ip_address=request.environ.get("HTTP_X_FORWARDED_FOR", request.remote_addr),
                 user_agent=request.headers.get("User-Agent", "Unknown")[:200],
             )
@@ -55,7 +48,7 @@ class Auth(BaseAuth):
 
         if user_data and user_data.get("oid"):
             extra = {
-                "user_id_hash": self._hash_user_id(user_data["oid"]),
+                "user_id": user_data.get("oid"),
                 "ip_address": request.environ.get("HTTP_X_FORWARDED_FOR", request.remote_addr),
                 "user_agent": request.headers.get("User-Agent", "Unknown")[:200],
             }
