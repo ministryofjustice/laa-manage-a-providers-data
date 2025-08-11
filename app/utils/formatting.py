@@ -47,3 +47,10 @@ def format_yes_no(value: Optional[str]) -> str:
     elif value.lower() in ["no", "false", "0"]:
         return "No"
     return value
+
+
+def format_title_case(value: str) -> str:
+    """Format title case for display"""
+    if not isinstance(value, str):
+        return value
+    return value.title()

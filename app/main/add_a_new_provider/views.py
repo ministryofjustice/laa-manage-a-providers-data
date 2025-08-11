@@ -3,7 +3,13 @@ from flask.views import MethodView
 
 from app.components.tables import TransposedDataTable
 from app.pda.api import ProviderDataApiError
-from app.utils.formatting import format_constitutional_status, format_date, format_provider_type, format_yes_no
+from app.utils.formatting import (
+    format_constitutional_status,
+    format_date,
+    format_provider_type,
+    format_title_case,
+    format_yes_no,
+)
 from app.views import BaseFormView
 
 
@@ -84,7 +90,7 @@ class ViewProvider(MethodView):
             "formatter": format_yes_no,
         },
         {"session_key": "solicitor_advocate", "label": "Solicitor advocate", "formatter": format_yes_no},
-        {"session_key": "advocate_level", "label": "Advocate level", "formatter": None},
+        {"session_key": "advocate_level", "label": "Advocate level", "formatter": format_title_case},
         {"session_key": "bar_or_council_roll", "label": "Bar or council roll", "formatter": None},
         {"session_key": "firm_intervened", "label": "Firm intervened", "formatter": format_yes_no},
     ]
