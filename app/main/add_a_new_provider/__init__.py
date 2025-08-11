@@ -7,7 +7,7 @@ from .views import (
     ChambersDetailsFormView,
     LspDetailsFormView,
     ParentProviderFormView,
-    ViewProviderView,
+    ViewProvider,
 )
 
 
@@ -22,4 +22,4 @@ def register_views():
 
 
 register_views()
-bp.add_url_rule("/view-provider", view_func=ViewProviderView.as_view("view_provider"))
+bp.add_url_rule("/view-provider", view_func=ViewProvider.as_view("view_provider"))
