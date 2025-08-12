@@ -36,7 +36,7 @@ class Config(object):
     SESSION_COOKIE_DOMAIN = None  # Don't set domain for localhost
     SESSION_COOKIE_SAMESITE = "Lax"
     SESSION_COOKIE_NAME = "session"
-    
+
     PREFERRED_URL_SCHEME = os.environ.get("PREFERRED_URL_SCHEME", "https")
 
     TESTING = os.environ.get("TESTING", "False").lower() == "true"

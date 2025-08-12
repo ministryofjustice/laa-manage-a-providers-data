@@ -124,7 +124,7 @@ def create_app(config_class=Config, pda_class=ProviderDataApi):
         pda = MockProviderDataApi()
     else:
         pda = pda_class()
-        
+
     pda.init_app(app, base_url=app.config["PDA_URL"], api_key=app.config["PDA_API_KEY"])
 
     auth.init_app(app)
