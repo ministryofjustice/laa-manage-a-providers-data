@@ -1,4 +1,14 @@
 services:
+  redis:
+    image: redis:8-alpine
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+
   asset-watcher:
     container_name: asset-watcher
     build:
@@ -13,7 +23,6 @@ services:
     build:
       context: .
       args:
-        BASE_IMAGE: python:3.13-bookworm
         REQUIREMENTS_FILE: "requirements-development.txt"
       target: development
     restart: always
@@ -21,8 +30,14 @@ services:
       - SECRET_KEY=CHANGE_ME
       - FLASK_RUN_PORT=8020
       - SENTRY_DSN=${SENTRY_DSN:-}
+      - REDIS_URL=redis://redis:6379/0
     ports:
       - "8020:8020"
     volumes:
       - ./app:/home/app/manage-a-providers-data/app
       - ./tests:/home/app/manage-a-providers-data/tests
+    depends_on:
+      - redis
+
+volumes:
+  redis_data:

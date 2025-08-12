@@ -17,7 +17,7 @@ class AddProviderFormView(BaseFormView):
         # Call parent method for redirect
         return super().form_valid(form)
 
-    def dispatch_request(self):
+    def dispatch_request(self, context):
         form = AddProviderForm()
         if form.validate_on_submit():
             provider_type = form.data.get("provider_type")

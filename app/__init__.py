@@ -1,12 +1,15 @@
 import sentry_sdk
 from flask import Flask
+from flask_session import Session
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
 from govuk_frontend_wtf.main import WTFormsHelpers
 from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
 from sentry_sdk.integrations.flask import FlaskIntegration
 
+from app.auth import authentication as auth
 from app.config import Config
+from app.config.logging import configure_logging
 from app.pda.api import ProviderDataApi
 
 csrf = CSRFProtect()
@@ -34,6 +37,9 @@ def create_app(config_class=Config, pda_class=ProviderDataApi):
     app: Flask = Flask(__name__, static_url_path="/assets", static_folder="static/dist")
     app.url_map.strict_slashes = False  # This allows www.host.gov.uk/category to be routed to www.host.gov.uk/category/
     app.config.from_object(config_class)
+
+    configure_logging(app)
+
     app.jinja_env.lstrip_blocks = True
     app.jinja_env.trim_blocks = True
     app.jinja_loader = ChoiceLoader(
@@ -106,9 +112,9 @@ def create_app(config_class=Config, pda_class=ProviderDataApi):
         permissions_policy=permissions_policy,
         content_security_policy_nonce_in=["script-src", "style-src"],
         force_https=False,
-        session_cookie_secure=True,
+        session_cookie_secure=Config.SESSION_COOKIE_SECURE,
         session_cookie_http_only=Config.SESSION_COOKIE_HTTP_ONLY,
-        session_cookie_samesite="Strict",
+        session_cookie_samesite=Config.SESSION_COOKIE_SAMESITE,
     )
 
     # Use mock API if configured
@@ -118,10 +124,17 @@ def create_app(config_class=Config, pda_class=ProviderDataApi):
         pda = MockProviderDataApi()
     else:
         pda = pda_class()
-
+        
     pda.init_app(app, base_url=app.config["PDA_URL"], api_key=app.config["PDA_API_KEY"])
 
+    auth.init_app(app)
+
+    # Store auth instance for access
+    app.extensions["auth"] = auth
+
     WTFormsHelpers(app)
+
+    Session(app)
 
     # Register custom template filters
     from app.filters import register_template_filters
@@ -129,12 +142,10 @@ def create_app(config_class=Config, pda_class=ProviderDataApi):
     register_template_filters(app)
 
     # Register blueprints
-    from app.auth import bp as auth_bp
     from app.example_form import bp as example_form_bp
     from app.main import bp as main_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(example_form_bp)
-    app.register_blueprint(auth_bp)
 
     return app
