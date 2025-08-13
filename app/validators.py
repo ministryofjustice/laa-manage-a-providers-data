@@ -117,6 +117,7 @@ class ValidatePastDate:
 
     def __call__(self, form, field):
         if field.data and field.data > date.today():
+            raise ValidationError(self.message)
 
 
 class ValidateSearchResults:
