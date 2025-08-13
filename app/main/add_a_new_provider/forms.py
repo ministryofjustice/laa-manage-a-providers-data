@@ -3,11 +3,11 @@ from wtforms import RadioField
 from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired, Length
 
+from app.fields import GovUKTableRadioField
 from app.validators import ValidateSearchResults
 from app.widgets import GovRadioInput, GovTextInput
 
 from ...forms import BaseForm
-from .fields import GovUKTableRadioField
 
 
 class AddProviderForm(BaseForm):

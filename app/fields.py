@@ -4,7 +4,7 @@ from app.components.tables import RadioDataTable, TableStructure
 
 
 class GovUKTableRadioField(RadioField):
-    """A RadioField that generates GOV.UK table params for template rendering."""
+    """RadioField that generates a GOV.UK table with radio buttons as the first table column."""
 
     def __init__(
         self,
