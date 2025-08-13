@@ -2,7 +2,7 @@ import pytest
 from cachelib import SimpleCache
 
 from app import Config, create_app
-from tests.fixture.pda import mock_provider_data_api
+from app.pda.mock_api import MockProviderDataApi
 
 
 @pytest.fixture(scope="session")
@@ -31,6 +31,8 @@ class TestConfig(Config):
     SESSION_CACHELIB = SimpleCache()
 
 
-@pytest.fixture(scope="module")
-def app():
-    return create_app(TestConfig, mock_provider_data_api)
+@pytest.fixture(scope="session")
+def app(config=TestConfig):
+    app = create_app(config, MockProviderDataApi)
+
+    return app

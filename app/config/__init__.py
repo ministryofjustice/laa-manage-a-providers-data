@@ -37,11 +37,12 @@ class Config(object):
     SESSION_COOKIE_SAMESITE = "Lax"
     SESSION_COOKIE_NAME = "session"
 
-    TESTING = os.environ.get("TESTING", "False").lower() == "true"
     PREFERRED_URL_SCHEME = os.environ.get("PREFERRED_URL_SCHEME", "https")
 
+    TESTING = os.environ.get("TESTING", "False").lower() == "true"
     SKIP_AUTH = os.environ.get("ENTRA_ID_SKIP_AUTH", "false").lower() == "true"
 
+    PDA_USE_MOCK_API = os.environ.get("PDA_USE_MOCK_API", "False").lower() == "true"
     PDA_URL = os.environ.get("PDA_URL")
     PDA_ENVIRONMENT = os.environ.get("PDA_ENVIRONMENT")
     PDA_API_KEY = os.environ.get("PDA_API_KEY")
