@@ -2,7 +2,6 @@ from typing import Any
 
 from flask import Response, redirect, render_template, url_for
 from flask.views import MethodView
-from flask_wtf import FlaskForm
 
 from app.forms import BaseForm
 
@@ -10,13 +9,13 @@ from app.forms import BaseForm
 class BaseFormView(MethodView):
     """Base view class for handling forms with GET and POST methods."""
 
-    form_class: type[FlaskForm] = BaseForm
+    form_class: type[BaseForm] = BaseForm
     template: str = "form.html"
     success_endpoint: str = "main.index"
 
     def __init__(
         self,
-        form_class: type[FlaskForm] | None = None,
+        form_class: type[BaseForm] | None = None,
         template: str | None = None,
         success_endpoint: str | None = None,
     ) -> None:
@@ -27,18 +26,18 @@ class BaseFormView(MethodView):
         if success_endpoint is not None:
             self.success_endpoint = success_endpoint
 
-    def get_form_class(self) -> type[FlaskForm]:
+    def get_form_class(self) -> type[BaseForm]:
         return self.form_class
 
     def get_template(self) -> str:
         return self.template
 
-    def get_success_url(self) -> str:
+    def get_success_url(self, form: BaseForm | None = None) -> str:
         if self.success_endpoint:
             return url_for(self.success_endpoint)
         return url_for("main.index")
 
-    def get_context_data(self, form: FlaskForm, context: dict, **kwargs) -> dict[str, Any]:
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         return {
             "form": form,
             "title": getattr(self.get_form_class(), "title", "Form"),
@@ -46,10 +45,10 @@ class BaseFormView(MethodView):
             **kwargs,
         }
 
-    def form_valid(self, form: FlaskForm) -> Response:
-        return redirect(self.get_success_url())
+    def form_valid(self, form: BaseForm) -> Response:
+        return redirect(self.get_success_url(form))
 
-    def form_invalid(self, form: FlaskForm, **kwargs) -> str:
+    def form_invalid(self, form: BaseForm, **kwargs) -> str:
         return render_template(self.get_template(), **self.get_context_data(form, **kwargs))
 
     def get(self, **kwargs) -> str:
