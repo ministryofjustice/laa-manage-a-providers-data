@@ -55,7 +55,7 @@ def test_companies_house_number_validation_format(page: Page):
     page.get_by_role("button", name="Continue").click()
 
     # Should show validation error
-    expect(page.get_by_text("Error: Enter a valid Companies House number")).to_be_visible()
+    expect(page.get_by_text("Error: Companies House number must be 8 characters")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -69,7 +69,7 @@ def test_companies_house_number_valid_format(page: Page):
     page.get_by_role("button", name="Continue").click()
 
     # Should not show validation error and should navigate away
-    expect(page.get_by_text("Error: Enter a valid Companies House number")).not_to_be_visible()
+    expect(page.get_by_text("Error: Companies House number must be 8 characters")).not_to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
