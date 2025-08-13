@@ -1,0 +1,53 @@
+{% extends "form.html" %}
+
+{%- from 'govuk_frontend_jinja/components/input/macro.html' import govukInput -%}
+{%- from 'components/moj-pagination.html' import mojPagination -%}
+{%- from 'components/radio_button_table.html' import govukRadioTable %}
+{%- from "govuk_frontend_jinja/components/warning-text/macro.html" import govukWarningText %}
+
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% if form and form.errors %}
+            {{ govukErrorSummary(wtforms_errors(form)) }}
+        {% endif %}
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+              {{ govukNotificationBanner({'type': category, 'html': message}) }}
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <h1 class="govuk-heading-xl">{{ form.title }}</h1>
+
+      <form method="get" class="govuk-!-margin-bottom-6">
+          <div class="govuk-form-group--search">
+            {{ form.search() }}
+            {{ govukButton({'text': 'Search', 'classes': 'govuk-button--secondary'}) }}
+          </div>
+      </form>
+
+      {% if form.search_term %}
+        <h2 class="govuk-heading-m">{{ form.num_results }} search {{ "result" if form.num_results == 1 else "results" }} for ‘{{ form.search_term | upper }}’</h2>
+      {% endif %}
+
+      {# Selection form using POST #}
+      {% if form.num_results > 0 %}
+        <form method="post">
+          {{ form.hidden_tag() }}
+
+          {{ govukRadioTable(form.provider, pagination=mojPagination(currentPage=form.page, numShownPerPage=form.providers_shown_per_page, numResults=form.num_results, searchTerm=form.search_term)) }}
+
+          <br>
+
+          {{ govukButton({'text': 'Continue'}) }}
+        </form>
+      {% endif %}
+    </div>
+  </div>
+
+{% endblock %}

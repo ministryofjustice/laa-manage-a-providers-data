@@ -17,6 +17,10 @@
             <h1 class="govuk-heading-xl">{{ form.title }}</h1>
           {% endif %}
 
+          {% if not form | has_page_heading %}
+            <h1 class="govuk-heading-xl">{{ form.title }}</h1>
+          {% endif %}
+
           {% for field in form %}
             {% if field.type != 'CSRFToken' and field.type != 'HiddenField' %}
               {{ field }}
@@ -28,6 +32,4 @@
           }) }}
         {% endblock %}
     </form>
-  </div>
-</div>
 {% endblock %}
