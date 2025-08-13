@@ -41,7 +41,7 @@ def test_constitutional_status_validation_required(page: Page):
     page.get_by_role("button", name="Continue").click()
 
     # Should show validation error
-    expect(page.get_by_text("Error: Select a constitutional status")).to_be_visible()
+    expect(page.get_by_text("Error: Select the constitutional status")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")

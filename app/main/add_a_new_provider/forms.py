@@ -1,4 +1,4 @@
-from flask import session, current_app
+from flask import current_app, session
 from wtforms import RadioField
 from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired, Length, Optional
@@ -47,7 +47,7 @@ class LspDetailsForm(BaseForm):
     constitutional_status = RadioField(
         "Constitutional status",
         widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
-        validators=[InputRequired(message="Select a constitutional status")],
+        validators=[InputRequired(message="Select the constitutional status")],
         choices=[
             ("government funded organisation", "Government funded organisation"),
             ("sole practitioner", "Sole practitioner"),
