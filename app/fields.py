@@ -20,7 +20,7 @@ class GovUKTableRadioField(RadioField):
         Args:
             label: str - Field label (will be rendered as page heading in template)
             validators: list - Field validators
-            structure: Table structure definition following your TableStructure format
+            structure: list - Table structure
             radio_value_key: Key to use for radio button values
             **kwargs: Additional field arguments
         """
@@ -34,7 +34,7 @@ class GovUKTableRadioField(RadioField):
         self.type = "GovUKTableRadioField"
 
     def get_table_params(self, **kwargs):
-        """Generate GovUK table params
+        """Generate GOV.UK table params for template rendering
 
         Usage in template: {{ govukTable(field.get_table_params()) }}
 
@@ -42,7 +42,7 @@ class GovUKTableRadioField(RadioField):
             **kwargs: Additional parameters to pass to the table
 
         Returns:
-            dict: GovUK table parameters
+            dict: GOV.UK table parameters
         """
         # Convert field choices to DataTable format
         data = []
