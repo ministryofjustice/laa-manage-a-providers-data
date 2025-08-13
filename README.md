@@ -172,3 +172,23 @@ For example
 class CustomClass:
     client_secret = "8dyfuiRyq=vVc3RRr_edRk-fK__JItpZ"  #gitleaks:allow
 ```
+
+## Authentication and Authorization
+
+Authentication is implemented using **Microsoft Entra ID Single Sign-On (SSO)**.
+
+Currently, no role-based or scoped authorization is in place. Access is granted by manually assigning users to the associated **Entra ID enterprise application**.
+
+Members of the development team have the necessary permissions to manage user assignments directly via the **Microsoft Entra ID portal**.
+
+### Packages Used
+
+- [**flask_session**](https://pypi.org/project/Flask-Session/)
+  Handles server-side session storage. We use a Redis backend to persist user session data.
+
+- [**ms-identity-python**](https://github.com/azure-samples/ms-identity-python)
+  Provides integration with Microsoft Entra ID, including automatic registration of login and logout routes for Flask applications.
+
+  This package was modified(by subclassing) to support our specific use cases:
+  - **Logout Handling**: The default implementation had issues correctly detecting the request scheme (`http` vs `https`) for constructing the post-logout redirect URI.
+  - **`login_required` Behavior**: In certain environments (e.g., local development and automated tests), we needed a way to bypass Entra ID authentication

@@ -77,10 +77,6 @@ envVars:
     secret:
       name: provider-data-api
       key: api_key
-  PASSWORD:
-    secret:
-      name: password
-      key: value
   SENTRY_DSN:
     secret:
       name: sentry
@@ -95,4 +91,29 @@ envVars:
       name: sentry-config
       key: profiles_sample_rate
       optional: true
-
+  REDIS_URL:
+    secret:
+      name: elasticache-redis
+      key: url
+  ENTRA_ID_SKIP_AUTH:
+    value: "False"
+  ENTRA_ID_CLIENT_ID:
+    secret:
+      name: entra-id
+      key: client_id
+  ENTRA_ID_CLIENT_SECRET:
+    secret:
+      name: entra-id
+      key: client_secret
+  ENTRA_ID_CLIENT_SECRET_THUMBPRINT:
+    secret:
+      name: entra-id
+      key: client_secret_thumbprint
+  ENTRA_ID_AUTHORITY:
+    secret:
+      name: entra-id
+      key: authority
+  ENTRA_ID_REDIRECT_URI:
+    secret:
+      name: entra-id
+      key: redirect_uri
