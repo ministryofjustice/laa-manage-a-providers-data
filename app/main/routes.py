@@ -2,10 +2,10 @@ import math
 
 from flask import abort, current_app, render_template, request, url_for
 
-from app.auth import requires_authentication
+from app import auth
 from app.components.tables import DataTable, TableStructure, TransposedDataTable
-from app.main.utils import get_full_info_html
 from app.main import bp
+from app.main.utils import get_full_info_html
 
 
 @bp.get("/")
@@ -22,8 +22,8 @@ def status():
 
 
 @bp.get("/providers")
-@requires_authentication
-def providers():
+@auth.login_required
+def providers(context):
     def firm_name_html(row_data: dict[str, str]) -> str:
         _firm_id = row_data.get("firmId", "")
         _firm_name = row_data.get("firmName", "")
@@ -67,8 +67,8 @@ def providers():
 
 
 @bp.get("/provider/<int:firm_id>/offices")
-@requires_authentication
-def offices(firm_id: int):
+@auth.login_required
+def offices(firm_id: int, context):
     def firm_office_html(row_data: dict[str, str]) -> str:
         _office_code = row_data.get("firmOfficeCode", "")
         return f"<a class='govuk-link' href='{url_for('main.contracts', firm_id=firm_id, office_code=_office_code)}'>{_office_code}</a>"
@@ -94,8 +94,8 @@ def offices(firm_id: int):
 
 
 @bp.get("/provider/<int:firm_id>/office/<string:office_code>/contracts")
-@requires_authentication
-def contracts(firm_id: int, office_code: str):
+@auth.login_required
+def contracts(firm_id: int, office_code: str, context):
     columns: list[TableStructure] = [
         {"text": "Category of Law", "id": "categoryOfLaw"},
         {"text": "Sub Category of Law", "id": "subCategoryLaw"},
@@ -123,8 +123,8 @@ def contracts(firm_id: int, office_code: str):
 
 
 @bp.get("/provider/<int:firm_id>/office/<string:office_code>/schedules")
-@requires_authentication
-def schedules(firm_id: int, office_code: str):
+@auth.login_required
+def schedules(firm_id: int, office_code: str, context):
     columns: list[TableStructure] = [
         {"text": "Contract Description", "id": "contractDescription"},
         {"text": "Contract Reference", "id": "contractReference"},
@@ -156,8 +156,8 @@ def schedules(firm_id: int, office_code: str):
 
 
 @bp.get("/provider/<int:firm_id>/office/<string:office_code>/bank-details")
-@requires_authentication
-def bank_details(firm_id: int, office_code: str):
+@auth.login_required
+def bank_details(firm_id: int, office_code: str, context):
     rows: list[TableStructure] = [
         {"text": "Vendor Site ID", "id": "vendorSiteId"},
         {"text": "Bank Name", "id": "bankName"},

@@ -17,8 +17,7 @@
 
 {% block header %}
   {# Pass the user into the header here once we have an authenticated user. #}
-  {% set user={"email": "Authenticated"} if session.get("authenticated") else None%}
-  {{ mojHeader(user=user) }}
+  {{ mojHeader(user=current_user) }}
 
   {{ govukServiceNavigation({
     'serviceName': config['SERVICE_NAME'],

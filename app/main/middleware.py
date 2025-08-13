@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, session
 
 from app.main import bp
 
@@ -22,3 +22,13 @@ def add_no_cache_headers(response):
         response.headers["Pragma"] = "cache"
 
     return response
+
+
+@bp.app_context_processor
+def user_context_processor():
+    if current_user := session.get("_logged_in_user"):
+        current_user = {
+            "name": current_user["name"],
+            "email": current_user["preferred_username"],
+        }
+    return dict(current_user=current_user)
