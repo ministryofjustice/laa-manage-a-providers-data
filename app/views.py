@@ -2,7 +2,6 @@ from typing import Any
 
 from flask import Response, redirect, render_template, url_for
 from flask.views import MethodView
-from flask_wtf import FlaskForm
 
 from app.forms import BaseForm
 
@@ -38,7 +37,7 @@ class BaseFormView(MethodView):
             return url_for(self.success_endpoint)
         return url_for("main.index")
 
-    def get_context_data(self, form: FlaskForm, context: dict, **kwargs) -> dict[str, Any]:
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         return {
             "form": form,
             "title": getattr(self.get_form_class(), "title", "Form"),
@@ -46,10 +45,10 @@ class BaseFormView(MethodView):
             **kwargs,
         }
 
-    def form_valid(self, form: FlaskForm) -> Response:
+    def form_valid(self, form: BaseForm) -> Response:
         return redirect(self.get_success_url(form))
 
-    def form_invalid(self, form: FlaskForm, **kwargs) -> str:
+    def form_invalid(self, form: BaseForm, **kwargs) -> str:
         return render_template(self.get_template(), **self.get_context_data(form, **kwargs))
 
     def get(self, **kwargs) -> str:

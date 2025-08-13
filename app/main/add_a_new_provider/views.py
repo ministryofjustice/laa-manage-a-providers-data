@@ -1,6 +1,6 @@
 from flask import Response, redirect, render_template, request, session, url_for
 
-from app.main.add_a_new_provider import ParentProviderForm
+from app.main.add_a_new_provider import AssignChambersForm
 from app.views import BaseFormView
 
 
@@ -45,8 +45,8 @@ class ChambersDetailsFormView(BaseFormView):
         return super().form_valid(form)
 
 
-class ParentProviderFormView(BaseFormView):
-    """Form view for the Assign to parent provider"""
+class AssignChambersFormView(BaseFormView):
+    """Form view for the assign to a chambers form"""
 
     template = "add_provider/assign-chambers.html"
     success_url = "main.providers"
@@ -55,17 +55,17 @@ class ParentProviderFormView(BaseFormView):
         session["parent_provider_id"] = form.data.get("provider")
         return redirect(url_for(self.success_url))
 
-    def get(self):
+    def get(self, context):
         search_term = request.args.get("search", "").strip()
         page = int(request.args.get("page", 1))
-        form: ParentProviderForm = self.get_form_class()(search_term=search_term, page=page)
+        form: AssignChambersForm = self.get_form_class()(search_term=search_term, page=page)
 
         if search_term:
             form.search.validate(form)
 
-        return render_template(self.get_template(), **self.get_context_data(form))
+        return render_template(self.get_template(), **self.get_context_data(form, context))
 
-    def post(self) -> Response | str:
+    def post(self, context) -> Response | str:
         search_term = request.args.get("search", "").strip()
         page = int(request.args.get("page", 1))
         form = self.get_form_class()(search_term=search_term, page=page)

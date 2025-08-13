@@ -45,7 +45,7 @@ class ChambersDetailsForm(BaseForm):
     url = "add-provider/chambers-details"
 
 
-class ParentProviderForm(BaseForm):
+class AssignChambersForm(BaseForm):
     title = "Assign to a chambers"
     url = "assign-chambers"
     template = "add_provider/assign-chambers.html"
