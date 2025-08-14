@@ -31,6 +31,12 @@ services:
       - FLASK_RUN_PORT=8020
       - SENTRY_DSN=${SENTRY_DSN:-}
       - REDIS_URL=redis://redis:6379/0
+      - REDIS_URL=redis://redis:6379/0
+      - ENTRA_ID_SKIP_AUTH=True
+      - PDA_USE_MOCK_API=True
+      - PDA_URL="https://mock-api.com"
+      - PDA_ENVIRONMENT=Mock
+      - PDA_API_KEY="mock-api-key"
     ports:
       - "8020:8020"
     volumes:
