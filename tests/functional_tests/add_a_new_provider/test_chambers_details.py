@@ -14,8 +14,8 @@ def navigate_to_chambers_details_page(page):
 @pytest.mark.usefixtures("live_server")
 def test_chambers_details_page(page):
     navigate_to_chambers_details_page(page)
+    expect(page.get_by_text("Test provider")).to_be_visible()
     expect(page.get_by_role("heading", name="Chambers details")).to_be_visible()
-    expect(page.get_by_text("Is the provider a solicitor")).to_be_visible()
     expect(page.get_by_text("Advocate level")).to_be_visible()
     expect(page.get_by_text("Pupil")).to_be_visible()
     expect(page.get_by_text("Junior")).to_be_visible()
@@ -50,4 +50,4 @@ def test_bar_council_max_characters_form_submission(page):
     page.get_by_role("radio", name="King's Counsel (KC,").check()
     page.get_by_role("textbox", name="Bar Council roll number").fill("12345678911523456789")
     page.get_by_role("button", name="Continue").click()
-    expect(page.get_by_text("Error: The Bar Council roll")).to_be_visible()
+    expect(page.get_by_text("Error: Bar Council roll")).to_be_visible()

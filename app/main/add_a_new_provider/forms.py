@@ -121,7 +121,7 @@ class AssignChambersForm(BaseForm):
 
 class ChambersDetailsForm(BaseForm):
     title = "Chambers details"
-    url = "/chambers-details"
+    url = "chambers-details"
 
     @property
     def caption(self):
