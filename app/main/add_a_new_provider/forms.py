@@ -156,8 +156,3 @@ class ChambersDetailsForm(BaseForm):
             Length(max=15, message="The Bar Council roll number must be 15 characters or less"),
         ],
     )
-
-
-class ParentProviderForm(BaseForm):
-    title = "Assign to parent provider"
-    url = "add-provider/assign-parent-provider"
