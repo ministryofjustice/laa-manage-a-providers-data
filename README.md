@@ -74,9 +74,9 @@ For local development and deployments, run the below code to create and run the 
 ./run_local.sh
 ```
 
-## Playwright Testing
+## Testing
 
-To run all tests:
+To run all the tests:
 
 ```shell
 pytest
