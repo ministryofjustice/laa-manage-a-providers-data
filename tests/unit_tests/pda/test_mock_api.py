@@ -2,6 +2,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
+from app.models import Firm, Office
 from app.pda.mock_api import MockProviderDataApi, _clean_data, _load_fixture, _load_mock_data
 
 
@@ -121,14 +122,14 @@ class TestMockProviderDataApi:
 
         result = mock_api.get_provider_firm(1)
 
-        assert result == {"firm": {"firmId": 1, "firmName": "Test Firm"}}
+        assert result == Firm(firm_id=1, firm_name="Test Firm")
 
     def test_get_provider_firm_not_found(self, mock_api):
         mock_api._mock_data = {"firms": [{"firmId": 1, "firmName": "Test Firm"}]}
 
         result = mock_api.get_provider_firm(999)
 
-        assert result == {"firm": {}}
+        assert result is None
 
     def test_get_provider_firm_invalid_id(self, mock_api):
         with pytest.raises(ValueError, match="firm_id must be a positive integer"):
@@ -147,7 +148,7 @@ class TestMockProviderDataApi:
 
         result = mock_api.get_all_provider_firms()
 
-        expected = {"firms": [{"firmId": 1, "firmName": "Test Firm"}, {"firmId": 2, "firmName": "Other Firm"}]}
+        expected = [Firm(**{"firmId": 1, "firmName": "Test Firm"}), Firm(**{"firmId": 2, "firmName": "Other Firm"})]
         assert result == expected
 
     def test_get_provider_office_success(self, mock_api):
@@ -157,14 +158,14 @@ class TestMockProviderDataApi:
 
         result = mock_api.get_provider_office("1A001L")
 
-        assert result == {"office": {"firmOfficeCode": "1A001L", "officeName": "Test Office"}}
+        assert result == Office(**{"firmOfficeCode": "1A001L", "officeName": "Test Office"})
 
     def test_get_provider_office_not_found(self, mock_api):
         mock_api._mock_data = {"offices": []}
 
         result = mock_api.get_provider_office("NONEXISTENT")
 
-        assert result == {"office": {}}
+        assert result is None
 
     def test_get_provider_office_invalid_code(self, mock_api):
         with pytest.raises(ValueError, match="office_code must be a non-empty string"):
@@ -185,10 +186,7 @@ class TestMockProviderDataApi:
 
         result = mock_api.get_provider_offices(1)
 
-        expected = {
-            "firm": {"firmId": 1, "firmName": "Test Firm"},
-            "offices": [{"firmOfficeCode": "1A001L"}, {"firmOfficeCode": "1A002L"}],
-        }
+        expected = [Office(**{"firmOfficeCode": "1A001L"}), Office(**{"firmOfficeCode": "1A002L"})]
         assert result == expected
 
     def test_get_provider_offices_invalid_firm_id(self, mock_api):
@@ -207,11 +205,7 @@ class TestMockProviderDataApi:
 
         result = mock_api.get_office_contract_details(1, "1A001L")
 
-        expected = {
-            "firm": {"firmId": 1, "firmName": "Test Firm"},
-            "office": {"firmOfficeCode": "1A001L", "firmOfficeId": 101},
-            "contracts": [{"categoryOfLaw": "MAT"}],
-        }
+        expected = [{"categoryOfLaw": "MAT"}]
         assert result == expected
 
     def test_get_office_contract_details_office_not_found(self, mock_api):
@@ -219,7 +213,7 @@ class TestMockProviderDataApi:
 
         result = mock_api.get_office_contract_details(1, "NONEXISTENT")
 
-        assert result == {"firm": {}, "office": {}, "contracts": []}
+        assert result == {}
 
     def test_get_office_schedule_details_success(self, mock_api):
         mock_api._mock_data = {
@@ -233,12 +227,7 @@ class TestMockProviderDataApi:
 
         result = mock_api.get_office_schedule_details(1, "1A001L")
 
-        expected = {
-            "firm": {"firmId": 1, "firmName": "Test Firm"},
-            "office": {"firmOfficeCode": "1A001L", "firmOfficeId": 101},
-            "pds": True,
-            "schedules": [{"contractType": "Standard"}],
-        }
+        expected = [{"contractType": "Standard"}]
         assert result == expected
 
     def test_get_office_schedule_details_office_not_found(self, mock_api):
@@ -246,7 +235,7 @@ class TestMockProviderDataApi:
 
         result = mock_api.get_office_schedule_details(1, "NONEXISTENT")
 
-        assert result == {"firm": {}, "office": {}, "pds": True, "schedules": []}
+        assert result is None
 
     def test_get_provider_users_success(self, mock_api):
         mock_api._mock_data = {"users": {1: [{"userId": 1, "name": "John"}], 2: [{"userId": 2, "name": "Jane"}]}}

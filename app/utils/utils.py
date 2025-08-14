@@ -1,13 +1,11 @@
-"""Utility functions for the main module."""
-
 from typing import Optional, Type
 
 from flask import Blueprint
 
 from app import auth
 
-from .forms import BaseForm
-from .views import BaseFormView
+from ..forms import BaseForm
+from ..views import BaseFormView
 
 
 def register_form_view(

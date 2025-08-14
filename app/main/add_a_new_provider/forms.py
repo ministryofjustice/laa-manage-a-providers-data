@@ -1,12 +1,14 @@
 from flask import current_app, session
 from wtforms import RadioField
 from wtforms.fields.simple import StringField
-from wtforms.validators import InputRequired, Length
+from wtforms.validators import InputRequired, Length, Optional
 
+from app.constants import CONSTITUTIONAL_STATUS_CHOICES, FIRM_TYPE_CHOICES
 from app.fields import GovUKTableRadioField
-from app.validators import ValidateSearchResults
-from app.widgets import GovRadioInput, GovTextInput
+from app.validators import ValidateCompaniesHouseNumber, ValidateGovDateField, ValidatePastDate, ValidateSearchResults
+from app.widgets import GovDateInput, GovRadioInput, GovTextInput
 
+from ...fields import GovDateField
 from ...forms import BaseForm
 
 
@@ -26,18 +28,41 @@ class AddProviderForm(BaseForm):
         "Provider type",
         widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
         validators=[InputRequired(message=("Select a provider type"))],
-        choices=[
-            ("barrister", "Barrister"),
-            ("advocate", "Advocate"),
-            ("chambers", "Chambers"),
-            ("lsp", "Legal services provider"),
-        ],
+        choices=FIRM_TYPE_CHOICES,
     )
 
 
 class LspDetailsForm(BaseForm):
     title = "Legal services provider details"
-    url = "add-provider/lsp-details"
+    url = "additional-details-legal-services-provider"
+
+    @property
+    def caption(self):
+        return session.get("new_provider", {}).get("firm_name")
+
+    constitutional_status = RadioField(
+        "Constitutional status",
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
+        validators=[InputRequired(message="Select a constitutional status")],
+        choices=CONSTITUTIONAL_STATUS_CHOICES,
+    )
+
+    indemnity_received_date = GovDateField(
+        "Indemnity received date (optional)",
+        widget=GovDateInput(heading_class="govuk-fieldset__legend--m", hint="For example 27 3 2025"),
+        format="%d %m %Y",
+        validators=[Optional(), ValidateGovDateField(), ValidatePastDate()],
+    )
+
+    companies_house_number = StringField(
+        "Companies House number (optional)",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-!-width-one-half",
+            hint="Also known as Company Registration Number",
+        ),
+        validators=[ValidateCompaniesHouseNumber()],
+    )
 
 
 class AssignChambersForm(BaseForm):
@@ -60,12 +85,12 @@ class AssignChambersForm(BaseForm):
     provider = GovUKTableRadioField(
         "",
         structure=[
-            {"text": "Provider", "id": "firmName"},
-            {"text": "Account number", "id": "firmNumber"},
-            {"text": "Type", "id": "firmType"},
+            {"text": "Provider", "id": "firm_name"},
+            {"text": "Account number", "id": "firm_number"},
+            {"text": "Type", "id": "firm_type"},
         ],
         choices=[],  # This will be set when the user sends a request.
-        radio_value_key="firmId",
+        radio_value_key="firm_id",
         validators=[InputRequired(message="Select a chambers to assign the new provider to")],
     )
 
@@ -74,11 +99,10 @@ class AssignChambersForm(BaseForm):
 
         # Get firms data
         pda = current_app.extensions["pda"]
-        data = pda.get_all_provider_firms()
-        firms = data["firms"]
+        firms = pda.get_all_provider_firms()
 
         # Advocates or Barristers can only have Chambers as their parent
-        firms = [firm for firm in firms if firm["firmType"] == "Chambers"]
+        firms = [firm for firm in firms if firm.firm_type == "Chambers"]
 
         # Set search field data
         self.search_term = search_term
@@ -91,7 +115,7 @@ class AssignChambersForm(BaseForm):
             firms = [
                 firm
                 for firm in firms
-                if (search_lower in firm["firmName"].lower() or search_lower in str(firm["firmId"]).lower())
+                if (search_lower in firm.firm_name.lower() or search_lower in str(firm.firm_id).lower())
             ]
 
         self.page = page
@@ -107,11 +131,11 @@ class AssignChambersForm(BaseForm):
         for firm in firms:
             choices.append(
                 (
-                    firm["firmId"],
+                    firm.firm_id,
                     {
-                        "firmName": firm["firmName"],
-                        "firmNumber": firm["firmNumber"],
-                        "firmType": firm["firmType"],
+                        "firm_name": firm.firm_name,
+                        "firm_number": firm.firm_number,
+                        "firm_type": firm.firm_type,
                     },
                 )
             )

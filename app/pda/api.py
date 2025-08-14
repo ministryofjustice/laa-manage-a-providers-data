@@ -2,8 +2,11 @@ import logging
 from typing import Any, Dict, List, Optional, Union
 
 import requests
+from pydantic import ValidationError
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
+
+from app.models import Firm, Office
 
 
 class ProviderDataApiError(Exception):
@@ -189,7 +192,7 @@ class ProviderDataApi:
             except requests.HTTPError as e:
                 raise ProviderDataApiError(f"HTTP error: {e}")
 
-    def get_provider_firm(self, firm_id: int) -> Optional[Dict[str, Any]]:
+    def get_provider_firm(self, firm_id: int) -> Firm | None:
         """
         Get details for a specific provider firm.
 
@@ -197,25 +200,44 @@ class ProviderDataApi:
             firm_id: The firm ID
 
         Returns:
-            Dict containing firm details, or None if not found
+            Firm model instance, or None if not found
         """
         if not isinstance(firm_id, int) or firm_id <= 0:
             raise ValueError("firm_id must be a positive integer")
 
         response = self.get(f"/provider-firms/{firm_id}")
-        return self._handle_response(response, {})
+        raw_data = self._handle_response(response, None)
 
-    def get_all_provider_firms(self) -> List[Dict[str, Any]]:
+        if raw_data is None:
+            return None
+
+        try:
+            firm = raw_data.get("firm")
+            return Firm(**firm)
+        except ValidationError as e:
+            self.logger.error(f"Invalid firm data from API for firm {firm_id}: {e}")
+            raise ProviderDataApiError(f"Invalid firm data: {e}")
+
+    def get_all_provider_firms(self) -> List[Firm]:
         """
         Get all provider firms.
 
         Returns:
-            List of dictionaries containing firm details
+            List of Firm model instances
         """
         response = self.get("/provider-firms")
-        return self._handle_response(response, [])
+        raw_data = self._handle_response(response, [])
 
-    def get_provider_office(self, office_code: str) -> Optional[Dict[str, Any]]:
+        if not raw_data:
+            return []
+
+        try:
+            return [Firm(**firm_data) for firm_data in raw_data["firms"]]
+        except ValidationError as e:
+            self.logger.error(f"Invalid firms data from API: {e}")
+            raise ProviderDataApiError(f"Invalid firms data: {e}")
+
+    def get_provider_office(self, office_code: str) -> Office | None:
         """
         Get details for a specific provider office.
 
@@ -223,15 +245,25 @@ class ProviderDataApi:
             office_code: The office code
 
         Returns:
-            Dict containing office details, or None if not found
+            Office model instance, or None if not found
         """
         if not office_code or not isinstance(office_code, str):
             raise ValueError("office_code must be a non-empty string")
 
         response = self.get(f"/provider-offices/{office_code}")
-        return self._handle_response(response, {})
+        raw_data = self._handle_response(response, None)
 
-    def get_provider_offices(self, firm_id: int) -> List[Dict[str, Any]]:
+        if raw_data is None:
+            return None
+
+        try:
+            office = raw_data.get("office", raw_data)  # Handle both wrapped and direct responses
+            return Office(**office)
+        except ValidationError as e:
+            self.logger.error(f"Invalid office data from API for office {office_code}: {e}")
+            raise ProviderDataApiError(f"Invalid office data: {e}")
+
+    def get_provider_offices(self, firm_id: int) -> List[Office]:
         """
         Get all offices for a specific firm.
 
@@ -239,13 +271,45 @@ class ProviderDataApi:
             firm_id: The firm ID
 
         Returns:
-            List of dictionaries containing office details
+            List of FirmOffice model instances
         """
         if not isinstance(firm_id, int) or firm_id <= 0:
             raise ValueError("firm_id must be a positive integer")
 
         response = self.get(f"/provider-firms/{firm_id}/provider-offices")
-        return self._handle_response(response, [])
+        raw_data = self._handle_response(response, [])
+
+        if not raw_data:
+            return []
+
+        try:
+            offices_data = raw_data.get("offices", raw_data)  # Handle both wrapped and direct responses
+            return [Office(**office_data) for office_data in offices_data]
+        except ValidationError as e:
+            self.logger.error(f"Invalid offices data from API for firm {firm_id}: {e}")
+            raise ProviderDataApiError(f"Invalid offices data: {e}")
+
+    def get_head_office(self, firm_id: int) -> Office | None:
+        """
+        Gets the head office for a specific firm.
+
+        Args:
+            firm_id: The firm ID
+
+        Returns:
+            FirmOffice model instance for the head office, or None if not found
+        """
+        offices = self.get_provider_offices(firm_id)
+
+        if not offices:
+            return None
+
+        for office in offices:
+            # Child offices have headOffice = parent's office ID
+            # Head offices have headOffice = "N/A"
+            if office.head_office == "N/A":
+                return office
+        return None
 
     def get_provider_users(self, firm_id: int) -> List[Dict[str, Any]]:
         """
