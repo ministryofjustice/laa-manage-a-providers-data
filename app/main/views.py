@@ -47,7 +47,7 @@ class ViewProvider(MethodView):
         data = {}
 
         for field_config in field_configs:
-            session_value = session.get(field_config["session_key"])
+            session_value = session.get("new_provider", {}).get(field_config["session_key"])
             if session_value:
                 rows.append({"text": field_config["label"], "id": field_config["session_key"]})
                 formatted_value = (

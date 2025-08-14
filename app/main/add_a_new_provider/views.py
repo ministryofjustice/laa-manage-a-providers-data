@@ -20,8 +20,8 @@ class AddProviderFormView(BaseFormView):
         session["new_provider"] = {}
         session["new_provider"].update(
             {
-                "firmName": form.data.get("provider_name"),
-                "firmType": form.data.get("provider_type"),
+                "provider_name": form.data.get("provider_name"),
+                "provider_type": form.data.get("provider_type"),
             }
         )
 
@@ -42,8 +42,8 @@ class LspDetailsFormView(BaseFormView):
     def form_valid(self, form):
         session["new_provider"].update(
             {
-                "constitutionalStatus": form.data.get("constitutional_status"),
-                "companyHouseNumber": form.data.get("companies_house_number"),
+                "constitutional_status": form.data.get("constitutional_status"),
+                "companies_house_number": form.data.get("companies_house_number"),
             }
         )
 
