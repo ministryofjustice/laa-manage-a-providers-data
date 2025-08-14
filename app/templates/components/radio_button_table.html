@@ -1,0 +1,27 @@
+{%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable %}
+
+{% macro govukRadioTable(field, pagination) %}
+<div class="govuk-form-group{% if field.errors %} govuk-form-group--error{% endif %}">
+  {% if field.label.text %}
+    <fieldset class="govuk-fieldset">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+        <h1 class="govuk-fieldset__heading">{{ field.label.text }}</h1>
+      </legend>
+  {% endif %}
+
+  {% if field.errors %}
+    <p id="{{ field.id }}-error" class="govuk-error-message">
+      <span class="govuk-visually-hidden">Error:</span>
+      {{ field.errors[0] }}
+    </p>
+  {% endif %}
+
+  {{ govukTable(field.get_table_params()) }}
+
+  {% if field.label.text %}
+    </fieldset>
+  {% endif %}
+
+  {{ pagination }}
+</div>
+{% endmacro %}

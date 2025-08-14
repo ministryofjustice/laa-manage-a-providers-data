@@ -2,7 +2,6 @@ from typing import Any
 
 from flask import Response, redirect, render_template, url_for
 from flask.views import MethodView
-from flask_wtf import FlaskForm
 
 from app.forms import BaseForm
 
@@ -10,13 +9,13 @@ from app.forms import BaseForm
 class BaseFormView(MethodView):
     """Base view class for handling forms with GET and POST methods."""
 
-    form_class: type[FlaskForm] = BaseForm
+    form_class: type[BaseForm] = BaseForm
     template: str = "form.html"
     success_endpoint: str = "main.index"
 
     def __init__(
         self,
-        form_class: type[FlaskForm] | None = None,
+        form_class: type[BaseForm] | None = None,
         template: str | None = None,
         success_endpoint: str | None = None,
     ) -> None:
@@ -27,7 +26,7 @@ class BaseFormView(MethodView):
         if success_endpoint is not None:
             self.success_endpoint = success_endpoint
 
-    def get_form_class(self) -> type[FlaskForm]:
+    def get_form_class(self) -> type[BaseForm]:
         return self.form_class
 
     def get_template(self) -> str:
@@ -38,24 +37,28 @@ class BaseFormView(MethodView):
             return url_for(self.success_endpoint)
         return url_for("main.index")
 
-    def get_context_data(self, form: FlaskForm) -> dict[str, Any]:
-        context = {"form": form, "title": getattr(self.get_form_class(), "title", "Form")}
-        return context
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        return {
+            "form": form,
+            "title": getattr(self.get_form_class(), "title", "Form"),
+            **(context.get("context", {}) if context else {}),
+            **kwargs,
+        }
 
-    def form_valid(self, form: FlaskForm) -> Response:
+    def form_valid(self, form: BaseForm) -> Response:
         return redirect(self.get_success_url(form))
 
-    def form_invalid(self, form: FlaskForm) -> str:
-        return render_template(self.get_template(), **self.get_context_data(form))
+    def form_invalid(self, form: BaseForm, **kwargs) -> str:
+        return render_template(self.get_template(), **self.get_context_data(form, **kwargs))
 
-    def get(self) -> str:
+    def get(self, **kwargs) -> str:
         form = self.get_form_class()()
-        return render_template(self.get_template(), **self.get_context_data(form))
+        return render_template(self.get_template(), **self.get_context_data(form, **kwargs))
 
-    def post(self) -> Response | str:
+    def post(self, *args, **kwargs) -> Response | str:
         form = self.get_form_class()()
 
         if form.validate_on_submit():
             return self.form_valid(form)
         else:
-            return self.form_invalid(form)
+            return self.form_invalid(form, **kwargs)

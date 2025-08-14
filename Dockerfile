@@ -8,7 +8,7 @@ RUN npm install
 RUN npm run build
 
 
-FROM $BASE_IMAGE AS base
+FROM python:3.13-bookworm AS base
 ARG REQUIREMENTS_FILE=requirements-production.txt
 RUN apt-get update
 # Upgrade perl-base to install latests security update

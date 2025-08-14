@@ -1,12 +1,12 @@
 from app.main import bp
 from app.utils import register_form_view
 
-from .forms import AddProviderForm, ChambersDetailsForm, LspDetailsForm, ParentProviderForm
+from .forms import AddProviderForm, AssignChambersForm, ChambersDetailsForm, LspDetailsForm
 from .views import (
     AddProviderFormView,
+    AssignChambersFormView,
     ChambersDetailsFormView,
     LspDetailsFormView,
-    ParentProviderFormView,
     ViewProvider,
 )
 
@@ -18,7 +18,7 @@ def register_views():
 
     register_form_view(form_class=ChambersDetailsForm, view_class=ChambersDetailsFormView, blueprint=bp)
 
-    register_form_view(form_class=ParentProviderForm, view_class=ParentProviderFormView, blueprint=bp)
+    register_form_view(form_class=AssignChambersForm, view_class=AssignChambersFormView, blueprint=bp)
 
 
 register_views()

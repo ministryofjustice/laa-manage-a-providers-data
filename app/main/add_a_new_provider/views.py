@@ -1,7 +1,8 @@
-from flask import current_app, flash, render_template, session, url_for
+from flask import Response, current_app, flash, redirect, render_template, request, session, url_for
 from flask.views import MethodView
 
 from app.components.tables import TransposedDataTable
+from app.main.add_a_new_provider import AssignChambersForm
 from app.pda.api import ProviderDataApiError
 from app.utils.formatting import (
     format_constitutional_status,
@@ -19,8 +20,8 @@ class AddProviderFormView(BaseFormView):
     template = "templates/form.html"
 
     next_step_mapping = {
-        "barrister": "main.add_provider/assign_parent_provider",
-        "advocate": "main.add_provider/assign_parent_provider",
+        "barrister": "main.assign_chambers",
+        "advocate": "main.assign_chambers",
         "chambers": "main.add_provider/chambers_details",
         "lsp": "main.additional_details_legal_services_provider",
     }
@@ -61,10 +62,34 @@ class ChambersDetailsFormView(BaseFormView):
     pass
 
 
-class ParentProviderFormView(BaseFormView):
-    """Form view for the Assign to parent provider"""
+class AssignChambersFormView(BaseFormView):
+    """Form view for the assign to a chambers form"""
 
-    pass
+    template = "add_provider/assign-chambers.html"
+    success_url = "main.providers"
+
+    def form_valid(self, form):
+        session["parent_provider_id"] = form.data.get("provider")
+        return redirect(url_for(self.success_url))
+
+    def get(self, context):
+        search_term = request.args.get("search", "").strip()
+        page = int(request.args.get("page", 1))
+        form: AssignChambersForm = self.get_form_class()(search_term=search_term, page=page)
+
+        if search_term:
+            form.search.validate(form)
+
+        return render_template(self.get_template(), **self.get_context_data(form, context))
+
+    def post(self, context) -> Response | str:
+        search_term = request.args.get("search", "").strip()
+        page = int(request.args.get("page", 1))
+        form = self.get_form_class()(search_term=search_term, page=page)
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
 
 class ViewProvider(MethodView):
