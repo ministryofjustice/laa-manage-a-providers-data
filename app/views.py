@@ -45,11 +45,7 @@ class BaseFormView(MethodView):
             **kwargs,
         }
 
-<<<<<<< HEAD
     def form_valid(self, form: BaseForm) -> Response:
-=======
-    def form_valid(self, form: FlaskForm) -> Response:
->>>>>>> 4501bbd (MAPD-43: Move next_step_mapping to views.py)
         return redirect(self.get_success_url(form))
 
     def form_invalid(self, form: BaseForm, **kwargs) -> str:
