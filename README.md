@@ -10,11 +10,15 @@ A flask application for managing legal aid providers' data.
 
 ### Setup
 
-Create a virtual environment and install the python dependencies:
+Create a virtual environment:
 
 ```shell
 python3 -m venv .venv
 source .venv/bin/activate
+```
+
+Install the Python dependencies:
+```
 pip install -r requirements/generated/requirements-development.txt
 ```
 
@@ -72,15 +76,7 @@ For local development and deployments, run the below code to create and run the 
 
 ## Testing
 
-To run the tests:
-
-```shell
-python -m pytest --cov=app --cov-report=term-missing --cov-branch
-```
-
-## Playwright Testing
-
-To run all tests:
+To run all the tests:
 
 ```shell
 pytest
