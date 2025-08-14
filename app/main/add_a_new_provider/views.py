@@ -1,4 +1,4 @@
-from flask import session, url_for
+from flask import Response, redirect, render_template, request, session, url_for
 
 from app.main.add_a_new_provider import AssignChambersForm
 from app.views import BaseFormView
@@ -10,13 +10,8 @@ class AddProviderFormView(BaseFormView):
     template = "templates/form.html"
 
     next_step_mapping = {
-<<<<<<< HEAD
         "barrister": "main.assign_chambers",
         "advocate": "main.assign_chambers",
-=======
-        "barrister": "main.add_provider/assign_parent_provider",
-        "advocate": "main.add_provider/assign_parent_provider",
->>>>>>> 4501bbd (MAPD-43: Move next_step_mapping to views.py)
         "chambers": "main.add_provider/chambers_details",
         "lsp": "main.add_provider/lsp_details",
     }
