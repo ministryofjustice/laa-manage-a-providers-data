@@ -12,7 +12,7 @@ class AddProviderFormView(BaseFormView):
     next_step_mapping = {
         "Barrister": "main.assign_chambers",
         "Advocate": "main.assign_chambers",
-        "Chambers": ""main.chambers_details",,
+        "Chambers": "main.chambers_details",
         "Legal Services Provider": "main.additional_details_legal_services_provider",
     }
 
