@@ -38,6 +38,16 @@ def providers(context):
     pda = current_app.extensions["pda"]
     data = pda.get_all_provider_firms()
 
+    firms = data["firms"]
+    values = {}
+    for firm in firms:
+        for key, value in firm.items():
+            if key not in values:
+                values[key]: set = set()
+            values[key].add(value)
+
+    print(values)
+
     provider_data = data["firms"][start_provider_firm_num:]
 
     # Filter providers based on search term
