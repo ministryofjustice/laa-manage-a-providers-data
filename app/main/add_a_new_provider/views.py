@@ -10,18 +10,18 @@ class AddProviderFormView(BaseFormView):
     template = "templates/form.html"
 
     next_step_mapping = {
-        "barrister": "main.assign_chambers",
-        "advocate": "main.assign_chambers",
-        "chambers": "main.add_provider/chambers_details",
-        "lsp": "main.additional_details_legal_services_provider",
+        "Barrister": "main.assign_chambers",
+        "Advocate": "main.assign_chambers",
+        "Chambers": "main.add_provider/chambers_details",
+        "Legal Services Provider": "main.additional_details_legal_services_provider",
     }
 
     def form_valid(self, form):
         session["new_provider"] = {}
         session["new_provider"].update(
             {
-                "provider_name": form.data.get("provider_name"),
-                "provider_type": form.data.get("provider_type"),
+                "firm_name": form.data.get("provider_name"),
+                "firm_type": form.data.get("provider_type"),
             }
         )
 
@@ -43,7 +43,7 @@ class LspDetailsFormView(BaseFormView):
         session["new_provider"].update(
             {
                 "constitutional_status": form.data.get("constitutional_status"),
-                "companies_house_number": form.data.get("companies_house_number"),
+                "company_house_number": form.data.get("companies_house_number"),
             }
         )
 
@@ -65,11 +65,11 @@ class AssignChambersFormView(BaseFormView):
     """Form view for the assign to a chambers form"""
 
     template = "add_provider/assign-chambers.html"
-    success_url = "main.providers"
+    success_endpoint = "main.view_provider"
 
     def form_valid(self, form):
-        session["parent_provider_id"] = form.data.get("provider")
-        return redirect(url_for(self.success_url))
+        session.get("new_provider", {}).update({"parent_firm_id": form.data.get("provider")})
+        return redirect(self.get_success_url(form))
 
     def get(self, context):
         search_term = request.args.get("search", "").strip()

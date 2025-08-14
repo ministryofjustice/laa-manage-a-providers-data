@@ -1,83 +1,91 @@
-from flask import current_app, flash, render_template, session
+from flask import abort, current_app, render_template, session, url_for
 from flask.views import MethodView
 
 from app.components.tables import TransposedDataTable
-from app.pda.api import ProviderDataApiError
-from app.utils.formatting import (
-    format_constitutional_status,
-    format_date,
-    format_provider_type,
-    format_title_case,
-    format_yes_no,
-)
+from app.models import Firm, Office
+from app.utils.formatting import format_constitutional_status, format_date, format_title_case, format_yes_no
 
 
 class ViewProvider(MethodView):
     template = "view-provider.html"
 
-    MAIN_SECTION_FIELDS = [
-        {"session_key": "provider_name", "label": "Provider name", "formatter": None},
-        {"session_key": "provider_number", "label": "Provider number", "formatter": None},
-    ]
-
-    ADDITIONAL_DETAILS_FIELDS = [
-        {"session_key": "provider_type", "label": "Provider type", "formatter": format_provider_type},
-        {
-            "session_key": "constitutional_status",
-            "label": "Constitutional status",
-            "formatter": format_constitutional_status,
-        },
-        {"session_key": "indemnity_received_date", "label": "Indemnity received date", "formatter": format_date},
-        {"session_key": "companies_house_number", "label": "Companies House number", "formatter": None},
-        {
-            "session_key": "not_for_profit_organisation",
-            "label": "Not for profit organisation",
-            "formatter": format_yes_no,
-        },
-        {"session_key": "solicitor_advocate", "label": "Solicitor advocate", "formatter": format_yes_no},
-        {"session_key": "advocate_level", "label": "Advocate level", "formatter": format_title_case},
-        {"session_key": "bar_or_council_roll", "label": "Bar or council roll", "formatter": None},
-        {"session_key": "firm_intervened", "label": "Firm intervened", "formatter": format_yes_no},
-    ]
+    @staticmethod
+    def parent_provider_name_html(parent_provider: Firm):
+        return f"<a class='govuk-link', href={url_for('main.view_provider_with_id', firm_id=parent_provider.firm_id)}>{parent_provider.firm_name}</a>"
 
     @staticmethod
-    def _process_fields(field_configs):
-        """Process field configurations and return rows and data for table creation"""
-        rows = []
-        data = {}
+    def _add_field(rows, data, value, label, formatter=None, html=None):
+        """Helper to add a field if it has a value. Uses snake_case label as ID."""
+        if value:
+            # Convert label to snake_case for the ID
+            field_id = label.lower().replace(" ", "_")
+            row = {"text": label, "id": field_id, "classes": "govuk-!-width-one-half"}
+            if html:
+                row.update({"html": html})
+            rows.append(row)
+            data[field_id] = formatter(value) if formatter else value
 
-        for field_config in field_configs:
-            session_value = session.get("new_provider", {}).get(field_config["session_key"])
-            if session_value:
-                rows.append({"text": field_config["label"], "id": field_config["session_key"]})
-                formatted_value = (
-                    field_config["formatter"](session_value) if field_config["formatter"] else session_value
-                )
-                data[field_config["session_key"]] = formatted_value
+    def get(self, firm_id: int | None = None):
+        if firm_id:
+            firm = current_app.extensions["pda"].get_provider_firm(firm_id)
+        else:
+            # If there is no firm in the URL load from the session
+            firm = Firm(**session.get("new_provider"))
 
-        return rows, data
+        if not firm:
+            abort(404)
 
-    def get(self):
-        main_rows, main_data = self._process_fields(self.MAIN_SECTION_FIELDS)
+        pda = current_app.extensions["pda"]
 
-        # Handle parent provider info (special case requiring API call)
-        parent_provider_id = session.get("parent_provider_id")
-        if parent_provider_id:
-            pda = current_app.extensions["pda"]
-            try:
-                parent_provider = pda.get_provider_firm(firm_id=int(parent_provider_id))["firm"]
+        head_office, parent_provider = None, None
 
-                main_rows.append({"text": "Parent provider name", "id": "parent_provider_name"})
-                main_data["parent_provider_name"] = parent_provider["firmName"]
+        if firm.firm_id:
+            # Get head office for account number
+            head_office: Office = pda.get_head_office(firm.firm_id)
 
-                main_rows.append({"text": "Parent provider number", "id": "parent_provider_number"})
-                main_data["parent_provider_number"] = parent_provider["firmNumber"]
-            except ProviderDataApiError:
-                flash("Parent provider not found", "error")
-                pass
+        if firm.parent_firm_id:
+            # Get parent provider
+            parent_provider: Firm = pda.get_provider_firm(firm.parent_firm_id)
 
-        additional_rows, additional_data = self._process_fields(self.ADDITIONAL_DETAILS_FIELDS)
+        # Main section
+        main_rows, main_data = [], {}
+        self._add_field(main_rows, main_data, firm.firm_name, "Provider name")
+        self._add_field(main_rows, main_data, firm.firm_number, "Provider number")
 
+        if head_office:
+            self._add_field(main_rows, main_data, head_office.firm_office_code, "Account number")
+
+        if parent_provider:
+            self._add_field(
+                main_rows,
+                main_data,
+                parent_provider.firm_name,
+                "Parent provider name",
+                html=self.parent_provider_name_html(parent_provider),
+            )
+            self._add_field(main_rows, main_data, parent_provider.firm_number, "Parent provider number")
+
+        # Additional section
+        additional_rows, additional_data = [], {}
+        self._add_field(
+            additional_rows,
+            additional_data,
+            firm.constitutional_status,
+            "Constitutional status",
+            format_constitutional_status,
+        )
+        self._add_field(
+            additional_rows, additional_data, firm.indemnity_received_date, "Indemnity received date", format_date
+        )
+        self._add_field(
+            additional_rows, additional_data, firm.non_profit_organisation, "Not for profit organisation", format_yes_no
+        )
+        self._add_field(additional_rows, additional_data, firm.solicitor_advocate, "Solicitor advocate", format_yes_no)
+        self._add_field(additional_rows, additional_data, firm.advocate_level, "Advocate level", format_title_case)
+        self._add_field(additional_rows, additional_data, firm.company_house_number, "company_house_number")
+        self._add_field(additional_rows, additional_data, firm.bar_council_role, "bar_council_role")
+
+        # Create tables
         main_table = TransposedDataTable(structure=main_rows, data=main_data) if main_rows else None
         additional_table = (
             TransposedDataTable(structure=additional_rows, data=additional_data) if additional_rows else None
@@ -87,6 +95,6 @@ class ViewProvider(MethodView):
             self.template,
             main_table=main_table,
             additional_table=additional_table,
-            provider_name=main_data.get("provider_name"),
-            provider_type=additional_data.get("provider_type"),
+            provider_name=firm.firm_name,
+            provider_type=firm.firm_type,
         )

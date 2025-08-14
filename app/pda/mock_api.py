@@ -4,6 +4,16 @@ import os
 from typing import Any, Dict, List, Optional
 from unittest.mock import Mock
 
+from pydantic import ValidationError
+
+from app.models import Firm, Office
+
+
+class ProviderDataApiError(Exception):
+    """Base exception for Provider Data API errors."""
+
+    pass
+
 
 def _load_fixture(filepath: str) -> Dict[str, Any]:
     """Load a single fixture file."""
@@ -60,7 +70,16 @@ class MockProviderDataApi:
                 return office
         return None
 
-    def init_app(self, app, base_url: str = None, **kwargs) -> None:
+    def init_app(self, app, base_url: str = None, api_key: str = None, **kwargs) -> None:
+        """
+        Initialize the mock API client with Flask app configuration.
+
+        Args:
+            app: Flask application instance
+            base_url: Base URL for the Provider Data API (unused in mock)
+            api_key: API key for authentication (unused in mock)
+            **kwargs: Additional arguments (unused in mock)
+        """
         self.app = app
         self.base_url = base_url.rstrip("/") if base_url else None
 
@@ -71,29 +90,87 @@ class MockProviderDataApi:
         self._initialized = True
         self.logger.info("Mock Provider Data API initialized")
 
-    def get_provider_firm(self, firm_id: int) -> Optional[Dict[str, Any]]:
+    def test_connection(self) -> bool:
+        """
+        Test connection to the Provider Data API.
+
+        Returns:
+            bool: Always True for mock implementation
+        """
+        if not self._initialized:
+            raise ProviderDataApiError("API client not initialized. Call init_app() first.")
+        return True
+
+    def get_provider_firm(self, firm_id: int) -> Firm | None:
+        """
+        Get details for a specific provider firm.
+
+        Args:
+            firm_id: The firm ID
+
+        Returns:
+            Firm model instance, or None if not found
+        """
         if not isinstance(firm_id, int) or firm_id <= 0:
             raise ValueError("firm_id must be a positive integer")
 
         for firm in self._mock_data["firms"]:
             if firm.get("firmId") == firm_id:
-                return {"firm": _clean_data(firm)}
-        return {"firm": {}}
+                try:
+                    cleaned_firm = _clean_data(firm)
+                    return Firm(**cleaned_firm)
+                except ValidationError as e:
+                    self.logger.error(f"Invalid firm data in mock for firm {firm_id}: {e}")
+                    raise ProviderDataApiError(f"Invalid firm data: {e}")
+        return None
 
-    def get_all_provider_firms(self) -> Dict[str, Any]:
-        cleaned_firms = [_clean_data(firm) for firm in self._mock_data["firms"]]
-        return {"firms": cleaned_firms}
+    def get_all_provider_firms(self) -> List[Firm]:
+        """
+        Get all provider firms.
 
-    def get_provider_office(self, office_code: str) -> Optional[Dict[str, Any]]:
+        Returns:
+            List of Firm model instances
+        """
+        try:
+            cleaned_firms = [_clean_data(firm) for firm in self._mock_data["firms"]]
+            return [Firm(**firm_data) for firm_data in cleaned_firms]
+        except ValidationError as e:
+            self.logger.error(f"Invalid firms data in mock: {e}")
+            raise ProviderDataApiError(f"Invalid firms data: {e}")
+
+    def get_provider_office(self, office_code: str) -> Office | None:
+        """
+        Get details for a specific provider office.
+
+        Args:
+            office_code: The office code
+
+        Returns:
+            Office model instance, or None if not found
+        """
         if not office_code or not isinstance(office_code, str):
             raise ValueError("office_code must be a non-empty string")
 
         for office in self._mock_data["offices"]:
             if office.get("firmOfficeCode") == office_code:
-                return {"office": _clean_data(office)}
-        return {"office": {}}
+                try:
+                    cleaned_office = _clean_data(office)
+                    return Office(**cleaned_office)
+                except ValidationError as e:
+                    self.logger.error(f"Invalid office data in mock for office {office_code}: {e}")
+                    raise ProviderDataApiError(f"Invalid office data: {e}")
+        return None
 
-    def get_provider_offices(self, firm_id: int) -> dict[str, Any]:
+    def get_provider_offices(self, firm_id: int) -> List[Office]:
+        """
+        Get all offices for a specific firm.
+
+        Args:
+            firm_id: The firm ID
+
+        Returns:
+            List of Office model instances
+        """
         if not isinstance(firm_id, int) or firm_id <= 0:
             raise ValueError("firm_id must be a positive integer")
 
@@ -103,16 +180,64 @@ class MockProviderDataApi:
                 cleaned_office = _clean_data(office)
                 filtered_offices.append(cleaned_office)
 
-        firm = self.get_provider_firm(firm_id)["firm"]
-        return {"firm": firm, "offices": filtered_offices}
+        if not filtered_offices:
+            return []
+
+        try:
+            return [Office(**office_data) for office_data in filtered_offices]
+        except ValidationError as e:
+            self.logger.error(f"Invalid offices data in mock for firm {firm_id}: {e}")
+            raise ProviderDataApiError(f"Invalid offices data: {e}")
+
+    def get_head_office(self, firm_id: int) -> Office | None:
+        """
+        Gets the head office for a specific firm.
+
+        Args:
+            firm_id: The firm ID
+
+        Returns:
+            Office model instance for the head office, or None if not found
+        """
+        offices = self.get_provider_offices(firm_id)
+
+        if not offices:
+            return None
+
+        for office in offices:
+            # Child offices have headOffice = parent's office ID
+            # Head offices have headOffice = "N/A"
+            if office.head_office == "N/A":
+                return office
+        return None
 
     def get_provider_users(self, firm_id: int) -> List[Dict[str, Any]]:
+        """
+        Get all users for a specific firm.
+
+        Args:
+            firm_id: The firm ID
+
+        Returns:
+            List of dictionaries containing user details
+        """
         if not isinstance(firm_id, int) or firm_id <= 0:
             raise ValueError("firm_id must be a positive integer")
 
-        return self._mock_data["users"].get(firm_id, [])
+        # Return empty list if no users data exists for this firm
+        return self._mock_data.get("users", {}).get(firm_id, [])
 
     def get_office_contract_details(self, firm_id: int, office_code: str) -> Optional[Dict[str, Any]]:
+        """
+        Get contract details for a specific office.
+
+        Args:
+            firm_id: The firm ID
+            office_code: The office code
+
+        Returns:
+            Dict containing contract details
+        """
         if not isinstance(firm_id, int) or firm_id <= 0:
             raise ValueError("firm_id must be a positive integer")
         if not office_code or not isinstance(office_code, str):
@@ -120,10 +245,13 @@ class MockProviderDataApi:
 
         office_data = self._find_office_data(firm_id, office_code)
         if office_data is None:
-            return {"firm": {}, "office": {}, "contracts": []}
+            return {}
 
-        firm_data = self.get_provider_firm(firm_id)["firm"]
-        cleaned_office = _clean_data(office_data)
+        firm = self.get_provider_firm(firm_id)
+        office = self.get_provider_office(office_code)
+
+        if not firm or not office:
+            return None
 
         contracts = []
         office_id = office_data.get("firmOfficeId")
@@ -132,9 +260,19 @@ class MockProviderDataApi:
                 cleaned_contract = _clean_data(contract)
                 contracts.append(cleaned_contract)
 
-        return {"firm": firm_data, "office": cleaned_office, "contracts": contracts}
+        return contracts
 
-    def get_office_schedule_details(self, firm_id: int, office_code: str) -> Optional[Dict[str, Any]]:
+    def get_office_schedule_details(self, firm_id: int, office_code: str) -> list[Optional[Dict[str, Any]]]:
+        """
+        Get schedule details for a specific office.
+
+        Args:
+            firm_id: The firm ID
+            office_code: The office code
+
+        Returns:
+            Dict containing schedule details
+        """
         if not isinstance(firm_id, int) or firm_id <= 0:
             raise ValueError("firm_id must be a positive integer")
         if not office_code or not isinstance(office_code, str):
@@ -142,10 +280,13 @@ class MockProviderDataApi:
 
         office_data = self._find_office_data(firm_id, office_code)
         if office_data is None:
-            return {"firm": {}, "office": {}, "pds": True, "schedules": []}
+            return None
 
-        firm_data = self.get_provider_firm(firm_id)["firm"]
-        cleaned_office = _clean_data(office_data)
+        firm = self.get_provider_firm(firm_id)
+        office = self.get_provider_office(office_code)
+
+        if not firm or not office:
+            return {}
 
         schedules = []
         office_id = office_data.get("firmOfficeId")
@@ -154,4 +295,37 @@ class MockProviderDataApi:
                 cleaned_schedule = _clean_data(schedule)
                 schedules.append(cleaned_schedule)
 
-        return {"firm": firm_data, "office": cleaned_office, "pds": True, "schedules": schedules}
+        return schedules
+
+    def get_office_bank_details(self, firm_id: int, office_code: str) -> Optional[Dict[str, Any]]:
+        """
+        Get bank details for a specific office.
+
+        Args:
+            firm_id: The firm ID
+            office_code: The office code
+
+        Returns:
+            Dict containing bank details
+        """
+        if not isinstance(firm_id, int) or firm_id <= 0:
+            raise ValueError("firm_id must be a positive integer")
+        if not office_code or not isinstance(office_code, str):
+            raise ValueError("office_code must be a non-empty string")
+
+        office_data = self._find_office_data(firm_id, office_code)
+        if office_data is None:
+            return {}
+
+        firm = self.get_provider_firm(firm_id)
+        office = self.get_provider_office(office_code)
+
+        if not firm or not office:
+            return {}
+
+        # Mock bank details - you can expand this based on your fixture data structure
+        return {
+            "firm": firm.to_api_dict(),
+            "office": office.to_api_dict(),
+            "bankDetails": [],  # Add mock bank details here if needed
+        }

@@ -81,8 +81,12 @@ class DataTable:
 
         cell = {"text": text}
 
-        if html_func := header.get("html"):
-            cell["html"] = html_func(row_data)
+        if html := header.get("html"):
+            # If we need to call a function to generate the HTML do so, otherwise just render the provided HTML
+            if isinstance(html, Callable):
+                cell["html"] = html(row_data)
+            else:
+                cell["html"] = html
 
         for key in ("format", "classes", "attributes"):
             if value := header.get(key):

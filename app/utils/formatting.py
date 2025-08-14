@@ -1,16 +1,16 @@
 from datetime import datetime
 from typing import Optional
 
-from app.constants import CONSTITUTIONAL_STATUS_CHOICES, PROVIDER_TYPE_CHOICES
+from app.constants import CONSTITUTIONAL_STATUS_CHOICES, FIRM_TYPE_CHOICES
 
 
-def format_provider_type(provider_type: str) -> str:
-    """Format provider type for display"""
-    if not provider_type:
+def format_firm_type(firm_type: str) -> str:
+    """Format firm type for display"""
+    if not firm_type:
         return ""
 
-    choices_dict = dict(PROVIDER_TYPE_CHOICES)
-    return choices_dict.get(provider_type.lower(), provider_type.title())
+    choices_dict = dict(FIRM_TYPE_CHOICES)
+    return choices_dict.get(firm_type.lower(), firm_type.title())
 
 
 def format_constitutional_status(status: str) -> str:
@@ -19,7 +19,7 @@ def format_constitutional_status(status: str) -> str:
         return ""
 
     choices_dict = dict(CONSTITUTIONAL_STATUS_CHOICES)
-    return choices_dict.get(status.lower(), status.title())
+    return choices_dict.get(status)
 
 
 def format_date(date_string: Optional[str]) -> str:

@@ -6,6 +6,7 @@ from app import auth
 from app.components.tables import DataTable, TableStructure, TransposedDataTable
 from app.main import bp
 from app.main.utils import get_full_info_html
+from app.models import Firm
 
 
 @bp.get("/")
@@ -25,30 +26,18 @@ def status():
 @auth.login_required
 def providers(context):
     def firm_name_html(row_data: dict[str, str]) -> str:
-        _firm_id = row_data.get("firmId", "")
-        _firm_name = row_data.get("firmName", "")
-        return f"<a class='govuk-link', href={url_for('main.offices', firm_id=_firm_id)}>{_firm_name}"
+        _firm_id = row_data.get("firm_id", "")
+        _firm_name = row_data.get("firm_name", "")
+        return f"<a class='govuk-link', href={url_for('main.view_provider_with_id', firm_id=_firm_id)}>{_firm_name}"
 
     search_term = request.args.get("search", "")
-
     providers_shown_per_page = 20
-
     start_provider_firm_num = 0
 
     pda = current_app.extensions["pda"]
-    data = pda.get_all_provider_firms()
+    firms: list[Firm] = pda.get_all_provider_firms()
 
-    firms = data["firms"]
-    values = {}
-    for firm in firms:
-        for key, value in firm.items():
-            if key not in values:
-                values[key]: set = set()
-            values[key].add(value)
-
-    print(values)
-
-    provider_data = data["firms"][start_provider_firm_num:]
+    provider_data = firms[start_provider_firm_num:]
 
     # Filter providers based on search term
     if search_term:
@@ -56,13 +45,13 @@ def providers(context):
         provider_data = [
             firm
             for firm in provider_data
-            if (search_lower in firm["firmName"].lower() or search_lower in str(firm["firmId"]).lower())
+            if (search_lower in firm.firm_name.lower() or search_lower in str(firm.firm_id).lower())
         ]
 
     columns: list[TableStructure] = [
-        {"text": "Provider name", "id": "firmName", "html": firm_name_html},
-        {"text": "Account number", "id": "firmNumber"},
-        {"text": "Provider type", "id": "firmType"},
+        {"text": "Provider name", "id": "firm_name", "html": firm_name_html},
+        {"text": "Account number", "id": "firm_number"},
+        {"text": "Provider type", "id": "firm_type"},
     ]
 
     page = request.args.get("page", 1, type=int)
@@ -74,7 +63,7 @@ def providers(context):
     start_id = providers_shown_per_page * (page - 1)
     end_id = providers_shown_per_page * (page - 1) + providers_shown_per_page
 
-    table = DataTable(structure=columns, data=provider_data[start_id:end_id])
+    table = DataTable(structure=columns, data=[firm.to_internal_dict() for firm in provider_data[start_id:end_id]])
 
     return render_template(
         "providers.html",

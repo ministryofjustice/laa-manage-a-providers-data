@@ -49,12 +49,6 @@
     "href": url_for("main.add_provider")
   }) }}
 
-  {{ govukButton({
-    "text": "Add a new provider",
-    "classes": "govuk-button--secondary",
-    "href": url_for("main.add_provider")
-  }) }}
-
   <div class="moj-scrollable-pane">
     {{ govukTable(table.to_govuk_params()) }}
   </div>
