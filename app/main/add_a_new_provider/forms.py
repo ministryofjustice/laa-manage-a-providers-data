@@ -1,8 +1,7 @@
-from flask import current_app
+from flask import current_app, session
 from wtforms import RadioField
 from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired, Length
-from flask import session
 
 from app.fields import GovUKTableRadioField
 from app.validators import ValidateSearchResults
@@ -40,7 +39,7 @@ class LspDetailsForm(BaseForm):
     title = "Legal services provider details"
     url = "add-provider/lsp-details"
 
-  
+
 class AssignChambersForm(BaseForm):
     title = "Assign to a chambers"
     url = "assign-chambers"
@@ -118,6 +117,7 @@ class AssignChambersForm(BaseForm):
             )
 
         self.provider.choices = choices
+
 
 class ChambersDetailsForm(BaseForm):
     title = "Chambers details"
