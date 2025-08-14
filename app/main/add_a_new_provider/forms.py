@@ -121,7 +121,7 @@ class AssignChambersForm(BaseForm):
 
 class ChambersDetailsForm(BaseForm):
     title = "Chambers details"
-    url = "add-provider/chambers-details"
+    url = "/chambers-details"
 
     @property
     def caption(self):
@@ -153,6 +153,6 @@ class ChambersDetailsForm(BaseForm):
         widget=GovTextInput(heading_class="govuk-fieldset__legend--m", classes="govuk-!-width-one-half"),
         validators=[
             InputRequired(message="Enter the Bar Council roll number"),
-            Length(max=15, message="The Bar Council roll number must be 15 characters or less"),
+            Length(max=15, message="Bar Council roll number must be 15 characters or less"),
         ],
     )
