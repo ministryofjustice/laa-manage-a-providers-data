@@ -13,7 +13,7 @@ class AddProviderFormView(BaseFormView):
         "barrister": "main.assign_chambers",
         "advocate": "main.assign_chambers",
         "chambers": "main.chambers_details",
-        "lsp": "main.add_provider/lsp_details",
+        "lsp": "main.additional_details_legal_services_provider",
     }
 
     def form_valid(self, form):
@@ -33,16 +33,20 @@ class LspDetailsFormView(BaseFormView):
     """Form view for the Legal services provider details"""
 
     def form_valid(self, form):
-        # Call parent method for redirect
+        session["constitutional_status"] = form.data.get("constitutional_status")
+        session["companies_house_number"] = form.data.get("companies_house_number")
+
+        indemnity_date = form.data.get("indemnity_received_date")
+        if indemnity_date:
+            session["indemnity_received_date"] = indemnity_date.isoformat()
+
         return super().form_valid(form)
 
 
 class ChambersDetailsFormView(BaseFormView):
     """Form view for the Chambers details"""
 
-    def form_valid(self, form):
-        # Call parent method for redirect
-        return super().form_valid(form)
+    pass
 
 
 class AssignChambersFormView(BaseFormView):

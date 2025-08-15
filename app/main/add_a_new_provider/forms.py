@@ -1,12 +1,13 @@
 from flask import current_app, session
 from wtforms import RadioField
 from wtforms.fields.simple import StringField
-from wtforms.validators import InputRequired, Length
+from wtforms.validators import InputRequired, Length, Optional
 
 from app.fields import GovUKTableRadioField
-from app.validators import ValidateSearchResults
-from app.widgets import GovRadioInput, GovTextInput
+from app.validators import ValidateCompaniesHouseNumber, ValidateGovDateField, ValidatePastDate, ValidateSearchResults
+from app.widgets import GovDateInput, GovRadioInput, GovTextInput
 
+from ...fields import GovDateField
 from ...forms import BaseForm
 
 
@@ -37,7 +38,43 @@ class AddProviderForm(BaseForm):
 
 class LspDetailsForm(BaseForm):
     title = "Legal services provider details"
-    url = "add-provider/lsp-details"
+    url = "additional-details-legal-services-provider"
+    submit_button_text = "Submit"
+
+    @property
+    def caption(self):
+        return session.get("provider_name")
+
+    constitutional_status = RadioField(
+        "Constitutional status",
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
+        validators=[InputRequired(message="Select the constitutional status")],
+        choices=[
+            ("government funded organisation", "Government funded organisation"),
+            ("sole practitioner", "Sole practitioner"),
+            ("charity", "Charity"),
+            ("partnership", "Partnership"),
+            ("llp", "LLP"),
+            ("limited company", "Limited company"),
+        ],
+    )
+
+    indemnity_received_date = GovDateField(
+        "Indemnity received date (optional)",
+        widget=GovDateInput(heading_class="govuk-fieldset__legend--m", hint="For example 27 3 2025"),
+        format="%d %m %Y",
+        validators=[Optional(), ValidateGovDateField(), ValidatePastDate()],
+    )
+
+    companies_house_number = StringField(
+        "Companies House number (optional)",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-!-width-one-half",
+            hint="Also known as Company Registration Number",
+        ),
+        validators=[ValidateCompaniesHouseNumber()],
+    )
 
 
 class AssignChambersForm(BaseForm):
