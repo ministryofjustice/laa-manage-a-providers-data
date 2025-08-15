@@ -39,6 +39,7 @@ class AddProviderForm(BaseForm):
 class LspDetailsForm(BaseForm):
     title = "Legal services provider details"
     url = "additional-details-legal-services-provider"
+    submit_button_text = "Submit"
 
     @property
     def caption(self):
