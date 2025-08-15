@@ -38,7 +38,7 @@ def test_constitutional_status_validation_required(page: Page):
 
     # Fill other required fields but not constitutional status
     page.get_by_role("textbox", name="Companies House number").fill("12345678")
-    page.get_by_role("button", name="Continue").click()
+    page.get_by_role("button", name="Submit").click()
 
     # Should show validation error
     expect(page.get_by_text("Error: Select the constitutional status")).to_be_visible()
