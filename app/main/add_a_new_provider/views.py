@@ -61,12 +61,12 @@ class AssignChambersFormView(BaseFormView):
     """Form view for the assign to a chambers form"""
 
     template = "add_provider/assign-chambers.html"
-    
+
     next_step_mapping = {
         "barrister": "main.providers",
         "advocate": "main.advocate_details",
     }
-    
+
     def get_success_url(self, form):
         provider_type = session.get("provider_type")
         next_page = self.next_step_mapping.get(provider_type, "main.providers")
@@ -74,7 +74,7 @@ class AssignChambersFormView(BaseFormView):
 
     def form_valid(self, form):
         session["parent_provider_id"] = form.data.get("provider")
-        return redirect(url_for(self.get_success_url(form)))
+        return redirect(self.get_success_url(form))
 
     def get(self, context):
         search_term = request.args.get("search", "").strip()
