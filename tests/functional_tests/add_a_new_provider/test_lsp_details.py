@@ -28,7 +28,7 @@ def test_lsp_details_page_loads_via_ui(page: Page):
     expect(page.get_by_role("textbox", name="Month")).to_be_visible()
     expect(page.get_by_role("textbox", name="Year")).to_be_visible()
     expect(page.get_by_role("textbox", name="Companies House number")).to_be_visible()
-    expect(page.get_by_role("button", name="Continue")).to_be_visible()
+    expect(page.get_by_role("button", name="Submit")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
