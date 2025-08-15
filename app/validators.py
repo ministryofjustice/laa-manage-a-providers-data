@@ -100,11 +100,11 @@ class ValidateCompaniesHouseNumber:
     """Validate Companies House number format."""
 
     def __init__(self, message=None):
-        self.message = message or "Enter a valid Companies House number (8 characters)"
+        self.message = message or "Companies House number must be 8 characters"
 
     def __call__(self, form, field):
         if field.data:
-            # Companies House numbers are 8 characters long and may start with 2 letters
+            # Companies House numbers are 8 characters long
             if not re.match(r"^[A-Z0-9]{8}$", field.data.upper()):
                 raise ValidationError(self.message)
 

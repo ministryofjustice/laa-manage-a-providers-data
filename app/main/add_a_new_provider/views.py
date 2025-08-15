@@ -48,7 +48,6 @@ class AdvocateDetailsFormView(BaseFormView):
         session["solicitor_advocate"] = form.data.get("solicitor_advocate")
         session["advocate_level"] = form.data.get("advocate_level")
         session["bar_council_roll_number"] = form.data.get("bar_council_roll_number")
-
         return super().form_valid(form)
 
 

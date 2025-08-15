@@ -45,7 +45,7 @@ class TestValidateCompaniesHouseNumber:
             with pytest.raises(ValidationError) as exc_info:
                 print(field.data)
                 validator(form, field)
-            assert "Enter a valid Companies House number" in str(exc_info.value)
+            assert "Companies House number must be 8 characters" in str(exc_info.value)
 
     def test_empty_field_data(self):
         """Test that empty field data doesn't raise validation error."""
