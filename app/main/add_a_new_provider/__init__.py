@@ -1,13 +1,13 @@
 from app.main import bp
 from app.utils import register_form_view
 
-from .forms import AddProviderForm, AdvocateDetailsForm, ChambersDetailsForm, LspDetailsForm, ParentProviderForm
+from .forms import AddProviderForm, AdvocateDetailsForm, AssignChambersForm, ChambersDetailsForm, LspDetailsForm
 from .views import (
     AddProviderFormView,
     AdvocateDetailsFormView,
+    AssignChambersFormView,
     ChambersDetailsFormView,
     LspDetailsFormView,
-    ParentProviderFormView,
 )
 
 
