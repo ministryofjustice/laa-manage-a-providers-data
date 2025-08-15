@@ -43,6 +43,14 @@ class LspDetailsFormView(BaseFormView):
         return super().form_valid(form)
 
 
+class AdvocateDetailsFormView(BaseFormView):
+    def form_valid(self, form):
+        session["solicitor_advocate"] = form.data.get("solicitor_advocate")
+        session["advocate_level"] = form.data.get("advocate_level")
+        session["bar_council_roll_number"] = form.data.get("bar_council_roll_number")
+        return super().form_valid(form)
+
+
 class ChambersDetailsFormView(BaseFormView):
     """Form view for the Chambers details"""
 
@@ -53,11 +61,20 @@ class AssignChambersFormView(BaseFormView):
     """Form view for the assign to a chambers form"""
 
     template = "add_provider/assign-chambers.html"
-    success_url = "main.providers"
+
+    next_step_mapping = {
+        "barrister": "main.providers",
+        "advocate": "main.advocate_details",
+    }
+
+    def get_success_url(self, form):
+        provider_type = session.get("provider_type")
+        next_page = self.next_step_mapping.get(provider_type, "main.providers")
+        return url_for(next_page)
 
     def form_valid(self, form):
         session["parent_provider_id"] = form.data.get("provider")
-        return redirect(url_for(self.success_url))
+        return redirect(self.get_success_url(form))
 
     def get(self, context):
         search_term = request.args.get("search", "").strip()
