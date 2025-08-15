@@ -24,12 +24,12 @@ class TestRegisterFormView:
         mock_view_class.as_view.return_value = "mock_view_func"
 
         with patch("app.utils.BaseFormView", mock_view_class), patch("app.main.bp", mock_blueprint):
-            register_form_view(MockForm)
+            register_form_view(MockForm, login_required=False)
 
-            mock_blueprint.add_url_rule.assert_called_once_with(
-                "/test-form", view_func="mock_view_func", methods=["GET", "POST"]
-            )
-            mock_view_class.as_view.assert_called_once_with("test_form", form_class=MockForm)
+        mock_blueprint.add_url_rule.assert_called_once_with(
+            "/test-form", view_func="mock_view_func", methods=["GET", "POST"]
+        )
+        mock_view_class.as_view.assert_called_once_with("test_form", form_class=MockForm)
 
     def test_register_with_custom_blueprint(self):
         custom_blueprint = Mock(spec=Blueprint)
@@ -37,7 +37,7 @@ class TestRegisterFormView:
         mock_view_class.as_view.return_value = "mock_view_func"
 
         with patch("app.utils.BaseFormView", mock_view_class):
-            register_form_view(MockForm, blueprint=custom_blueprint)
+            register_form_view(MockForm, blueprint=custom_blueprint, login_required=False)
 
             custom_blueprint.add_url_rule.assert_called_once_with(
                 "/test-form", view_func="mock_view_func", methods=["GET", "POST"]
@@ -50,7 +50,7 @@ class TestRegisterFormView:
         mock_custom_view.as_view.return_value = "custom_view_func"
 
         with patch("app.main.bp", mock_blueprint):
-            register_form_view(MockForm, view_class=mock_custom_view)
+            register_form_view(MockForm, view_class=mock_custom_view, login_required=False)
 
             mock_blueprint.add_url_rule.assert_called_once_with(
                 "/test-form", view_func="custom_view_func", methods=["GET", "POST"]
@@ -62,7 +62,7 @@ class TestRegisterFormView:
         mock_custom_view = Mock()
         mock_custom_view.as_view.return_value = "custom_view_func"
 
-        register_form_view(MockForm, view_class=mock_custom_view, blueprint=custom_blueprint)
+        register_form_view(MockForm, view_class=mock_custom_view, blueprint=custom_blueprint, login_required=False)
 
         custom_blueprint.add_url_rule.assert_called_once_with(
             "/test-form", view_func="custom_view_func", methods=["GET", "POST"]
@@ -78,7 +78,7 @@ class TestRegisterFormView:
         mock_view_class.as_view.return_value = "mock_view_func"
 
         with patch("app.main.bp", mock_blueprint), patch("app.utils.BaseFormView", mock_view_class):
-            register_form_view(CustomUrlForm)
+            register_form_view(CustomUrlForm, login_required=False)
 
             mock_blueprint.add_url_rule.assert_called_once_with(
                 "/custom-url-path", view_func="mock_view_func", methods=["GET", "POST"]
@@ -93,7 +93,7 @@ class TestRegisterFormView:
         mock_view_class.as_view.return_value = "mock_view_func"
 
         with patch("app.main.bp", mock_blueprint), patch("app.utils.BaseFormView", mock_view_class):
-            register_form_view(VeryLongFormClassName)
+            register_form_view(VeryLongFormClassName, login_required=False)
 
             mock_view_class.as_view.assert_called_once_with("test", form_class=VeryLongFormClassName)
 
@@ -103,7 +103,7 @@ class TestRegisterFormView:
         mock_view_class.as_view.return_value = "mock_view_func"
 
         with patch("app.main.bp", mock_blueprint), patch("app.utils.BaseFormView", mock_view_class):
-            register_form_view(MockForm)
+            register_form_view(MockForm, login_required=False)
 
             call_args = mock_blueprint.add_url_rule.call_args
             assert call_args[1]["methods"] == ["GET", "POST"]
@@ -114,7 +114,7 @@ class TestRegisterFormView:
         mock_view_class.as_view.return_value = "mock_view_func"
 
         with patch("app.main.bp", mock_blueprint), patch("app.utils.BaseFormView", mock_view_class):
-            register_form_view(MockForm)
+            register_form_view(MockForm, login_required=False)
 
             call_args = mock_view_class.as_view.call_args
             assert call_args[1]["form_class"] == MockForm
@@ -125,7 +125,7 @@ class TestRegisterFormView:
         mock_view_class.as_view.return_value = "mock_view_func"
 
         with patch("app.main.bp", mock_blueprint), patch("app.utils.BaseFormView", mock_view_class):
-            result = register_form_view(MockForm)
+            result = register_form_view(MockForm, login_required=False)
 
             assert result is None
 
@@ -137,7 +137,7 @@ class TestRegisterFormViewIntegration:
         mock_view_func = Mock()
         mock_view_class.as_view.return_value = mock_view_func
 
-        register_form_view(MockForm, view_class=mock_view_class, blueprint=real_blueprint)
+        register_form_view(MockForm, view_class=mock_view_class, blueprint=real_blueprint, login_required=False)
 
         # Verify the view class was called correctly
         mock_view_class.as_view.assert_called_once_with("test_form", form_class=MockForm)
@@ -153,8 +153,8 @@ class TestRegisterFormViewIntegration:
         mock_view_class = Mock()
         mock_view_class.as_view.return_value = Mock()
 
-        register_form_view(Form1, view_class=mock_view_class, blueprint=real_blueprint)
-        register_form_view(Form2, view_class=mock_view_class, blueprint=real_blueprint)
+        register_form_view(Form1, view_class=mock_view_class, blueprint=real_blueprint, login_required=False)
+        register_form_view(Form2, view_class=mock_view_class, blueprint=real_blueprint, login_required=False)
 
         # Both forms should be registered
         assert mock_view_class.as_view.call_count == 2
@@ -173,7 +173,7 @@ class TestRegisterFormViewIntegration:
         mock_view_class.as_view.return_value = "mock_view_func"
 
         with patch("app.utils.BaseFormView", mock_view_class):
-            register_form_view(FormWithNumbers123, blueprint=mock_blueprint)
+            register_form_view(FormWithNumbers123, blueprint=mock_blueprint, login_required=False)
 
             mock_view_class.as_view.assert_called_once_with("special_form", form_class=FormWithNumbers123)
 
@@ -184,7 +184,9 @@ class TestRegisterFormViewIntegration:
         mock_view_class.as_view.return_value = "mock_view_func"
 
         # This should not raise any type errors if the function signature is correct
-        register_form_view(form_class=MockForm, view_class=mock_view_class, blueprint=mock_blueprint)
+        register_form_view(
+            form_class=MockForm, view_class=mock_view_class, blueprint=mock_blueprint, login_required=False
+        )
 
         # Verify it was called
         mock_blueprint.add_url_rule.assert_called_once()

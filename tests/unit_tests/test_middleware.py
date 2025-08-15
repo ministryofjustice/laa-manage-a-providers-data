@@ -36,7 +36,7 @@ class TestAddNoindexHeader:
 
 
 class TestAddNoCacheHeaders:
-    def test_adds_no_cache_headers_for_regular_paths(self):
+    def test_adds_no_cache_headers_for_regular_paths(self, client):
         response = Mock(spec=Response)
         response.headers = {}
 
@@ -50,7 +50,7 @@ class TestAddNoCacheHeaders:
             assert response.headers["Expires"] == "0"
             assert result == response
 
-    def test_adds_cache_headers_for_assets_paths(self):
+    def test_adds_cache_headers_for_assets_paths(self, client):
         response = Mock(spec=Response)
         response.headers = {}
 
@@ -64,7 +64,7 @@ class TestAddNoCacheHeaders:
             assert "Expires" not in response.headers
             assert result == response
 
-    def test_assets_path_variations(self):
+    def test_assets_path_variations(self, client):
         response = Mock(spec=Response)
 
         test_cases = [
@@ -86,7 +86,7 @@ class TestAddNoCacheHeaders:
                 assert response.headers["Pragma"] == "cache"
                 assert result == response
 
-    def test_non_assets_path_variations(self):
+    def test_non_assets_path_variations(self, client):
         test_cases = [
             "/",
             "/home",
@@ -112,7 +112,7 @@ class TestAddNoCacheHeaders:
                 assert response.headers["Expires"] == "0"
                 assert result == response
 
-    def test_preserves_existing_headers(self):
+    def test_preserves_existing_headers(self, client):
         response = Mock(spec=Response)
         response.headers = {"Content-Type": "text/html"}
 
@@ -125,7 +125,7 @@ class TestAddNoCacheHeaders:
             assert response.headers["Cache-Control"] == "no-store, no-cache, must-revalidate, max-age=0"
             assert result == response
 
-    def test_overwrites_existing_cache_headers(self):
+    def test_overwrites_existing_cache_headers(self, client):
         response = Mock(spec=Response)
         response.headers = {"Cache-Control": "max-age=3600", "Pragma": "public"}
 
@@ -139,7 +139,7 @@ class TestAddNoCacheHeaders:
             assert response.headers["Expires"] == "0"
             assert result == response
 
-    def test_edge_case_empty_path(self):
+    def test_edge_case_empty_path(self, client):
         response = Mock(spec=Response)
         response.headers = {}
 
@@ -153,7 +153,7 @@ class TestAddNoCacheHeaders:
             assert response.headers["Expires"] == "0"
             assert result == response
 
-    def test_edge_case_root_assets_path(self):
+    def test_edge_case_root_assets_path(self, client):
         response = Mock(spec=Response)
         response.headers = {}
 

@@ -20,7 +20,7 @@ def register_views():
 
     register_form_view(form_class=ChambersDetailsForm, view_class=ChambersDetailsFormView, blueprint=bp)
 
-    register_form_view(form_class=ParentProviderForm, view_class=ParentProviderFormView, blueprint=bp)
+    register_form_view(form_class=AssignChambersForm, view_class=AssignChambersFormView, blueprint=bp)
 
 
 register_views()

@@ -5,3 +5,19 @@
 
 /* Import your custom SCSS below to be compiled into one */
 @use "./back-link";
+
+
+.provider-search {
+	text-transform: uppercase;
+}
+
+.govuk-table__cell {
+    vertical-align: middle;
+}
+
+.govuk-form-group--search {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}

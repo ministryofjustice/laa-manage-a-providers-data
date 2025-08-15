@@ -3,8 +3,8 @@ from flask import url_for
 from playwright.sync_api import Page, expect
 
 ROUTING = [
-    {"link_text": "Barrister", "next_page_heading": "Assign to parent provider"},
-    {"link_text": "Advocate", "next_page_heading": "Advocate details"},
+    {"link_text": "Barrister", "next_page_heading": "Assign to a chambers"},
+    {"link_text": "Advocate", "next_page_heading": "Assign to a chambers"},
     {"link_text": "Chambers", "next_page_heading": "Chambers details"},
     {"link_text": "Legal services provider", "next_page_heading": "Legal services provider details"},
 ]
