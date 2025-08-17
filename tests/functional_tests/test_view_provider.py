@@ -70,7 +70,7 @@ def test_add_new_lsp(page):
     page.get_by_role("button", name="Submit").click()
 
     # Assert our LSP information is displayed correctly
-    expect(page.get_by_text("New provider successfully added")).to_be_visible()
+    expect(page.get_by_text("New provider successfully created")).to_be_visible()
     expect(page.get_by_role("alert", name="Success").locator("div").first).to_be_visible()
     expect(page.get_by_text("Legal Services Provider")).to_be_visible()
     expect(page.get_by_role("heading", name="Test provider")).to_be_visible()
@@ -97,7 +97,7 @@ def test_add_new_advocate(page):
     page.get_by_role("button", name="Continue").click()
 
     # Assert our advocate information is displayed correctly
-    expect(page.get_by_text("New provider successfully added")).to_be_visible()
+    expect(page.get_by_text("New provider successfully created")).to_be_visible()
     expect(page.get_by_text("Advocate", exact=True)).to_be_visible()
     expect(page.get_by_role("heading", name="Test provider")).to_be_visible()
     expect(page.get_by_role("rowheader", name="Parent provider name")).to_be_visible()

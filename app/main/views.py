@@ -30,7 +30,7 @@ class ViewProvider(MethodView):
             firm = current_app.extensions["pda"].get_provider_firm(firm_id)
         else:
             # If there is no firm in the URL load from the session
-            flash("New provider successfully created", "success")
+            flash("<b>New provider successfully created</b>", "success")
             firm = Firm(**session.get("new_provider"))
 
         if not firm:
