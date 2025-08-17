@@ -1,4 +1,4 @@
-from flask import abort, current_app, render_template, session, url_for
+from flask import abort, current_app, flash, render_template, session, url_for
 from flask.views import MethodView
 
 from app.components.tables import TransposedDataTable
@@ -30,6 +30,7 @@ class ViewProvider(MethodView):
             firm = current_app.extensions["pda"].get_provider_firm(firm_id)
         else:
             # If there is no firm in the URL load from the session
+            flash("New provider successfully created", "success")
             firm = Firm(**session.get("new_provider"))
 
         if not firm:

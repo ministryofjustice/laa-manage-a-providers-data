@@ -1,4 +1,4 @@
-from flask import Response, flash, redirect, render_template, request, session, url_for
+from flask import Response, redirect, render_template, request, session, url_for
 
 from app.main.add_a_new_provider import AssignChambersForm
 from app.views import BaseFormView
@@ -51,7 +51,6 @@ class LspDetailsFormView(BaseFormView):
         if indemnity_date:
             session["new_provider"].update({"indemnityReceivedDate": indemnity_date.isoformat()})
 
-        flash("New provider successfully created", "success")
         return super().form_valid(form)
 
 

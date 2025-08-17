@@ -149,7 +149,7 @@ class ChambersDetailsForm(BaseForm):
 
     @property
     def caption(self):
-        return session.get("provider_name", default="unknown")
+        return session.get("new_provider", {}).get("firm_name", "unknown")
 
     solicitor_advocate = RadioField(
         "Is the provider a solicitor advocate?",
