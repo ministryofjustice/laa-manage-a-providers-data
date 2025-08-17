@@ -51,9 +51,9 @@ def format_yes_no(value: Optional[str]) -> str:
     if not value:
         return ""
 
-    if value.lower() in ["yes", "true", "1"]:
+    if value.lower() in ["yes", "true", "1", "y"]:
         return "Yes"
-    elif value.lower() in ["no", "false", "0"]:
+    elif value.lower() in ["no", "false", "0", "n"]:
         return "No"
     return value
 
