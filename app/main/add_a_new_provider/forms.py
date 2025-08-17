@@ -3,7 +3,7 @@ from wtforms import RadioField
 from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired, Length, Optional
 
-from app.constants import CONSTITUTIONAL_STATUS_CHOICES, FIRM_TYPE_CHOICES
+from app.constants import ADVOCATE_LEVEL_CHOICES, CONSTITUTIONAL_STATUS_CHOICES, FIRM_TYPE_CHOICES, YES_NO_CHOICES
 from app.fields import GovUKTableRadioField
 from app.validators import ValidateCompaniesHouseNumber, ValidateGovDateField, ValidatePastDate, ValidateSearchResults
 from app.widgets import GovDateInput, GovRadioInput, GovTextInput
@@ -77,7 +77,7 @@ class AdvocateDetailsForm(BaseForm):
     solicitor_advocate = RadioField(
         "Is the provider a solicitor advocate? (optional)",
         widget=GovRadioInput(heading_class="govuk-fieldset__legend--m", classes="govuk-radios--inline"),
-        choices=[("yes", "Yes"), ("no", "No")],
+        choices=YES_NO_CHOICES,
         validators=[Optional()],
     )
 
@@ -85,11 +85,7 @@ class AdvocateDetailsForm(BaseForm):
         "Advocate level",
         widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
         validators=[InputRequired(message="Select the advocate level")],
-        choices=[
-            ("pupil", "Pupil"),
-            ("junior", "Junior"),
-            ("king's council", "King's Counsel (KC, previously QC)"),
-        ],
+        choices=ADVOCATE_LEVEL_CHOICES,
     )
 
     bar_council_roll_number = StringField(
@@ -195,21 +191,14 @@ class ChambersDetailsForm(BaseForm):
         "Is the provider a solicitor advocate?",
         widget=GovRadioInput(heading_class="govuk-fieldset__legend--m", classes="govuk-radios--inline"),
         validators=[InputRequired(message=("Select yes if the provider is a solicitor advocate"))],
-        choices=[
-            ("yes", "Yes"),
-            ("no", "No"),
-        ],
+        choices=YES_NO_CHOICES,
     )
 
     advocate_level = RadioField(
         "Advocate level",
         widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
         validators=[InputRequired(message=("Select the advocate level"))],
-        choices=[
-            ("pupil", "Pupil"),
-            ("junior", "Junior"),
-            ("king's counsel", "King's Counsel (KC, previously QC)"),
-        ],
+        choices=ADVOCATE_LEVEL_CHOICES,
     )
 
     bar_council_number = StringField(
