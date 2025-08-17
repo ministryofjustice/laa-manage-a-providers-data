@@ -35,15 +35,16 @@ class AddProviderForm(BaseForm):
 class LspDetailsForm(BaseForm):
     title = "Legal services provider details"
     url = "additional-details-legal-services-provider"
+    submit_button_text = "Submit"
 
     @property
     def caption(self):
-        return session.get("new_provider", {}).get("firm_name")
+        return session.get("new_provider", {}).get("firm_name", "Unknown")
 
     constitutional_status = RadioField(
         "Constitutional status",
         widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
-        validators=[InputRequired(message="Select a constitutional status")],
+        validators=[InputRequired(message="Select the constitutional status")],
         choices=CONSTITUTIONAL_STATUS_CHOICES,
     )
 
@@ -62,6 +63,45 @@ class LspDetailsForm(BaseForm):
             hint="Also known as Company Registration Number",
         ),
         validators=[ValidateCompaniesHouseNumber()],
+    )
+
+
+class AdvocateDetailsForm(BaseForm):
+    title = "Advocate details"
+    url = "advocate-details"
+
+    @property
+    def caption(self):
+        return session.get("new_provider", {}).get("firm_name", "Unknown")
+
+    solicitor_advocate = RadioField(
+        "Is the provider a solicitor advocate? (optional)",
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m", classes="govuk-radios--inline"),
+        choices=[("yes", "Yes"), ("no", "No")],
+        validators=[Optional()],
+    )
+
+    advocate_level = RadioField(
+        "Advocate level",
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
+        validators=[InputRequired(message="Select the advocate level")],
+        choices=[
+            ("pupil", "Pupil"),
+            ("junior", "Junior"),
+            ("king's council", "King's Counsel (KC, previously QC)"),
+        ],
+    )
+
+    bar_council_roll_number = StringField(
+        "Bar Council roll number",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-!-width-one-half",
+        ),
+        validators=[
+            InputRequired("Enter the Bar Council roll number"),
+            Length(max=15, message="Bar Council roll number must be 15 characters or less"),
+        ],
     )
 
 

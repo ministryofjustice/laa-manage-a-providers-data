@@ -66,7 +66,7 @@ def test_add_new_lsp(page):
     page.get_by_role("textbox", name="Month").fill("1")
     page.get_by_role("textbox", name="Year").fill("2020")
     page.get_by_role("textbox", name="Companies House number").fill("12345678")
-    page.get_by_role("button", name="Continue").click()
+    page.get_by_role("button", name="Submit").click()
     expect(page.get_by_text("New provider successfully")).to_be_visible()
     expect(page.get_by_role("alert", name="Success").locator("div").first).to_be_visible()
     expect(page.get_by_text("Legal Services Provider")).to_be_visible()
