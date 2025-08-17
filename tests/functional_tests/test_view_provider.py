@@ -26,7 +26,7 @@ def test_view_provider_page_ui_loads(page):
     expect(page.get_by_role("cell", name="Partnership")).to_be_visible()
 
     expect(page.get_by_role("rowheader", name="Not for profit organisation")).to_be_visible()
-    expect(page.get_by_role("cell", name="N", exact=True)).to_be_visible()
+    expect(page.get_by_role("cell", name="No", exact=True)).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
