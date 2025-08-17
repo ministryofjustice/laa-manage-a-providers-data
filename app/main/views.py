@@ -3,7 +3,7 @@ from flask.views import MethodView
 
 from app.components.tables import TransposedDataTable
 from app.models import Firm, Office
-from app.utils.formatting import format_constitutional_status, format_date, format_title_case, format_yes_no
+from app.utils.formatting import format_advocate_level, format_constitutional_status, format_date, format_yes_no
 
 
 class ViewProvider(MethodView):
@@ -82,9 +82,9 @@ class ViewProvider(MethodView):
             additional_rows, additional_data, firm.non_profit_organisation, "Not for profit organisation", format_yes_no
         )
         self._add_field(additional_rows, additional_data, firm.solicitor_advocate, "Solicitor advocate", format_yes_no)
-        self._add_field(additional_rows, additional_data, firm.advocate_level, "Advocate level", format_title_case)
-        self._add_field(additional_rows, additional_data, firm.company_house_number, "company_house_number")
-        self._add_field(additional_rows, additional_data, firm.bar_council_role, "bar_council_role")
+        self._add_field(additional_rows, additional_data, firm.advocate_level, "Advocate level", format_advocate_level)
+        self._add_field(additional_rows, additional_data, firm.company_house_number, "Companies House number")
+        self._add_field(additional_rows, additional_data, firm.bar_council_roll, "Bar Council roll number")
 
         # Create tables
         main_table = TransposedDataTable(structure=main_rows, data=main_data) if main_rows else None

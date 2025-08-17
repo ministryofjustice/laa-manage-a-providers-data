@@ -55,17 +55,33 @@ class LspDetailsFormView(BaseFormView):
 
 
 class AdvocateDetailsFormView(BaseFormView):
+    success_endpoint = "main.view_provider"
+
     def form_valid(self, form):
-        session["solicitor_advocate"] = form.data.get("solicitor_advocate")
-        session["advocate_level"] = form.data.get("advocate_level")
-        session["bar_council_roll_number"] = form.data.get("bar_council_roll_number")
+        session["new_provider"].update(
+            {
+                "solicitor_advocate": form.data.get("solicitor_advocate"),
+                "advocate_level": form.data.get("advocate_level"),
+                "bar_council_roll": form.data.get("bar_council_roll_number"),
+            }
+        )
         return super().form_valid(form)
 
 
 class ChambersDetailsFormView(BaseFormView):
     """Form view for the Chambers details"""
 
-    pass
+    success_endpoint = "main.view_provider"
+
+    def form_valid(self, form):
+        session["new_provider"].update(
+            {
+                "solicitor_advocate": form.data.get("solicitor_advocate"),
+                "advocate_level": form.data.get("advocate_level"),
+                "bar_council_roll": form.data.get("bar_council_roll_number"),
+            }
+        )
+        return super().form_valid(form)
 
 
 class AssignChambersFormView(BaseFormView):

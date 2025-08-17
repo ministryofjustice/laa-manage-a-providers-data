@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from app.constants import CONSTITUTIONAL_STATUS_CHOICES, FIRM_TYPE_CHOICES
+from app.constants import ADVOCATE_LEVEL_CHOICES, CONSTITUTIONAL_STATUS_CHOICES, FIRM_TYPE_CHOICES
 
 
 def format_firm_type(firm_type: str) -> str:
@@ -20,6 +20,15 @@ def format_constitutional_status(status: str) -> str:
 
     choices_dict = dict(CONSTITUTIONAL_STATUS_CHOICES)
     return choices_dict.get(status)
+
+
+def format_advocate_level(advocate_level: str) -> str:
+    """Format advocate level for display"""
+    if not advocate_level:
+        return ""
+
+    choices_dict = dict(ADVOCATE_LEVEL_CHOICES)
+    return choices_dict.get(advocate_level)
 
 
 def format_date(date_string: Optional[str]) -> str:

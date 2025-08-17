@@ -29,7 +29,7 @@ class Firm(BaseModel):
     constitutional_status: ConstitutionalStatus = Field(alias="constitutionalStatus", default=None)
     solicitor_advocate: YesNo | None = Field(alias="solicitorAdvocateYN", default=None)
     advocate_level: Optional[AdvocateLevel] = Field(alias="advocateLevel", default=None)
-    bar_council_role: Optional[str] = Field(alias="barCouncilRoll", default=None)
+    bar_council_roll: Optional[str] = Field(alias="barCouncilRoll", default=None)
     company_house_number: Optional[str] = Field(alias="companyHouseNumber", default=None)
     indemnity_received_date: str | None = Field(alias="indemnityReceivedDate", default=None)
     high_risk_supplier: Optional[YesNo] = Field(alias="highRiskSupplier", default=None)
