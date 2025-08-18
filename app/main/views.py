@@ -31,7 +31,8 @@ class ViewProvider(MethodView):
         else:
             # If there is no firm in the URL load from the session
             flash("<b>New provider successfully created</b>", "success")
-            firm = Firm(**session.get("new_provider"))
+            if firm := session.get("new_provider", None):
+                firm = Firm(**firm)
 
         if not firm:
             abort(404)
