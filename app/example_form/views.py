@@ -16,8 +16,8 @@ class ExampleFormView(BaseFormView):
         # Call parent method for redirect
         return super().form_valid(form)
 
-    def get_context_data(self, form):
+    def get_context_data(self, form, **kwargs):
         # Add custom context data to be passed to the template.
-        context = super().get_context_data(form)
+        context = super().get_context_data(form, kwargs)
         context["custom_data"] = "Your custom data here"
         return context
