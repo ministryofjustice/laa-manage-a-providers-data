@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
+{%- from "govuk_frontend_jinja/components/warning-text/macro.html" import govukWarningText %}
+{% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
+{%- from 'govuk_frontend_jinja/components/button/macro.html' import govukButton -%}
+{%- from 'components/moj_sub_navigation.html' import mojSubNavigation %}
+{%- from 'components/back_link.html' import govukBackLink -%}
+
+{% block beforeContent %}
+  {{ super() }}
+  {{ govukBackLink() }}
+{% endblock %}
+
+{% block pageContent %}
+
+  <span class="govuk-caption-xl">{{ provider_type }}</span>
+  <h1 class="govuk-heading-xl">{{ provider_name }}</h1>
+
+  {{ govukButton({
+    "text": "Add an office",
+    "href": url_for("main.add_provider")
+  }) }}
+
+  {{ govukButton({
+    "text": "Make inactive",
+    "classes": "govuk-button--secondary govuk-!-margin-left-3",
+  }) }}
+
+  {% if main_table %}
+    {{ govukTable(main_table.to_govuk_params()) }}
+  {% endif %}
+
+  {% if additional_table %}
+    <h2 class="govuk-heading-m">Additional details</h2>
+    {{ govukTable(additional_table.to_govuk_params()) }}
+  {% endif %}
+
+{% endblock %}

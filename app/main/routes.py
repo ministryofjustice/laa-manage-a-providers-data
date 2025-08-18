@@ -1,6 +1,4 @@
-import math
-
-from flask import abort, current_app, render_template, request, url_for
+from flask import current_app, render_template, url_for
 
 from app import auth
 from app.components.tables import DataTable, TableStructure, TransposedDataTable
@@ -19,51 +17,6 @@ def index():
 @bp.route("/status", methods=["GET"])
 def status():
     return "OK"
-
-
-@bp.get("/providers")
-@auth.login_required
-def providers(context):
-    def firm_name_html(row_data: dict[str, str]) -> str:
-        _firm_id = row_data.get("firmId", "")
-        _firm_name = row_data.get("firmName", "")
-        return f"<a class='govuk-link', href={url_for('main.offices', firm_id=_firm_id)}>{_firm_name}"
-
-    providers_shown_per_page = 20
-
-    start_provider_firm_num = 0
-
-    pda = current_app.extensions["pda"]
-    data = pda.get_all_provider_firms()
-
-    provider_data = data["firms"][start_provider_firm_num:]
-
-    columns: list[TableStructure] = [
-        {"text": "Name", "id": "firmName", "html": firm_name_html},
-        {"text": "Type", "id": "firmType"},
-        {"text": "Constitutional status", "id": "constitutionalStatus"},
-        {"text": "Website", "id": "websiteUrl"},
-        {"text": "Full info", "html": get_full_info_html},
-    ]
-
-    page = request.args.get("page", 1, type=int)
-    max_page = math.ceil(len(provider_data) / providers_shown_per_page)
-
-    if page < 1 or page > max_page:
-        return abort(404)
-
-    start_id = providers_shown_per_page * (page - 1)
-    end_id = providers_shown_per_page * (page - 1) + providers_shown_per_page
-
-    table = DataTable(structure=columns, data=provider_data[start_id:end_id])
-
-    return render_template(
-        "providers.html",
-        table=table,
-        current_page=page,
-        num_shown_per_page=providers_shown_per_page,
-        num_results=len(provider_data),
-    )
 
 
 @bp.get("/provider/<int:firm_id>/offices")

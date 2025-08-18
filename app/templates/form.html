@@ -9,11 +9,10 @@
   <form method="post" novalidate>
     {% block form %}
       {{ form.hidden_tag() }}
-
       {% if not form | has_page_heading %}
         {% if form.caption %}
           <span class="govuk-caption-xl">{{ form.caption }}</span>
-            {% endif %}
+        {% endif %}
         <h1 class="govuk-heading-xl">{{ form.title }}</h1>
       {% endif %}
 
