@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'form.html' %}
 
 {%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
 {%- from 'govuk_frontend_jinja/components/button/macro.html' import govukButton -%}
@@ -11,48 +11,41 @@
 {% endblock %}
 
 {% block content %}
-  {{ super() }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% if form and form.errors %}
+            {{ govukErrorSummary(wtforms_errors(form)) }}
+        {% endif %}
 
-  <h1 class="govuk-heading-xl">Provider records</h1>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+              {{ govukNotificationBanner({'type': category, 'html': message}) }}
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
 
-  <form method="get" class="govuk-!-margin-bottom-6">
-  <div class="govuk-form-group{% if search_term and num_results == 0 %} govuk-form-group--error{% endif %}">
-    <label class="govuk-label govuk-label--m govuk-!-margin-bottom-0" for="search">
-      Find a provider
-    </label>
-    <div class="govuk-hint">
-      You can search by name, office or account number
-    </div>
+      <h1 class="govuk-heading-xl">{{ form.title }}</h1>
 
-    {% if search_term and num_results == 0 %}
-      <p id="search-error" class="govuk-error-message">
-        <span class="govuk-visually-hidden">Error:</span>
-        No providers found. Try a different search term.
-      </p>
-    {% endif %}
+      <form method="get" class="govuk-!-margin-bottom-6">
+          <div class="govuk-form-group--search">
+            {{ form.search() }}
+            {{ govukButton({'text': 'Search'}) }}
+          </div>
+      </form>
 
-    <div style="display: flex; gap: 10px; align-items: flex-end;">
-      <input class="govuk-input govuk-input--width-30 provider-search{% if search_term and num_results == 0 %} govuk-input--error{% endif %}"
-             id="search"
-             name="search"
-             type="text"
-             value="{{ search_term or '' }}"
-             {% if search_term and num_results == 0 %}aria-describedby="search-error"{% endif %}>
-      {{ govukButton({'text': 'Search'}) }}
+      {{ govukButton({
+        "text": "Add a new provider",
+        "classes": "govuk-button--secondary",
+        "href": url_for("main.add_provider")
+      }) }}
+
+      <div class="moj-scrollable-pane">
+        {{ govukTable(table.to_govuk_params()) }}
+      </div>
+
+      {{ mojPagination(currentPage=form.page, numShownPerPage=form.firms_shown_per_page, numResults=form.num_results) }}
     </div>
   </div>
-</form>
-
-  {{ govukButton({
-    "text": "Add a new provider",
-    "classes": "govuk-button--secondary",
-    "href": url_for("main.add_provider")
-  }) }}
-
-  <div class="moj-scrollable-pane">
-    {{ govukTable(table.to_govuk_params()) }}
-  </div>
-
-  {{ mojPagination(currentPage=current_page, numShownPerPage=num_shown_per_page, numResults=num_results) }}
 
 {% endblock %}

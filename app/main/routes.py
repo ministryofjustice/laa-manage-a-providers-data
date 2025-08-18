@@ -1,12 +1,9 @@
-import math
-
-from flask import abort, current_app, render_template, request, url_for
+from flask import current_app, render_template, url_for
 
 from app import auth
 from app.components.tables import DataTable, TableStructure, TransposedDataTable
 from app.main import bp
 from app.main.utils import get_full_info_html
-from app.models import Firm
 
 
 @bp.get("/")
@@ -20,59 +17,6 @@ def index():
 @bp.route("/status", methods=["GET"])
 def status():
     return "OK"
-
-
-@bp.get("/providers")
-@auth.login_required
-def providers(context):
-    def firm_name_html(row_data: dict[str, str]) -> str:
-        _firm_id = row_data.get("firm_id", "")
-        _firm_name = row_data.get("firm_name", "")
-        return f"<a class='govuk-link', href={url_for('main.view_provider_with_id', firm_id=_firm_id)}>{_firm_name}"
-
-    search_term = request.args.get("search", "")
-    providers_shown_per_page = 20
-    start_provider_firm_num = 0
-
-    pda = current_app.extensions["pda"]
-    firms: list[Firm] = pda.get_all_provider_firms()
-
-    provider_data = firms[start_provider_firm_num:]
-
-    # Filter providers based on search term
-    if search_term:
-        search_lower = search_term.lower()
-        provider_data = [
-            firm
-            for firm in provider_data
-            if (search_lower in firm.firm_name.lower() or search_lower in str(firm.firm_id).lower())
-        ]
-
-    columns: list[TableStructure] = [
-        {"text": "Provider name", "id": "firm_name", "html": firm_name_html},
-        {"text": "Account number", "id": "firm_number"},
-        {"text": "Provider type", "id": "firm_type"},
-    ]
-
-    page = request.args.get("page", 1, type=int)
-    max_page = math.ceil(len(provider_data) / providers_shown_per_page)
-
-    if page < 1 or page > max_page:
-        return abort(404)
-
-    start_id = providers_shown_per_page * (page - 1)
-    end_id = providers_shown_per_page * (page - 1) + providers_shown_per_page
-
-    table = DataTable(structure=columns, data=[firm.to_internal_dict() for firm in provider_data[start_id:end_id]])
-
-    return render_template(
-        "providers.html",
-        table=table,
-        search_term=search_term,
-        current_page=page,
-        num_shown_per_page=providers_shown_per_page,
-        num_results=len(provider_data),
-    )
 
 
 @bp.get("/provider/<int:firm_id>/offices")

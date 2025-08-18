@@ -49,7 +49,7 @@ class LspDetailsFormView(BaseFormView):
 
         indemnity_date = form.data.get("indemnity_received_date")
         if indemnity_date:
-            session["new_provider"].update({"indemnityReceivedDate": indemnity_date.isoformat()})
+            session["new_provider"].update({"indemnity_received_date": indemnity_date.isoformat()})
 
         return super().form_valid(form)
 
