@@ -38,6 +38,11 @@ def create_app(config_class=Config, pda_class=ProviderDataApi):
     app.url_map.strict_slashes = False  # This allows www.host.gov.uk/category to be routed to www.host.gov.uk/category/
     app.config.from_object(config_class)
 
+    # Register custom URL converters
+    from app.utils.converters import FirmConverter
+
+    app.url_map.converters["firm"] = FirmConverter
+
     configure_logging(app)
 
     app.jinja_env.lstrip_blocks = True

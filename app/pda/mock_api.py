@@ -329,3 +329,27 @@ class MockProviderDataApi:
             "office": office.to_api_dict(),
             "bankDetails": [],  # Add mock bank details here if needed
         }
+
+    def create_provider_firm(self, firm: Firm) -> Firm:
+        """
+        Create a new provider firm in the mock data.
+
+        Args:
+            firm: Firm model instance to create
+
+        Returns:
+            Firm: The created Firm model instance with assigned ID
+        """
+        # Generate a new firm ID
+        existing_ids = [firm_data.get("firmId", 0) for firm_data in self._mock_data["firms"]]
+        new_firm_id = max(existing_ids, default=0) + 1
+
+        # Create a copy with the generated ID fields
+        updated_firm = firm.model_copy(
+            update={"firm_id": new_firm_id, "firm_number": str(new_firm_id), "ccms_firm_id": new_firm_id}
+        )
+
+        # Add to mock data
+        self._mock_data["firms"].append(updated_firm.to_api_dict())
+
+        return updated_firm

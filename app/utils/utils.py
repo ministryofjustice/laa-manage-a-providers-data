@@ -13,6 +13,7 @@ def register_form_view(
     view_class: Optional[Type[BaseFormView]] = None,
     blueprint: Optional[Blueprint] = None,
     login_required: bool = True,
+    endpoint: str | None = None,
 ) -> None:
     """Register a view class for a form with GET and POST methods."""
     if blueprint is None:
@@ -26,10 +27,11 @@ def register_form_view(
     if form_class is not None and hasattr(form_class, "template"):
         view_class.template = form_class.template
 
-    route_name = form_class.url.lower().replace("-", "_")
+    if endpoint is None:
+        endpoint = form_class.url.lower().replace("-", "_")
 
     # Create the view function
-    view_func = view_class.as_view(f"{route_name}", form_class=form_class)
+    view_func = view_class.as_view(f"{endpoint}", form_class=form_class)
 
     # Apply authentication decorator if needed
     if login_required:

@@ -262,3 +262,54 @@ class TestMockProviderDataApi:
         MockProviderDataApi()
 
         mock_load_data.assert_called_once()
+
+    def test_create_provider_firm_basic(self, mock_api):
+        """Test creating a basic provider firm."""
+        # Create a Firm instance
+        firm_data = Firm(
+            firm_name="TEST FIRM", firm_type="Legal Services Provider", constitutional_status="Partnership"
+        )
+
+        # Create a new firm
+        new_firm = mock_api.create_provider_firm(firm_data)
+
+        # Verify the firm was created
+        assert new_firm.firm_name == "TEST FIRM"
+        assert new_firm.firm_type == "Legal Services Provider"
+        assert new_firm.firm_id > 0
+
+        # Verify we can retrieve it
+        retrieved_firm = mock_api.get_provider_firm(new_firm.firm_id)
+        assert retrieved_firm is not None
+        assert retrieved_firm.firm_name == "TEST FIRM"
+
+    def test_create_provider_firm_with_all_fields(self, mock_api):
+        """Test creating a firm with all optional fields."""
+        firm_data = Firm(
+            firm_name="COMPREHENSIVE TEST FIRM",
+            firm_type="Chambers",
+            constitutional_status="Limited Company",
+            website_url="https://example.com",
+            small_business_flag="Y",
+            women_owned_flag="Y",
+        )
+
+        new_firm = mock_api.create_provider_firm(firm_data)
+
+        assert new_firm.firm_name == "COMPREHENSIVE TEST FIRM"
+        assert new_firm.firm_type == "Chambers"
+        assert new_firm.constitutional_status == "Limited Company"
+        assert new_firm.website_url == "https://example.com"
+        assert new_firm.small_business_flag == "Y"
+        assert new_firm.women_owned_flag == "Y"
+
+    def test_create_multiple_firms_get_unique_ids(self, mock_api):
+        """Test that multiple firms get unique IDs."""
+        firm1_data = Firm(firm_name="FIRM ONE", firm_type="Legal Services Provider")
+        firm1 = mock_api.create_provider_firm(firm1_data)
+
+        firm2_data = Firm(firm_name="FIRM TWO", firm_type="Chambers")
+        firm2 = mock_api.create_provider_firm(firm2_data)
+
+        assert firm1.firm_id != firm2.firm_id
+        assert firm2.firm_id > firm1.firm_id
