@@ -11,7 +11,7 @@ whitelist:
 pdb:
   enabled: false
 
-env:
+envVars:
   PDA_USE_MOCK_API:
     value: "True"
   PDA_ENVIRONMENT:
