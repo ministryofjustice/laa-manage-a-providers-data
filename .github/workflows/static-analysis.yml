@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the repository
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
 
     - name: Set up Python
       uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
@@ -36,7 +36,7 @@ jobs:
     name: Secret scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           fetch-depth: 0
       - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
       - name: Lint
         uses: chartboost/ruff-action@v1
         with:
@@ -64,13 +64,13 @@ jobs:
     name: SonarQube
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           # Number of commits to fetch. 0 indicates all history for all branches and tags.
           # Default: 1
           fetch-depth: 0
       - name: Download coverage report
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
         with:
           name: coverage-xml-report
           path: coverage
