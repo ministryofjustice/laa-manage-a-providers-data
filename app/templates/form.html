@@ -6,23 +6,27 @@
 {% block pageTitle %}{{ title }} – GOV.UK{% endblock %}
 
 {% block pageContent %}
-    <form method="post" novalidate>
-          {% block form %}
-            {{ form.hidden_tag() }}
+  <form method="post" novalidate>
+    {% block form %}
+      {{ form.hidden_tag() }}
+      {% if not form | has_page_heading %}
+        {% if form.caption %}
+          <span class="govuk-caption-xl">{{ form.caption }}</span>
+        {% endif %}
+        <h1 class="govuk-heading-xl">{{ form.title }}</h1>
+      {% endif %}
 
-            {% if not form | has_page_heading %}
-              <h1 class="govuk-heading-xl">{{ form.title }}</h1>
-            {% endif %}
+      {% for field in form %}
+        {% if field.type != 'CSRFToken' and field.type != 'HiddenField' %}
+          {{ field }}
+        {% endif %}
+      {% endfor %}
 
-            {% for field in form %}
-              {% if field.type != 'CSRFToken' and field.type != 'HiddenField' %}
-                {{ field }}
-              {% endif %}
-            {% endfor %}
+      {% set submitButtonText = form.submit_button_text or "Continue" %}
 
-            {{ govukButton({
-              'text': 'Continue'
-            }) }}
-          {% endblock %}
-    </form>
+      {{ govukButton({
+        'text': submitButtonText
+      }) }}
+    {% endblock %}
+  </form>
 {% endblock %}

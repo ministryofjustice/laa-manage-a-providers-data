@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'form.html' %}
 
 {%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
 {%- from 'govuk_frontend_jinja/components/button/macro.html' import govukButton -%}
@@ -11,20 +11,41 @@
 {% endblock %}
 
 {% block content %}
-  {{ super() }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% if form and form.errors %}
+            {{ govukErrorSummary(wtforms_errors(form)) }}
+        {% endif %}
 
-  <h1 class="govuk-heading-xl">Providers</h1>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+              {{ govukNotificationBanner({'type': category, 'html': message}) }}
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
 
-  {{ govukButton({
-    "text": "Add a new provider",
-    "classes": "govuk-button--secondary",
-    "href": url_for("main.add_provider")
-  }) }}
+      <h1 class="govuk-heading-xl">{{ form.title }}</h1>
 
-  <div class="moj-scrollable-pane">
-    {{ govukTable(table.to_govuk_params()) }}
+      <form method="get" class="govuk-!-margin-bottom-6">
+          <div class="govuk-form-group--search">
+            {{ form.search() }}
+            {{ govukButton({'text': 'Search'}) }}
+          </div>
+      </form>
+
+      {{ govukButton({
+        "text": "Add a new provider",
+        "classes": "govuk-button--secondary",
+        "href": url_for("main.add_provider")
+      }) }}
+
+      <div class="moj-scrollable-pane">
+        {{ govukTable(table.to_govuk_params()) }}
+      </div>
+
+      {{ mojPagination(currentPage=form.page, numShownPerPage=form.firms_shown_per_page, numResults=form.num_results) }}
+    </div>
   </div>
-
-  {{ mojPagination(currentPage=current_page, numShownPerPage=num_shown_per_page, numResults=num_results) }}
 
 {% endblock %}
