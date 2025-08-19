@@ -1,6 +1,6 @@
 from wtforms.fields.choices import RadioField
 from wtforms.fields.simple import StringField
-from wtforms.validators import InputRequired
+from wtforms.validators import InputRequired, Length
 
 from app.constants import YES_NO_CHOICES
 from app.forms import BaseForm
@@ -28,7 +28,10 @@ class AddOfficeForm(BaseForm):
     office_name = StringField(
         "Office name",
         widget=GovTextInput(heading_class="govuk-fieldset__legend--m"),
-        validators=[InputRequired(message="Enter the office name")],
+        validators=[
+            InputRequired(message="Enter the office name"),
+            Length(max=320, message="Office name must be less than 320 characters"),
+        ],
     )
 
     is_head_office = RadioField(
