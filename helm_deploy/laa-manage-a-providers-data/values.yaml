@@ -69,10 +69,6 @@ envVars:
     configmap:
       name: provider-data-api
       key: url
-  PDA_ENVIRONMENT:
-    configmap:
-      name: provider-data-api
-      key: environment
   PDA_API_KEY:
     secret:
       name: provider-data-api

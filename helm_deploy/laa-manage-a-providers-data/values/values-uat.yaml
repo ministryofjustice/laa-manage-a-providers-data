@@ -12,4 +12,7 @@ pdb:
   enabled: false
 
 env:
-  PDA_USE_MOCK_API: True
+  PDA_USE_MOCK_API:
+    value: "True"
+  PDA_ENVIRONMENT:
+    value: "Mock"
