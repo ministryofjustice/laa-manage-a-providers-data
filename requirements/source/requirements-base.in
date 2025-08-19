@@ -1,7 +1,12 @@
 Flask
 flask-talisman
 Flask-WTF
+Flask-Session
 govuk-frontend-wtf
 python-dotenv
+redis
 requests
 sentry-sdk[flask]
+ms_identity_python[flask] @ git+https://github.com/azure-samples/ms-identity-python@0.9
+structlog
+pydantic

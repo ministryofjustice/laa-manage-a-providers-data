@@ -3,6 +3,7 @@ from unittest.mock import Mock
 import pytest
 import requests
 
+from app.models import Firm, Office
 from app.pda.api import ProviderDataApi, ProviderDataApiConnectionError, ProviderDataApiError
 
 
@@ -106,12 +107,16 @@ class TestProviderDataApi:
 
     def test_get_provider_firm_success(self, initialized_client):
         initialized_client.get = Mock(return_value=Mock(status_code=200))
-        initialized_client._handle_response = Mock(return_value={"firm_id": 123})
+        mock_firm = {
+            "firmId": 123,
+            "constitutionalStatus": "Charity",
+        }
+        initialized_client._handle_response = Mock(return_value={"firm": mock_firm})
 
         result = initialized_client.get_provider_firm(123)
 
         initialized_client.get.assert_called_once_with("/provider-firms/123")
-        assert result == {"firm_id": 123}
+        assert result == Firm(**mock_firm)
 
     def test_get_provider_firm_invalid_id(self, initialized_client):
         with pytest.raises(ValueError, match="firm_id must be a positive integer"):
@@ -119,21 +124,25 @@ class TestProviderDataApi:
 
     def test_get_all_provider_firms(self, initialized_client):
         initialized_client.get = Mock(return_value=Mock(status_code=200))
-        initialized_client._handle_response = Mock(return_value=[{"firm_id": 123}])
+        mock_firm = {
+            "firmId": 123,
+            "constitutionalStatus": "Charity",
+        }
+        initialized_client._handle_response = Mock(return_value={"firms": [mock_firm]})
 
         result = initialized_client.get_all_provider_firms()
 
         initialized_client.get.assert_called_once_with("/provider-firms")
-        assert result == [{"firm_id": 123}]
+        assert result == [Firm(**mock_firm)]
 
     def test_get_provider_office_success(self, initialized_client):
         initialized_client.get = Mock(return_value=Mock(status_code=200))
-        initialized_client._handle_response = Mock(return_value={"office_code": "1A234B"})
+        initialized_client._handle_response = Mock(return_value={"firm_office_code": "1A234B"})
 
         result = initialized_client.get_provider_office("1A234B")
 
         initialized_client.get.assert_called_once_with("/provider-offices/1A234B")
-        assert result == {"office_code": "1A234B"}
+        assert result == Office(firm_office_code="1A234B")
 
     def test_get_provider_office_invalid_code(self, initialized_client):
         with pytest.raises(ValueError, match="office_code must be a non-empty string"):
@@ -141,12 +150,12 @@ class TestProviderDataApi:
 
     def test_get_provider_offices(self, initialized_client):
         initialized_client.get = Mock(return_value=Mock(status_code=200))
-        initialized_client._handle_response = Mock(return_value=[{"office_code": "1A234B"}])
+        initialized_client._handle_response = Mock(return_value={"offices": [{"firm_office_code": "1A234B"}]})
 
         result = initialized_client.get_provider_offices(123)
 
         initialized_client.get.assert_called_once_with("/provider-firms/123/provider-offices")
-        assert result == [{"office_code": "1A234B"}]
+        assert result == [Office(firm_office_code="1A234B")]
 
     def test_get_provider_users(self, initialized_client):
         initialized_client.get = Mock(return_value=Mock(status_code=200))
