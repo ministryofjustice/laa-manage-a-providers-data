@@ -11,9 +11,13 @@ RUN npm run build
 FROM python:3.13-bookworm AS base
 ARG REQUIREMENTS_FILE=requirements-production.txt
 RUN apt-get update
-# Upgrade perl-base to install latests security update
+# Upgrade perl-base to install the latest security update
 # https://avd.aquasec.com/nvd/2024/cve-2024-56406/
 RUN apt-get install --only-upgrade perl-base -y
+
+# Upgrade libslt1 to install the latest security update
+# https://nvd.nist.gov/vuln/detail/CVE-2025-7424
+RUN apt-get upgrade -y libxslt1.1 libxslt1-dev
 
 # Set environment variables
 ENV FLASK_RUN_HOST=0.0.0.0
