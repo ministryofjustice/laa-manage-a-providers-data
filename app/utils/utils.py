@@ -1,15 +1,18 @@
-"""Utility functions for the main module."""
-
 from typing import Optional, Type
 
 from flask import Blueprint
 
-from .forms import BaseForm
-from .views import BaseFormView
+from app import auth
+
+from ..forms import BaseForm
+from ..views import BaseFormView
 
 
 def register_form_view(
-    form_class: Type[BaseForm], view_class: Optional[Type[BaseFormView]] = None, blueprint: Optional[Blueprint] = None
+    form_class: Type[BaseForm],
+    view_class: Optional[Type[BaseFormView]] = None,
+    blueprint: Optional[Blueprint] = None,
+    login_required: bool = True,
 ) -> None:
     """Register a view class for a form with GET and POST methods."""
     if blueprint is None:
@@ -25,9 +28,16 @@ def register_form_view(
 
     route_name = form_class.url.lower().replace("-", "_")
 
+    # Create the view function
+    view_func = view_class.as_view(f"{route_name}", form_class=form_class)
+
+    # Apply authentication decorator if needed
+    if login_required:
+        view_func = auth.login_required(view_func)
+
     # Register the view with the blueprint
     blueprint.add_url_rule(
         f"/{form_class.url}",
-        view_func=view_class.as_view(f"{route_name}", form_class=form_class),
+        view_func=view_func,
         methods=["GET", "POST"],
     )

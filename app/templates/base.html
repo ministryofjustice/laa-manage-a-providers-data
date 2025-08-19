@@ -17,8 +17,7 @@
 
 {% block header %}
   {# Pass the user into the header here once we have an authenticated user. #}
-  {% set user={"email": "Authenticated"} if session.get("authenticated") else None%}
-  {{ mojHeader(user=user) }}
+  {{ mojHeader(user=current_user) }}
 
   {{ govukServiceNavigation({
     'serviceName': config['SERVICE_NAME'],
@@ -36,17 +35,23 @@
 {% endblock %}
 
 {% block content %}
-  {% if form and form.errors %}
-    {{ govukErrorSummary(wtforms_errors(form)) }}
-  {% endif %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if form and form.errors %}
+        {{ govukErrorSummary(wtforms_errors(form)) }}
+      {% endif %}
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-          {{ govukNotificationBanner({'type': category, 'html': message}) }}
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+              {{ govukNotificationBanner({'type': category, 'html': message}) }}
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      {% block pageContent %}{% endblock %}
+    </div>
+  </div>
 {% endblock %}
 
 {% block footer %}
