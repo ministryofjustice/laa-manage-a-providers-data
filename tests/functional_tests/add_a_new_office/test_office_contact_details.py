@@ -40,10 +40,10 @@ def test_form_loads_correctly(page: Page):
     expect(page.get_by_role("textbox", name="Town or city")).to_be_visible()
     expect(page.get_by_role("textbox", name="County (optional)")).to_be_visible()
     expect(page.get_by_role("textbox", name="Postcode")).to_be_visible()
-    expect(page.get_by_role("textbox", name="Telephone number (optional)")).to_be_visible()
-    expect(page.get_by_role("textbox", name="Email address (optional)")).to_be_visible()
-    expect(page.get_by_role("textbox", name="DX number (optional)")).to_be_visible()
-    expect(page.get_by_role("textbox", name="DX centre (optional)")).to_be_visible()
+    expect(page.get_by_role("textbox", name="Telephone number")).to_be_visible()
+    expect(page.get_by_role("textbox", name="Email address")).to_be_visible()
+    expect(page.get_by_role("textbox", name="DX number")).to_be_visible()
+    expect(page.get_by_role("textbox", name="DX centre")).to_be_visible()
     expect(page.get_by_role("button", name="Continue")).to_be_visible()
 
 
@@ -59,6 +59,10 @@ def test_required_fields_validation(page: Page):
     expect(page.get_by_text("Error: Enter address line 1, typically the building and street")).to_be_visible()
     expect(page.get_by_text("Error: Enter the town or city")).to_be_visible()
     expect(page.get_by_text("Error: Enter the postcode")).to_be_visible()
+    expect(page.get_by_text("Error: Enter the telephone number")).to_be_visible()
+    expect(page.get_by_text("Error: Enter the email address")).to_be_visible()
+    expect(page.get_by_text("Error: Enter the DX number")).to_be_visible()
+    expect(page.get_by_text("Error: Enter the DX centre")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -70,7 +74,7 @@ def test_email_validation(page: Page):
     page.get_by_role("textbox", name="Address line 1").fill("123 Test Street")
     page.get_by_role("textbox", name="Town or city").fill("Test City")
     page.get_by_role("textbox", name="Postcode").fill("TE1 5ST")
-    page.get_by_role("textbox", name="Email address (optional)").fill("invalid-email")
+    page.get_by_role("textbox", name="Email address").fill("invalid-email")
     page.get_by_role("button", name="Continue").click()
 
     # Should show email validation error
@@ -121,13 +125,17 @@ def test_postcode_auto_capitalize(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_successful_form_submission_minimal(page: Page):
-    """Test successful form submission with only required fields."""
+    """Test successful form submission with all required fields."""
     navigate_to_office_contact_details(page)
 
-    # Fill only required fields
+    # Fill all required fields
     page.get_by_role("textbox", name="Address line 1").fill("123 Test Street")
     page.get_by_role("textbox", name="Town or city").fill("Test City")
     page.get_by_role("textbox", name="Postcode").fill("TE1 5ST")
+    page.get_by_role("textbox", name="Telephone number").fill("01234567890")
+    page.get_by_role("textbox", name="Email address").fill("test@office.com")
+    page.get_by_role("textbox", name="DX number").fill("DX123456")
+    page.get_by_role("textbox", name="DX centre").fill("Test Centre")
     page.get_by_role("button", name="Continue").click()
 
     # Should redirect back to provider view (no flash message expected as we don't create office yet)
@@ -147,10 +155,10 @@ def test_successful_form_submission_all_fields(page: Page):
     page.get_by_role("textbox", name="Town or city").fill("Test City")
     page.get_by_role("textbox", name="County (optional)").fill("Test County")
     page.get_by_role("textbox", name="Postcode").fill("TE1 5ST")
-    page.get_by_role("textbox", name="Telephone number (optional)").fill("01234567890")
-    page.get_by_role("textbox", name="Email address (optional)").fill("test@office.com")
-    page.get_by_role("textbox", name="DX number (optional)").fill("DX123456")
-    page.get_by_role("textbox", name="DX centre (optional)").fill("Test Centre")
+    page.get_by_role("textbox", name="Telephone number").fill("01234567890")
+    page.get_by_role("textbox", name="Email address").fill("test@office.com")
+    page.get_by_role("textbox", name="DX number").fill("DX123456")
+    page.get_by_role("textbox", name="DX centre").fill("Test Centre")
     page.get_by_role("button", name="Continue").click()
 
     # Should redirect back to provider view (no flash message expected as we don't create office yet)
@@ -171,11 +179,15 @@ def test_optional_fields_not_required(page: Page):
     """Test that optional fields don't prevent form submission."""
     navigate_to_office_contact_details(page)
 
-    # Fill only required fields, leave optional fields empty
+    # Fill required fields, leave optional fields empty
     page.get_by_role("textbox", name="Address line 1").fill("123 Test Street")
     page.get_by_role("textbox", name="Town or city").fill("Test City")
     page.get_by_role("textbox", name="Postcode").fill("TE1 5ST")
-    # Leave optional fields empty: address_line_2-4, county, telephone, email, dx fields
+    page.get_by_role("textbox", name="Telephone number").fill("01234567890")
+    page.get_by_role("textbox", name="Email address").fill("test@office.com")
+    page.get_by_role("textbox", name="DX number").fill("DX123456")
+    page.get_by_role("textbox", name="DX centre").fill("Test Centre")
+    # Leave optional fields empty: address_line_2-4, county
     page.get_by_role("button", name="Continue").click()
 
     # Should succeed without validation errors on optional fields

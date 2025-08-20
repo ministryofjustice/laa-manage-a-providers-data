@@ -62,9 +62,6 @@ class OfficeContactDetailsForm(BaseForm):
         office_name = new_office.get("office_name", "Office name")
         return office_name
 
-    # Address section heading - displayed in template
-    address_heading = "Address"
-
     address_line_1 = StringField(
         "Address line 1",
         widget=GovTextInput(classes="govuk-!-width-three-quarters"),
@@ -119,16 +116,19 @@ class OfficeContactDetailsForm(BaseForm):
 
     # Contact fields
     telephone_number = StringField(
-        "Telephone number (optional)",
+        "Telephone number",
         widget=GovTextInput(heading_class="govuk-fieldset__legend--m", classes="govuk-input--width-20"),
-        validators=[Optional(), Length(max=20, message="Telephone number must be 20 characters or fewer")],
+        validators=[
+            InputRequired(message="Enter the telephone number"),
+            Length(max=20, message="Telephone number must be 20 characters or fewer"),
+        ],
     )
 
     email_address = StringField(
-        "Email address (optional)",
+        "Email address",
         widget=GovTextInput(heading_class="govuk-fieldset__legend--m", classes="govuk-!-width-full"),
         validators=[
-            Optional(),
+            InputRequired(message="Enter the email address"),
             Email(message="Enter a valid email address"),
             Length(max=100, message="Email address must be 100 characters or fewer"),
         ],
@@ -136,13 +136,19 @@ class OfficeContactDetailsForm(BaseForm):
 
     # DX fields
     dx_number = StringField(
-        "DX number (optional)",
+        "DX number",
         widget=GovTextInput(heading_class="govuk-fieldset__legend--m", classes="govuk-input--width-20"),
-        validators=[Optional(), Length(max=20, message="DX number must be 20 characters or fewer")],
+        validators=[
+            InputRequired(message="Enter the DX number"),
+            Length(max=20, message="DX number must be 20 characters or fewer"),
+        ],
     )
 
     dx_centre = StringField(
-        "DX centre (optional)",
+        "DX centre",
         widget=GovTextInput(heading_class="govuk-fieldset__legend--m", classes="govuk-input--width-20"),
-        validators=[Optional(), Length(max=50, message="DX centre must be 50 characters or fewer")],
+        validators=[
+            InputRequired(message="Enter the DX centre"),
+            Length(max=50, message="DX centre must be 50 characters or fewer"),
+        ],
     )
