@@ -44,7 +44,7 @@ def test_form_loads_correctly(page: Page):
     expect(page.get_by_role("textbox", name="Email address")).to_be_visible()
     expect(page.get_by_role("textbox", name="DX number")).to_be_visible()
     expect(page.get_by_role("textbox", name="DX centre")).to_be_visible()
-    expect(page.get_by_role("button", name="Continue")).to_be_visible()
+    expect(page.get_by_role("button", name="Submit")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -53,7 +53,7 @@ def test_required_fields_validation(page: Page):
     navigate_to_office_contact_details(page)
 
     # Try to submit without filling required fields
-    page.get_by_role("button", name="Continue").click()
+    page.get_by_role("button", name="Submit").click()
 
     # Should show validation errors for required fields
     expect(page.get_by_text("Error: Enter address line 1, typically the building and street")).to_be_visible()
@@ -75,7 +75,7 @@ def test_email_validation(page: Page):
     page.get_by_role("textbox", name="Town or city").fill("Test City")
     page.get_by_role("textbox", name="Postcode").fill("TE1 5ST")
     page.get_by_role("textbox", name="Email address").fill("invalid-email")
-    page.get_by_role("button", name="Continue").click()
+    page.get_by_role("button", name="Submit").click()
 
     # Should show email validation error
     expect(page.get_by_text("Error: Enter a valid email address")).to_be_visible()
@@ -91,7 +91,7 @@ def test_field_length_validation(page: Page):
     page.get_by_role("textbox", name="Address line 1").fill(long_address)
     page.get_by_role("textbox", name="Town or city").fill("Test City")
     page.get_by_role("textbox", name="Postcode").fill("TE1 5ST")
-    page.get_by_role("button", name="Continue").click()
+    page.get_by_role("button", name="Submit").click()
 
     # Should show length validation error
     expect(page.get_by_text("Error: Address line 1 must be 240 characters or fewer")).to_be_visible()
@@ -106,7 +106,7 @@ def test_postcode_validation(page: Page):
     page.get_by_role("textbox", name="Address line 1").fill("123 Test Street")
     page.get_by_role("textbox", name="Town or city").fill("Test City")
     page.get_by_role("textbox", name="Postcode").fill("INVALID")
-    page.get_by_role("button", name="Continue").click()
+    page.get_by_role("button", name="Submit").click()
 
     # Should show postcode validation error
     expect(page.get_by_text("Error: Enter a valid UK postcode")).to_be_visible()
@@ -136,7 +136,7 @@ def test_successful_form_submission_minimal(page: Page):
     page.get_by_role("textbox", name="Email address").fill("test@office.com")
     page.get_by_role("textbox", name="DX number").fill("DX123456")
     page.get_by_role("textbox", name="DX centre").fill("Test Centre")
-    page.get_by_role("button", name="Continue").click()
+    page.get_by_role("button", name="Submit").click()
 
     # Should redirect back to provider view (no flash message expected as we don't create office yet)
     expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
@@ -159,7 +159,7 @@ def test_successful_form_submission_all_fields(page: Page):
     page.get_by_role("textbox", name="Email address").fill("test@office.com")
     page.get_by_role("textbox", name="DX number").fill("DX123456")
     page.get_by_role("textbox", name="DX centre").fill("Test Centre")
-    page.get_by_role("button", name="Continue").click()
+    page.get_by_role("button", name="Submit").click()
 
     # Should redirect back to provider view (no flash message expected as we don't create office yet)
     expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
@@ -188,7 +188,7 @@ def test_optional_fields_not_required(page: Page):
     page.get_by_role("textbox", name="DX number").fill("DX123456")
     page.get_by_role("textbox", name="DX centre").fill("Test Centre")
     # Leave optional fields empty: address_line_2-4, county
-    page.get_by_role("button", name="Continue").click()
+    page.get_by_role("button", name="Submit").click()
 
     # Should succeed without validation errors on optional fields
     expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()

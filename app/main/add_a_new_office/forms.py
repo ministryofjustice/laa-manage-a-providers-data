@@ -49,6 +49,8 @@ class OfficeContactDetailsForm(BaseForm):
     url = "provider/<firm:firm>/add-office-contact-details"
     template = "add_office/office-contact-details.html"
 
+    submit_button_text = "Submit"
+
     firm: Firm | None = None  # Firm this office is being added to
 
     def __init__(self, firm: Firm, *args, **kwargs):
