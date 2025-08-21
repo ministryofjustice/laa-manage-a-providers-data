@@ -1,7 +1,8 @@
 from flask import Response, abort, render_template, session, url_for
 
 from app.forms import BaseForm
-from app.models import Firm
+from app.main.utils import add_new_office
+from app.models import Firm, Office
 from app.views import BaseFormView
 
 
@@ -66,6 +67,10 @@ class OfficeContactDetailsFormView(BaseFormView):
                 "dx_centre": form.data.get("dx_centre"),
             }
         )
+
+        # Create the office
+        office = Office(**session.get("new_office"))
+        add_new_office(office, firm_id=form.firm.firm_id)
 
         return super().form_valid(form)
 

@@ -232,3 +232,15 @@ class RadioDataTable(DataTable):
         }
         params.update(kwargs)
         return params
+
+
+def add_field(rows, data, value, label, formatter=None, html=None):
+    """Helper to add a field to a data table if it has a value. Uses snake_case label as ID."""
+    if value:
+        # Convert label to snake_case for the ID
+        field_id = label.lower().replace(" ", "_")
+        row = {"text": label, "id": field_id, "classes": "govuk-!-width-one-half"}
+        if html:
+            row.update({"html": html})
+        rows.append(row)
+        data[field_id] = formatter(value) if formatter else value

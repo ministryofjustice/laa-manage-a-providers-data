@@ -93,6 +93,10 @@ class Office(BaseModel):
     police_station_area_name: Optional[str] = Field(alias="policeStationAreaName", default=None)
     duty_solicitor_area_name: Optional[str] = Field(alias="dutySolicitorAreaName", default=None)
 
+    is_head_office: Optional[bool] = Field(
+        default=False, exclude=True
+    )  # Internal field that will be converted to head_office format when writing to PDA
+
     def to_api_dict(self) -> dict:
         """Export as camelCase dictionary for API calls."""
         return self.model_dump(by_alias=True, exclude_none=True)
