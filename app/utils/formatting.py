@@ -63,3 +63,15 @@ def format_title_case(value: str) -> str:
     if not isinstance(value, str):
         return value
     return value.title()
+
+
+def format_head_office(head_office_value: str) -> str:
+    """Format head office value for display.
+    If this office is a head office the value will be "N/A"
+    If this office is a child office the value will be the head office number
+    """
+    if not head_office_value:
+        return "Unknown"
+    if head_office_value.lower() in ["n/a", "N/A"]:
+        return "Yes"
+    return "No"

@@ -353,3 +353,33 @@ class MockProviderDataApi:
         self._mock_data["firms"].append(updated_firm.to_api_dict())
 
         return updated_firm
+
+    def create_provider_office(self, office: Office, firm_id: int) -> Office:
+        """
+        Create a new provider office in the mock data.
+
+        Args:
+            office: Office model instance to create
+            firm_id: ID of the firm this office belongs to
+
+        Returns:
+            Office: The created Office model instance with assigned ID
+        """
+        # Generate a new office ID
+        existing_ids = [office_data.get("officeId", 0) for office_data in self._mock_data["offices"]]
+        new_office_id = max(existing_ids, default=0) + 1
+
+        # Generate office code (simple format: firm_id followed by office sequence)
+        firm_offices = [o for o in self._mock_data["offices"] if o.get("firmId") == firm_id]
+        office_sequence = len(firm_offices) + 1
+        office_code = f"{firm_id}{office_sequence:02d}"
+
+        # Create a copy with the generated ID fields
+        updated_office = office.model_copy(
+            update={"office_id": new_office_id, "office_code": office_code, "firm_id": firm_id}
+        )
+
+        # Add to mock data
+        self._mock_data["offices"].append(updated_office.to_api_dict())
+
+        return updated_office
