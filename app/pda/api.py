@@ -44,6 +44,7 @@ class ProviderDataApi:
         self.session = requests.Session()
         self.logger = logging.getLogger(__name__)
         self._initialized = False
+        self._mock_fallback = None
 
     def init_app(self, app, base_url: str = None, api_key: str = None) -> None:
         """

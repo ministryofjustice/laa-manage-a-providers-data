@@ -14,12 +14,12 @@
 
 {% block pageContent %}
 
-  <span class="govuk-caption-xl">{{ provider_type }}</span>
-  <h1 class="govuk-heading-xl">{{ provider_name }}</h1>
+  <span class="govuk-caption-xl">{{ firm.firm_type }}</span>
+  <h1 class="govuk-heading-xl">{{ firm.firm_name }}</h1>
 
   {{ govukButton({
     "text": "Add an office",
-    "href": url_for("main.add_provider")
+    "href": url_for("main.add_office", firm=firm)
   }) }}
 
   {{ govukButton({

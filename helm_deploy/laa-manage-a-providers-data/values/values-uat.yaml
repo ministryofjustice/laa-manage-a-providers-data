@@ -10,3 +10,9 @@ whitelist:
 
 pdb:
   enabled: false
+
+envVars:
+  PDA_USE_MOCK_API:
+    value: "True"
+  PDA_ENVIRONMENT:
+    value: "Mock"

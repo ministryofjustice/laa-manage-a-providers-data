@@ -1,10 +1,11 @@
 import math
 from typing import NoReturn
 
-from flask import abort, current_app, flash, render_template, request, session, url_for
+from flask import abort, current_app, redirect, render_template, request, session, url_for
 from flask.views import MethodView
 
 from app.components.tables import DataTable, TableStructure, TransposedDataTable
+from app.main.utils import add_new_provider
 from app.models import Firm, Office
 from app.utils.formatting import format_advocate_level, format_constitutional_status, format_date, format_yes_no
 from app.views import BaseFormView
@@ -20,7 +21,7 @@ class ProviderList(BaseFormView):
     def firm_name_html(row_data: dict[str, str]) -> str:
         _firm_id = row_data.get("firm_id", "")
         _firm_name = row_data.get("firm_name", "")
-        return f"<a class='govuk-link', href={url_for('main.view_provider_with_id', firm_id=_firm_id)}>{_firm_name}"
+        return f"<a class='govuk-link', href={url_for('main.view_provider_with_id', firm=_firm_id)}>{_firm_name}"
 
     def get(self, context):
         form = self.get_form_class()(request.args)
@@ -71,7 +72,7 @@ class ViewProvider(MethodView):
 
     @staticmethod
     def parent_provider_name_html(parent_provider: Firm):
-        return f"<a class='govuk-link', href={url_for('main.view_provider_with_id', firm_id=parent_provider.firm_id)}>{parent_provider.firm_name}</a>"
+        return f"<a class='govuk-link', href={url_for('main.view_provider_with_id', firm=parent_provider.firm_id)}>{parent_provider.firm_name}</a>"
 
     @staticmethod
     def _add_field(rows, data, value, label, formatter=None, html=None):
@@ -85,18 +86,14 @@ class ViewProvider(MethodView):
             rows.append(row)
             data[field_id] = formatter(value) if formatter else value
 
-    def get(self, firm_id: int | None = None):
+    def get(self, firm: Firm | None = None):
         pda = current_app.extensions["pda"]
 
-        if firm_id:
-            firm = pda.get_provider_firm(firm_id)
-        else:
-            # If there is no firm in the URL load from the session
-            flash("<b>New provider successfully created</b>", "success")
-            if firm := session.get("new_provider", None):
-                firm = Firm(**firm)
-
         if not firm:
+            if firm_data := session.get("new_provider"):
+                del session["new_provider"]
+                firm = add_new_provider(Firm(**firm_data))
+                return redirect(url_for("main.view_provider_with_id", firm=firm))
             abort(404)
 
         head_office, parent_provider = None, None
@@ -157,6 +154,5 @@ class ViewProvider(MethodView):
             self.template,
             main_table=main_table,
             additional_table=additional_table,
-            provider_name=firm.firm_name,
-            provider_type=firm.firm_type,
+            firm=firm,
         )
