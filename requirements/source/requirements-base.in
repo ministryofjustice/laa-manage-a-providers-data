@@ -10,3 +10,4 @@ sentry-sdk[flask]
 ms_identity_python[flask] @ git+https://github.com/azure-samples/ms-identity-python@0.9
 structlog
 pydantic
+email-validator
