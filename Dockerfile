@@ -7,21 +7,17 @@ COPY app/static/src app/static/src
 RUN npm install
 RUN npm run build
 
-
 FROM python:3.13-bookworm AS base
 ARG REQUIREMENTS_FILE=requirements-production.txt
-RUN apt-get update
-# Upgrade perl-base to install the latest security update
+
+# Security updates for perl-base + libxslt and then clean apt lists
 # https://avd.aquasec.com/nvd/2024/cve-2024-56406/
-RUN apt-get install --only-upgrade perl-base -y
-
-# Upgrade libslt1 to install the latest security update
-# https://nvd.nist.gov/vuln/detail/CVE-2025-7424
-RUN apt-get install --only-upgrade libxslt1.1 libxslt1-dev -y
-
-# Clean up cached package files & index files for a smaller image size
-RUN apt-get clean
-RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+    && apt-get install  --only-upgrade -y \
+    perl-base \
+    libxslt1.1 \
+    libxslt1-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables
 ENV FLASK_RUN_HOST=0.0.0.0
