@@ -11,7 +11,7 @@
     "watch": "npm run gov-images && node esbuild.config.js --watch"
   },
   "dependencies": {
-    "@ministryofjustice/frontend": "^5.1.4",
+    "@ministryofjustice/frontend": "^5.1.5",
     "govuk-frontend": "^5.11.1",
     "moment": "^2.30.1"
   },
