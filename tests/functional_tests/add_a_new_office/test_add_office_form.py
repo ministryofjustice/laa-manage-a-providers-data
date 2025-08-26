@@ -82,9 +82,8 @@ def test_valid_form_submission_head_office_yes(page: Page):
     page.get_by_role("radio", name="Yes").click()
     page.get_by_role("button", name="Continue").click()
 
-    # Should redirect back to provider view (success)
-    # We expect to be back on the provider page
-    expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    # Should go to the office details form
+    expect(page.get_by_role("heading", name="Office contact details")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -97,8 +96,8 @@ def test_valid_form_submission_head_office_no(page: Page):
     page.get_by_role("radio", name="No").click()
     page.get_by_role("button", name="Continue").click()
 
-    # Should redirect back to provider view (success)
-    expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    # Should go to the office details form
+    expect(page.get_by_role("heading", name="Office contact details")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -114,7 +113,7 @@ def test_office_name_accepts_valid_length(page: Page):
 
     # Should not show validation error and should redirect
     expect(page.get_by_text("Error: Office name must be less than 320 characters")).not_to_be_visible()
-    expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.get_by_role("heading", name="Office contact details")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")

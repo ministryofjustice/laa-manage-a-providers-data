@@ -129,3 +129,22 @@ class ValidateSearchResults:
     def __call__(self, form, field):
         if field.data and hasattr(form, "num_results") and form.num_results == 0:
             raise ValidationError(self.message)
+
+
+class ValidatePostcode:
+    """Validate UK postcode format."""
+
+    def __init__(self, message=None):
+        self.message = message or "Enter a valid UK postcode"
+
+    def __call__(self, form, field):
+        if field.data:
+            # UK postcode regex pattern
+            # Matches formats like: SW1A 1AA, M1 1AA, B33 8TH, W1A 0AX, EC1A 1BB
+            uk_postcode_pattern = r"^[A-Z]{1,2}[0-9][A-Z0-9]?\s?[0-9][A-Z]{2}$"
+
+            # Clean the postcode (remove extra spaces, convert to uppercase)
+            cleaned_postcode = re.sub(r"\s+", " ", field.data.strip().upper())
+
+            if not re.match(uk_postcode_pattern, cleaned_postcode):
+                raise ValidationError(self.message)
