@@ -57,6 +57,14 @@ Don't worry, you can't commit your `.env` file.
 
 ### Run the service
 
+start redis
+
+```
+http://127.0.0.1:8020
+```
+
+In another terminal wndow run:
+
 ```shell
 source .venv/bin/activate
 flask --app app run --debug --port=8020
