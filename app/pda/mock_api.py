@@ -344,7 +344,7 @@ class MockProviderDataApi:
         existing_ids = [firm_data.get("firmId", 0) for firm_data in self._mock_data["firms"]]
         new_firm_id = max(existing_ids, default=0) + 1
 
-        # Create a copy with the generated ID fields
+        # Create a copy with the generated ID fields 
         updated_firm = firm.model_copy(
             update={"firm_id": new_firm_id, "firm_number": str(new_firm_id), "ccms_firm_id": new_firm_id}
         )
@@ -376,7 +376,7 @@ class MockProviderDataApi:
 
         # Create a copy with the generated ID fields
         updated_office = office.model_copy(
-            update={"office_id": new_office_id, "office_code": office_code, "firm_id": firm_id}
+            update={"office_id": new_office_id, "firm_office_code": office_code, "firm_id": firm_id}
         )
 
         # Add to mock data

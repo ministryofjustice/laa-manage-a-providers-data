@@ -40,11 +40,17 @@ class AddOfficeFormView(BaseFormView):
 class OfficeContactDetailsFormView(BaseFormView):
     """Form view for the Office Contact Details page"""
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.created_office = None
+
     def get_success_url(self, form: BaseForm | None = None) -> str:
         if not form or not hasattr(form, "firm"):
             abort(404)
 
-        return url_for("main.view_provider_with_id", firm=form.firm)
+        return url_for("main.view_office", 
+                      firm=form.firm, 
+                      office=self.created_office)
 
     def form_valid(self, form):
         # Check if office data exists in session
@@ -52,7 +58,8 @@ class OfficeContactDetailsFormView(BaseFormView):
             abort(404)
 
         # Add contact details to the existing office dict
-        session["new_office"].update(
+        office_data = session["new_office"].copy()
+        office_data.update(
             {
                 "address_line_1": form.data.get("address_line_1"),
                 "address_line_2": form.data.get("address_line_2"),
@@ -69,8 +76,10 @@ class OfficeContactDetailsFormView(BaseFormView):
         )
 
         # Create the office
-        office = Office(**session.get("new_office"))
-        add_new_office(office, firm_id=form.firm.firm_id)
+        self.created_office = Office(**office_data)
+        created_office = add_new_office(self.created_office, firm_id=form.firm.firm_id)
+
+        self.created_office = created_office
 
         return super().form_valid(form)
 
