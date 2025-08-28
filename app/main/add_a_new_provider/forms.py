@@ -18,7 +18,10 @@ class AddProviderForm(BaseForm):
 
     provider_name = StringField(
         "Provider name",
-        widget=GovTextInput(heading_class="govuk-fieldset__legend--m"),
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            hint="Do not include the provider type or address in the name"
+        ),
         validators=[
             InputRequired(message="Enter the provider name"),
         ],
