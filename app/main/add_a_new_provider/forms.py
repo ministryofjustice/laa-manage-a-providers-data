@@ -13,7 +13,7 @@ from ...forms import BaseForm
 
 
 class AddProviderForm(BaseForm):
-    title = "Add a new provider"
+    title = "Add a parent provider"
     url = "add-provider"
 
     provider_name = StringField(
