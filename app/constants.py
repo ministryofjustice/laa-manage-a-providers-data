@@ -11,9 +11,16 @@ YN = Literal["Y", "N"]
 YNOrNA = Literal["Y", "N", "N/A"]
 
 # Choice definitions for forms
+# Some firms can be children of other firms.
+# All firm types...
 FIRM_TYPE_CHOICES = [
     ("Barrister", "Barrister"),
     ("Advocate", "Advocate"),
+    ("Chambers", "Chambers"),
+    ("Legal Services Provider", "Legal Services Provider"),
+]
+# ...but only these can be 'parent' firms
+PARENT_FIRM_TYPE_CHOICES = [
     ("Chambers", "Chambers"),
     ("Legal Services Provider", "Legal Services Provider"),
 ]
