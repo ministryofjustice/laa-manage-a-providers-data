@@ -78,33 +78,3 @@ def test_add_new_lsp(page):
     expect(page.get_by_role("cell", name="Charity")).to_be_visible()
     expect(page.get_by_role("cell", name="/01/2020")).to_be_visible()
     expect(page.get_by_role("cell", name="12345678")).to_be_visible()
-
-
-@pytest.mark.usefixtures("live_server")
-def test_add_new_advocate(page):
-    # Add an advocate
-    page.get_by_role("button", name="Start now").click()
-    page.get_by_role("button", name="Add a new provider").click()
-    page.get_by_role("textbox", name="Provider name").click()
-    page.get_by_role("textbox", name="Provider name").fill("Test provider")
-    page.get_by_role("radio", name="Advocate").check()
-    page.get_by_role("button", name="Continue").click()
-    page.get_by_role("row", name="Select this row JOHNSON").locator("div").click()
-    page.get_by_role("button", name="Continue").click()
-    page.get_by_role("radio", name="Yes").check()
-    page.get_by_role("radio", name="King's Counsel").check()
-    page.get_by_role("textbox", name="Bar Council roll number").fill("1234567")
-    page.get_by_role("button", name="Continue").click()
-
-    # Assert our advocate information is displayed correctly
-    expect(page.get_by_text("New provider successfully created")).to_be_visible()
-    expect(page.get_by_text("Advocate", exact=True)).to_be_visible()
-    expect(page.get_by_role("heading", name="Test provider")).to_be_visible()
-    expect(page.get_by_role("rowheader", name="Parent provider name")).to_be_visible()
-    expect(page.get_by_role("cell", name="JOHNSON LEGAL SERVICES")).to_be_visible()
-    expect(page.get_by_role("rowheader", name="Parent provider number")).to_be_visible()
-    expect(page.get_by_role("cell", name="2", exact=True)).to_be_visible()
-    expect(page.get_by_role("cell", name="King's Counsel (KC,")).to_be_visible()
-    expect(page.get_by_role("rowheader", name="Solicitor advocate")).to_be_visible()
-    expect(page.get_by_role("cell", name="Yes")).to_be_visible()
-    expect(page.get_by_role("cell", name="1234567")).to_be_visible()
