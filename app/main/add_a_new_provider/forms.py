@@ -3,7 +3,12 @@ from wtforms import RadioField
 from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired, Length, Optional
 
-from app.constants import ADVOCATE_LEVEL_CHOICES, CONSTITUTIONAL_STATUS_CHOICES, YES_NO_CHOICES, PARENT_FIRM_TYPE_CHOICES
+from app.constants import (
+    ADVOCATE_LEVEL_CHOICES,
+    CONSTITUTIONAL_STATUS_CHOICES,
+    YES_NO_CHOICES,
+    PARENT_FIRM_TYPE_CHOICES,
+)
 from app.fields import GovUKTableRadioField
 from app.validators import ValidateCompaniesHouseNumber, ValidateGovDateField, ValidatePastDate, ValidateSearchResults
 from app.widgets import GovDateInput, GovRadioInput, GovTextInput
@@ -19,8 +24,7 @@ class AddProviderForm(BaseForm):
     provider_name = StringField(
         "Provider name",
         widget=GovTextInput(
-            heading_class="govuk-fieldset__legend--m",
-            hint="Do not include the provider type or address in the name"
+            heading_class="govuk-fieldset__legend--m", hint="Do not include the provider type or address in the name"
         ),
         validators=[
             InputRequired(message="Enter the provider name"),
