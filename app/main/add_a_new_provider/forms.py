@@ -3,8 +3,7 @@ from wtforms import RadioField
 from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired, Length, Optional
 
-from app.constants import ADVOCATE_LEVEL_CHOICES, CONSTITUTIONAL_STATUS_CHOICES, YES_NO_CHOICES, \
-    PARENT_FIRM_TYPE_CHOICES
+from app.constants import ADVOCATE_LEVEL_CHOICES, CONSTITUTIONAL_STATUS_CHOICES, YES_NO_CHOICES, PARENT_FIRM_TYPE_CHOICES
 from app.fields import GovUKTableRadioField
 from app.validators import ValidateCompaniesHouseNumber, ValidateGovDateField, ValidatePastDate, ValidateSearchResults
 from app.widgets import GovDateInput, GovRadioInput, GovTextInput
