@@ -91,7 +91,7 @@ jobs:
           --force \
           --install
 
-      - name: Post deployment comment
+      - name: Post deployment comment - test
         run: |
           set -euo pipefail
 
