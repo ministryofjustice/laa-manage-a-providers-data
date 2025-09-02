@@ -89,7 +89,7 @@ jobs:
           --force \
           --install
 
-      - name: Post deployment comment
+      - name: Post deployment comment - this is a test of long branch names DO NOT MERGE
         run: |
           # Get short commit SHA
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
