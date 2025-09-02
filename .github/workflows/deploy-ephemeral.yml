@@ -71,6 +71,8 @@ jobs:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         run: |
           export CLEANED_BRANCH_NAME=$(echo ${BRANCH_NAME} | sed 's/^feature[-/]//' | sed 's:^\w*\/::' | tr -s ' _/[]().' '-' | tr '[:upper:]' '[:lower:]' | cut -c1-28 | sed 's/-$//')
+          echo "CLEANED_BRANCH_NAME=$CLEANED_BRANCH_NAME" >> "$GITHUB_ENV"
+
           export HOST_NAME=${CLEANED_BRANCH_NAME}-${DEV_HOST}
           export DEPLOYMENT_URL="https://${HOST_NAME}"
           echo "DEPLOYMENT_URL=https://${HOST_NAME}" >> $GITHUB_ENV
@@ -91,19 +93,29 @@ jobs:
 
       - name: Post deployment comment
         run: |
-          # Get short commit SHA
-          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          
-          # Get commit message
-          COMMIT_MSG=$(git log -1 --pretty=format:"%s" ${{ github.sha }} 2>/dev/null || echo "Latest changes")
-          
-          # Create comment
-          gh pr comment ${{ github.event.number }} --body "## 🚀 Ephermal Deployment Successful
-          
-          **Build:** [\`${SHORT_SHA}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) • ${COMMIT_MSG}
-          
+          set -euo pipefail
+
+          # Try PR by cleaned name first, then fall back to full branch
+          PR_NUMBER=$(gh pr view "${CLEANED_BRANCH_NAME}" --json number -q .number 2>/dev/null || true)
+          if [ -z "${PR_NUMBER}" ]; then
+            BRANCH_NAME="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+            PR_NUMBER=$(gh pr view "${BRANCH_NAME}" --json number -q .number 2>/dev/null || true)
+          fi
+
+          if [ -z "${PR_NUMBER}" ]; then
+            echo "No PR found for '${CLEANED_BRANCH_NAME}' or '${BRANCH_NAME:-}'. Skipping PR comment."
+            exit 0
+          fi
+
+          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+          COMMIT_MSG=$(git log -1 --pretty=format:"%s" "${GITHUB_SHA}" 2>/dev/null || echo "Latest changes")
+
+          gh pr comment "${PR_NUMBER}" --body "## 🚀 Ephemeral Deployment Successful
+
+          **Build:** [\`${SHORT_SHA}\`](${{ github.server_url }}/${{ github.repository }}/commit/${GITHUB_SHA}) • ${COMMIT_MSG}
+
           **View live site:** ${{ env.DEPLOYMENT_URL }}
-          
+
           ---
           *Deployed to ${{ inputs.environment }} by ${{ github.actor }} • [View Workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*"
         env:
