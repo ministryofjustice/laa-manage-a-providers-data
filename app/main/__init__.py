@@ -22,4 +22,4 @@ bp.add_url_rule(
     "/provider/<firm:firm>/offices", view_func=ViewProvider.as_view("view_provider_offices", subpage="offices")
 )
 
-bp.add_url_rule("/provider/<firm:firm>/view-office/<office:office>", view_func=ViewOffice.as_view("view_office"))
+bp.add_url_rule("/provider/<firm:firm>/office/<office:office>", view_func=ViewOffice.as_view("view_office"))
