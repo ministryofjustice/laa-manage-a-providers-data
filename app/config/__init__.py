@@ -46,3 +46,7 @@ class Config(object):
     PDA_URL = os.environ.get("PDA_URL")
     PDA_ENVIRONMENT = os.environ.get("PDA_ENVIRONMENT")
     PDA_API_KEY = os.environ.get("PDA_API_KEY")
+
+    RATELIMIT_ENABLED = os.environ.get("RATELIMIT_ENABLED", "false").lower() == "true"
+    RATELIMIT_STORAGE_URI = os.environ.get("REDIS_URL", "redis://redis:6379/0")
+    RATELIMIT_DEFAULT = "5 per second"
