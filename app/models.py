@@ -100,3 +100,6 @@ class Office(BaseModel):
     def to_internal_dict(self) -> dict:
         """Export as snake_case dictionary for internal use."""
         return self.model_dump(by_alias=False, exclude_none=True)
+
+    def is_head_office(self):
+        return self.head_office == "N/A"

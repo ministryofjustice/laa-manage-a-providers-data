@@ -1,0 +1,72 @@
+{% extends "form.html" %}
+
+{%- from 'govuk_frontend_jinja/components/button/macro.html' import govukButton -%}
+{%- from 'components/checkbox_table.html' import govukCheckboxTable -%}
+
+{% set form = add_form %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if (form and form.errors) or (bulk_remove_form and bulk_remove_form.errors) %}
+        {% if form and form.errors %}
+          {{ govukErrorSummary(wtforms_errors(form)) }}
+        {% endif %}
+        {% if bulk_remove_form and bulk_remove_form.errors %}
+          {{ govukErrorSummary(wtforms_errors(bulk_remove_form)) }}
+        {% endif %}
+      {% endif %}
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            {% if category == 'success' %}
+              {{ govukNotificationBanner({'type': 'success', 'html': message}) }}
+            {% else %}
+              {{ govukNotificationBanner({'html': message}) }}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <h1 class="govuk-heading-xl">Contract Managers</h1>
+      
+      <form method="post" novalidate>
+        {{ add_form.hidden_tag() }}
+        
+        {% for field in add_form %}
+          {% if field.type != 'CSRFToken' and field.type != 'HiddenField' %}
+            {{ field }}
+          {% endif %}
+        {% endfor %}
+        
+        {{ govukButton({
+          'text': 'Add Manager',
+          'name': 'add_manager',
+          'value': '1'
+        }) }}
+      </form>
+      
+      {% if managers %}
+        <h2 class="govuk-heading-l govuk-!-margin-top-7">Contact Managers</h2>
+        
+        <form method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          
+          {{ govukCheckboxTable(managers, 'selected_managers', bulk_remove_form.selected_managers.errors if bulk_remove_form.selected_managers.errors else None) }}
+          
+          <div class="govuk-button-group govuk-!-margin-top-6">
+            {{ govukButton({
+              'text': 'Remove Selected',
+              'name': 'bulk_remove',
+              'value': '1',
+              'classes': 'govuk-button--warning'
+            }) }}
+          </div>
+        </form>
+      {% else %}
+        <p class="govuk-body govuk-!-margin-top-7">No contract managers have been added yet.</p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
