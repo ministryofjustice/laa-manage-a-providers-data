@@ -81,7 +81,7 @@ class TestDataTable:
 
     def test_get_cell_with_html_function(self):
         html_func = Mock(return_value="<strong>John</strong>")
-        header = {"text": "Name", "id": "name", "html": html_func}
+        header = {"text": "Name", "id": "name", "html_renderer": html_func}
         row_data = {"name": "John"}
 
         cell = DataTable._get_cell(header, row_data)

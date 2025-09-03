@@ -36,4 +36,29 @@
     {{ govukTable(additional_table.to_govuk_params()) }}
   {% endif %}
 
+  {{ mojSubNavigation({
+    "label": "Sub navigation",
+    "items": [{
+      "text": "Contact",
+      "href": url_for("main.view_provider_contact", firm=firm),
+      "active": subpage == "contact"
+    }, {
+      "text": "Offices",
+      "href": url_for("main.view_provider_offices", firm=firm),
+      "active": subpage == "offices"
+    }]
+  }) }}
+
+  {% if subpage == "offices" %}
+    {% if "head" in office_tables %}
+      <h3 class="govuk-heading-m">Head office</h3>
+      {{ govukTable(office_tables.head.to_govuk_params()) }}
+    {% endif %}
+
+    {% if "other" in office_tables %}
+      <h3 class="govuk-heading-m">Offices</h3>
+      {{ govukTable(office_tables.other.to_govuk_params()) }}
+    {% endif %}
+  {% endif %}
+
 {% endblock %}

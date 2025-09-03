@@ -44,7 +44,7 @@ class OfficeContactDetailsFormView(BaseFormView):
         if not form or not hasattr(form, "firm"):
             abort(404)
 
-        return url_for("main.view_provider_with_id", firm=form.firm)
+        return url_for("main.view_provider", firm=form.firm)
 
     def form_valid(self, form):
         # Check if office data exists in session
