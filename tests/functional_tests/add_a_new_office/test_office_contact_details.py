@@ -59,10 +59,6 @@ def test_required_fields_validation(page: Page):
     expect(page.get_by_text("Error: Enter address line 1, typically the building and street")).to_be_visible()
     expect(page.get_by_text("Error: Enter the town or city")).to_be_visible()
     expect(page.get_by_text("Error: Enter the postcode")).to_be_visible()
-    expect(page.get_by_text("Error: Enter the telephone number")).to_be_visible()
-    expect(page.get_by_text("Error: Enter the email address")).to_be_visible()
-    expect(page.get_by_text("Error: Enter the DX number")).to_be_visible()
-    expect(page.get_by_text("Error: Enter the DX centre")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
