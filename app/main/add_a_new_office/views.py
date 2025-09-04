@@ -1,4 +1,4 @@
-from flask import Response, abort, render_template, session, url_for
+from flask import Response, abort, redirect, render_template, session, url_for
 
 from app.forms import BaseForm
 from app.main.utils import add_new_office
@@ -40,16 +40,13 @@ class AddOfficeFormView(BaseFormView):
 class OfficeContactDetailsFormView(BaseFormView):
     """Form view for the Office Contact Details page"""
 
-    def get_success_url(self, form: BaseForm | None = None) -> str:
-        if not form or not hasattr(form, "firm"):
-            abort(404)
-
-        return url_for("main.view_provider", firm=form.firm)
+    def get_success_url(self, new_office: Office, firm: Firm) -> str:
+        return url_for("main.view_office", firm=firm, office=new_office)
 
     def form_valid(self, form):
         # Check if office data exists in session
         if not session.get("new_office"):
-            abort(404)
+            abort(500)
 
         # Add contact details to the existing office dict
         session["new_office"].update(
@@ -70,14 +67,14 @@ class OfficeContactDetailsFormView(BaseFormView):
 
         # Create the office
         office = Office(**session.get("new_office"))
-        add_new_office(office, firm_id=form.firm.firm_id)
+        new_office = add_new_office(office, firm_id=form.firm.firm_id)
 
-        return super().form_valid(form)
+        return redirect(self.get_success_url(new_office, form.firm))
 
     def get(self, context, firm: Firm, **kwargs):
         # Check if office data exists in session
         if not session.get("new_office"):
-            abort(404)
+            abort(400)
 
         form = self.get_form_class()(firm=firm)
         return render_template(self.template, **self.get_context_data(form, **kwargs))

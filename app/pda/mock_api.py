@@ -1,6 +1,8 @@
 import json
 import logging
 import os
+import random
+import string
 from typing import Any, Dict, List, Optional
 from unittest.mock import Mock
 
@@ -24,6 +26,15 @@ def _load_fixture(filepath: str) -> Dict[str, Any]:
 def _clean_data(data: Dict[str, Any]) -> Dict[str, Any]:
     """Remove fields that start with underscore from data."""
     return {k: v for k, v in data.items() if not k.startswith("_")}
+
+
+def _generate_unique_office_code(existing_codes: List[str], max_attempts: int = 100) -> str:
+    """Generate a unique office code that doesn't exist in the given list."""
+    for _ in range(max_attempts):
+        code = f"{random.randint(1, 9)}{random.choice(string.ascii_uppercase)}{random.randint(1, 999):03d}{random.choice(string.ascii_uppercase)}"
+        if code not in existing_codes:
+            return code
+    raise ProviderDataApiError(f"Could not generate unique office code after {max_attempts} attempts")
 
 
 def _load_mock_data() -> Dict[str, Any]:
@@ -369,17 +380,17 @@ class MockProviderDataApi:
         existing_ids = [office_data.get("officeId", 0) for office_data in self._mock_data["offices"]]
         new_office_id = max(existing_ids, default=0) + 1
 
-        # Generate office code (simple format: firm_id followed by office sequence)
-        firm_offices = [o for o in self._mock_data["offices"] if o.get("firmId") == firm_id]
-        office_sequence = len(firm_offices) + 1
-        office_code = f"{firm_id}{office_sequence:02d}"
+        # Generate unique office code
+        existing_codes = [o.get("firmOfficeCode") for o in self._mock_data["offices"]]
+        office_code = _generate_unique_office_code(existing_codes)
 
         # Create a copy with the generated ID fields
-        updated_office = office.model_copy(
-            update={"office_id": new_office_id, "office_code": office_code, "firm_id": firm_id}
-        )
+        updated_office = office.model_copy(update={"firm_office_id": new_office_id, "firm_office_code": office_code})
+
+        updated_office_dict = updated_office.to_api_dict()
+        updated_office_dict.update({"_firmId": firm_id})
 
         # Add to mock data
-        self._mock_data["offices"].append(updated_office.to_api_dict())
+        self._mock_data["offices"].append(updated_office_dict)
 
         return updated_office

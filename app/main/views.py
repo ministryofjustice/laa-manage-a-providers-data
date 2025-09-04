@@ -186,7 +186,7 @@ class ViewProvider(MethodView):
             offices = pda.get_provider_offices(firm.firm_id)
 
             # Remove the head office from the list of offices
-            other_offices = list(filter(lambda o: not o.is_head_office(), offices))
+            other_offices = list(filter(lambda o: not o.get_is_head_office(), offices))
 
             office_tables = self.get_office_tables(firm, head_office, other_offices)
             context.update({"office_tables": office_tables})
@@ -229,9 +229,6 @@ class ViewOffice(MethodView):
         add_field(overview_rows, overview_data, office.firm_office_code, "Office code")
         add_field(overview_rows, overview_data, office.head_office, "Head office", format_head_office)
         add_field(overview_rows, overview_data, firm.firm_type, "Supplier type", format_firm_type)
-        add_field(overview_rows, overview_data, "PDA does not provide this field", "Contract manager")
-        add_field(overview_rows, overview_data, "PDA does not provide this field", "Office interviewed")
-        add_field(overview_rows, overview_data, "PDA does not provide this field", "Date of intervention")
 
         # Regional information section
         regional_rows, regional_data = [], {}
