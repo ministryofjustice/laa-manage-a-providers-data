@@ -104,7 +104,7 @@ class OfficeContactDetailsForm(BaseForm):
         validators=[Optional(), Length(max=150, message="County must be 150 characters or fewer")],
     )
 
-    post_code = StringField(
+    postcode = StringField(
         "Postcode",
         widget=GovTextInput(classes="auto-capitalise govuk-input--width-10"),
         validators=[

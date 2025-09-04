@@ -256,6 +256,6 @@ def add_field(rows, data, value, label, formatter=None, html=None):
         field_id = label.lower().replace(" ", "_")
         row = {"text": label, "id": field_id, "classes": "govuk-!-width-one-half"}
         if html:
-            row.update({"html": html})
+            row.update({"html_renderer": html})
         rows.append(row)
         data[field_id] = formatter(value) if formatter else value

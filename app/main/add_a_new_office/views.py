@@ -57,7 +57,7 @@ class OfficeContactDetailsFormView(BaseFormView):
                 "address_line_4": form.data.get("address_line_4"),
                 "city": form.data.get("city"),
                 "county": form.data.get("county"),
-                "post_code": form.data.get("post_code"),
+                "postcode": form.data.get("postcode"),
                 "telephone_number": form.data.get("telephone_number"),
                 "email_address": form.data.get("email_address"),
                 "dx_number": form.data.get("dx_number"),

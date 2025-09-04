@@ -74,7 +74,7 @@ class Office(BaseModel):
     address_line_4: Optional[str] = Field(alias="addressLine4", default=None)
     city: Optional[str] = Field(default=None)
     county: Optional[str] = Field(default=None)
-    post_code: Optional[str] = Field(alias="postCode", default=None)
+    postcode: Optional[str] = Field(alias="postCode", default=None)
     dx_centre: Optional[str] = Field(alias="dxCentre", default=None)
     dx_number: Optional[str] = Field(alias="dxNumber", default=None)
     telephone_area_code: Optional[str] = Field(alias="telephoneAreaCode", default=None)

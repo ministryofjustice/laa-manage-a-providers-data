@@ -97,7 +97,7 @@ def format_office_address_one_line(office_data: dict | Office) -> str:
         office_data.get("address_line_3") or office_data.get("addressLine3"),
         office_data.get("address_line_4") or office_data.get("addressLine4"),
         office_data.get("city"),
-        office_data.get("post_code") or office_data.get("postCode"),
+        office_data.get("postcode") or office_data.get("postCode"),
     ]
 
     # Filter out None and empty string values, then join with commas
