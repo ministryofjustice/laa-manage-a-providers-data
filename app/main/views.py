@@ -15,7 +15,6 @@ from app.utils.formatting import (
     format_firm_type,
     format_head_office,
     format_office_address_one_line,
-    format_title_case,
     format_yes_no,
 )
 from app.views import BaseFormView
@@ -230,26 +229,7 @@ class ViewOffice(MethodView):
         add_field(overview_rows, overview_data, office.head_office, "Head office", format_head_office)
         add_field(overview_rows, overview_data, firm.firm_type, "Supplier type", format_firm_type)
 
-        # Regional information section
-        regional_rows, regional_data = [], {}
-        add_field(
-            regional_rows,
-            regional_data,
-            office.lsc_region,
-            "Region",
-            format_title_case,
-        )
-        add_field(regional_rows, regional_data, office.lsc_bid_zone, "Bid zone")
-        add_field(regional_rows, regional_data, office.office_name, "Office")
-        add_field(regional_rows, regional_data, office.cjs_force_name, "CJS force name")
-        add_field(regional_rows, regional_data, office.local_authority, "Local authority")
-        add_field(regional_rows, regional_data, office.police_station_area_name, "Police station area name")
-        add_field(regional_rows, regional_data, office.duty_solicitor_area_name, "Duty solicitor area name")
-
         # Create tables
         overview_table = TransposedDataTable(structure=overview_rows, data=overview_data) if overview_rows else None
-        regional_table = TransposedDataTable(structure=regional_rows, data=regional_data) if regional_rows else None
 
-        return render_template(
-            self.template, overview_table=overview_table, regional_table=regional_table, firm=firm, office=office
-        )
+        return render_template(self.template, overview_table=overview_table, firm=firm, office=office)
