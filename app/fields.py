@@ -1,7 +1,7 @@
 from wtforms.fields import DateField
-from wtforms.fields.choices import RadioField
+from wtforms.fields.choices import RadioField, SelectMultipleField
 
-from app.components.tables import RadioDataTable, TableStructure
+from app.components.tables import CheckboxDataTable, RadioDataTable, TableStructure
 
 
 class GovDateField(DateField):
@@ -140,3 +140,72 @@ class GovUKTableRadioField(RadioField):
         )
 
         return table.to_govuk_params(selected_value=self.data, **kwargs)
+
+
+class GovUKTableCheckboxField(SelectMultipleField):
+    """SelectMultipleField that generates a GOV.UK table with checkboxes as the first table column."""
+
+    def __init__(
+        self,
+        label: str = None,
+        validators: list = None,
+        structure: list[TableStructure] = None,
+        checkbox_value_key: str = "id",
+        **kwargs,
+    ):
+        """
+        Initialize the field.
+
+        Args:
+            label: str - Field label (will be rendered as page heading in template)
+            validators: list - Field validators
+            structure: list - Table structure
+            checkbox_value_key: Key to use for checkbox values
+            **kwargs: Additional field arguments
+        """
+        super().__init__(label, validators, **kwargs)
+
+        if structure is None:
+            raise ValueError("structure parameter is required")
+
+        self.structure = structure
+        self.checkbox_value_key = checkbox_value_key
+        self.type = "GovUKTableCheckboxField"
+
+    def get_table_params(self, **kwargs):
+        """Generate GOV.UK table params for template rendering
+
+        Usage in template: {{ govukTable(field.get_table_params()) }}
+
+        Args:
+            **kwargs: Additional parameters to pass to the table
+
+        Returns:
+            dict: GOV.UK table parameters
+        """
+        # Convert field choices to DataTable format
+        data = []
+        for choice_value, choice_data in self.choices:
+            if isinstance(choice_data, dict):
+                # If choice_data is already a dict, use it directly
+                row_data = choice_data.copy()
+                row_data[self.checkbox_value_key] = choice_value
+            elif isinstance(choice_data, (list, tuple)):
+                # Convert list/tuple to dict using structure IDs
+                row_data = {self.checkbox_value_key: choice_value}
+                for i, value in enumerate(choice_data):
+                    if i < len(self.structure):
+                        structure_id = self.structure[i].get("id", f"col_{i}")
+                        row_data[structure_id] = str(value)
+            else:
+                row_data = {self.checkbox_value_key: choice_value, "label": str(choice_data)}
+            data.append(row_data)
+
+        table = CheckboxDataTable(
+            structure=self.structure,
+            data=data,
+            checkbox_field_name=self.name,
+            checkbox_value_key=self.checkbox_value_key,
+        )
+
+        return table.to_govuk_params(selected_values=self.data, **kwargs)

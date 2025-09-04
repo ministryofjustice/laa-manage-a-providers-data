@@ -3,7 +3,6 @@ from flask import current_app, render_template, url_for
 from app import auth
 from app.components.tables import DataTable, TableStructure, TransposedDataTable
 from app.main import bp
-from app.main.contract_managers.views import contract_managers_view
 from app.main.utils import get_full_info_html
 
 
@@ -159,10 +158,3 @@ def bank_details(firm_id: int, office_code: str, context):
     return render_template(
         "bank-details.html", firm_id=firm_id, office_code=office_code, office_name=office_name, table=table
     )
-
-
-@bp.route("/contract-managers", methods=["GET", "POST"])
-@auth.login_required
-def contract_managers(context):
-    """Manage contract managers stored in Redis"""
-    return contract_managers_view()

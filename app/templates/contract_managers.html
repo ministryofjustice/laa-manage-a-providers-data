@@ -2,6 +2,7 @@
 
 {%- from 'govuk_frontend_jinja/components/button/macro.html' import govukButton -%}
 {%- from 'components/checkbox_table.html' import govukCheckboxTable -%}
+{%- from 'components/moj-pagination.html' import mojPagination -%}
 
 {% set form = add_form %}
 
@@ -48,12 +49,17 @@
       </form>
       
       {% if managers %}
-        <h2 class="govuk-heading-l govuk-!-margin-top-7">Contact Managers</h2>
-        
         <form method="post">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           
-          {{ govukCheckboxTable(managers, 'selected_managers', bulk_remove_form.selected_managers.errors if bulk_remove_form.selected_managers.errors else None) }}
+          {{ govukCheckboxTable(
+            bulk_remove_form.selected_managers,
+            pagination=mojPagination(
+              currentPage=bulk_remove_form.page, 
+              numShownPerPage=bulk_remove_form.managers_shown_per_page, 
+              numResults=bulk_remove_form.num_results
+            )
+          ) }}
           
           <div class="govuk-button-group govuk-!-margin-top-6">
             {{ govukButton({

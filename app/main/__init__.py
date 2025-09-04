@@ -7,6 +7,7 @@ from app.utils import register_form_view
 bp = Blueprint("main", __name__, template_folder="templates")
 
 # Import modules after blueprint creation to avoid circular imports
+from app.main import contract_managers  # noqa: E402,F401
 from app.main import middleware  # noqa: E402,F401
 from app.main import routes  # noqa: E402,F401
 from app.main import add_a_new_office, add_a_new_provider  # noqa: E402,F401

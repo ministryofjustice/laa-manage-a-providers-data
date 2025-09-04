@@ -1,48 +1,27 @@
-{%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
-{%- from 'govuk_frontend_jinja/components/checkboxes/macro.html' import govukCheckboxes -%}
+{%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable %}
 
-{% macro govukCheckboxTable(managers, form_field_name='selected_managers', field_errors=None) %}
-<div class="govuk-form-group{% if field_errors %} govuk-form-group--error{% endif %}">
-  <fieldset class="govuk-fieldset">
-    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-      <h2 class="govuk-fieldset__heading">Select managers to remove</h2>
-    </legend>
+{% macro govukCheckboxTable(field, pagination) %}
+<div class="govuk-form-group{% if field.errors %} govuk-form-group--error{% endif %}">
+  {% if field.label.text %}
+    <fieldset class="govuk-fieldset">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+        <h1 class="govuk-fieldset__heading">{{ field.label.text }}</h1>
+      </legend>
+  {% endif %}
 
-    {% if field_errors %}
-      <p id="{{ form_field_name }}-error" class="govuk-error-message">
-        <span class="govuk-visually-hidden">Error:</span>
-        {{ field_errors[0] }}
-      </p>
-    {% endif %}
+  {% if field.errors %}
+    <p id="{{ field.id }}-error" class="govuk-error-message">
+      <span class="govuk-visually-hidden">Error:</span>
+      {{ field.errors[0] }}
+    </p>
+  {% endif %}
 
-    {% if managers %}
-      {% set table_rows = [] %}
-      {% for manager in managers %}
-        {% set checkbox_html %}
-          <div class="govuk-checkboxes__item">
-            <input class="govuk-checkboxes__input" id="{{ form_field_name }}-{{ loop.index0 }}" name="{{ form_field_name }}" type="checkbox" value="{{ manager }}">
-            <label class="govuk-label govuk-checkboxes__label" for="{{ form_field_name }}-{{ loop.index0 }}">
-              <span class="govuk-visually-hidden">Select {{ manager }}</span>
-            </label>
-          </div>
-        {% endset %}
-        
-        {% set _ = table_rows.append([
-          {'html': checkbox_html},
-          {'text': manager}
-        ]) %}
-      {% endfor %}
-      
-      {{ govukTable({
-        'head': [
-          {'text': 'Select', 'classes': 'govuk-!-width-one-quarter'},
-          {'text': "Contact manager's name", 'classes': 'govuk-!-width-three-quarters'}
-        ],
-        'rows': table_rows
-      }) }}
-    {% else %}
-      <p class="govuk-body">No contract managers available.</p>
-    {% endif %}
-  </fieldset>
+  {{ govukTable(field.get_table_params()) }}
+
+  {% if field.label.text %}
+    </fieldset>
+  {% endif %}
+
+  {{ pagination }}
 </div>
 {% endmacro %}
