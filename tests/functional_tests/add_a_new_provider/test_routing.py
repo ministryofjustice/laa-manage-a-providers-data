@@ -12,6 +12,8 @@ ROUTING = [
 @pytest.mark.parametrize("routing", ROUTING)
 def test_add_provider_routing(page: Page, routing: dict):
     page.goto(url_for("main.add_parent_provider", _external=True))
+    # Check hint text is visible
+    expect(page.get_by_text("Do not include the provider")).to_be_visible()
     page.get_by_role("textbox", name="Provider name").fill("Test")
     page.get_by_role("radio", name=routing["link_text"]).click()
     page.get_by_role("button", name="Continue").click()
