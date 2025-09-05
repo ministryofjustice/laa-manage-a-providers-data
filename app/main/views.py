@@ -193,7 +193,7 @@ class ViewProvider(MethodView):
 
         context = {"main_table": main_table, "additional_table": additional_table}
 
-        if True:
+        if self.subpage == "offices":
             offices = pda.get_provider_offices(firm.firm_id)
 
             # Remove the head office from the list of offices
