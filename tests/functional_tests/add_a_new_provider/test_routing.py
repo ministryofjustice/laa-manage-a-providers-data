@@ -11,7 +11,7 @@ ROUTING = [
 @pytest.mark.usefixtures("live_server")
 @pytest.mark.parametrize("routing", ROUTING)
 def test_add_provider_routing(page: Page, routing: dict):
-    page.goto(url_for("main.add_provider", _external=True))
+    page.goto(url_for("main.add_parent_provider", _external=True))
     page.get_by_role("textbox", name="Provider name").fill("Test")
     page.get_by_role("radio", name=routing["link_text"]).click()
     page.get_by_role("button", name="Continue").click()

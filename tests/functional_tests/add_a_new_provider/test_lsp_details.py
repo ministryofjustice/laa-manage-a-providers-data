@@ -5,7 +5,7 @@ from playwright.sync_api import Page, expect
 
 def navigate_to_lsp_details(page: Page):
     """Helper function to navigate to LSP details page via UI flow."""
-    page.goto(url_for("main.add_provider", _external=True))
+    page.goto(url_for("main.add_parent_provider", _external=True))
     page.get_by_role("textbox", name="Provider name").fill("Test LSP")
     page.get_by_role("radio", name="Legal services provider").click()
     page.get_by_role("button", name="Continue").click()
