@@ -35,7 +35,6 @@ class Auth(BaseAuth):
             self.logger.info(
                 "User logged in",
                 user_id=user_data.get("oid"),
-                ip_address=request.environ.get("HTTP_X_FORWARDED_FOR", request.remote_addr),
                 user_agent=request.headers.get("User-Agent", "Unknown")[:200],
             )
 
@@ -49,7 +48,6 @@ class Auth(BaseAuth):
         if user_data and user_data.get("oid"):
             extra = {
                 "user_id": user_data.get("oid"),
-                "ip_address": request.environ.get("HTTP_X_FORWARDED_FOR", request.remote_addr),
                 "user_agent": request.headers.get("User-Agent", "Unknown")[:200],
             }
 

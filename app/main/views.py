@@ -89,6 +89,38 @@ class ViewProvider(MethodView):
     def parent_provider_name_html(parent_provider: Firm):
         return f"<a class='govuk-link', href={url_for('main.view_provider', firm=parent_provider.firm_id)}>{parent_provider.firm_name}</a>"
 
+    @staticmethod
+    def _add_field(rows, data, value, label, formatter=None, html=None):
+        """Helper to add a field if it has a value. Uses snake_case label as ID."""
+        if value:
+            # Convert label to snake_case for the ID
+            field_id = label.lower().replace(" ", "_")
+            row = {"text": label, "id": field_id, "classes": "govuk-!-width-one-half"}
+            if html:
+                row.update({"html": html})
+            rows.append(row)
+            data[field_id] = formatter(value) if formatter else value
+
+    def get(self, firm: Firm | None = None):
+        pda = current_app.extensions["pda"]
+
+        if not firm:
+            if firm_data := session.get("new_provider"):
+                del session["new_provider"]
+                firm = add_new_provider(Firm(**firm_data))
+                return redirect(url_for("main.view_provider_with_id", firm=firm))
+            abort(404)
+
+        head_office, parent_provider = None, None
+
+        if firm.firm_id:
+            # Get head office for account number
+            head_office: Office = pda.get_head_office(firm.firm_id)
+
+        if firm.parent_firm_id:
+            # Get parent provider
+            parent_provider: Firm = pda.get_provider_firm(firm.parent_firm_id)
+
     def get_main_table(self, firm, head_office, parent_provider) -> DataTable:
         main_rows, main_data = [], {}
         add_field(main_rows, main_data, firm.firm_name, "Provider name")
@@ -223,7 +255,7 @@ class ViewOffice(MethodView):
             overview_data,
             firm.firm_name,
             "Parent provider",
-            html=self.parent_provider_name_html(firm),
+            html=self.parent_provider_name_html(firm)
         )
         add_field(overview_rows, overview_data, office.firm_office_code, "Account number")
         add_field(overview_rows, overview_data, office.head_office, "Head office", format_head_office)

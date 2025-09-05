@@ -48,6 +48,7 @@ class OfficeContactDetailsForm(BaseForm):
     title = "Office contact details"
     url = "provider/<firm:firm>/add-office-contact-details"
     template = "add_office/office-contact-details.html"
+    submit_button_text = "Submit"
 
     firm: Firm | None = None  # Firm this office is being added to
 
@@ -116,19 +117,19 @@ class OfficeContactDetailsForm(BaseForm):
 
     # Contact fields
     telephone_number = StringField(
-        "Telephone number",
+        "Telephone number (optional)",
         widget=GovTextInput(heading_class="govuk-fieldset__legend--m", classes="govuk-input--width-20"),
         validators=[
-            InputRequired(message="Enter the telephone number"),
+            Optional(),
             Length(max=20, message="Telephone number must be 20 characters or fewer"),
         ],
     )
 
     email_address = StringField(
-        "Email address",
+        "Email address (optional)",
         widget=GovTextInput(heading_class="govuk-fieldset__legend--m", classes="govuk-!-width-full"),
         validators=[
-            InputRequired(message="Enter the email address"),
+            Optional(),
             Email(message="Enter a valid email address"),
             Length(max=100, message="Email address must be 100 characters or fewer"),
         ],
@@ -136,19 +137,19 @@ class OfficeContactDetailsForm(BaseForm):
 
     # DX fields
     dx_number = StringField(
-        "DX number",
+        "DX number (optional)",
         widget=GovTextInput(heading_class="govuk-fieldset__legend--m", classes="govuk-input--width-20"),
         validators=[
-            InputRequired(message="Enter the DX number"),
+            Optional(),
             Length(max=20, message="DX number must be 20 characters or fewer"),
         ],
     )
 
     dx_centre = StringField(
-        "DX centre",
+        "DX centre (optional)",
         widget=GovTextInput(heading_class="govuk-fieldset__legend--m", classes="govuk-input--width-20"),
         validators=[
-            InputRequired(message="Enter the DX centre"),
+            Optional(),
             Length(max=50, message="DX centre must be 50 characters or fewer"),
         ],
     )

@@ -41,6 +41,8 @@ class OfficeContactDetailsFormView(BaseFormView):
     """Form view for the Office Contact Details page"""
 
     def get_success_url(self, new_office: Office, firm: Firm) -> str:
+        if not form or not hasattr(form, "firm"):
+            abort(400)
         return url_for("main.view_office", firm=firm, office=new_office)
 
     def form_valid(self, form):
