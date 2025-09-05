@@ -57,10 +57,12 @@ Don't worry, you can't commit your `.env` file.
 
 ### Run the service
 
-start redis
+Add `redis://localhost:6379/0` as the REDIS_URL in your .env file
+
+start redis using
 
 ```
-http://127.0.0.1:8020
+docker compose up -d redis
 ```
 
 In another terminal wndow run:
