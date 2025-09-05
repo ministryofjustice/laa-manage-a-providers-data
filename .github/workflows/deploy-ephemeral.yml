@@ -37,7 +37,7 @@ jobs:
       pull-requests: write  # This is required to post the PR comment
     steps:
       - name: Checkout GitHub repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
 
       - name: Authenticate to the cluster
         env:
