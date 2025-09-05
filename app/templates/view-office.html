@@ -24,59 +24,48 @@
   }) }}
 {% endblock %}
 
-{% block content %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
+{% block pageContent %}
+    <span class="govuk-caption-xl">{{ firm.firm_name }}</span>
+    <h1 class="govuk-heading-xl">Office: {{ office.firm_office_code }}</h1>
 
-      <span class="govuk-caption-xl">{{ firm.firm_name }}</span>
-      <h1 class="govuk-heading-xl">Office: {{ office.firm_office_code }}</h1>
+    {{ addressDisplay(office) }}
 
-      {{ addressDisplay(office) }}
+    <br>
 
-      <br>
+    {{ govukButton({
+      "text": "Make inactive",
+      "classes": "govuk-button--secondary"
+    }) }}
 
-      {{ govukButton({
-        "text": "Make inactive",
-        "classes": "govuk-button--secondary"
-      }) }}
+    {{ govukButton({
+      "text": "Hold payments",
+      "classes": "govuk-button--secondary govuk-!-margin-left-3",
+    }) }}
 
-      {{ govukButton({
-        "text": "Hold payments",
-        "classes": "govuk-button--secondary govuk-!-margin-left-3",
-      }) }}
+    {{ govukButton({
+      "text": "Record office intervention",
+      "classes": "govuk-button--secondary govuk-!-margin-left-3",
+    }) }}
 
-      {{ govukButton({
-        "text": "Record office intervention",
-        "classes": "govuk-button--secondary govuk-!-margin-left-3",
-      }) }}
+    {{ mojSubNavigation({
+      "label": "Sub navigation",
+      "items": [{
+        "text": "Overview",
+        "href": "#",
+        "active": true
+      }, {
+        "text": "Contact",
+        "href": "#",
+      }, {
+        "text": "Bank accounts and payment",
+        "href": "#",
+      }]
+    }) }}
 
-      </div>
-  </div>
+    {% if overview_table %}
+      <h2 class="govuk-heading-m">Overview</h2>
+      {{ govukTable(overview_table.to_govuk_params()) }}
+    {% endif %}
 
-  {{ mojSubNavigation({
-    "label": "Sub navigation",
-    "items": [{
-      "text": "Overview",
-      "href": "#",
-      "active": true
-    }, {
-      "text": "Contact",
-      "href": "#",
-    }, {
-      "text": "Bank accounts and payment",
-      "href": "#",
-    }]
-  }) }}
-
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-
-      {% if overview_table %}
-        <h2 class="govuk-heading-m">Overview</h2>
-        {{ govukTable(overview_table.to_govuk_params()) }}
-      {% endif %}
-
-    </div>
-  </div>
 
 {% endblock %}

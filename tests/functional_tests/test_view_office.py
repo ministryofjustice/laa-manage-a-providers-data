@@ -48,8 +48,8 @@ def test_view_office_overview_section(page):
     expect(page.get_by_role("rowheader", name="Parent provider")).to_be_visible()
     expect(page.get_by_role("cell", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
 
-    expect(page.get_by_role("rowheader", name="Office code")).to_be_visible()
-    expect(page.get_by_role("row", name="Office code 1A001L").get_by_role("cell", name="1A001L")).to_be_visible()
+    expect(page.get_by_role("rowheader", name="Account number")).to_be_visible()
+    expect(page.get_by_role("row", name="Account number 1A001L").get_by_role("cell", name="1A001L")).to_be_visible()
 
     expect(page.get_by_role("rowheader", name="Head office")).to_be_visible()
     expect(page.get_by_role("cell", name="Yes")).to_be_visible()
