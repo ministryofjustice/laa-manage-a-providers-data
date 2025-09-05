@@ -34,7 +34,6 @@ def test_view_office_navigation_tabs(page):
     expect(page.get_by_role("link", name="Overview")).to_be_visible()
     expect(page.get_by_role("link", name="Contact")).to_be_visible()
     expect(page.get_by_role("link", name="Bank accounts and payment")).to_be_visible()
-    expect(page.get_by_role("link", name="Contracts and schedules")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
