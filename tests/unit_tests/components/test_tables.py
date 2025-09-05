@@ -281,7 +281,7 @@ class TestIntegration:
         assert len(params["rows"][0]) == 4
 
         assert params["rows"][0][2]["text"] == "john@example.com"  # Email lowercased
-        assert params["rows"][0][3]["html_renderer"] == "<a href='/user/John'>John</a>"  # HTML generated
+        assert params["rows"][0][3]["html"] == "<a href='/user/John'>John</a>"  # HTML generated
         assert params["rows"][0][1]["format"] == "numeric"  # Numeric format applied
 
     def test_transposed_with_missing_data(self):
