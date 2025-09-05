@@ -57,7 +57,7 @@ def test_view_parent_provider(page):
 def test_add_new_lsp(page):
     # Add a legal services provider
     page.get_by_role("button", name="Start now").click()
-    page.get_by_role("button", name="Add a new provider").click()
+    page.get_by_role("button", name="Add a new parent provider").click()
     page.get_by_role("textbox", name="Provider name").fill("Test provider")
     page.get_by_role("radio", name="Legal Services Provider").check()
     page.get_by_role("button", name="Continue").click()
