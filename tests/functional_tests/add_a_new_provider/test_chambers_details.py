@@ -4,7 +4,7 @@ from playwright.sync_api import expect
 
 def navigate_to_chambers_details_page(page):
     page.get_by_role("button", name="Start now").click()
-    page.get_by_role("button", name="Add a new provider").click()
+    page.get_by_role("button", name="Add a new parent provider").click()
     page.get_by_role("textbox", name="Provider name").click()
     page.get_by_role("textbox", name="Provider name").fill("Test provider")
     page.get_by_role("radio", name="Chambers").check()
