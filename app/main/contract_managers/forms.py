@@ -47,7 +47,7 @@ class BulkRemoveContractManagerForm(BaseForm):
     selected_managers = GovUKTableCheckboxField(
         "",
         structure=[
-            {"text": "Contract manager's name", "id": "name"},
+            {"text": "Name", "id": "name"},
         ],
         checkbox_value_key="name",
         validators=[DataRequired(message="Please select at least one manager to remove")],

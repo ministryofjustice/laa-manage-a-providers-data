@@ -1,4 +1,4 @@
-from flask import abort, flash, redirect, render_template, request, session, url_for
+from flask import flash, redirect, render_template, request, url_for
 
 from app.services.contract_managers import ContractManagerService
 from app.views import BaseFormView
@@ -25,8 +25,6 @@ class ContractManagersView(BaseFormView):
         }
 
     def get(self, **kwargs):
-        if "MAPD.Admin" not in session.get("_logged_in_user", {}).get("roles", []):
-            abort(403)
         page = int(request.args.get("page", 1))
         return render_template(self.get_template(), **self.get_context_data(page=page, **kwargs))
 
