@@ -225,7 +225,7 @@ class ViewOffice(MethodView):
             "Parent provider",
             html=self.parent_provider_name_html(firm),
         )
-        add_field(overview_rows, overview_data, office.firm_office_code, "Office code")
+        add_field(overview_rows, overview_data, office.firm_office_code, "Account number")
         add_field(overview_rows, overview_data, office.head_office, "Head office", format_head_office)
         add_field(overview_rows, overview_data, firm.firm_type, "Supplier type", format_firm_type)
 
