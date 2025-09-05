@@ -101,26 +101,6 @@ class ViewProvider(MethodView):
             rows.append(row)
             data[field_id] = formatter(value) if formatter else value
 
-    def get(self, firm: Firm | None = None):
-        pda = current_app.extensions["pda"]
-
-        if not firm:
-            if firm_data := session.get("new_provider"):
-                del session["new_provider"]
-                firm = add_new_provider(Firm(**firm_data))
-                return redirect(url_for("main.view_provider_with_id", firm=firm))
-            abort(404)
-
-        head_office, parent_provider = None, None
-
-        if firm.firm_id:
-            # Get head office for account number
-            head_office: Office = pda.get_head_office(firm.firm_id)
-
-        if firm.parent_firm_id:
-            # Get parent provider
-            parent_provider: Firm = pda.get_provider_firm(firm.parent_firm_id)
-
     def get_main_table(self, firm, head_office, parent_provider) -> DataTable:
         main_rows, main_data = [], {}
         add_field(main_rows, main_data, firm.firm_name, "Provider name")
@@ -251,11 +231,7 @@ class ViewOffice(MethodView):
         # Overview section
         overview_rows, overview_data = [], {}
         add_field(
-            overview_rows,
-            overview_data,
-            firm.firm_name,
-            "Parent provider",
-            html=self.parent_provider_name_html(firm)
+            overview_rows, overview_data, firm.firm_name, "Parent provider", html=self.parent_provider_name_html(firm)
         )
         add_field(overview_rows, overview_data, office.firm_office_code, "Account number")
         add_field(overview_rows, overview_data, office.head_office, "Head office", format_head_office)
