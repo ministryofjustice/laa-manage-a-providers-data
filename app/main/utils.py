@@ -3,7 +3,7 @@ import json
 
 from flask import current_app, flash
 
-from app.models import Firm
+from app.models import Firm, Office
 from app.pda.mock_api import MockProviderDataApi
 
 
@@ -37,3 +37,18 @@ def add_new_provider(firm: Firm) -> Firm:
     new_firm = pda.create_provider_firm(firm)
     flash("<b>New provider successfully created</b>", "success")
     return new_firm
+
+
+def add_new_office(office: Office, firm_id: int) -> Office:
+    """Adds a new office to the PDA, currently only the mock PDA supports this functionality."""
+
+    pda = current_app.extensions.get("pda")
+    if not pda:
+        raise RuntimeError("Provider Data API not initialized")
+
+    if not isinstance(pda, MockProviderDataApi):
+        raise RuntimeError("Provider Data API does not support this functionality yet.")
+
+    new_office = pda.create_provider_office(office, firm_id=firm_id)
+    flash(f"<b>New office {new_office.firm_office_code} successfully created</b>", "success")
+    return new_office

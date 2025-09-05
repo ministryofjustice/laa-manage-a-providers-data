@@ -9,11 +9,19 @@ CellFormat = Literal["numeric"]  # Currently numeric is the only valid cell form
 
 class TableStructure(TypedDict, total=False):
     text: str  # Display text of the header
-    id: str | None  # ID of the data to be displayed in the table i.e. firmId
-    format_text: Callable[[str], str] | None  # Function used to the format the data i.e. lambda x: x.title()
     format: CellFormat | None  # Format of the table cell, "numeric" wil right align the cell
     classes: str | None  # CSS classes to add to the table column, as comma separated class names.
-    html: Callable[[dict[str, str]], str] | None  # Function that takes row data, returns HTML string
+
+    id: str | None  # ID of the data to be displayed in the table i.e. firmId
+    format_text: Callable[[str], str] | None  # Function used to the format the data i.e. lambda x: x.title()
+
+    # The two below attributes are exclusive and override the id and format text logic, if present.
+    # They allow you to render a cell based on the full row data rather than just a single attribute.
+    # You can pass in strings directly to override text/ HTML generation logic.
+    text_renderer: (
+        Callable[[dict[str, str]], str] | str | None
+    )  # Function that takes row data, returns text for display.
+    html_renderer: Callable[[dict[str, str]], str] | str | None  # Function that takes row data, returns HTML string
 
 
 class Cell(TypedDict, total=False):
@@ -79,14 +87,21 @@ class DataTable:
         if format_func := header.get("format_text"):
             text = format_func(text)
 
+        if text_renderer := header.get("text_renderer"):
+            # If we need to call a function to generate the text do so, otherwise just render the provided text
+            if isinstance(text_renderer, Callable):
+                text = text_renderer(row_data)
+            else:
+                text = text_renderer
+
         cell = {"text": text}
 
-        if html := header.get("html"):
+        if html_renderer := header.get("html_renderer"):
             # If we need to call a function to generate the HTML do so, otherwise just render the provided HTML
-            if isinstance(html, Callable):
-                cell["html"] = html(row_data)
+            if isinstance(html_renderer, Callable):
+                cell["html"] = html_renderer(row_data)
             else:
-                cell["html"] = html
+                cell["html"] = html_renderer
 
         for key in ("format", "classes", "attributes"):
             if value := header.get(key):
@@ -232,3 +247,15 @@ class RadioDataTable(DataTable):
         }
         params.update(kwargs)
         return params
+
+
+def add_field(rows, data, value, label, formatter=None, html=None):
+    """Helper to add a field to a data table if it has a value. Uses snake_case label as ID."""
+    if value:
+        # Convert label to snake_case for the ID
+        field_id = label.lower().replace(" ", "_")
+        row = {"text": label, "id": field_id, "classes": "govuk-!-width-one-half"}
+        if html:
+            row.update({"html_renderer": html})
+        rows.append(row)
+        data[field_id] = formatter(value) if formatter else value

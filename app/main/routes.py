@@ -1,4 +1,4 @@
-from flask import current_app, render_template, url_for
+from flask import current_app, render_template
 
 from app import auth
 from app.components.tables import DataTable, TableStructure, TransposedDataTable
@@ -19,33 +19,6 @@ def status():
     return "OK"
 
 
-@bp.get("/provider/<int:firm_id>/offices")
-@auth.login_required
-def offices(firm_id: int, context):
-    def firm_office_html(row_data: dict[str, str]) -> str:
-        _office_code = row_data.get("firmOfficeCode", "")
-        return f"<a class='govuk-link' href='{url_for('main.contracts', firm_id=firm_id, office_code=_office_code)}'>{_office_code}</a>"
-
-    pda = current_app.extensions["pda"]
-    data = pda.get_provider_offices(firm_id)
-    office_data = data["offices"]
-    provider_name = data["firm"]["firmName"]
-
-    columns: list[TableStructure] = [
-        {"text": "Office Code", "id": "firmOfficeCode", "html": firm_office_html},
-        {"text": "Name", "id": "officeName"},
-        {"text": "City", "id": "city", "format_text": lambda x: x.title()},
-        {"text": "Type", "id": "type"},
-        {"text": "Head Office", "id": "headOffice", "format_text": lambda x: "Yes" if x == "N/A" else ""},
-        {"text": "Creation Date", "id": "creationDate"},
-        {"text": "Full info", "html": get_full_info_html},
-    ]
-
-    table = DataTable(structure=columns, data=office_data)
-
-    return render_template("offices.html", provider=provider_name, firm_id=firm_id, table=table)
-
-
 @bp.get("/provider/<int:firm_id>/office/<string:office_code>/contracts")
 @auth.login_required
 def contracts(firm_id: int, office_code: str, context):
@@ -56,7 +29,7 @@ def contracts(firm_id: int, office_code: str, context):
         {"text": "New Matters", "id": "newMatters"},
         {"text": "Contractual Devolved Powers", "id": "contractualDevolvedPowers"},
         {"text": "Remainder Authorisation", "id": "remainderAuthorisation"},
-        {"text": "Full info", "html": get_full_info_html},
+        {"text": "Full info", "html_renderer": get_full_info_html},
     ]
 
     pda = current_app.extensions["pda"]

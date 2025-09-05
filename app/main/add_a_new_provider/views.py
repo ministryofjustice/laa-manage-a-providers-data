@@ -36,7 +36,7 @@ class AddProviderFormView(BaseFormView):
 class LspDetailsFormView(BaseFormView):
     """Form view for the Legal services provider details"""
 
-    success_endpoint = "main.view_provider"
+    success_endpoint = "main.create_provider"
 
     def form_valid(self, form):
         session["new_provider"].update(
@@ -54,7 +54,7 @@ class LspDetailsFormView(BaseFormView):
 
 
 class AdvocateDetailsFormView(BaseFormView):
-    success_endpoint = "main.view_provider"
+    success_endpoint = "main.create_provider"
 
     def form_valid(self, form):
         session["new_provider"].update(
@@ -70,7 +70,7 @@ class AdvocateDetailsFormView(BaseFormView):
 class ChambersDetailsFormView(BaseFormView):
     """Form view for the Chambers details"""
 
-    success_endpoint = "main.view_provider"
+    success_endpoint = "main.create_provider"
 
     def form_valid(self, form):
         session["new_provider"].update(
@@ -87,16 +87,16 @@ class AssignChambersFormView(BaseFormView):
     """Form view for the assign to a chambers form"""
 
     template = "add_provider/assign-chambers.html"
-    success_endpoint = "main.view_provider"
+    success_endpoint = "main.create_provider"
 
     next_step_mapping = {
-        "Barrister": "main.view_provider",
+        "Barrister": "main.create_provider",
         "Advocate": "main.advocate_details",
     }
 
     def get_success_url(self, form):
         provider_type = session.get("new_provider", {}).get("firm_type")
-        next_page = self.next_step_mapping.get(provider_type, "main.view_provider")
+        next_page = self.next_step_mapping.get(provider_type, "main.create_provider")
         return url_for(next_page)
 
     def form_valid(self, form):

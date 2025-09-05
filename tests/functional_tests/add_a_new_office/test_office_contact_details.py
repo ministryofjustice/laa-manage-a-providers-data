@@ -134,8 +134,12 @@ def test_successful_form_submission_minimal(page: Page):
     page.get_by_role("textbox", name="DX centre").fill("Test Centre")
     page.get_by_role("button", name="Submit").click()
 
-    # Should redirect back to provider view (no flash message expected as we don't create office yet)
-    expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    # Should redirect to the new office
+    expect(page.locator("span").filter(has_text="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.get_by_role("heading", name="Office: ")).to_be_visible()
+    expect(page.get_by_text("123 Test Street")).to_be_visible()
+    expect(page.get_by_text("Test City")).to_be_visible()
+    expect(page.get_by_text("TE1 5ST")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -157,8 +161,14 @@ def test_successful_form_submission_all_fields(page: Page):
     page.get_by_role("textbox", name="DX centre").fill("Test Centre")
     page.get_by_role("button", name="Submit").click()
 
-    # Should redirect back to provider view (no flash message expected as we don't create office yet)
-    expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    # Should redirect to the new office
+    expect(page.locator("span").filter(has_text="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.get_by_role("heading", name="Office: ")).to_be_visible()
+    expect(page.get_by_text("123 Test Street")).to_be_visible()
+    expect(page.get_by_text("Suite 456")).to_be_visible()
+    expect(page.get_by_text("Business Park")).to_be_visible()
+    expect(page.get_by_text("Test City")).to_be_visible()
+    expect(page.get_by_text("TE1 5ST")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -186,8 +196,12 @@ def test_optional_fields_not_required(page: Page):
     # Leave optional fields empty: address_line_2-4, county
     page.get_by_role("button", name="Submit").click()
 
-    # Should succeed without validation errors on optional fields
-    expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    # Should redirect to the new office
+    expect(page.locator("span").filter(has_text="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.get_by_role("heading", name="Office: ")).to_be_visible()
+    expect(page.get_by_text("123 Test Street")).to_be_visible()
+    expect(page.get_by_text("Test City")).to_be_visible()
+    expect(page.get_by_text("TE1 5ST")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -196,5 +210,5 @@ def test_direct_access_without_session_redirects(page: Page):
     # Try to access contact details page directly without going through add office flow
     page.goto(url_for("main.add_office_contact_details", firm=1, _external=True))
 
-    # Should get 404 error since no session data exists
-    assert page.title() == "404 Not Found"
+    # Should get 400 error since no session data exists
+    assert page.title() == "400 Bad Request"

@@ -3,7 +3,14 @@ from unittest.mock import Mock, patch
 import pytest
 
 from app.models import Firm, Office
-from app.pda.mock_api import MockProviderDataApi, _clean_data, _load_fixture, _load_mock_data
+from app.pda.mock_api import (
+    MockProviderDataApi,
+    ProviderDataApiError,
+    _clean_data,
+    _generate_unique_office_code,
+    _load_fixture,
+    _load_mock_data,
+)
 
 
 class TestDataLoadFunctions:
@@ -60,6 +67,30 @@ class TestDataLoadFunctions:
         }
         assert result == expected
         assert mock_load_fixture.call_count == 4
+
+    def test_generate_unique_office_code(self):
+        """Test generation of unique office code."""
+        existing_codes = ["1A001L", "2R006L"]
+
+        code = _generate_unique_office_code(existing_codes)
+
+        assert len(code) == 6
+        assert code[0].isdigit()
+        assert code[1].isupper()
+        assert code[2:5].isdigit()
+        assert code[5].isupper()
+        assert code not in existing_codes
+
+    def test_generate_unique_office_code_max_attempts(self):
+        """Test error when max attempts reached."""
+        with (
+            patch("app.pda.mock_api.random.randint", return_value=1),
+            patch("app.pda.mock_api.random.choice", return_value="A"),
+        ):
+            existing_codes = ["1A001A"]
+
+            with pytest.raises(ProviderDataApiError):
+                _generate_unique_office_code(existing_codes, max_attempts=5)
 
 
 class TestMockProviderDataApi:
@@ -313,3 +344,19 @@ class TestMockProviderDataApi:
 
         assert firm1.firm_id != firm2.firm_id
         assert firm2.firm_id > firm1.firm_id
+
+    def test_create_provider_office(self, mock_api):
+        """Test creating an office generates valid code."""
+        office_data = Office(office_name="Test Office", city="London")
+
+        new_office = mock_api.create_provider_office(office_data, firm_id=1)
+
+        assert new_office.office_name == "Test Office"
+        assert new_office.firm_office_id > 0
+        assert len(new_office.firm_office_code) == 6
+
+        # Check that the office is associated with the firm in mock data
+        office_in_data = next(
+            (o for o in mock_api._mock_data["offices"] if o["firmOfficeCode"] == new_office.firm_office_code), None
+        )
+        assert office_in_data["_firmId"] == 1
