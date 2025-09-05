@@ -18,8 +18,8 @@ from ...forms import BaseForm
 
 
 class AddProviderForm(BaseForm):
-    title = "Add a parent provider"
     url = "add-provider"
+    title = "Add a new parent provider"
 
     provider_name = StringField(
         "Provider name",
