@@ -57,6 +57,16 @@ Don't worry, you can't commit your `.env` file.
 
 ### Run the service
 
+Add `redis://localhost:6379/0` as the REDIS_URL in your .env file
+
+start redis using
+
+```
+docker compose up -d redis
+```
+
+In another terminal wndow run:
+
 ```shell
 source .venv/bin/activate
 flask --app app run --debug --port=8020
