@@ -51,12 +51,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
       - name: Lint
-        uses: chartboost/ruff-action@v1
+        uses: chartboost/ruff-action@e18ae971ccee1b2d7bbef113930f00c670b78da4
         with:
           args: check --output-format=github
           version: 0.12.3
       - name: Format
-        uses: chartboost/ruff-action@v1
+        uses: chartboost/ruff-action@e18ae971ccee1b2d7bbef113930f00c670b78da4
         with:
           args: format --check
 
@@ -75,7 +75,7 @@ jobs:
           name: coverage-xml-report
           path: coverage
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@8c71dc039c2dd71d3821e89a2b58ecc7fee6ced9
+        uses: SonarSource/sonarqube-scan-action@1a6d90ebcb0e6a6b1d87e37ba693fe453195ae25
         with:
           args: >
             -Dsonar.python.version=3.13
