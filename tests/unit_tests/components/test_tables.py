@@ -264,7 +264,7 @@ class TestIntegration:
             {
                 "text": "Profile",
                 "id": "profile",
-                "html": lambda row: f"<a href='/user/{row['name']}'>{row['name']}</a>",
+                "html_renderer": lambda row: f"<a href='/user/{row['name']}'>{row['name']}</a>",
             },
         ]
 
