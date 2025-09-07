@@ -5,6 +5,7 @@ from wtforms.validators import Length
 from app.components.tables import DataTable, TableStructure
 from app.forms import BaseForm
 from app.models import Firm
+from app.validators import ValidateSearchResults
 from app.widgets import GovTextInput
 
 
@@ -31,7 +32,7 @@ class ProviderListForm(BaseForm):
             classes="provider-search",
             hint="You can search by name, provider number or account number",
         ),
-        validators=[Length(max=100, message="Search term must be 100 characters or less")],
+        validators=[Length(max=100, message="Search term must be 100 characters or less"), ValidateSearchResults()],
     )
 
     def __init__(self, *args, **kwargs):
@@ -61,8 +62,9 @@ class ProviderListForm(BaseForm):
 
         columns: list[TableStructure] = [
             {"text": "Provider name", "id": "firm_name", "html": firm_name_html},
-            {"text": "Account number", "id": "firm_number"},
             {"text": "Provider type", "id": "firm_type"},
+            {"text": "Provider number", "id": "firm_number"},
+            {"text": "Status"},  # Add status tags here when available.
         ]
 
         if len(firms) > 0:

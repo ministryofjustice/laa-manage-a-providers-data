@@ -17,6 +17,7 @@ class ProviderList(BaseFormView):
 
     def get(self, context):
         form = self.get_form_class()(request.args)
+        form.validate()
         return render_template(self.get_template(), **self.get_context_data(form, context))
 
     def post(self, context) -> NoReturn:
