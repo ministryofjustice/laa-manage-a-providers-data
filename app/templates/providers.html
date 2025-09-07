@@ -41,6 +41,10 @@
       }) }}
 
       {% if form.table %}
+        {% if form.search_term %}
+          <h2 class="govuk-heading-m">{{ form.num_results }} search {{ "result" if form.num_results == 1 else "results" }} for ‘{{ form.search_term }}’</h2>
+        {% endif %}
+
         <div class="moj-scrollable-pane">
           {{ govukTable(form.table.to_govuk_params()) }}
         </div>

@@ -15,6 +15,11 @@ def firm_name_html(row_data: dict[str, str]) -> str:
     return f"<a class='govuk-link', href={url_for('main.view_provider_with_id', firm=_firm_id)}>{_firm_name}"
 
 
+def get_firm_statuses(row_data):
+    # Add logic to render firm status tags here when available.
+    return "<p class='govuk-visually-hidden'>No statuses</p>"
+
+
 class ProviderListForm(BaseForm):
     title = "Provider records"
     url = "providers"
@@ -29,7 +34,6 @@ class ProviderListForm(BaseForm):
         widget=GovTextInput(
             form_group_classes="govuk-!-width-two-thirds",
             heading_class="govuk-fieldset__legend--s",
-            classes="provider-search",
             hint="You can search by name, provider number or account number",
         ),
         validators=[Length(max=100, message="Search term must be 100 characters or less"), ValidateSearchResults()],
@@ -64,7 +68,7 @@ class ProviderListForm(BaseForm):
             {"text": "Provider name", "id": "firm_name", "html": firm_name_html},
             {"text": "Provider type", "id": "firm_type"},
             {"text": "Provider number", "id": "firm_number"},
-            {"text": "Status"},  # Add status tags here when available.
+            {"text": "Status", "html": get_firm_statuses},  # Add status tags here when available.
         ]
 
         if len(firms) > 0:
