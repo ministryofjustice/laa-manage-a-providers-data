@@ -1,10 +1,9 @@
-import math
 from typing import NoReturn
 
 from flask import abort, current_app, redirect, render_template, request, session, url_for
 from flask.views import MethodView
 
-from app.components.tables import DataTable, TableStructure, TransposedDataTable
+from app.components.tables import TransposedDataTable
 from app.main.utils import add_new_provider
 from app.models import Firm, Office
 from app.utils.formatting import format_advocate_level, format_constitutional_status, format_date, format_yes_no
@@ -15,52 +14,10 @@ class ProviderList(BaseFormView):
     """View for provider list"""
 
     template = "providers.html"
-    firms_shown_per_page = 20
-
-    @staticmethod
-    def firm_name_html(row_data: dict[str, str]) -> str:
-        _firm_id = row_data.get("firm_id", "")
-        _firm_name = row_data.get("firm_name", "")
-        return f"<a class='govuk-link', href={url_for('main.view_provider_with_id', firm=_firm_id)}>{_firm_name}"
 
     def get(self, context):
         form = self.get_form_class()(request.args)
-
-        pda = current_app.extensions["pda"]
-        firms: list[Firm] = pda.get_all_provider_firms()
-
-        # Filter providers based on search term
-        if form.validate() and form.data.get("search"):
-            search_lower = form.data.get("search").lower()
-            firms = [
-                firm
-                for firm in firms
-                if (search_lower in firm.firm_name.lower() or search_lower in str(firm.firm_id).lower())
-            ]
-
-        columns: list[TableStructure] = [
-            {"text": "Provider name", "id": "firm_name", "html": self.firm_name_html},
-            {"text": "Account number", "id": "firm_number"},
-            {"text": "Provider type", "id": "firm_type"},
-        ]
-
-        form.page = request.args.get("page", 1, type=int)
-        form.firms_shown_per_page = self.firms_shown_per_page
-        form.num_results = len(firms)
-
-        max_page = math.ceil(len(firms) / self.firms_shown_per_page)
-        if form.page < 1 or form.page > max_page:
-            abort(404)
-
-        if form.num_results == 0:
-            form.search.errors.append("No providers found. Check the spelling and search for something else.")
-
-        start_id = self.firms_shown_per_page * (form.page - 1)
-        end_id = self.firms_shown_per_page * (form.page - 1) + self.firms_shown_per_page
-
-        table = DataTable(structure=columns, data=[firm.to_internal_dict() for firm in firms[start_id:end_id]])
-
-        return render_template(self.get_template(), table=table, **self.get_context_data(form, context))
+        return render_template(self.get_template(), **self.get_context_data(form, context))
 
     def post(self, context) -> NoReturn:
         """POST method not allowed for this resource."""

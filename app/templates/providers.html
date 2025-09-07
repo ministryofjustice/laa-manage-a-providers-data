@@ -40,11 +40,13 @@
         "href": url_for("main.add_parent_provider")
       }) }}
 
-      <div class="moj-scrollable-pane">
-        {{ govukTable(table.to_govuk_params()) }}
-      </div>
+      {% if form.table %}
+        <div class="moj-scrollable-pane">
+          {{ govukTable(form.table.to_govuk_params()) }}
+        </div>
 
-      {{ mojPagination(currentPage=form.page, numShownPerPage=form.firms_shown_per_page, numResults=form.num_results) }}
+        {{ mojPagination(currentPage=form.page, numShownPerPage=form.providers_shown_per_page, numResults=form.num_results) }}
+      {% endif %}
     </div>
   </div>
 
