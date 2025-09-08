@@ -12,7 +12,7 @@ class AddProviderFormView(BaseFormView):
 
     # Only 'parent' firm choices
     next_step_mapping = {
-        "Chambers": "main.chambers_details",
+        "Chambers": "main.add_contact_details",
         "Legal Services Provider": "main.additional_details_legal_services_provider",
     }
 
@@ -55,22 +55,6 @@ class LspDetailsFormView(BaseFormView):
 
 
 class AdvocateDetailsFormView(BaseFormView):
-    success_endpoint = "main.create_provider"
-
-    def form_valid(self, form):
-        session["new_provider"].update(
-            {
-                "solicitor_advocate": form.data.get("solicitor_advocate"),
-                "advocate_level": form.data.get("advocate_level"),
-                "bar_council_roll": form.data.get("bar_council_roll_number"),
-            }
-        )
-        return super().form_valid(form)
-
-
-class ChambersDetailsFormView(BaseFormView):
-    """Form view for the Chambers details"""
-
     success_endpoint = "main.create_provider"
 
     def form_valid(self, form):
