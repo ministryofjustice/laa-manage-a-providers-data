@@ -379,7 +379,7 @@ class MockProviderDataApi:
             Office: The created Office model instance with assigned ID
         """
         # Generate a new office ID
-        existing_ids = [office_data.get("officeId", 0) for office_data in self._mock_data["offices"]]
+        existing_ids = [office_data.get("firmOfficeId", 0) for office_data in self._mock_data["offices"]]
         new_office_id = max(existing_ids, default=0) + 1
 
         # Generate unique office code
