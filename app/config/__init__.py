@@ -49,4 +49,4 @@ class Config(object):
 
     RATELIMIT_ENABLED = os.environ.get("RATELIMIT_ENABLED", "false").lower() == "true"
     RATELIMIT_STORAGE_URI = os.environ.get("REDIS_URL", "redis://redis:6379/0")
-    RATELIMIT_DEFAULT = "5 per second"
+    RATELIMIT_APPLICATION = "5 per second, 60 per minute"  # These limits are shared across the entire application
