@@ -63,3 +63,10 @@ def format_title_case(value: str) -> str:
     if not isinstance(value, str):
         return value
     return value.title()
+
+
+def format_sentence_case(value: str) -> str:
+    """Format sentence case for display"""
+    if not isinstance(value, str):
+        return value
+    return value.capitalize()

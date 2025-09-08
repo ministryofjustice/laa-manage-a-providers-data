@@ -5,6 +5,7 @@ from wtforms.validators import Length
 from app.components.tables import DataTable, TableStructure
 from app.forms import BaseForm
 from app.models import Firm
+from app.utils.formatting import format_sentence_case
 from app.validators import ValidateSearchResults
 from app.widgets import GovTextInput
 
@@ -66,7 +67,7 @@ class ProviderListForm(BaseForm):
 
         columns: list[TableStructure] = [
             {"text": "Provider name", "id": "firm_name", "html": firm_name_html},
-            {"text": "Provider type", "id": "firm_type"},
+            {"text": "Provider type", "id": "firm_type", "format_text": format_sentence_case},
             {"text": "Provider number", "id": "firm_number"},
             {"text": "Status", "html": get_firm_statuses},  # Add status tags here when available.
         ]
