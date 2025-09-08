@@ -226,8 +226,16 @@ class ChambersDetailsForm(BaseForm):
 
 
 class HeadOfficeContactDetailsForm(OfficeContactDetailsForm):
-    title = "Head office contact details"
+    """This form is used both for LSP Head Office contact details and Chambers contact details as both populate the firm's head office information. They are just displayed differently to end users."""
+
     url = "add-contact-details"
+
+    @property
+    def title(self):
+        if self.firm.firm_type == "Legal Services Provider":
+            return "Head office contact details"
+        if self.firm.firm_type == "Chambers":
+            return "Add chambers contact details"
 
     @property
     def caption(self):
