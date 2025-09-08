@@ -4,23 +4,17 @@ from unittest.mock import patch
 import pytest
 
 from app import create_app
-from app.config import Config
+from tests.conftest import TestConfig
 
 
-class TestRateLimitingConfig(Config):
-    TESTING = True
+class TestRateLimitingConfig(TestConfig):
     RATELIMIT_ENABLED = True
     RATELIMIT_STORAGE_URI = "memory://"
     RATELIMIT_APPLICATION = "5 per second, 60 per minute"
-    SECRET_KEY = "test-key"
-    SKIP_AUTH = True
 
 
-class TestRateLimitingDisabledConfig(Config):
-    TESTING = True
+class TestRateLimitingDisabledConfig(TestConfig):
     RATELIMIT_ENABLED = False
-    SECRET_KEY = "test-key"
-    SKIP_AUTH = True
 
 
 class TestRateLimiting:
