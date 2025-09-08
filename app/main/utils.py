@@ -104,15 +104,12 @@ def create_provider_from_session() -> Firm | None:
         if bank_account_data := session.get("new_head_office_bank_account"):
             del session["new_head_office_bank_account"]
 
-            # Create bank account if we have complete bank account data (all required fields)
-            required_bank_fields = ["bank_account_name", "sort_code", "account_number"]
-            if all(field in bank_account_data and bank_account_data[field] for field in required_bank_fields):
-                bank_account = BankAccount(**bank_account_data)
-                add_new_bank_account(
-                    bank_account,
-                    firm_id=firm.firm_id,
-                    office_code=new_office.firm_office_code,
-                    show_success_message=False,
-                )
+            bank_account = BankAccount(**bank_account_data)
+            add_new_bank_account(
+                bank_account,
+                firm_id=firm.firm_id,
+                office_code=new_office.firm_office_code,
+                show_success_message=False,
+            )
 
     return firm
