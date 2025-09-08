@@ -17,6 +17,7 @@ RUN apt-get update \
     perl-base \
     libxslt1.1 \
     libxslt1-dev \
+    libc-bin \
     && rm -rf /var/lib/apt/lists/*
 
 # Upgrade libslt1 to install the latest security update
