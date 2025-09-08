@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=python:3.13-trixie
+ARG BASE_IMAGE=python:3.13-bookworm
 
 FROM node:lts-iron AS node_build
 WORKDIR /home/node
@@ -10,6 +10,24 @@ RUN npm run build
 
 FROM $BASE_IMAGE AS base
 ARG REQUIREMENTS_FILE=requirements-production.txt
+# Security updates for perl-base + libxslt and then clean apt lists
+# https://avd.aquasec.com/nvd/2024/cve-2024-56406/
+RUN apt-get update \
+    && apt-get install  --only-upgrade -y \
+    perl-base \
+    libxslt1.1 \
+    libxslt1-dev \
+    libc-bin \
+    libexpat1 \
+    libperl5.36 \
+    libpq-dev \
+    libsqlite3-0 \
+    libxml2 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Upgrade libslt1 to install the latest security update
+# https://nvd.nist.gov/vuln/detail/CVE-2025-7424
+RUN apt-get install --only-upgrade libxslt1.1 libxslt1-dev -y
 
 # Clean up cached package files & index files for a smaller image size
 RUN apt-get clean
