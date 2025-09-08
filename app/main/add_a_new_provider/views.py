@@ -132,6 +132,7 @@ class HeadOfficeContactDetailsFormView(BaseFormView):
     def form_valid(self, form):
         session["new_head_office"] = {
             "is_head_office": True,
+            "head_office": "N/A",
             "address_line_1": form.data.get("address_line_1"),
             "address_line_2": form.data.get("address_line_2"),
             "address_line_3": form.data.get("address_line_3"),
