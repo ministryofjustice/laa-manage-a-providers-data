@@ -2,11 +2,11 @@ import logging
 import math
 from typing import Literal, NoReturn
 
-from flask import abort, current_app, redirect, render_template, request, session, url_for
+from flask import abort, current_app, redirect, render_template, request, url_for
 from flask.views import MethodView
 
 from app.components.tables import DataTable, TableStructure, TransposedDataTable, add_field
-from app.main.utils import add_new_office, add_new_provider
+from app.main.utils import create_provider_from_session
 from app.models import Firm, Office
 from app.utils.formatting import (
     format_advocate_level,
@@ -194,15 +194,8 @@ class ViewProvider(MethodView):
 
     def get(self, firm: Firm | None = None):
         if not firm:
-            if firm_data := session.get("new_provider"):
-                del session["new_provider"]
-                firm = add_new_provider(Firm(**firm_data))
-                if office_data := session.get("new_head_office"):
-                    del session["new_head_office"]
-                    add_new_office(
-                        Office(**office_data), firm_id=firm.firm_id, show_success_message=False
-                    )  # Don't show success message as head office is created at the same time as the provider.
-                return redirect(url_for("main.view_provider", firm=firm))
+            if created_firm := create_provider_from_session():
+                return redirect(url_for("main.view_provider", firm=created_firm))
             abort(404)
 
         context = self.get_context(firm)

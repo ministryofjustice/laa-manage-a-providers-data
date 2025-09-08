@@ -11,10 +11,12 @@ from app.constants import (
 )
 from app.fields import GovUKTableRadioField
 from app.validators import (
+    ValidateAccountNumber,
     ValidateCompaniesHouseNumber,
     ValidateGovDateField,
     ValidatePastDate,
     ValidateSearchResults,
+    ValidateSortCode,
     ValidateVATRegistrationNumber,
 )
 from app.widgets import GovDateInput, GovRadioInput, GovTextInput
@@ -260,10 +262,61 @@ class VATRegistrationForm(BaseForm):
         widget=GovTextInput(
             heading_class="govuk-fieldset__legend--xl",
             classes="govuk-!-width-one-half",
-            hint="This is 9 numbers, sometimes with ‘GB’ at the start, for example 123456789 or GB123456789.",
+            hint="This is 9 numbers, sometimes with 'GB' at the start, for example 123456789 or GB123456789.",
         ),
         validators=[
             Optional(),
             ValidateVATRegistrationNumber(message="Enter the VAT registration number in the correct format"),
+        ],
+    )
+
+
+class BankAccountForm(BaseForm):
+    title = "Head office: \nBank account details"
+    url = "add-bank-account"
+    submit_button_text = "Submit"
+
+    @property
+    def caption(self):
+        # Get provider name from session if available
+        new_provider_name = session.get("new_provider", {}).get("firm_name", "Unknown")
+        return new_provider_name
+
+    bank_account_name = StringField(
+        "Account name",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-!-width-two-thirds",
+            hint="The name on the bank account",
+        ),
+        validators=[
+            InputRequired(message="Enter the account name"),
+            Length(max=100, message="Account name must be 100 characters or less"),
+        ],
+    )
+
+    sort_code = StringField(
+        "Sort code",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-!-width-one-quarter",
+            hint="6 digits, for example 12 34 56",
+        ),
+        validators=[
+            InputRequired(message="Enter the sort code"),
+            ValidateSortCode(),
+        ],
+    )
+
+    account_number = StringField(
+        "Account number",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-!-width-one-half",
+            hint="8 digits, for example 12345678",
+        ),
+        validators=[
+            InputRequired(message="Enter the account number"),
+            ValidateAccountNumber(),
         ],
     )

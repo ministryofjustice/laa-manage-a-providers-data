@@ -164,3 +164,33 @@ class ValidateVATRegistrationNumber:
 
             if not re.match(uk_vat_reg_pattern, field.data):
                 raise ValidationError(self.message)
+
+
+class ValidateSortCode:
+    """Validate UK bank sort code format."""
+
+    def __init__(self, message=None):
+        self.message = message or "Sort code must be 6 digits"
+
+    def __call__(self, form, field):
+        if field.data:
+            # Remove spaces and hyphens, then check if it's 6 digits
+            cleaned_sort_code = re.sub(r"[\s-]", "", field.data)
+
+            if not re.match(r"^[0-9]{6}$", cleaned_sort_code):
+                raise ValidationError(self.message)
+
+
+class ValidateAccountNumber:
+    """Validate UK bank account number format."""
+
+    def __init__(self, message=None):
+        self.message = message or "Account number must be 8 digits"
+
+    def __call__(self, form, field):
+        if field.data:
+            # Remove spaces and check if it's 8 digits
+            cleaned_account_number = re.sub(r"\s", "", field.data)
+
+            if not re.match(r"^[0-9]{8}$", cleaned_account_number):
+                raise ValidationError(self.message)

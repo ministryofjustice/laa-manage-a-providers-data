@@ -1,7 +1,7 @@
 import pytest
-from flask import get_flashed_messages
+from flask import get_flashed_messages, session
 
-from app.main.utils import add_new_provider
+from app.main.utils import add_new_provider, create_provider_from_session
 from app.models import Firm
 from app.pda.api import ProviderDataApi
 from app.pda.mock_api import MockProviderDataApi
@@ -105,3 +105,212 @@ class TestAddNewProvider:
             category, message = messages[0]
             assert category == "success"
             assert message == "<b>New legal services provider successfully created</b>"
+
+
+class TestCreateProviderFromSession:
+    @pytest.fixture(autouse=True)
+    def setup_mock_api(self, app):
+        """Ensure each test starts with a clean MockProviderDataApi."""
+        with app.app_context():
+            from app.pda.mock_api import MockProviderDataApi
+
+            mock_pda = MockProviderDataApi()
+            mock_pda.init_app(app)
+            app.extensions["pda"] = mock_pda
+
+    def test_create_provider_from_session_no_session_data(self, app):
+        """Test that function returns None when no session data exists."""
+        with app.test_request_context():
+            result = create_provider_from_session()
+            assert result is None
+
+    def test_create_provider_from_session_firm_only(self, app):
+        """Test creating provider with only firm data in session."""
+        with app.test_request_context():
+            # Set up firm session data
+            session["new_provider"] = {
+                "firm_name": "Test Session Firm",
+                "firm_type": "Legal Services Provider",
+                "constitutional_status": "Limited Company",
+            }
+
+            result = create_provider_from_session()
+
+            # Verify firm was created
+            assert result is not None
+            assert isinstance(result, Firm)
+            assert result.firm_name == "Test Session Firm"
+            assert result.firm_type == "Legal Services Provider"
+            assert result.firm_id is not None
+
+            # Verify session was cleaned up
+            assert "new_provider" not in session
+
+    def test_create_provider_from_session_with_office(self, app):
+        """Test creating provider with firm and office data in session."""
+        with app.test_request_context():
+            # Set up session data
+            session["new_provider"] = {
+                "firm_name": "Test Firm With Office",
+                "firm_type": "Legal Services Provider",
+                "constitutional_status": "Partnership",
+            }
+            session["new_head_office"] = {
+                "address_line_1": "123 Test Street",
+                "city": "Test City",
+                "postcode": "TE1 5ST",
+                "telephone_number": "01234567890",
+                "email_address": "test@example.com",
+            }
+
+            result = create_provider_from_session()
+
+            # Verify firm was created
+            assert result is not None
+            assert result.firm_name == "Test Firm With Office"
+
+            # Verify office was created
+            pda = app.extensions["pda"]
+            offices = pda.get_provider_offices(result.firm_id)
+            assert len(offices) == 1
+            office = offices[0]
+            assert office.address_line_1 == "123 Test Street"
+            assert office.city == "Test City"
+            assert office.postcode == "TE1 5ST"
+
+            # Verify sessions were cleaned up
+            assert "new_provider" not in session
+            assert "new_head_office" not in session
+
+    def test_create_provider_from_session_with_bank_account(self, app):
+        """Test creating provider with firm, office, and bank account data."""
+        with app.test_request_context():
+            # Set up session data
+            session["new_provider"] = {
+                "firm_name": "Test Firm With Bank",
+                "firm_type": "Legal Services Provider",
+                "constitutional_status": "Limited Company",
+            }
+            session["new_head_office"] = {
+                "address_line_1": "456 Banking Street",
+                "city": "Finance City",
+                "postcode": "FC2 1BA",
+                "telephone_number": "09876543210",
+                "email_address": "finance@example.com",
+            }
+            session["new_head_office_bank_account"] = {
+                "bank_account_name": "Test Business Account",
+                "sort_code": "123456",
+                "account_number": "87654321",
+            }
+
+            result = create_provider_from_session()
+
+            # Verify firm was created
+            assert result is not None
+            assert result.firm_name == "Test Firm With Bank"
+
+            # Verify office was created
+            pda = app.extensions["pda"]
+            offices = pda.get_provider_offices(result.firm_id)
+            assert len(offices) == 1
+            office = offices[0]
+            assert office.address_line_1 == "456 Banking Street"
+
+            # Verify bank account was created
+            bank_account = pda.get_office_bank_account(result.firm_id, office.firm_office_code)
+            assert bank_account is not None
+            assert bank_account.bank_account_name == "Test Business Account"
+            assert bank_account.sort_code == "123456"
+            assert bank_account.account_number == "87654321"
+
+            # Verify sessions were cleaned up
+            assert "new_provider" not in session
+            assert "new_head_office" not in session
+            assert "new_head_office_bank_account" not in session
+
+    def test_create_provider_from_session_partial_bank_data(self, app):
+        """Test that bank account is created with partial data (only required fields)."""
+        with app.test_request_context():
+            # Set up session data with only required bank account fields
+            session["new_provider"] = {
+                "firm_name": "Test Partial Bank Firm",
+                "firm_type": "Chambers",
+                "constitutional_status": "Partnership",
+            }
+            session["new_head_office"] = {
+                "address_line_1": "789 Partial Street",
+                "city": "Incomplete City",
+                "postcode": "IC3 2PA",
+                "telephone_number": "01111111111",
+                "email_address": "partial@example.com",
+            }
+            session["new_head_office_bank_account"] = {
+                # Only required bank account data
+                "bank_account_name": "Partial Account",
+                "sort_code": "123456",
+                "account_number": "87654321",
+                # Missing optional fields like bank_name, bank_branch_name, etc.
+            }
+
+            result = create_provider_from_session()
+
+            # Verify firm was created
+            assert result is not None
+            assert result.firm_name == "Test Partial Bank Firm"
+
+            # Verify office was created
+            pda = app.extensions["pda"]
+            offices = pda.get_provider_offices(result.firm_id)
+            assert len(offices) == 1
+            office = offices[0]
+            assert office.address_line_1 == "789 Partial Street"
+
+            # Verify bank account was created with required fields only
+            bank_account = pda.get_office_bank_account(result.firm_id, office.firm_office_code)
+            assert bank_account is not None
+            assert bank_account.bank_account_name == "Partial Account"
+            assert bank_account.sort_code == "123456"
+            assert bank_account.account_number == "87654321"
+            # Optional fields should be None or defaults
+            assert bank_account.bank_name is None
+            assert bank_account.bank_branch_name is None
+
+    def test_create_provider_from_session_incomplete_bank_data(self, app):
+        """Test that no bank account is created when required bank data is missing."""
+        with app.test_request_context():
+            # Set up session data with incomplete bank account info (missing required fields)
+            session["new_provider"] = {
+                "firm_name": "Test Incomplete Bank Firm",
+                "firm_type": "Legal Services Provider",
+                "constitutional_status": "Partnership",
+            }
+            session["new_head_office"] = {
+                "address_line_1": "999 Incomplete Street",
+                "city": "Incomplete City",
+                "postcode": "IC4 5IN",
+                "telephone_number": "04444444444",
+                "email_address": "incomplete@example.com",
+            }
+            session["new_head_office_bank_account"] = {
+                # Missing required bank account fields - only have account name
+                "bank_account_name": "Incomplete Account",
+                # Missing sort_code and account_number (required)
+            }
+
+            result = create_provider_from_session()
+
+            # Verify firm was created
+            assert result is not None
+            assert result.firm_name == "Test Incomplete Bank Firm"
+
+            # Verify office was created
+            pda = app.extensions["pda"]
+            offices = pda.get_provider_offices(result.firm_id)
+            assert len(offices) == 1
+            office = offices[0]
+            assert office.address_line_1 == "999 Incomplete Street"
+
+            # Verify no bank account was created (due to missing required fields)
+            bank_account = pda.get_office_bank_account(result.firm_id, office.firm_office_code)
+            assert bank_account is None

@@ -168,7 +168,7 @@ class HeadOfficeContactDetailsFormView(BaseFormView):
 
 
 class VATRegistrationFormView(FullWidthBaseFormView):
-    success_endpoint = "main.create_provider"
+    success_endpoint = "main.add_bank_account"
 
     def form_valid(self, form):
         session["new_head_office"].update(
@@ -176,6 +176,55 @@ class VATRegistrationFormView(FullWidthBaseFormView):
                 "vat_registration_number": form.data.get("vat_registration_number"),
             }
         )
+
+        return super().form_valid(form)
+
+    def get(self, context, **kwargs):
+        # Check if firm data exists in session
+        if (
+            not session.get("new_provider")
+            and session.get("new_provider", {}).get("firm_type") == "Legal Services Provider"
+        ):
+            abort(400)
+
+        # Check if the new head office data exists in the session
+        if not session.get("new_head_office"):
+            abort(400)
+
+        firm = Firm(**session.get("new_provider"))
+        form = self.get_form_class()(firm=firm)
+        return render_template(self.template, **self.get_context_data(form, **kwargs))
+
+    def post(self, *args, **kwargs) -> Response | str:
+        # Check if firm data exists in the session
+        if (
+            not session.get("new_provider")
+            and session.get("new_provider", {}).get("firm_type") == "Legal Services Provider"
+        ):
+            abort(400)
+
+        # Check if the new head office data exists in the session
+        if not session.get("new_head_office"):
+            abort(400)
+
+        firm = Firm(**session.get("new_provider"))
+        form = self.get_form_class()(firm=firm)
+
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form, **kwargs)
+
+
+class BankAccountFormView(FullWidthBaseFormView):
+    success_endpoint = "main.create_provider"
+
+    def form_valid(self, form):
+        session["new_head_office_bank_account"] = {
+            "bank_account_name": form.data.get("bank_account_name"),
+            "sort_code": form.data.get("sort_code"),
+            "account_number": form.data.get("account_number"),
+        }
 
         return super().form_valid(form)
 
