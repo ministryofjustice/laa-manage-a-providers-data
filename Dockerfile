@@ -8,7 +8,7 @@ RUN npm install
 RUN npm run build
 
 
-FROM python:3.13-bookworm AS base
+FROM $BASE_IMAGE AS base
 ARG REQUIREMENTS_FILE=requirements-production.txt
 # Security updates for perl-base + libxslt and then clean apt lists
 # https://avd.aquasec.com/nvd/2024/cve-2024-56406/
