@@ -5,7 +5,7 @@ from flask import abort, current_app, redirect, render_template, request, sessio
 from flask.views import MethodView
 
 from app.components.tables import DataTable, TableStructure, TransposedDataTable, add_field
-from app.main.utils import add_new_provider
+from app.main.utils import add_new_office, add_new_provider
 from app.models import Firm, Office
 from app.utils.formatting import (
     format_advocate_level,
@@ -155,6 +155,11 @@ class ViewProvider(MethodView):
             if firm_data := session.get("new_provider"):
                 del session["new_provider"]
                 firm = add_new_provider(Firm(**firm_data))
+                if office_data := session.get("new_head_office"):
+                    del session["new_head_office"]
+                    add_new_office(
+                        Office(**office_data), firm_id=firm.firm_id, show_success_message=False
+                    )  # Don't show success message as head office is created at the same time as the provider.
                 return redirect(url_for("main.view_provider", firm=firm))
             abort(404)
 

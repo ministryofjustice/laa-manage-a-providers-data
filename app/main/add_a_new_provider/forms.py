@@ -6,8 +6,8 @@ from wtforms.validators import InputRequired, Length, Optional
 from app.constants import (
     ADVOCATE_LEVEL_CHOICES,
     CONSTITUTIONAL_STATUS_CHOICES,
-    YES_NO_CHOICES,
     PARENT_FIRM_TYPE_CHOICES,
+    YES_NO_CHOICES,
 )
 from app.fields import GovUKTableRadioField
 from app.validators import ValidateCompaniesHouseNumber, ValidateGovDateField, ValidatePastDate, ValidateSearchResults
@@ -15,6 +15,7 @@ from app.widgets import GovDateInput, GovRadioInput, GovTextInput
 
 from ...fields import GovDateField
 from ...forms import BaseForm
+from ..add_a_new_office import OfficeContactDetailsForm
 
 
 class AddProviderForm(BaseForm):
@@ -216,3 +217,14 @@ class ChambersDetailsForm(BaseForm):
             Length(max=15, message="Bar Council roll number must be 15 characters or less"),
         ],
     )
+
+
+class HeadOfficeContactDetailsForm(OfficeContactDetailsForm):
+    title = "Head office contact details"
+    url = "add-contact-details"
+
+    @property
+    def caption(self):
+        # Get provider name from session if available
+        new_provider_name = session.get("new_provider", {}).get("firm_name", "Unknown")
+        return new_provider_name
