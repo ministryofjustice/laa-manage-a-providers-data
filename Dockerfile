@@ -18,6 +18,7 @@ RUN apt-get update \
     libxslt1.1 \
     libxslt1-dev \
     libc-bin \
+    linux-libc-dev \
     libexpat1 \
     libperl5.36 \
     libpq-dev \
