@@ -13,7 +13,7 @@ from app.widgets import GovTextInput
 def firm_name_html(row_data: dict[str, str]) -> str:
     _firm_id = row_data.get("firm_id", "")
     _firm_name = row_data.get("firm_name", "")
-    return f"<a class='govuk-link', href={url_for('main.view_provider_with_id', firm=_firm_id)}>{_firm_name}"
+    return f"<a class='govuk-link', href={url_for('main.view_provider', firm=_firm_id)}>{_firm_name}"
 
 
 def get_firm_statuses(row_data):
@@ -66,10 +66,10 @@ class ProviderListForm(BaseForm):
         end_id = self.providers_shown_per_page * (self.page - 1) + self.providers_shown_per_page
 
         columns: list[TableStructure] = [
-            {"text": "Provider name", "id": "firm_name", "html": firm_name_html},
+            {"text": "Provider name", "id": "firm_name", "html_renderer": firm_name_html},
             {"text": "Provider type", "id": "firm_type", "format_text": format_sentence_case},
             {"text": "Provider number", "id": "firm_number"},
-            {"text": "Status", "html": get_firm_statuses},  # Add status tags here when available.
+            {"text": "Status", "html_renderer": get_firm_statuses},  # Add status tags here when available.
         ]
 
         if len(firms) > 0:
