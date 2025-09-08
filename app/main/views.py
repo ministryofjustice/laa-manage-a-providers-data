@@ -89,18 +89,6 @@ class ViewProvider(MethodView):
     def parent_provider_name_html(parent_provider: Firm):
         return f"<a class='govuk-link', href={url_for('main.view_provider', firm=parent_provider.firm_id)}>{parent_provider.firm_name}</a>"
 
-    @staticmethod
-    def _add_field(rows, data, value, label, formatter=None, html=None):
-        """Helper to add a field if it has a value. Uses snake_case label as ID."""
-        if value:
-            # Convert label to snake_case for the ID
-            field_id = label.lower().replace(" ", "_")
-            row = {"text": label, "id": field_id, "classes": "govuk-!-width-one-half"}
-            if html:
-                row.update({"html": html})
-            rows.append(row)
-            data[field_id] = formatter(value) if formatter else value
-
     def get_main_table(self, firm, head_office, parent_provider) -> DataTable:
         main_rows, main_data = [], {}
         add_field(main_rows, main_data, firm.firm_name, "Provider name")
