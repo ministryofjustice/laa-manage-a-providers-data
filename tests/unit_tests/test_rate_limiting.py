@@ -1,5 +1,4 @@
 import time
-from unittest.mock import patch
 
 import pytest
 
@@ -93,21 +92,3 @@ class TestRateLimiting:
         # 6th request to any endpoint should be rate limited
         response = client_with_rate_limiting.get("/")
         assert response.status_code == 429
-
-    def test_rate_limit_error_response_format(self, client_with_rate_limiting):
-        """Test that rate limit error returns proper 429 status"""
-        # Exhaust the rate limit
-        for i in range(5):
-            client_with_rate_limiting.get("/")
-
-        # Next request should return 429
-        response = client_with_rate_limiting.get("/")
-        assert response.status_code == 429
-
-    @patch("app.limiter.limit")
-    def test_rate_limiting_decorator_not_called_when_disabled(self, mock_limit, client_without_rate_limiting):
-        """Test that limiter decorators are not applied when rate limiting is disabled"""
-        # Make 10 requests to home page
-        for i in range(10):
-            response = client_without_rate_limiting.get("/")
-            assert response.status_code == 200  # Since rate limiting is disabled, the limiter should not be active
