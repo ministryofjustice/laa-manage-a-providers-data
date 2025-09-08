@@ -17,7 +17,7 @@
       {% endif %}
 
       {% for field in form %}
-        {% if field.type != 'CSRFToken' and field.type != 'HiddenField' %}
+        {% if field.type != 'CSRFToken' and field.type != 'HiddenField' and field.type != "SubmitField" %}
           {{ field }}
         {% endif %}
       {% endfor %}
@@ -27,6 +27,14 @@
       {{ govukButton({
         'text': submitButtonText
       }) }}
+
+      {# Render additional submissions buttons to the right of the default field #}
+      {% for field in form %}
+        {% if field.type == "SubmitField" %}
+          {{ field }}
+        {% endif %}
+      {% endfor %}
+
     {% endblock %}
   </form>
 {% endblock %}

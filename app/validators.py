@@ -151,7 +151,7 @@ class ValidatePostcode:
 
 
 class ValidateVATRegistrationNumber:
-    """Validate VAT registration number format."""
+    """Validate UK VAT registration number format."""
 
     def __init__(self, message=None):
         self.message = message or "Enter the VAT registration number in the correct format"
@@ -170,27 +170,29 @@ class ValidateSortCode:
     """Validate UK bank sort code format."""
 
     def __init__(self, message=None):
-        self.message = message or "Sort code must be 6 digits"
+        self.message = message or "Enter a valid sort code like 309430"
 
     def __call__(self, form, field):
         if field.data:
-            # Remove spaces and hyphens, then check if it's 6 digits
+            # Remove spaces and hyphens from the sort code
             cleaned_sort_code = re.sub(r"[\s-]", "", field.data)
 
+            # Check if it's exactly 6 digits after cleaning
             if not re.match(r"^[0-9]{6}$", cleaned_sort_code):
                 raise ValidationError(self.message)
+
+            # Update the field data with cleaned version
+            field.data = cleaned_sort_code
 
 
 class ValidateAccountNumber:
     """Validate UK bank account number format."""
 
     def __init__(self, message=None):
-        self.message = message or "Account number must be 8 digits"
+        self.message = message or "Enter a valid account number like 00733445"
 
     def __call__(self, form, field):
         if field.data:
-            # Remove spaces and check if it's 8 digits
-            cleaned_account_number = re.sub(r"\s", "", field.data)
-
-            if not re.match(r"^[0-9]{8}$", cleaned_account_number):
+            # Check if it's between 6 and 8 digits (no spaces allowed)
+            if not re.match(r"^[0-9]{6,8}$", field.data):
                 raise ValidationError(self.message)

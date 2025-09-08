@@ -1,5 +1,5 @@
 from flask import current_app, session
-from wtforms import RadioField
+from wtforms import RadioField, SubmitField
 from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired, Length, Optional
 
@@ -19,7 +19,7 @@ from app.validators import (
     ValidateSortCode,
     ValidateVATRegistrationNumber,
 )
-from app.widgets import GovDateInput, GovRadioInput, GovTextInput
+from app.widgets import GovDateInput, GovRadioInput, GovSubmitInput, GovTextInput
 
 from ...fields import GovDateField
 from ...forms import BaseForm
@@ -286,8 +286,7 @@ class BankAccountForm(BaseForm):
         "Account name",
         widget=GovTextInput(
             heading_class="govuk-fieldset__legend--m",
-            classes="govuk-!-width-two-thirds",
-            hint="The name on the bank account",
+            classes="govuk-!-width-one-quarter",
         ),
         validators=[
             InputRequired(message="Enter the account name"),
@@ -299,11 +298,11 @@ class BankAccountForm(BaseForm):
         "Sort code",
         widget=GovTextInput(
             heading_class="govuk-fieldset__legend--m",
-            classes="govuk-!-width-one-quarter",
-            hint="6 digits, for example 12 34 56",
+            classes="govuk-input--width-10",
+            hint="Must be 6 digits long",
         ),
         validators=[
-            InputRequired(message="Enter the sort code"),
+            InputRequired(message="Enter a sort code"),
             ValidateSortCode(),
         ],
     )
@@ -312,11 +311,15 @@ class BankAccountForm(BaseForm):
         "Account number",
         widget=GovTextInput(
             heading_class="govuk-fieldset__legend--m",
-            classes="govuk-!-width-one-half",
-            hint="8 digits, for example 12345678",
+            classes="govuk-!-width-one-quarter",
+            hint="Must be between 6 and 8 digits long",
         ),
         validators=[
-            InputRequired(message="Enter the account number"),
+            InputRequired(message="Enter an account number"),
             ValidateAccountNumber(),
         ],
+    )
+
+    skip_button = SubmitField(
+        "Cheque payment: Skip this step", widget=GovSubmitInput(classes="govuk-button--secondary govuk-!-margin-left-2")
     )

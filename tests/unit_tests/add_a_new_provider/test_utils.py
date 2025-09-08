@@ -314,3 +314,38 @@ class TestCreateProviderFromSession:
             # Verify no bank account was created (due to missing required fields)
             bank_account = pda.get_office_bank_account(result.firm_id, office.firm_office_code)
             assert bank_account is None
+
+    def test_create_provider_from_session_no_bank_account_when_skipped(self, app):
+        """Test that no bank account is created when user skipped the bank account step."""
+        with app.test_request_context():
+            # Set up session data without bank account session key (simulating skip)
+            session["new_provider"] = {
+                "firm_name": "Test Skip Bank Firm",
+                "firm_type": "Legal Services Provider",
+                "constitutional_status": "Partnership",
+            }
+            session["new_head_office"] = {
+                "address_line_1": "789 Skip Street",
+                "city": "Skip City",
+                "postcode": "SK1 5IP",
+                "telephone_number": "09876543210",
+                "email_address": "skip@example.com",
+            }
+            # No new_head_office_bank_account session key (simulating skip)
+
+            result = create_provider_from_session()
+
+            # Verify firm was created
+            assert result is not None
+            assert result.firm_name == "Test Skip Bank Firm"
+
+            # Verify office was created
+            pda = app.extensions["pda"]
+            offices = pda.get_provider_offices(result.firm_id)
+            assert len(offices) == 1
+            office = offices[0]
+            assert office.address_line_1 == "789 Skip Street"
+
+            # Verify no bank account was created (since skip was used)
+            bank_account = pda.get_office_bank_account(result.firm_id, office.firm_office_code)
+            assert bank_account is None

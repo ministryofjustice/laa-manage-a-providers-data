@@ -256,6 +256,11 @@ class BankAccountFormView(FullWidthBaseFormView):
         if not session.get("new_head_office"):
             abort(400)
 
+        # Check if skip button was clicked (before validation)
+        if request.form.get("skip_button"):
+            # Skip storing bank account data and go to next step
+            return redirect(url_for(self.success_endpoint))
+
         firm = Firm(**session.get("new_provider"))
         form = self.get_form_class()(firm=firm)
 
