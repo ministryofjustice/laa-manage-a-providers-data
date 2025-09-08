@@ -29,6 +29,8 @@ class TestConfig(Config):
     # Use in-memory cache for testing sessions
     SESSION_TYPE = "cachelib"
     SESSION_CACHELIB = SimpleCache()
+    # Use memory storage for rate limiting in tests
+    RATELIMIT_STORAGE_URI = "memory://"
 
 
 @pytest.fixture(scope="session")

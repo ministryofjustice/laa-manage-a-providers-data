@@ -48,7 +48,6 @@ class OfficeContactDetailsForm(BaseForm):
     title = "Office contact details"
     url = "provider/<firm:firm>/add-office-contact-details"
     template = "add_office/office-contact-details.html"
-
     submit_button_text = "Submit"
 
     firm: Firm | None = None  # Firm this office is being added to
@@ -106,7 +105,7 @@ class OfficeContactDetailsForm(BaseForm):
         validators=[Optional(), Length(max=150, message="County must be 150 characters or fewer")],
     )
 
-    post_code = StringField(
+    postcode = StringField(
         "Postcode",
         widget=GovTextInput(classes="auto-capitalise govuk-input--width-10"),
         validators=[

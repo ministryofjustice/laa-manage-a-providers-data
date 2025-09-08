@@ -1,5 +1,7 @@
 import sentry_sdk
 from flask import Flask
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from flask_session import Session
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
@@ -14,6 +16,7 @@ from app.pda.api import ProviderDataApi
 
 csrf = CSRFProtect()
 talisman = Talisman()
+limiter = Limiter(get_remote_address)
 
 
 if Config.SENTRY_DSN:
@@ -39,9 +42,10 @@ def create_app(config_class=Config, pda_class=ProviderDataApi):
     app.config.from_object(config_class)
 
     # Register custom URL converters
-    from app.utils.converters import FirmConverter
+    from app.utils.converters import FirmConverter, OfficeConverter
 
     app.url_map.converters["firm"] = FirmConverter
+    app.url_map.converters["office"] = OfficeConverter
 
     configure_logging(app)
 
@@ -121,6 +125,8 @@ def create_app(config_class=Config, pda_class=ProviderDataApi):
         session_cookie_http_only=Config.SESSION_COOKIE_HTTP_ONLY,
         session_cookie_samesite=Config.SESSION_COOKIE_SAMESITE,
     )
+
+    limiter.init_app(app)
 
     # Use mock API if configured
     if app.config.get("PDA_USE_MOCK_API", False):

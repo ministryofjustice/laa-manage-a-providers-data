@@ -11,3 +11,4 @@ ms_identity_python[flask] @ git+https://github.com/azure-samples/ms-identity-pyt
 structlog
 pydantic
 email-validator
+Flask-Limiter

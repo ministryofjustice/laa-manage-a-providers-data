@@ -74,7 +74,7 @@ class Office(BaseModel):
     address_line_4: Optional[str] = Field(alias="addressLine4", default=None)
     city: Optional[str] = Field(default=None)
     county: Optional[str] = Field(default=None)
-    post_code: Optional[str] = Field(alias="postCode", default=None)
+    postcode: Optional[str] = Field(alias="postCode", default=None)
     dx_centre: Optional[str] = Field(alias="dxCentre", default=None)
     dx_number: Optional[str] = Field(alias="dxNumber", default=None)
     telephone_area_code: Optional[str] = Field(alias="telephoneAreaCode", default=None)
@@ -93,6 +93,10 @@ class Office(BaseModel):
     police_station_area_name: Optional[str] = Field(alias="policeStationAreaName", default=None)
     duty_solicitor_area_name: Optional[str] = Field(alias="dutySolicitorAreaName", default=None)
 
+    is_head_office: Optional[bool] = Field(
+        default=False, exclude=True
+    )  # Internal field that will be converted to head_office format when writing to PDA
+
     def to_api_dict(self) -> dict:
         """Export as camelCase dictionary for API calls."""
         return self.model_dump(by_alias=True, exclude_none=True)
@@ -100,3 +104,6 @@ class Office(BaseModel):
     def to_internal_dict(self) -> dict:
         """Export as snake_case dictionary for internal use."""
         return self.model_dump(by_alias=False, exclude_none=True)
+
+    def get_is_head_office(self):
+        return self.head_office == "N/A"
