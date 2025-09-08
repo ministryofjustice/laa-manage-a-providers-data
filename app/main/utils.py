@@ -24,7 +24,7 @@ def get_full_info_html(data):
     return html_content
 
 
-def add_new_provider(firm: Firm) -> Firm:
+def add_new_provider(firm: Firm, show_success_message: bool = True) -> Firm:
     """Adds a new provider to the PDA, currently only the mock PDA supports this functionality."""
 
     pda = current_app.extensions.get("pda")
@@ -34,12 +34,16 @@ def add_new_provider(firm: Firm) -> Firm:
     if not isinstance(pda, MockProviderDataApi):
         raise RuntimeError("Provider Data API does not support this functionality yet.")
 
-    new_firm = pda.create_provider_firm(firm)
-    flash("<b>New provider successfully created</b>", "success")
+    new_firm: Firm = pda.create_provider_firm(firm)
+
+    if show_success_message:
+        firm_type: str = new_firm.firm_type.lower()
+        flash(f"<b>New {firm_type} successfully created</b>", "success")
+
     return new_firm
 
 
-def add_new_office(office: Office, firm_id: int) -> Office:
+def add_new_office(office: Office, firm_id: int, show_success_message: bool = True) -> Office:
     """Adds a new office to the PDA, currently only the mock PDA supports this functionality."""
 
     pda = current_app.extensions.get("pda")
@@ -50,5 +54,8 @@ def add_new_office(office: Office, firm_id: int) -> Office:
         raise RuntimeError("Provider Data API does not support this functionality yet.")
 
     new_office = pda.create_provider_office(office, firm_id=firm_id)
-    flash(f"<b>New office {new_office.firm_office_code} successfully created</b>", "success")
+
+    if show_success_message:
+        flash(f"<b>New office {new_office.firm_office_code} successfully created</b>", "success")
+
     return new_office
