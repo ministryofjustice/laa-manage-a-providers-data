@@ -1,5 +1,4 @@
 import logging
-import math
 from typing import Literal, NoReturn
 
 from flask import abort, current_app, redirect, render_template, request, session, url_for
