@@ -10,8 +10,7 @@ RUN npm run build
 
 FROM $BASE_IMAGE AS base
 ARG REQUIREMENTS_FILE=requirements-production.txt
-# Security updates for perl-base + libxslt and then clean apt lists
-# https://avd.aquasec.com/nvd/2024/cve-2024-56406/
+# Update package directory and install latest versions, then clean apt lists
 RUN apt-get update \
     && apt-get install  --only-upgrade -y \
     perl-base \
