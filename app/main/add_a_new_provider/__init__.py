@@ -8,6 +8,7 @@ from .forms import (
     ChambersDetailsForm,
     HeadOfficeContactDetailsForm,
     LspDetailsForm,
+    VATRegistrationForm,
 )
 from .views import (
     AddProviderFormView,
@@ -15,6 +16,7 @@ from .views import (
     AssignChambersFormView,
     HeadOfficeContactDetailsFormView,
     LspDetailsFormView,
+    VATRegistrationFormView,
 )
 
 
@@ -30,6 +32,8 @@ def register_views():
     register_form_view(
         form_class=HeadOfficeContactDetailsForm, view_class=HeadOfficeContactDetailsFormView, blueprint=bp
     )
+
+    register_form_view(form_class=VATRegistrationForm, view_class=VATRegistrationFormView, blueprint=bp)
 
 
 register_views()

@@ -3,7 +3,7 @@
 
 {%- from 'govuk_frontend_jinja/components/button/macro.html' import govukButton -%}
 
-{% block pageTitle %}{{ title }} – GOV.UK{% endblock %}
+{% block pageTitle %}{{ form.title }} – GOV.UK{% endblock %}
 
 {% block pageContent %}
   <form method="post" novalidate>
@@ -13,7 +13,7 @@
         {% if form.caption %}
           <span class="govuk-caption-xl">{{ form.caption }}</span>
         {% endif %}
-        <h1 class="govuk-heading-xl">{{ form.title }}</h1>
+        <h1 class="govuk-heading-xl">{{ form.title|replace('\n', '<br>')|safe }}</h1>
       {% endif %}
 
       {% for field in form %}

@@ -245,7 +245,9 @@ class HeadOfficeContactDetailsForm(OfficeContactDetailsForm):
 
 
 class VATRegistrationForm(BaseForm):
-    title = "VAT registration number (optional)"
+    title = "Head office: \nVAT Registration number (optional)"
+    url = "add-vat-number"
+    submit_button_text = "Submit"
 
     @property
     def caption(self):
@@ -254,10 +256,11 @@ class VATRegistrationForm(BaseForm):
         return new_provider_name
 
     vat_registration_number = StringField(
-        "VAT Registration number (optional)",
+        "",
         widget=GovTextInput(
-            heading_class="govuk-fieldset__legend--m",
+            heading_class="govuk-fieldset__legend--xl",
             classes="govuk-!-width-one-half",
+            hint="This is 9 numbers, sometimes with ‘GB’ at the start, for example 123456789 or GB123456789.",
         ),
         validators=[
             Optional(),
