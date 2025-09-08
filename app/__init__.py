@@ -42,9 +42,10 @@ def create_app(config_class=Config, pda_class=ProviderDataApi):
     app.config.from_object(config_class)
 
     # Register custom URL converters
-    from app.utils.converters import FirmConverter
+    from app.utils.converters import FirmConverter, OfficeConverter
 
     app.url_map.converters["firm"] = FirmConverter
+    app.url_map.converters["office"] = OfficeConverter
 
     configure_logging(app)
 

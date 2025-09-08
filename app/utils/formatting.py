@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Optional
 
 from app.constants import ADVOCATE_LEVEL_CHOICES, CONSTITUTIONAL_STATUS_CHOICES, FIRM_TYPE_CHOICES
+from app.models import Office
 
 
 def format_firm_type(firm_type: str) -> str:
@@ -63,3 +64,41 @@ def format_title_case(value: str) -> str:
     if not isinstance(value, str):
         return value
     return value.title()
+
+
+def format_head_office(head_office_value: str) -> str:
+    """Format head office value for display.
+    If this office is a head office the value will be "N/A"
+    If this office is a child office the value will be the head office number
+    """
+    if not head_office_value:
+        return "Unknown"
+    if head_office_value.lower() in ["n/a", "N/A"]:
+        return "Yes"
+    return "No"
+
+
+def format_office_address_one_line(office_data: dict | Office) -> str:
+    """
+    Format office address data into a single line string.
+
+    Args:
+        office_data: Office dictionary or object containing address fields
+
+    Returns:
+        Formatted address string with non-empty fields joined by commas
+    """
+    if isinstance(office_data, Office):
+        office_data: dict = office_data.to_internal_dict()
+
+    fields = [
+        office_data.get("address_line_1") or office_data.get("addressLine1"),
+        office_data.get("address_line_2") or office_data.get("addressLine2"),
+        office_data.get("address_line_3") or office_data.get("addressLine3"),
+        office_data.get("address_line_4") or office_data.get("addressLine4"),
+        office_data.get("city"),
+        office_data.get("postcode") or office_data.get("postCode"),
+    ]
+
+    # Filter out None and empty string values, then join with commas
+    return ", ".join(field.strip() for field in fields if field and field.strip())

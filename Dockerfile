@@ -19,6 +19,14 @@ RUN apt-get update \
     libxslt1-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Upgrade libslt1 to install the latest security update
+# https://nvd.nist.gov/vuln/detail/CVE-2025-7424
+RUN apt-get install --only-upgrade libxslt1.1 libxslt1-dev -y
+
+# Clean up cached package files & index files for a smaller image size
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
+
 # Set environment variables
 ENV FLASK_RUN_HOST=0.0.0.0
 ARG FLASK_RUN_PORT=8000

@@ -1,0 +1,29 @@
+{% macro addressDisplay(office) %}
+  <h4 class="govuk-heading-s govuk-!-margin-bottom-0">Address:</h4>
+  {% set address_parts = [] %}
+  {% if office.address_line_1 %}
+    {% set address_parts = address_parts + [office.address_line_1] %}
+  {% endif %}
+  {% if office.address_line_2 %}
+    {% set address_parts = address_parts + [office.address_line_2] %}
+  {% endif %}
+  {% if office.address_line_3 %}
+    {% set address_parts = address_parts + [office.address_line_3] %}
+  {% endif %}
+  {% if office.address_line_4 %}
+    {% set address_parts = address_parts + [office.address_line_4] %}
+  {% endif %}
+  {% if office.city %}
+    {% set address_parts = address_parts + [office.city] %}
+  {% endif %}
+  {% if office.postcode %}
+    {% set address_parts = address_parts + [office.postcode] %}
+  {% endif %}
+
+  {% for part in address_parts %}
+    {% set is_last = loop.last %}
+    <p class="govuk-body{% if not is_last %} govuk-!-margin-bottom-0{% endif %}">
+      {{ part }}{% if not is_last %},{% endif %}
+    </p>
+  {% endfor %}
+{% endmacro %}
