@@ -5,7 +5,12 @@ from playwright.sync_api import expect
 @pytest.mark.usefixtures("live_server")
 def test_view_provider_page_ui_loads(page):
     page.get_by_role("button", name="Start now").click()
+
+    # Perform a blank search to view all providers
+    page.get_by_role("button", name="Search").click()
+
     page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
+
     # Buttons
     expect(page.get_by_role("button", name="Add an office")).to_be_visible()
     expect(page.get_by_role("button", name="Make inactive")).to_be_visible()
@@ -32,6 +37,9 @@ def test_view_provider_page_ui_loads(page):
 @pytest.mark.usefixtures("live_server")
 def test_view_parent_provider(page):
     page.get_by_role("button", name="Start now").click()
+
+    # Perform a blank search to view all providers
+    page.get_by_role("button", name="Search").click()
 
     # Click child provider
     page.get_by_role("link", name="DAVIES & ASSOCIATES").click()
