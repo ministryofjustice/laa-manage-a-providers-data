@@ -11,6 +11,9 @@ def navigate_to_add_office_form(page: Page):
     # Click on the first provider (should be "SMITH & PARTNERS SOLICITORS" from fixtures)
     page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
 
+    # Click on the Offices sub-navigation
+    page.get_by_role("link", name="Offices").click()
+
     # Click "Add an office" button
     page.get_by_role("button", name="Add an office").click()
 

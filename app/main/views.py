@@ -79,7 +79,10 @@ class ProviderList(BaseFormView):
 
 
 class ViewProvider(MethodView):
-    template = "view-provider.html"
+    templates = {
+        "Legal Services Provider": "view-provider-legal-services-provider.html",
+        "Chambers": "view-provider-chambers.html",
+    }
 
     def __init__(self, subpage: Literal["contact", "offices"] = "contact"):
         if subpage:
@@ -107,35 +110,43 @@ class ViewProvider(MethodView):
             )
             add_field(main_rows, main_data, parent_provider.firm_number, "Parent provider number")
 
-        main_table = TransposedDataTable(structure=main_rows, data=main_data) if main_rows else None
+        # Additional data
 
-        return main_table
+        if firm.firm_type == "Legal Services Provider":
+            # Show these fields even without entries, so they can always be changed
+            add_field(
+                main_rows,
+                main_data,
+                firm.indemnity_received_date if firm.indemnity_received_date not in (None, "") else "Not provided",
+                "Indemnity received date",
+                format_date,
+            )
+            add_field(
+                main_rows,
+                main_data,
+                firm.company_house_number if firm.company_house_number not in (None, "") else "Not provided",
+                "Companies House number",
+            )
 
-    def get_additional_table(self, firm) -> DataTable:
-        additional_rows, additional_data = [], {}
         add_field(
-            additional_rows,
-            additional_data,
+            main_rows,
+            main_data,
             firm.constitutional_status,
             "Constitutional status",
             format_constitutional_status,
         )
-        add_field(
-            additional_rows, additional_data, firm.indemnity_received_date, "Indemnity received date", format_date
-        )
-        add_field(
-            additional_rows, additional_data, firm.non_profit_organisation, "Not for profit organisation", format_yes_no
-        )
-        add_field(additional_rows, additional_data, firm.solicitor_advocate, "Solicitor advocate", format_yes_no)
-        add_field(additional_rows, additional_data, firm.advocate_level, "Advocate level", format_advocate_level)
-        add_field(additional_rows, additional_data, firm.company_house_number, "Companies House number")
-        add_field(additional_rows, additional_data, firm.bar_council_roll, "Bar Council roll number")
+        if firm.firm_type != "Legal Services Provider":
+            add_field(main_rows, main_data, firm.indemnity_received_date, "Indemnity received date", format_date)
+        add_field(main_rows, main_data, firm.non_profit_organisation, "Not for profit organisation", format_yes_no)
+        add_field(main_rows, main_data, firm.solicitor_advocate, "Solicitor advocate", format_yes_no)
+        add_field(main_rows, main_data, firm.advocate_level, "Advocate level", format_advocate_level)
+        if firm.firm_type != "Legal Services Provider":
+            add_field(main_rows, main_data, firm.company_house_number, "Companies House number")
+        add_field(main_rows, main_data, firm.bar_council_roll, "Bar Council roll number")
 
-        additional_table = (
-            TransposedDataTable(structure=additional_rows, data=additional_data) if additional_rows else None
-        )
+        main_table = TransposedDataTable(structure=main_rows, data=main_data) if main_rows else None
 
-        return additional_table
+        return main_table
 
     def get_office_tables(self, firm, head_office: Office, other_offices: list[Office]) -> dict[str, DataTable]:
         """Gets two data tables one for the main office and one for other offices."""
@@ -163,6 +174,12 @@ class ViewProvider(MethodView):
 
         return office_tables
 
+    def get_contact_table(self, firm: Firm) -> DataTable:
+        contact_rows, contact_data = [], {}
+        add_field(contact_rows, contact_data, "Firstname Lastname", "Name")
+        contact_table = TransposedDataTable(structure=contact_rows, data=contact_data) if contact_rows else None
+        return contact_table
+
     def get_context(self, firm):
         pda = current_app.extensions["pda"]
 
@@ -177,9 +194,8 @@ class ViewProvider(MethodView):
             parent_provider: Firm = pda.get_provider_firm(firm.parent_firm_id)
 
         main_table = self.get_main_table(firm, head_office, parent_provider)
-        additional_table = self.get_additional_table(firm)
 
-        context = {"main_table": main_table, "additional_table": additional_table}
+        context = {"main_table": main_table}
 
         if self.subpage == "offices":
             offices = pda.get_provider_offices(firm.firm_id)
@@ -189,6 +205,9 @@ class ViewProvider(MethodView):
 
             office_tables = self.get_office_tables(firm, head_office, other_offices)
             context.update({"office_tables": office_tables})
+
+        if self.subpage == "contact":
+            context.update({"contact_table": self.get_contact_table(firm)})
 
         return context
 
@@ -201,8 +220,9 @@ class ViewProvider(MethodView):
             abort(404)
 
         context = self.get_context(firm)
+        template = self.templates.get(firm.firm_type, "view-provider-legal-services-provider.html")
 
-        return render_template(self.template, firm=firm, subpage=self.subpage, **context)
+        return render_template(template, firm=firm, subpage=self.subpage, **context)
 
 
 class ViewOffice(MethodView):

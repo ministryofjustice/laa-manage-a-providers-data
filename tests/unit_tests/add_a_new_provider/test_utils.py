@@ -104,4 +104,4 @@ class TestAddNewProvider:
             assert len(messages) == 1
             category, message = messages[0]
             assert category == "success"
-            assert message == "<b>New provider successfully created</b>"
+            assert message == "<b>New legal services provider successfully created</b>"
