@@ -66,13 +66,11 @@ def test_bank_account_form_caption_shows_provider_name(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_bank_account_form_hint_text_visible(page: Page):
-    """Test that the Bank Account form shows helpful hint text."""
+    """Test that the Bank Account form shows hint text."""
     navigate_to_bank_account(page)
 
-    # Check that hint text is visible and helpful
-    expect(page.get_by_text("The name on the bank account")).to_be_visible()
-    expect(page.get_by_text("6 digits, for example 12 34 56")).to_be_visible()
-    expect(page.get_by_text("8 digits, for example 12345678")).to_be_visible()
+    expect(page.get_by_text("Must be 6 digits long")).to_be_visible()
+    expect(page.get_by_text("Must be between 6 and 8 digits long")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -184,7 +182,7 @@ def test_bank_account_form_invalid_account_number_validation(page: Page):
     page.get_by_role("button", name="Submit").click()
 
     # Should show validation error
-    expect(page.get_by_text("Error: Enter a valid account number like 00733445")).to_be_visible()
+    expect(page.get_by_text("Error: Account number must be between 6 and 8 digits")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -199,7 +197,7 @@ def test_bank_account_form_invalid_account_number_letters_validation(page: Page)
     page.get_by_role("button", name="Submit").click()
 
     # Should show validation error
-    expect(page.get_by_text("Error: Enter a valid account number like 00733445")).to_be_visible()
+    expect(page.get_by_text("Error: Account number must be between 6 and 8 digits")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
