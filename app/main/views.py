@@ -5,7 +5,7 @@ from typing import Literal, NoReturn
 from flask import abort, current_app, redirect, render_template, request, session, url_for
 from flask.views import MethodView
 
-from app.components.tables import DataTable, TableStructure, TransposedDataTable, add_field
+from app.components.tables import Card, DataTable, TableStructure, TransposedDataTable, add_field
 from app.main.utils import add_new_provider
 from app.models import Firm, Office
 from app.utils.formatting import (
@@ -175,9 +175,22 @@ class ViewProvider(MethodView):
         return office_tables
 
     def get_contact_table(self, firm: Firm) -> DataTable:
-        contact_rows, contact_data = [], {}
-        add_field(contact_rows, contact_data, "Firstname Lastname", "Name")
-        contact_table = TransposedDataTable(structure=contact_rows, data=contact_data) if contact_rows else None
+        contact_table_structure = []
+        contact_data = {}
+
+        add_field(contact_table_structure, contact_data, "Liason manager", "Job title")
+        add_field(contact_table_structure, contact_data, "0118 9998819", "Telephone number")
+        add_field(contact_table_structure, contact_data, "name@domain.com", "Email address")
+        add_field(contact_table_structure, contact_data, "domain.com", "Website")
+        add_field(contact_table_structure, contact_data, "1st Jan 2025", "Active from")
+
+        card: Card = {"title": "Firstname Lastname", "action_text": "Change liaison manager", "action_url": "#"}
+
+        contact_table = (
+            TransposedDataTable(structure=contact_table_structure, data=contact_data, card=card)
+            if contact_data
+            else None
+        )
         return contact_table
 
     def get_context(self, firm):

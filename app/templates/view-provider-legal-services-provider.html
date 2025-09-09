@@ -45,7 +45,7 @@
 
 {% if subpage == "contact" %}
     <h3 class="govuk-heading-m">Contacts</h3>
-    {{ govukTable(contact_table.to_govuk_params()) }}
+    {{ govukSummaryList(contact_table.to_summary_govuk_params()) }}
 
 {% endif %}
 {% endblock %}
