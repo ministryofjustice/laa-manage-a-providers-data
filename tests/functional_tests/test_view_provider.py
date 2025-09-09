@@ -77,3 +77,20 @@ def test_add_new_lsp(page):
     expect(page.get_by_role("cell", name="Charity")).to_be_visible()
     expect(page.get_by_role("cell", name="/01/2020")).to_be_visible()
     expect(page.get_by_role("cell", name="12345678")).to_be_visible()
+
+
+@pytest.mark.usefixtures("live_server")
+def test_lsp_contact(page):
+    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("link", name="METROPOLITAN LAW CENTRE").click()
+
+    # Contact subpage visible on landing
+    expect(page.get_by_role("heading", name="Contacts")).to_be_visible()
+
+    # Summary list of liaison manager
+    expect(page.locator("dl")).to_contain_text("Job title")
+    expect(page.locator("dl")).to_contain_text("Telephone number")
+    expect(page.locator("dl")).to_contain_text("Email address")
+    expect(page.locator("dl")).to_contain_text("Website")
+    expect(page.locator("dl")).to_contain_text("Active from")
+    expect(page.get_by_role("link", name="Change liaison manager")).to_be_visible()
