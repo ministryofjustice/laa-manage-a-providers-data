@@ -135,6 +135,7 @@ def test_successful_form_submission_minimal_fields(page: Page):
     page.get_by_role("button", name="Submit").click()
 
     # Check we are on the view provider page
+    # TODO: Update this when full flow implemented
     expect(page.get_by_role("heading", name="Test Legal Services Provider")).to_be_visible()
     expect(page.get_by_text("New legal services provider successfully created")).to_be_visible()
 
@@ -159,6 +160,7 @@ def test_successful_form_submission_all_fields(page: Page):
     page.get_by_role("button", name="Submit").click()
 
     # Check we are on the view provider page
+    # TODO: Update this when full flow implemented
     expect(page.get_by_role("heading", name="Test Legal Services Provider")).to_be_visible()
     expect(page.get_by_text("New legal services provider successfully created")).to_be_visible()
 
