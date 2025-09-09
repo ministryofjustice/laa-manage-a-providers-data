@@ -247,7 +247,7 @@ class HeadOfficeContactDetailsForm(OfficeContactDetailsForm):
 
 
 class VATRegistrationForm(BaseForm):
-    title = "Head office: \nVAT Registration number (optional)"
+    title = "Head office: \nVAT registration number (optional)"
     url = "add-vat-number"
     submit_button_text = "Submit"
 
