@@ -199,7 +199,7 @@ class TransposedDataTable(DataTable):
         summary_rows = []
 
         for row in table_rows:
-            if len(row) >= 2:  # Should have at least key and one value
+            if len(row) == 2:  # Should have at least key and one value
                 summary_rows.append({"key": row[0], "value": row[1]})
 
         params = {
