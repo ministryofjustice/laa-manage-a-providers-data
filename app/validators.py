@@ -170,7 +170,7 @@ class ValidateSortCode:
     """Validate UK bank sort code format."""
 
     def __init__(self, message=None):
-        self.message = message or "Enter a valid sort code like 309430"
+        self.message = message or "Account number must be between 6 and 8 digits"
 
     def __call__(self, form, field):
         if field.data:
