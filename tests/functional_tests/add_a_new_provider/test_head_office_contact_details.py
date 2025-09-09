@@ -134,10 +134,8 @@ def test_successful_form_submission_minimal_fields(page: Page):
     page.get_by_role("textbox", name="DX centre").fill("Head Office Centre")
     page.get_by_role("button", name="Submit").click()
 
-    # Check we are on the view provider page
-    # TODO: Update this when full flow implemented
-    expect(page.get_by_role("heading", name="Test Legal Services Provider")).to_be_visible()
-    expect(page.get_by_text("New legal services provider successfully created")).to_be_visible()
+    # Check we are on the VAT registration number page
+    expect(page.get_by_role("heading", name="Head office: VAT registration number (optional)")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -159,10 +157,8 @@ def test_successful_form_submission_all_fields(page: Page):
     page.get_by_role("textbox", name="DX centre").fill("Head Office Centre")
     page.get_by_role("button", name="Submit").click()
 
-    # Check we are on the view provider page
-    # TODO: Update this when full flow implemented
-    expect(page.get_by_role("heading", name="Test Legal Services Provider")).to_be_visible()
-    expect(page.get_by_text("New legal services provider successfully created")).to_be_visible()
+    # Check we are on the VAT registration number page
+    expect(page.get_by_role("heading", name="Head office: VAT registration number (optional)")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -174,16 +170,12 @@ def test_optional_fields_not_required(page: Page):
     page.get_by_role("textbox", name="Address line 1").fill("123 Head Office Street")
     page.get_by_role("textbox", name="Town or city").fill("Head Office City")
     page.get_by_role("textbox", name="Postcode").fill("HO1 2CE")
-    page.get_by_role("textbox", name="Telephone number").fill("01234567890")
     page.get_by_role("textbox", name="Email address").fill("headoffice@testlsp.com")
-    page.get_by_role("textbox", name="DX number").fill("DX123456")
-    page.get_by_role("textbox", name="DX centre").fill("Head Office Centre")
-    # Leave optional fields empty: address_line_2-4, county
+    # Leave optional fields empty: address_line_2-4, county, telephone number, DX number & centre
     page.get_by_role("button", name="Submit").click()
 
-    # Check we are on the view provider page
-    expect(page.get_by_role("heading", name="Test Legal Services Provider")).to_be_visible()
-    expect(page.get_by_text("New legal services provider successfully created")).to_be_visible()
+    # Check we are on the VAT registration number page
+    expect(page.get_by_role("heading", name="Head office: VAT registration number (optional)")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")

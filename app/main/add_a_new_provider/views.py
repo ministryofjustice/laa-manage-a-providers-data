@@ -138,7 +138,7 @@ class HeadOfficeContactDetailsFormView(BaseFormView):
         }
 
         return super().form_valid(form)
-      
+
     @staticmethod
     def check_parent_provider_exists_in_session():
         if not session.get("new_provider"):
@@ -178,13 +178,13 @@ class VATRegistrationFormView(FullWidthBaseFormView):
         )
 
         return super().form_valid(form)
-    
+
     @staticmethod
     def check_lsp_provider_exists_in_session():
         if not session.get("new_provider"):
             abort(400)
 
-        if session.get("new_provider").get("firm_type") == "Legal Services Provider":
+        if session.get("new_provider").get("firm_type") != "Legal Services Provider":
             abort(400)
 
     def get(self, context, **kwargs):
@@ -193,7 +193,10 @@ class VATRegistrationFormView(FullWidthBaseFormView):
         # Check if the new head office data exists in the session
         if not session.get("new_head_office"):
             abort(400)
-            
+
+        firm = Firm(**session.get("new_provider"))
+        form = self.get_form_class()(firm=firm)
+        return render_template(self.template, **self.get_context_data(form, **kwargs))
 
     def post(self, *args, **kwargs) -> Response | str:
         self.check_lsp_provider_exists_in_session()
