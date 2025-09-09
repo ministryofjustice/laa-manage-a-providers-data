@@ -35,7 +35,7 @@ def add_new_provider(firm: Firm) -> Firm:
         raise RuntimeError("Provider Data API does not support this functionality yet.")
 
     new_firm = pda.create_provider_firm(firm)
-    flash("<b>New provider successfully created</b>", "success")
+    flash(f"<b>New {new_firm.firm_type.lower()} successfully created</b>", "success")
     return new_firm
 
 
