@@ -249,7 +249,6 @@ class VATRegistrationForm(BaseForm):
     url = "add-vat-number"
     submit_button_text = "Submit"
 
-
     @property
     def caption(self):
         # Get provider name from session if available
