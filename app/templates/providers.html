@@ -40,11 +40,17 @@
         "href": url_for("main.add_parent_provider")
       }) }}
 
-      <div class="moj-scrollable-pane">
-        {{ govukTable(table.to_govuk_params()) }}
-      </div>
+      {% if form.table %}
+        {% if form.search_term %}
+          <h2 class="govuk-heading-m">{{ form.num_results }} search {{ "result" if form.num_results == 1 else "results" }} for ‘{{ form.search_term }}’</h2>
+        {% endif %}
 
-      {{ mojPagination(currentPage=form.page, numShownPerPage=form.firms_shown_per_page, numResults=form.num_results) }}
+        <div class="moj-scrollable-pane">
+          {{ govukTable(form.table.to_govuk_params()) }}
+        </div>
+
+        {{ mojPagination(currentPage=form.page, numShownPerPage=form.providers_shown_per_page, numResults=form.num_results) }}
+      {% endif %}
     </div>
   </div>
 
