@@ -177,11 +177,8 @@ def test_chambers_optional_fields_not_required(page: Page):
     page.get_by_role("textbox", name="Address line 1").fill("123 Chambers Street")
     page.get_by_role("textbox", name="Town or city").fill("Chambers City")
     page.get_by_role("textbox", name="Postcode").fill("CH1 2MB")
-    page.get_by_role("textbox", name="Telephone number").fill("01234567890")
     page.get_by_role("textbox", name="Email address").fill("contact@testchambers.com")
-    page.get_by_role("textbox", name="DX number").fill("DX789123")
-    page.get_by_role("textbox", name="DX centre").fill("Chambers Centre")
-    # Leave optional fields empty: address_line_2-4, county
+    # Leave optional fields empty: address_line_2-4, county, telephone number, DX number & centre
     page.get_by_role("button", name="Submit").click()
 
     # Should redirect to create provider page
