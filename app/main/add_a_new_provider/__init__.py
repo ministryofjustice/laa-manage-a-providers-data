@@ -5,7 +5,6 @@ from .forms import (
     AddProviderForm,
     AdvocateDetailsForm,
     AssignChambersForm,
-    ChambersDetailsForm,
     HeadOfficeContactDetailsForm,
     LspDetailsForm,
 )
