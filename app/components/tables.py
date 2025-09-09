@@ -128,8 +128,9 @@ class DataTable:
         return [{key: column.get(key, "") for key in ("id", "text", "classes")} for column in self.structure]
 
     def to_govuk_params(self, **kwargs) -> dict[str, Any]:
-        """Convert table to govukTable dictionary for template rendering.
+        """Convert table to dictionary for template rendering.
         Usage: {{ govukTable(table.to_govuk_params()) }}
+        With overrides: {{ govukTable(table.to_govuk_params(classes="custom-class")) }}
         """
         params = {
             "head": self.get_headings(),
@@ -139,8 +140,7 @@ class DataTable:
         }
         if self.sortable_table:
             params.update({"attributes": {"data-module": SORTABLE_TABLE_MODULE}})
-
-        params.update(kwargs)
+        params.update(kwargs)  # Allow overriding any defaults
         return params
 
 
