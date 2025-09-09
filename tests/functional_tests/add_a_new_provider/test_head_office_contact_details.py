@@ -134,14 +134,10 @@ def test_successful_form_submission_minimal_fields(page: Page):
     page.get_by_role("textbox", name="DX centre").fill("Head Office Centre")
     page.get_by_role("button", name="Submit").click()
 
-    # Should redirect to create provider page or success page
-    # Check that we're no longer on the contact details page
-    expect(page.get_by_role("heading", name="Head office contact details")).not_to_be_visible()
-
-    # Should see the success flow (depending on what main.create_provider does)
-    # We'll check for common success indicators
-    current_url = page.url
-    assert "add-contact-details" not in current_url
+    # Check we are on the view provider page
+    # TODO: Update this when full flow implemented
+    expect(page.get_by_role("heading", name="Test Legal Services Provider")).to_be_visible()
+    expect(page.get_by_text("New legal services provider successfully created")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -163,13 +159,10 @@ def test_successful_form_submission_all_fields(page: Page):
     page.get_by_role("textbox", name="DX centre").fill("Head Office Centre")
     page.get_by_role("button", name="Submit").click()
 
-    # Should redirect to create provider page or success page
-    # Check that we're no longer on the contact details page
-    expect(page.get_by_role("heading", name="Head office contact details")).not_to_be_visible()
-
-    # Should see the success flow
-    current_url = page.url
-    assert "add-contact-details" not in current_url
+    # Check we are on the view provider page
+    # TODO: Update this when full flow implemented
+    expect(page.get_by_role("heading", name="Test Legal Services Provider")).to_be_visible()
+    expect(page.get_by_text("New legal services provider successfully created")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -188,10 +181,9 @@ def test_optional_fields_not_required(page: Page):
     # Leave optional fields empty: address_line_2-4, county
     page.get_by_role("button", name="Submit").click()
 
-    # Should redirect to create provider page
-    expect(page.get_by_role("heading", name="Head office contact details")).not_to_be_visible()
-    current_url = page.url
-    assert "add-contact-details" not in current_url
+    # Check we are on the view provider page
+    expect(page.get_by_role("heading", name="Test Legal Services Provider")).to_be_visible()
+    expect(page.get_by_text("New legal services provider successfully created")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
