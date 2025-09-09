@@ -1,5 +1,6 @@
 from flask import Response, abort, redirect, render_template, request, session, url_for
 
+from app.constants import PARENT_FIRM_TYPE_CHOICES
 from app.main.add_a_new_provider import AssignChambersForm
 from app.models import Firm
 from app.views import BaseFormView
@@ -132,25 +133,24 @@ class HeadOfficeContactDetailsFormView(BaseFormView):
 
         return super().form_valid(form)
 
-    def get(self, context, **kwargs):
-        # Check if firm data exists in session
-        if (
-            not session.get("new_provider")
-            and session.get("new_provider", {}).get("firm_type") == "Legal Services Provider"
-        ):
+    @staticmethod
+    def check_parent_provider_exists_in_session():
+        if not session.get("new_provider"):
             abort(400)
+
+        valid_parent_types = [choice[0] for choice in PARENT_FIRM_TYPE_CHOICES]
+        if session.get("new_provider").get("firm_type") not in valid_parent_types:
+            abort(400)
+
+    def get(self, context, **kwargs):
+        self.check_parent_provider_exists_in_session()
 
         firm = Firm(**session.get("new_provider"))
         form = self.get_form_class()(firm=firm)
         return render_template(self.template, **self.get_context_data(form, **kwargs))
 
     def post(self, *args, **kwargs) -> Response | str:
-        # Check if firm data exists in session
-        if (
-            not session.get("new_provider")
-            and session.get("new_provider", {}).get("firm_type") == "Legal Services Provider"
-        ):
-            abort(400)
+        self.check_parent_provider_exists_in_session()
 
         firm = Firm(**session.get("new_provider"))
         form = self.get_form_class()(firm=firm)
