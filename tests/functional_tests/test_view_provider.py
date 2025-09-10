@@ -95,6 +95,9 @@ def test_add_new_lsp(page):
 @pytest.mark.usefixtures("live_server")
 def test_lsp_contact(page):
     page.get_by_role("button", name="Start now").click()
+    # Perform a blank search to view all providers
+    page.get_by_role("button", name="Search").click()
+
     page.get_by_role("link", name="METROPOLITAN LAW CENTRE").click()
 
     # Contact subpage visible on landing
