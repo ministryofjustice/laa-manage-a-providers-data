@@ -262,7 +262,7 @@ class VATRegistrationForm(BaseForm):
         widget=GovTextInput(
             heading_class="govuk-fieldset__legend--xl",
             classes="govuk-!-width-one-half",
-            hint="This is 9 numbers, sometimes with 'GB' at the start, for example 123456789 or GB123456789.",
+            hint="This is 9 numbers, sometimes with ‘GB’ at the start, for example 123456789 or GB123456789.",
         ),
         validators=[
             Optional(),
