@@ -1,5 +1,5 @@
 from flask import current_app, session
-from wtforms import RadioField
+from wtforms import RadioField, SubmitField
 from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired, Length, Optional
 
@@ -11,13 +11,15 @@ from app.constants import (
 )
 from app.fields import GovUKTableRadioField
 from app.validators import (
+    ValidateAccountNumber,
     ValidateCompaniesHouseNumber,
     ValidateGovDateField,
     ValidatePastDate,
     ValidateSearchResults,
+    ValidateSortCode,
     ValidateVATRegistrationNumber,
 )
-from app.widgets import GovDateInput, GovRadioInput, GovTextInput
+from app.widgets import GovDateInput, GovRadioInput, GovSubmitInput, GovTextInput
 
 from ...fields import GovDateField
 from ...forms import BaseForm
@@ -266,4 +268,58 @@ class VATRegistrationForm(BaseForm):
             Optional(),
             ValidateVATRegistrationNumber(message="Enter the VAT registration number in the correct format"),
         ],
+    )
+
+
+class BankAccountForm(BaseForm):
+    title = "Head office: \nBank account details"
+    url = "add-bank-account"
+    submit_button_text = "Submit"
+
+    @property
+    def caption(self):
+        # Get provider name from session if available
+        new_provider_name = session.get("new_provider", {}).get("firm_name", "Unknown")
+        return new_provider_name
+
+    bank_account_name = StringField(
+        "Account name",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-!-width-one-quarter",
+        ),
+        validators=[
+            InputRequired(message="Enter the account name"),
+            Length(max=100, message="Account name must be 100 characters or less"),
+        ],
+    )
+
+    sort_code = StringField(
+        "Sort code",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-input--width-10",
+            hint="Must be 6 digits long",
+        ),
+        validators=[
+            InputRequired(message="Enter a sort code"),
+            ValidateSortCode(),
+        ],
+    )
+
+    account_number = StringField(
+        "Account number",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-!-width-one-quarter",
+            hint="Must be between 6 and 8 digits long",
+        ),
+        validators=[
+            InputRequired(message="Enter an account number"),
+            ValidateAccountNumber(),
+        ],
+    )
+
+    skip_button = SubmitField(
+        "Cheque payment: Skip this step", widget=GovSubmitInput(classes="govuk-button--secondary govuk-!-margin-left-2")
     )

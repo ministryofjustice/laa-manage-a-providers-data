@@ -140,7 +140,7 @@ class HeadOfficeContactDetailsFormView(BaseFormView):
         return super().form_valid(form)
 
     @staticmethod
-    def check_parent_provider_exists_in_session():
+    def get_valid_firm_or_abort():
         if not session.get("new_provider"):
             abort(400)
 
@@ -149,14 +149,14 @@ class HeadOfficeContactDetailsFormView(BaseFormView):
             abort(400)
 
     def get(self, context, **kwargs):
-        self.check_parent_provider_exists_in_session()
+        self.get_valid_firm_or_abort()
 
         firm = Firm(**session.get("new_provider"))
         form = self.get_form_class()(firm=firm)
         return render_template(self.template, **self.get_context_data(form, **kwargs))
 
     def post(self, *args, **kwargs) -> Response | str:
-        self.check_parent_provider_exists_in_session()
+        self.get_valid_firm_or_abort()
 
         firm = Firm(**session.get("new_provider"))
         form = self.get_form_class()(firm=firm)
@@ -168,7 +168,7 @@ class HeadOfficeContactDetailsFormView(BaseFormView):
 
 
 class VATRegistrationFormView(FullWidthBaseFormView):
-    success_endpoint = "main.create_provider"
+    success_endpoint = "main.add_bank_account"
 
     def form_valid(self, form):
         session["new_head_office"].update(
@@ -180,7 +180,7 @@ class VATRegistrationFormView(FullWidthBaseFormView):
         return super().form_valid(form)
 
     @staticmethod
-    def check_lsp_provider_exists_in_session():
+    def get_valid_firm_or_abort():
         if not session.get("new_provider"):
             abort(400)
 
@@ -188,7 +188,7 @@ class VATRegistrationFormView(FullWidthBaseFormView):
             abort(400)
 
     def get(self, context, **kwargs):
-        self.check_lsp_provider_exists_in_session()
+        self.get_valid_firm_or_abort()
 
         # Check if the new head office data exists in the session
         if not session.get("new_head_office"):
@@ -199,11 +199,63 @@ class VATRegistrationFormView(FullWidthBaseFormView):
         return render_template(self.template, **self.get_context_data(form, **kwargs))
 
     def post(self, *args, **kwargs) -> Response | str:
-        self.check_lsp_provider_exists_in_session()
+        self.get_valid_firm_or_abort()
 
         # Check if the new head office data exists in the session
         if not session.get("new_head_office"):
             abort(400)
+
+        firm = Firm(**session.get("new_provider"))
+        form = self.get_form_class()(firm=firm)
+
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form, **kwargs)
+
+
+class BankAccountFormView(FullWidthBaseFormView):
+    success_endpoint = "main.create_provider"
+
+    def form_valid(self, form):
+        session["new_head_office_bank_account"] = {
+            "bank_account_name": form.data.get("bank_account_name"),
+            "sort_code": form.data.get("sort_code"),
+            "account_number": form.data.get("account_number"),
+        }
+
+        return super().form_valid(form)
+
+    @staticmethod
+    def get_valid_firm_or_abort():
+        if not session.get("new_provider"):
+            abort(400)
+
+        if session.get("new_provider").get("firm_type") != "Legal Services Provider":
+            abort(400)
+
+    def get(self, context, **kwargs):
+        self.get_valid_firm_or_abort()
+
+        # Check if the new head office data exists in the session
+        if not session.get("new_head_office"):
+            abort(400)
+
+        firm = Firm(**session.get("new_provider"))
+        form = self.get_form_class()(firm=firm)
+        return render_template(self.template, **self.get_context_data(form, **kwargs))
+
+    def post(self, *args, **kwargs) -> Response | str:
+        self.get_valid_firm_or_abort()
+
+        # Check if the new head office data exists in the session
+        if not session.get("new_head_office"):
+            abort(400)
+
+        # Check if skip button was clicked (before validation)
+        if request.form.get("skip_button"):
+            # Skip storing bank account data and go to next step
+            return redirect(url_for(self.success_endpoint))
 
         firm = Firm(**session.get("new_provider"))
         form = self.get_form_class()(firm=firm)

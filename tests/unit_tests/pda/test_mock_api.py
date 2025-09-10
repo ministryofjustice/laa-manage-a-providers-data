@@ -2,7 +2,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from app.models import Firm, Office
+from app.models import BankAccount, Firm, Office
 from app.pda.mock_api import (
     MockProviderDataApi,
     ProviderDataApiError,
@@ -55,6 +55,7 @@ class TestDataLoadFunctions:
             {"offices": [{"officeId": 101}]},  # offices.json
             {"contracts": [{"contractId": 1}]},  # contracts.json
             {"schedules": [{"scheduleId": 1}]},  # schedules.json
+            {"bank_accounts": [{"vendorSiteId": 101}]},  # bank_accounts.json
         ]
 
         result = _load_mock_data()
@@ -64,9 +65,10 @@ class TestDataLoadFunctions:
             "offices": [{"officeId": 101}],
             "contracts": [{"contractId": 1}],
             "schedules": [{"scheduleId": 1}],
+            "bank_accounts": [{"vendorSiteId": 101}],
         }
         assert result == expected
-        assert mock_load_fixture.call_count == 4
+        assert mock_load_fixture.call_count == 5
 
     def test_generate_unique_office_code(self):
         """Test generation of unique office code."""
@@ -288,7 +290,13 @@ class TestMockProviderDataApi:
 
     @patch("app.pda.mock_api._load_mock_data")
     def test_load_mock_data_called_on_init(self, mock_load_data):
-        mock_load_data.return_value = {"firms": [], "offices": [], "contracts": [], "schedules": []}
+        mock_load_data.return_value = {
+            "firms": [],
+            "offices": [],
+            "contracts": [],
+            "schedules": [],
+            "bank_accounts": [],
+        }
 
         MockProviderDataApi()
 
@@ -360,3 +368,194 @@ class TestMockProviderDataApi:
             (o for o in mock_api._mock_data["offices"] if o["firmOfficeCode"] == new_office.firm_office_code), None
         )
         assert office_in_data["_firmId"] == 1
+
+    def test_get_office_bank_account_success(self, mock_api):
+        """Test getting a bank account for an office."""
+        mock_api._mock_data = {
+            "offices": [{"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101}],
+            "bank_accounts": [
+                {
+                    "vendorSiteId": 101,
+                    "bankName": "Test Bank",
+                    "bankBranchName": "Test Branch",
+                    "sortCode": "123456",
+                    "accountNumber": "12345678",
+                    "bankAccountName": "Test Account",
+                    "currencyCode": "GBP",
+                    "accountType": "Current Account",
+                    "primaryFlag": "Y",
+                    "country": "GB",
+                }
+            ],
+        }
+
+        result = mock_api.get_office_bank_account(1, "1A001L")
+
+        assert result is not None
+        assert result.vendor_site_id == 101
+        assert result.bank_name == "Test Bank"
+        assert result.sort_code == "123456"
+        assert result.account_number == "12345678"
+
+    def test_get_office_bank_account_not_found(self, mock_api):
+        """Test getting a bank account when none exists."""
+        mock_api._mock_data = {
+            "offices": [{"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101}],
+            "bank_accounts": [],
+        }
+
+        result = mock_api.get_office_bank_account(1, "1A001L")
+
+        assert result is None
+
+    def test_get_office_bank_account_office_not_found(self, mock_api):
+        """Test getting a bank account when office doesn't exist."""
+        mock_api._mock_data = {"offices": [], "bank_accounts": []}
+
+        result = mock_api.get_office_bank_account(1, "NONEXISTENT")
+
+        assert result is None
+
+    def test_get_office_bank_account_invalid_params(self, mock_api):
+        """Test validation of parameters."""
+        with pytest.raises(ValueError, match="firm_id must be a positive integer"):
+            mock_api.get_office_bank_account(0, "1A001L")
+
+        with pytest.raises(ValueError, match="office_code must be a non-empty string"):
+            mock_api.get_office_bank_account(1, "")
+
+    def test_create_office_bank_account_success(self, mock_api):
+        """Test creating a bank account for an office."""
+        mock_api._mock_data = {
+            "offices": [{"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101}],
+            "bank_accounts": [],
+        }
+
+        bank_account = BankAccount(
+            vendor_site_id=999,  # This should be overridden
+            bank_name="New Bank",
+            bank_branch_name="New Branch",
+            sort_code="654321",
+            account_number="87654321",
+            bank_account_name="New Account",
+            currency_code="GBP",
+            account_type="Business Account",
+            primary_flag="Y",
+            country="GB",
+        )
+
+        result = mock_api.create_office_bank_account(1, "1A001L", bank_account)
+
+        assert result.vendor_site_id == 101  # Should be set to office ID
+        assert result.bank_name == "New Bank"
+        assert len(mock_api._mock_data["bank_accounts"]) == 1
+
+    def test_create_office_bank_account_office_not_found(self, mock_api):
+        """Test creating bank account when office doesn't exist."""
+        mock_api._mock_data = {"offices": [], "bank_accounts": []}
+
+        bank_account = BankAccount(
+            vendor_site_id=101,
+            bank_name="Test Bank",
+            bank_branch_name="Test Branch",
+            sort_code="123456",
+            account_number="12345678",
+            bank_account_name="Test Account",
+        )
+
+        with pytest.raises(ProviderDataApiError, match="Office NONEXISTENT not found"):
+            mock_api.create_office_bank_account(1, "NONEXISTENT", bank_account)
+
+    def test_create_office_bank_account_already_exists(self, mock_api):
+        """Test creating bank account when one already exists."""
+        mock_api._mock_data = {
+            "offices": [{"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101}],
+            "bank_accounts": [{"vendorSiteId": 101, "bankName": "Existing Bank"}],
+        }
+
+        bank_account = BankAccount(
+            vendor_site_id=101,
+            bank_name="New Bank",
+            bank_branch_name="New Branch",
+            sort_code="123456",
+            account_number="12345678",
+            bank_account_name="New Account",
+        )
+
+        with pytest.raises(ProviderDataApiError, match="Office 1A001L already has a bank account"):
+            mock_api.create_office_bank_account(1, "1A001L", bank_account)
+
+    def test_update_office_bank_account_success(self, mock_api):
+        """Test updating a bank account for an office."""
+        mock_api._mock_data = {
+            "offices": [{"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101}],
+            "bank_accounts": [
+                {
+                    "vendorSiteId": 101,
+                    "bankName": "Old Bank",
+                    "bankBranchName": "Old Branch",
+                    "sortCode": "111111",
+                    "accountNumber": "11111111",
+                    "bankAccountName": "Old Account",
+                    "currencyCode": "GBP",
+                    "accountType": "Current Account",
+                    "primaryFlag": "Y",
+                    "country": "GB",
+                }
+            ],
+        }
+
+        updated_account = BankAccount(
+            vendor_site_id=999,  # This should be overridden
+            bank_name="Updated Bank",
+            bank_branch_name="Updated Branch",
+            sort_code="222222",
+            account_number="22222222",
+            bank_account_name="Updated Account",
+            currency_code="GBP",
+            account_type="Business Account",
+            primary_flag="Y",
+            country="GB",
+        )
+
+        result = mock_api.update_office_bank_account(1, "1A001L", updated_account)
+
+        assert result.vendor_site_id == 101  # Should be set to office ID
+        assert result.bank_name == "Updated Bank"
+        assert result.sort_code == "222222"
+        assert mock_api._mock_data["bank_accounts"][0]["bankName"] == "Updated Bank"
+
+    def test_update_office_bank_account_not_found(self, mock_api):
+        """Test updating bank account when none exists."""
+        mock_api._mock_data = {
+            "offices": [{"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101}],
+            "bank_accounts": [],
+        }
+
+        bank_account = BankAccount(
+            vendor_site_id=101,
+            bank_name="Test Bank",
+            bank_branch_name="Test Branch",
+            sort_code="123456",
+            account_number="12345678",
+            bank_account_name="Test Account",
+        )
+
+        with pytest.raises(ProviderDataApiError, match="Bank account not found for office 1A001L"):
+            mock_api.update_office_bank_account(1, "1A001L", bank_account)
+
+    def test_update_office_bank_account_office_not_found(self, mock_api):
+        """Test updating bank account when office doesn't exist."""
+        mock_api._mock_data = {"offices": [], "bank_accounts": []}
+
+        bank_account = BankAccount(
+            vendor_site_id=101,
+            bank_name="Test Bank",
+            bank_branch_name="Test Branch",
+            sort_code="123456",
+            account_number="12345678",
+            bank_account_name="Test Account",
+        )
+
+        with pytest.raises(ProviderDataApiError, match="Office NONEXISTENT not found"):
+            mock_api.update_office_bank_account(1, "NONEXISTENT", bank_account)

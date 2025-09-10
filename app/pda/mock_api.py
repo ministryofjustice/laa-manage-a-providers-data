@@ -8,7 +8,7 @@ from unittest.mock import Mock
 
 from pydantic import ValidationError
 
-from app.models import Firm, Office
+from app.models import BankAccount, Firm, Office
 
 
 class ProviderDataApiError(Exception):
@@ -46,6 +46,7 @@ def _load_mock_data() -> Dict[str, Any]:
     offices_data = _load_fixture(os.path.join(fixtures_dir, "offices.json"))
     contracts_data = _load_fixture(os.path.join(fixtures_dir, "contracts.json"))
     schedules_data = _load_fixture(os.path.join(fixtures_dir, "schedules.json"))
+    bank_accounts_data = _load_fixture(os.path.join(fixtures_dir, "bank_accounts.json"))
 
     # Store all data as-is for internal use
     return {
@@ -53,6 +54,7 @@ def _load_mock_data() -> Dict[str, Any]:
         "offices": offices_data.get("offices", []),
         "contracts": contracts_data.get("contracts", []),
         "schedules": schedules_data.get("schedules", []),
+        "bank_accounts": bank_accounts_data.get("bank_accounts", []),
     }
 
 
@@ -377,7 +379,7 @@ class MockProviderDataApi:
             Office: The created Office model instance with assigned ID
         """
         # Generate a new office ID
-        existing_ids = [office_data.get("officeId", 0) for office_data in self._mock_data["offices"]]
+        existing_ids = [office_data.get("firmOfficeId", 0) for office_data in self._mock_data["offices"]]
         new_office_id = max(existing_ids, default=0) + 1
 
         # Generate unique office code
@@ -394,3 +396,112 @@ class MockProviderDataApi:
         self._mock_data["offices"].append(updated_office_dict)
 
         return updated_office
+
+    def get_office_bank_account(self, firm_id: int, office_code: str) -> BankAccount | None:
+        """
+        Get the bank account for a specific office (each office has only one bank account).
+
+        Args:
+            firm_id: The firm ID
+            office_code: The office code
+
+        Returns:
+            BankAccount model instance, or None if not found
+        """
+        if not isinstance(firm_id, int) or firm_id <= 0:
+            raise ValueError("firm_id must be a positive integer")
+        if not office_code or not isinstance(office_code, str):
+            raise ValueError("office_code must be a non-empty string")
+
+        office_data = self._find_office_data(firm_id, office_code)
+        if office_data is None:
+            return None
+
+        office_id = office_data.get("firmOfficeId")
+        if not office_id:
+            return None
+
+        # Find the bank account for this office
+        for account in self._mock_data["bank_accounts"]:
+            if account.get("vendorSiteId") == office_id:
+                try:
+                    return BankAccount(**account)
+                except ValidationError as e:
+                    self.logger.error(f"Invalid bank account data in mock for office {office_code}: {e}")
+                    raise ProviderDataApiError(f"Invalid bank account data: {e}")
+
+        return None
+
+    def create_office_bank_account(self, firm_id: int, office_code: str, bank_account: BankAccount) -> BankAccount:
+        """
+        Create a bank account for an office.
+
+        Args:
+            firm_id: The firm ID
+            office_code: The office code
+            bank_account: BankAccount model instance to create
+
+        Returns:
+            BankAccount: The created BankAccount model instance
+
+        Raises:
+            ProviderDataApiError: If office doesn't exist or already has a bank account
+        """
+        if not isinstance(firm_id, int) or firm_id <= 0:
+            raise ValueError("firm_id must be a positive integer")
+        if not office_code or not isinstance(office_code, str):
+            raise ValueError("office_code must be a non-empty string")
+
+        office_data = self._find_office_data(firm_id, office_code)
+        if office_data is None:
+            raise ProviderDataApiError(f"Office {office_code} not found for firm {firm_id}")
+
+        office_id = office_data.get("firmOfficeId")
+
+        # Check if office already has a bank account
+        existing_account = self.get_office_bank_account(firm_id, office_code)
+        if existing_account:
+            raise ProviderDataApiError(f"Office {office_code} already has a bank account")
+
+        # Set the vendor_site_id to the office ID
+        updated_account = bank_account.model_copy(update={"vendor_site_id": office_id})
+
+        # Add to mock data
+        self._mock_data["bank_accounts"].append(updated_account.to_api_dict())
+
+        return updated_account
+
+    def update_office_bank_account(self, firm_id: int, office_code: str, bank_account: BankAccount) -> BankAccount:
+        """
+        Update the bank account for an office.
+
+        Args:
+            firm_id: The firm ID
+            office_code: The office code
+            bank_account: BankAccount model instance with updated data
+
+        Returns:
+            BankAccount: The updated BankAccount model instance
+
+        Raises:
+            ProviderDataApiError: If office or bank account doesn't exist
+        """
+        if not isinstance(firm_id, int) or firm_id <= 0:
+            raise ValueError("firm_id must be a positive integer")
+        if not office_code or not isinstance(office_code, str):
+            raise ValueError("office_code must be a non-empty string")
+
+        office_data = self._find_office_data(firm_id, office_code)
+        if office_data is None:
+            raise ProviderDataApiError(f"Office {office_code} not found for firm {firm_id}")
+
+        office_id = office_data.get("firmOfficeId")
+
+        # Find and update the bank account
+        for i, account in enumerate(self._mock_data["bank_accounts"]):
+            if account.get("vendorSiteId") == office_id:
+                updated_account = bank_account.model_copy(update={"vendor_site_id": office_id})
+                self._mock_data["bank_accounts"][i] = updated_account.to_api_dict()
+                return updated_account
+
+        raise ProviderDataApiError(f"Bank account not found for office {office_code}")

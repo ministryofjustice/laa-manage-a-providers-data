@@ -107,3 +107,51 @@ class Office(BaseModel):
 
     def get_is_head_office(self):
         return self.head_office == "N/A"
+
+
+class BankAccount(BaseModel):
+    """Bank Account model
+
+    Represents account details for an office.
+    Supports both snake_case (internal) and camelCase (API) field names.
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Accept both snake_case AND camelCase
+        str_strip_whitespace=True,  # Auto-strip whitespace from strings
+        validate_assignment=True,  # Validate when fields are assigned
+        extra="forbid",  # Don't allow extra fields
+    )
+
+    # vendorSiteId maps to firm_office_id
+    vendor_site_id: int = Field(alias="vendorSiteId", gt=0, default=None)  # This is the firm_office_id
+    bank_name: str = Field(alias="bankName", min_length=1, default=None)
+    bank_branch_name: str = Field(alias="bankBranchName", min_length=1, default=None)
+    sort_code: str = Field(alias="sortCode", min_length=6, max_length=6, default=None)
+    account_number: str = Field(alias="accountNumber", min_length=6, max_length=8, default=None)
+    bank_account_name: str = Field(alias="bankAccountName", min_length=1, default=None)
+    currency_code: str = Field(alias="currencyCode", default="GBP")
+    account_type: str = Field(alias="accountType", default=None)
+    primary_flag: str = Field(alias="primaryFlag", default="N")
+
+    # Bank address fields
+    address_line_1: Optional[str] = Field(alias="addressLine1", default=None)
+    address_line_2: Optional[str] = Field(alias="addressLine2", default=None)
+    address_line_3: Optional[str] = Field(alias="addressLine3", default=None)
+    city: Optional[str] = Field(default=None)
+    county: Optional[str] = Field(default=None)
+    country: str = Field(default="GB")
+    zip: Optional[str] = Field(default=None)
+
+    def to_api_dict(self) -> dict:
+        """Export as camelCase dictionary for API calls."""
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    def to_internal_dict(self) -> dict:
+        """Export as snake_case dictionary for internal use."""
+        return self.model_dump(by_alias=False, exclude_none=True)
+
+    @property
+    def firm_office_id(self) -> int:
+        """Convenience property to access vendor_site_id as firm_office_id."""
+        return self.vendor_site_id
