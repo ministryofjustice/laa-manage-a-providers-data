@@ -6,6 +6,7 @@
 {%- from 'govuk_frontend_jinja/components/button/macro.html' import govukButton -%}
 {%- from 'components/moj_sub_navigation.html' import mojSubNavigation %}
 {%- from 'components/back_link.html' import govukBackLink -%}
+{% from 'govuk_frontend_jinja/components/summary-list/macro.html' import govukSummaryList %}
 
 {% block beforeContent %}
   {{ super() }}
@@ -14,51 +15,19 @@
 
 {% block pageContent %}
 
-  <span class="govuk-caption-xl">{{ firm.firm_type }}</span>
+  <span class="govuk-caption-xl">{{ firm.firm_type|capitalize }}</span>
   <h1 class="govuk-heading-xl">{{ firm.firm_name }}</h1>
 
-  {{ govukButton({
-    "text": "Add an office",
-    "href": url_for("main.add_office", firm=firm)
-  }) }}
-
-  {{ govukButton({
-    "text": "Make inactive",
-    "classes": "govuk-button--secondary govuk-!-margin-left-3",
-  }) }}
+{% block actionButtons %}
+  {# Place firm-type specific action buttons  #}
+{% endblock %}
 
   {% if main_table %}
     {{ govukTable(main_table.to_govuk_params()) }}
   {% endif %}
 
-  {% if additional_table %}
-    <h2 class="govuk-heading-m">Additional details</h2>
-    {{ govukTable(additional_table.to_govuk_params()) }}
-  {% endif %}
-
-  {{ mojSubNavigation({
-    "label": "Sub navigation",
-    "items": [{
-      "text": "Contact",
-      "href": url_for("main.view_provider_contact", firm=firm),
-      "active": subpage == "contact"
-    }, {
-      "text": "Offices",
-      "href": url_for("main.view_provider_offices", firm=firm),
-      "active": subpage == "offices"
-    }]
-  }) }}
-
-  {% if subpage == "offices" %}
-    {% if "head" in office_tables %}
-      <h3 class="govuk-heading-m">Head office</h3>
-      {{ govukTable(office_tables.head.to_govuk_params()) }}
-    {% endif %}
-
-    {% if "other" in office_tables %}
-      <h3 class="govuk-heading-m">Offices</h3>
-      {{ govukTable(office_tables.other.to_govuk_params()) }}
-    {% endif %}
-  {% endif %}
+{% block firmTypeSubNavigation %}
+  {# Sub-navigation with type-appropriate panels #}
+{% endblock %}
 
 {% endblock %}
