@@ -62,6 +62,11 @@ def test_assign_contract_manager_form_loads_correctly(page: Page):
     # Verify the page title
     expect(page.get_by_role("heading", name="Assign contract manager")).to_be_visible()
 
+    # Verify the hint text
+    expect(
+        page.get_by_text("If you cannot find the contract manager you want to assign, contact {{name}}")
+    ).to_be_visible()
+
     # Verify form elements are present
     expect(page.get_by_role("textbox", name="Search for a contract manager")).to_be_visible()
     expect(page.get_by_role("button", name="Search")).to_be_visible()
