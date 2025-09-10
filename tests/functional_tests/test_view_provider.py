@@ -89,11 +89,10 @@ def test_add_new_lsp(page):
     page.get_by_role("button", name="Cheque payment: Skip this step").click()
 
     # Add liaison manager information
-    page.get_by_role("textbox", name="Address line 1").fill("123 Provider Street")
-    page.get_by_role("textbox", name="Town or city").fill("Provider City")
-    page.get_by_role("textbox", name="Postcode").fill("PR1 2MB")
-    page.get_by_role("textbox", name="Email address").fill("contact@testprovider.com")
-    # Leave optional fields empty: address_line_2-4, county, telephone number, DX number & centre
+    page.get_by_role("textbox", name="First name").fill("Bob")
+    page.get_by_role("textbox", name="Last name").fill("Jones")
+    page.get_by_role("textbox", name="Email address").fill("bob.jones@testlsp.com")
+    page.get_by_role("textbox", name="Telephone number").fill("01234567890")
     page.get_by_role("button", name="Submit").click()
 
     # Assert our LSP information is displayed correctly
