@@ -15,7 +15,7 @@
 
 {% block pageContent %}
 
-  <span class="govuk-caption-xl">{{ firm.firm_type }}</span>
+  <span class="govuk-caption-xl">{{ firm.firm_type|capitalize }}</span>
   <h1 class="govuk-heading-xl">{{ firm.firm_name }}</h1>
 
 {% block actionButtons %}

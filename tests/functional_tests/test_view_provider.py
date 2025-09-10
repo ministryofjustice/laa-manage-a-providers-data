@@ -65,7 +65,7 @@ def test_add_new_lsp(page):
     page.get_by_role("button", name="Start now").click()
     page.get_by_role("button", name="Add a new parent provider").click()
     page.get_by_role("textbox", name="Provider name").fill("Test provider")
-    page.get_by_role("radio", name="Legal Services Provider").check()
+    page.get_by_role("radio", name="Legal services provider").check()
     page.get_by_role("button", name="Continue").click()
     page.get_by_role("radio", name="Charity").check()
     page.get_by_role("textbox", name="Day").click()
@@ -84,7 +84,7 @@ def test_add_new_lsp(page):
     # Assert our LSP information is displayed correctly
     expect(page.get_by_text("New legal services provider successfully created")).to_be_visible()
     expect(page.get_by_role("alert", name="Success").locator("div").first).to_be_visible()
-    expect(page.get_by_text("Legal Services Provider", exact=True)).to_be_visible()
+    expect(page.get_by_text("Legal services provider", exact=True)).to_be_visible()
     expect(page.get_by_role("heading", name="Test provider")).to_be_visible()
     expect(page.get_by_role("cell", name="Test provider")).to_be_visible()
     expect(page.get_by_role("cell", name="Charity")).to_be_visible()
