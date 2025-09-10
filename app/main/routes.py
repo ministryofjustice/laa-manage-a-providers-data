@@ -63,7 +63,7 @@ def schedules(firm_id: int, office_code: str, context):
         {"text": "End Date", "id": "scheduleEndDate"},
         {"text": "Schedule Authorization Status", "id": "scheduleAuthorizationStatus"},
         {"text": "Schedule Status", "id": "scheduleStatus"},
-        {"text": "Full info", "html": get_full_info_html},
+        {"text": "Full info", "html_renderer": get_full_info_html},
     ]
 
     pda = current_app.extensions["pda"]
@@ -101,7 +101,7 @@ def bank_details(firm_id: int, office_code: str, context):
         {"text": "County", "id": "county"},
         {"text": "Country", "id": "country"},
         {"text": "Postcode", "id": "zip"},
-        {"text": "Full info", "html": get_full_info_html},
+        {"text": "Full info", "html_renderer": get_full_info_html},
     ]
 
     pda = current_app.extensions["pda"]

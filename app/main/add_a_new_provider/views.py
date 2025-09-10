@@ -1,6 +1,8 @@
-from flask import Response, redirect, render_template, request, session, url_for
+from flask import Response, abort, redirect, render_template, request, session, url_for
 
+from app.constants import PARENT_FIRM_TYPE_CHOICES
 from app.main.add_a_new_provider import AssignChambersForm
+from app.models import Firm
 from app.views import BaseFormView
 
 
@@ -11,7 +13,7 @@ class AddProviderFormView(BaseFormView):
 
     # Only 'parent' firm choices
     next_step_mapping = {
-        "Chambers": "main.chambers_details",
+        "Chambers": "main.add_contact_details",
         "Legal Services Provider": "main.additional_details_legal_services_provider",
     }
 
@@ -36,7 +38,7 @@ class AddProviderFormView(BaseFormView):
 class LspDetailsFormView(BaseFormView):
     """Form view for the Legal services provider details"""
 
-    success_endpoint = "main.create_provider"
+    success_endpoint = "main.add_contact_details"
 
     def form_valid(self, form):
         session["new_provider"].update(
@@ -54,22 +56,6 @@ class LspDetailsFormView(BaseFormView):
 
 
 class AdvocateDetailsFormView(BaseFormView):
-    success_endpoint = "main.create_provider"
-
-    def form_valid(self, form):
-        session["new_provider"].update(
-            {
-                "solicitor_advocate": form.data.get("solicitor_advocate"),
-                "advocate_level": form.data.get("advocate_level"),
-                "bar_council_roll": form.data.get("bar_council_roll_number"),
-            }
-        )
-        return super().form_valid(form)
-
-
-class ChambersDetailsFormView(BaseFormView):
-    """Form view for the Chambers details"""
-
     success_endpoint = "main.create_provider"
 
     def form_valid(self, form):
@@ -121,3 +107,55 @@ class AssignChambersFormView(BaseFormView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
+
+
+class HeadOfficeContactDetailsFormView(BaseFormView):
+    """Form view for the Head office contact details page"""
+
+    success_endpoint = "main.create_provider"
+
+    def form_valid(self, form):
+        session["new_head_office"] = {
+            "is_head_office": True,
+            "head_office": "N/A",
+            "address_line_1": form.data.get("address_line_1"),
+            "address_line_2": form.data.get("address_line_2"),
+            "address_line_3": form.data.get("address_line_3"),
+            "address_line_4": form.data.get("address_line_4"),
+            "city": form.data.get("city"),
+            "county": form.data.get("county"),
+            "postcode": form.data.get("postcode"),
+            "telephone_number": form.data.get("telephone_number"),
+            "email_address": form.data.get("email_address"),
+            "dx_number": form.data.get("dx_number"),
+            "dx_centre": form.data.get("dx_centre"),
+        }
+
+        return super().form_valid(form)
+
+    @staticmethod
+    def check_parent_provider_exists_in_session():
+        if not session.get("new_provider"):
+            abort(400)
+
+        valid_parent_types = [choice[0] for choice in PARENT_FIRM_TYPE_CHOICES]
+        if session.get("new_provider").get("firm_type") not in valid_parent_types:
+            abort(400)
+
+    def get(self, context, **kwargs):
+        self.check_parent_provider_exists_in_session()
+
+        firm = Firm(**session.get("new_provider"))
+        form = self.get_form_class()(firm=firm)
+        return render_template(self.template, **self.get_context_data(form, **kwargs))
+
+    def post(self, *args, **kwargs) -> Response | str:
+        self.check_parent_provider_exists_in_session()
+
+        firm = Firm(**session.get("new_provider"))
+        form = self.get_form_class()(firm=firm)
+
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form, **kwargs)

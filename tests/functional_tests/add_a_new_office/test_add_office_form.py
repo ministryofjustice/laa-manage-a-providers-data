@@ -8,6 +8,10 @@ def navigate_to_add_office_form(page: Page):
     # Navigate to the providers list
     page.goto(url_for("main.providers", _external=True))
 
+    # Search for "Smith" to find "SMITH & PARTNERS SOLICITORS"
+    page.get_by_role("textbox", name="Find a provider").fill("smith")
+    page.get_by_role("button", name="Search").click()
+
     # Click on the first provider (should be "SMITH & PARTNERS SOLICITORS" from fixtures)
     page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
 

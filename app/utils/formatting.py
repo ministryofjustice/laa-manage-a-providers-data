@@ -66,6 +66,13 @@ def format_title_case(value: str) -> str:
     return value.title()
 
 
+def format_sentence_case(value: str) -> str:
+    """Format sentence case for display"""
+    if not isinstance(value, str):
+        return value
+    return value.capitalize()
+
+
 def format_head_office(head_office_value: str) -> str:
     """Format head office value for display.
     If this office is a head office the value will be "N/A"
