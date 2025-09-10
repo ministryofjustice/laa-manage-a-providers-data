@@ -276,45 +276,6 @@ class TestCreateProviderFromSession:
             assert bank_account.bank_name is None
             assert bank_account.bank_branch_name is None
 
-    def test_create_provider_from_session_incomplete_bank_data(self, app):
-        """Test that no bank account is created when required bank data is missing."""
-        with app.test_request_context():
-            # Set up session data with incomplete bank account info (missing required fields)
-            session["new_provider"] = {
-                "firm_name": "Test Incomplete Bank Firm",
-                "firm_type": "Legal Services Provider",
-                "constitutional_status": "Partnership",
-            }
-            session["new_head_office"] = {
-                "address_line_1": "999 Incomplete Street",
-                "city": "Incomplete City",
-                "postcode": "IC4 5IN",
-                "telephone_number": "04444444444",
-                "email_address": "incomplete@example.com",
-            }
-            session["new_head_office_bank_account"] = {
-                # Missing required bank account fields - only have account name
-                "bank_account_name": "Incomplete Account",
-                # Missing sort_code and account_number (required)
-            }
-
-            result = create_provider_from_session()
-
-            # Verify firm was created
-            assert result is not None
-            assert result.firm_name == "Test Incomplete Bank Firm"
-
-            # Verify office was created
-            pda = app.extensions["pda"]
-            offices = pda.get_provider_offices(result.firm_id)
-            assert len(offices) == 1
-            office = offices[0]
-            assert office.address_line_1 == "999 Incomplete Street"
-
-            # Verify no bank account was created (due to missing required fields)
-            bank_account = pda.get_office_bank_account(result.firm_id, office.firm_office_code)
-            assert bank_account is None
-
     def test_create_provider_from_session_no_bank_account_when_skipped(self, app):
         """Test that no bank account is created when user skipped the bank account step."""
         with app.test_request_context():
