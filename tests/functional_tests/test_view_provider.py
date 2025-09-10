@@ -11,9 +11,10 @@ def test_view_provider_page_ui_loads(page):
 
     page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
 
+    expect(page.get_by_role("link", name="Offices")).to_be_visible()
+
     # Buttons
-    expect(page.get_by_role("button", name="Add an office")).to_be_visible()
-    expect(page.get_by_role("button", name="Make inactive")).to_be_visible()
+    expect(page.get_by_role("button", name="Make provider inactive")).to_be_visible()
     # Main table
     expect(page.get_by_role("rowheader", name="Provider name")).to_be_visible()
     expect(page.get_by_role("cell", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
@@ -23,9 +24,6 @@ def test_view_provider_page_ui_loads(page):
 
     expect(page.get_by_role("rowheader", name="Account number")).to_be_visible()
     expect(page.get_by_role("cell", name="1A001L")).to_be_visible()
-
-    # Additional table
-    expect(page.get_by_role("heading", name="Additional details")).to_be_visible()
 
     expect(page.get_by_role("rowheader", name="Constitutional status")).to_be_visible()
     expect(page.get_by_role("cell", name="Partnership")).to_be_visible()
@@ -67,7 +65,7 @@ def test_add_new_lsp(page):
     page.get_by_role("button", name="Start now").click()
     page.get_by_role("button", name="Add a new parent provider").click()
     page.get_by_role("textbox", name="Provider name").fill("Test provider")
-    page.get_by_role("radio", name="Legal Services Provider").check()
+    page.get_by_role("radio", name="Legal services provider").check()
     page.get_by_role("button", name="Continue").click()
     page.get_by_role("radio", name="Charity").check()
     page.get_by_role("textbox", name="Day").click()
@@ -90,9 +88,29 @@ def test_add_new_lsp(page):
     # Assert our LSP information is displayed correctly
     expect(page.get_by_text("New legal services provider successfully created")).to_be_visible()
     expect(page.get_by_role("alert", name="Success").locator("div").first).to_be_visible()
-    expect(page.get_by_text("Legal Services Provider", exact=True)).to_be_visible()
+    expect(page.get_by_text("Legal services provider", exact=True)).to_be_visible()
     expect(page.get_by_role("heading", name="Test provider")).to_be_visible()
     expect(page.get_by_role("cell", name="Test provider")).to_be_visible()
     expect(page.get_by_role("cell", name="Charity")).to_be_visible()
     expect(page.get_by_role("cell", name="/01/2020")).to_be_visible()
     expect(page.get_by_role("cell", name="12345678")).to_be_visible()
+
+
+@pytest.mark.usefixtures("live_server")
+def test_lsp_contact(page):
+    page.get_by_role("button", name="Start now").click()
+    # Perform a blank search to view all providers
+    page.get_by_role("button", name="Search").click()
+
+    page.get_by_role("link", name="METROPOLITAN LAW CENTRE").click()
+
+    # Contact subpage visible on landing
+    expect(page.get_by_role("heading", name="Contacts")).to_be_visible()
+
+    # Summary list of liaison manager
+    expect(page.locator("dl")).to_contain_text("Job title")
+    expect(page.locator("dl")).to_contain_text("Telephone number")
+    expect(page.locator("dl")).to_contain_text("Email address")
+    expect(page.locator("dl")).to_contain_text("Website")
+    expect(page.locator("dl")).to_contain_text("Active from")
+    expect(page.get_by_role("link", name="Change liaison manager")).to_be_visible()

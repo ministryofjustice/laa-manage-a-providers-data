@@ -254,6 +254,87 @@ class TestTransposedDataTable:
 
         assert headings == []
 
+    def test_to_summary_govuk_params_basic(self):
+        structure = [{"text": "Name", "id": "name"}, {"text": "Age", "id": "age"}]
+        data = [{"name": "John", "age": "30"}]
+
+        table = TransposedDataTable(structure, data)
+        params = table.to_summary_govuk_params()
+
+        expected_rows = [
+            {"key": {"text": "Name", "classes": ""}, "value": {"text": "John"}},
+            {"key": {"text": "Age", "classes": ""}, "value": {"text": "30"}},
+        ]
+
+        assert params["rows"] == expected_rows
+        assert params["classes"] == DEFAULT_TABLE_CLASSES
+        assert "card" not in params
+
+    def test_to_summary_govuk_params_with_card(self):
+        structure = [{"text": "Name", "id": "name"}]
+        data = [{"name": "John"}]
+        card = {
+            "title": "Contact Details",
+            "action_text": "Change details",
+            "action_url": "/change",
+            "action_visually_hidden_text": "contact details",
+        }
+
+        table = TransposedDataTable(structure, data, card=card)
+        params = table.to_summary_govuk_params()
+
+        expected_card = {
+            "title": {"text": "Contact Details"},
+            "actions": {
+                "items": [
+                    {
+                        "text": "Change details",
+                        "href": "/change",
+                        "visuallyHiddenText": "contact details",
+                    }
+                ]
+            },
+        }
+
+        assert params["card"] == expected_card
+        assert len(params["rows"]) == 1
+
+    def test_to_summary_govuk_params_card_without_action(self):
+        structure = [{"text": "Name", "id": "name"}]
+        data = [{"name": "John"}]
+        card = {"title": "Simple Card"}
+
+        table = TransposedDataTable(structure, data, card=card)
+        params = table.to_summary_govuk_params()
+
+        expected_card = {"title": {"text": "Simple Card"}}
+        assert params["card"] == expected_card
+
+    def test_to_summary_govuk_params_with_overrides(self):
+        structure = [{"text": "Name", "id": "name"}]
+        data = [{"name": "John"}]
+
+        table = TransposedDataTable(structure, data)
+        params = table.to_summary_govuk_params(classes="custom-class", custom_attr="value")
+
+        assert params["classes"] == "custom-class"
+        assert params["custom_attr"] == "value"
+
+    def test_to_summary_govuk_params_with_formatting(self):
+        structure = [
+            {"text": "Name", "id": "name"},
+            {"text": "Email", "id": "email", "format_text": lambda x: x.lower()},
+            {"text": "Profile", "id": "profile", "html_renderer": lambda row: f"<strong>{row['name']}</strong>"},
+        ]
+        data = [{"name": "John", "email": "JOHN@EXAMPLE.COM", "profile": "john"}]
+
+        table = TransposedDataTable(structure, data)
+        params = table.to_summary_govuk_params()
+
+        assert len(params["rows"]) == 3
+        assert params["rows"][1]["value"]["text"] == "john@example.com"  # Email lowercased
+        assert params["rows"][2]["value"]["html"] == "<strong>John</strong>"  # HTML rendered
+
 
 class TestIntegration:
     def test_complex_table_scenario(self):
