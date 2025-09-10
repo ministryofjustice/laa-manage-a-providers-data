@@ -56,6 +56,7 @@ class TestDataLoadFunctions:
             {"contracts": [{"contractId": 1}]},  # contracts.json
             {"schedules": [{"scheduleId": 1}]},  # schedules.json
             {"bank_accounts": [{"vendorSiteId": 101}]},  # bank_accounts.json
+            {"contacts": [{"vendorSiteId": 101}]},  # contacts.json
         ]
 
         result = _load_mock_data()
@@ -66,9 +67,10 @@ class TestDataLoadFunctions:
             "contracts": [{"contractId": 1}],
             "schedules": [{"scheduleId": 1}],
             "bank_accounts": [{"vendorSiteId": 101}],
+            "contacts": [{"vendorSiteId": 101}],  # contacts.json
         }
         assert result == expected
-        assert mock_load_fixture.call_count == 5
+        assert mock_load_fixture.call_count == 6
 
     def test_generate_unique_office_code(self):
         """Test generation of unique office code."""

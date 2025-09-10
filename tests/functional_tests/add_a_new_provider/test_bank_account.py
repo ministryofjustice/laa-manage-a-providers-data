@@ -84,12 +84,8 @@ def test_bank_account_form_successful_submission(page: Page):
     page.get_by_role("textbox", name="Account number").fill("12345678")
     page.get_by_role("button", name="Submit").click()
 
-    # Should redirect to create provider page (successful completion)
-    expect(page.get_by_text("Head office: Bank account details")).not_to_be_visible()
-
-    # TODO: Append this when we have the next page
-    current_url = page.url
-    assert "add-bank-account" not in current_url
+    # Should redirect to liaison manager page
+    expect(page.get_by_role("heading", name="Add liaison manager")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -103,10 +99,8 @@ def test_bank_account_form_sort_code_with_spaces_validation(page: Page):
     page.get_by_role("textbox", name="Account number").fill("87654321")
     page.get_by_role("button", name="Submit").click()
 
-    # TODO: Append this when we have the next page
-    expect(page.get_by_text("Head office: Bank account details")).not_to_be_visible()
-    current_url = page.url
-    assert "add-bank-account" not in current_url
+    # Should redirect to liaison manager page
+    expect(page.get_by_role("heading", name="Add liaison manager")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -120,10 +114,8 @@ def test_bank_account_form_sort_code_with_hyphens_validation(page: Page):
     page.get_by_role("textbox", name="Account number").fill("87654321")
     page.get_by_role("button", name="Submit").click()
 
-    # TODO: Append this when we have the next page
-    expect(page.get_by_text("Head office: Bank account details")).not_to_be_visible()
-    current_url = page.url
-    assert "add-bank-account" not in current_url
+    # Should redirect to liaison manager page
+    expect(page.get_by_role("heading", name="Add liaison manager")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -211,10 +203,8 @@ def test_bank_account_form_six_digit_account_number_validation(page: Page):
     page.get_by_role("textbox", name="Account number").fill("123456")  # 6 digits, should be valid
     page.get_by_role("button", name="Submit").click()
 
-    # TODO: Append this when we have the next page
-    expect(page.get_by_text("Head office: Bank account details")).not_to_be_visible()
-    current_url = page.url
-    assert "add-bank-account" not in current_url
+    # Should redirect to liaison manager page
+    expect(page.get_by_role("heading", name="Add liaison manager")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -267,9 +257,5 @@ def test_bank_account_form_skip_functionality(page: Page):
     # Click skip button without filling any fields (should bypass validation)
     page.get_by_role("button", name="Cheque payment: Skip this step").click()
 
-    # Should complete the flow without validation errors
-    expect(page.get_by_text("Head office: Bank account details")).not_to_be_visible()
-
-    # TODO: Append this when we have the next page
-    current_url = page.url
-    assert "add-bank-account" not in current_url
+    # Should redirect to liaison manager page
+    expect(page.get_by_role("heading", name="Add liaison manager")).to_be_visible()
