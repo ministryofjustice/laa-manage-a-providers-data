@@ -62,3 +62,12 @@ class BaseFormView(MethodView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form, **kwargs)
+
+
+class FullWidthBaseFormView(BaseFormView):
+    """Used to render full width form pages by setting the grid_column_class to 'govuk-grid-column-full'"""
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form=form, context=context, **kwargs)
+        context.update({"grid_column_class": "govuk-grid-column-full"})
+        return context

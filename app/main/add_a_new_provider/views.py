@@ -3,7 +3,7 @@ from flask import Response, abort, redirect, render_template, request, session, 
 from app.constants import PARENT_FIRM_TYPE_CHOICES
 from app.main.add_a_new_provider import AssignChambersForm
 from app.models import Firm
-from app.views import BaseFormView
+from app.views import BaseFormView, FullWidthBaseFormView
 
 
 class AddProviderFormView(BaseFormView):
@@ -112,7 +112,13 @@ class AssignChambersFormView(BaseFormView):
 class HeadOfficeContactDetailsFormView(BaseFormView):
     """Form view for the Head office contact details page"""
 
-    success_endpoint = "main.create_provider"
+    next_step_mapping = {
+        "Chambers": "main.create_provider",
+        "Legal Services Provider": "main.add_vat_number",
+    }
+
+    def get_success_url(self, form):
+        return url_for(self.next_step_mapping.get(form.firm.firm_type, "main.create_provider"))
 
     def form_valid(self, form):
         session["new_head_office"] = {
@@ -151,6 +157,53 @@ class HeadOfficeContactDetailsFormView(BaseFormView):
 
     def post(self, *args, **kwargs) -> Response | str:
         self.check_parent_provider_exists_in_session()
+
+        firm = Firm(**session.get("new_provider"))
+        form = self.get_form_class()(firm=firm)
+
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form, **kwargs)
+
+
+class VATRegistrationFormView(FullWidthBaseFormView):
+    success_endpoint = "main.create_provider"
+
+    def form_valid(self, form):
+        session["new_head_office"].update(
+            {
+                "vat_registration_number": form.data.get("vat_registration_number"),
+            }
+        )
+
+        return super().form_valid(form)
+
+    @staticmethod
+    def check_lsp_provider_exists_in_session():
+        if not session.get("new_provider"):
+            abort(400)
+
+        if session.get("new_provider").get("firm_type") != "Legal Services Provider":
+            abort(400)
+
+    def get(self, context, **kwargs):
+        self.check_lsp_provider_exists_in_session()
+
+        # Check if the new head office data exists in the session
+        if not session.get("new_head_office"):
+            abort(400)
+
+        firm = Firm(**session.get("new_provider"))
+        form = self.get_form_class()(firm=firm)
+        return render_template(self.template, **self.get_context_data(form, **kwargs))
+
+    def post(self, *args, **kwargs) -> Response | str:
+        self.check_lsp_provider_exists_in_session()
+
+        # Check if the new head office data exists in the session
+        if not session.get("new_head_office"):
+            abort(400)
 
         firm = Firm(**session.get("new_provider"))
         form = self.get_form_class()(firm=firm)

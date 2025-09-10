@@ -181,10 +181,10 @@ def test_chambers_optional_fields_not_required(page: Page):
     # Leave optional fields empty: address_line_2-4, county, telephone number, DX number & centre
     page.get_by_role("button", name="Submit").click()
 
-    # Should redirect to create provider page
-    expect(page.get_by_role("heading", name="Add chambers contact details")).not_to_be_visible()
-    current_url = page.url
-    assert "add-contact-details" not in current_url
+    # Check we are on the view provider page
+    # TODO: Update this when full flow implemented
+    expect(page.get_by_role("heading", name="Test Chambers")).to_be_visible()
+    expect(page.get_by_text("New chambers successfully created")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")

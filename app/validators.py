@@ -148,3 +148,19 @@ class ValidatePostcode:
 
             if not re.match(uk_postcode_pattern, cleaned_postcode):
                 raise ValidationError(self.message)
+
+
+class ValidateVATRegistrationNumber:
+    """Validate VAT registration number format."""
+
+    def __init__(self, message=None):
+        self.message = message or "Enter the VAT registration number in the correct format"
+
+    def __call__(self, form, field):
+        if field.data:
+            # UK VAT registration number regex pattern
+            # Matches formats like: GB123456789 or 123456789
+            uk_vat_reg_pattern = r"^(GB|gb)?[0-9]{9}$"
+
+            if not re.match(uk_vat_reg_pattern, field.data):
+                raise ValidationError(self.message)

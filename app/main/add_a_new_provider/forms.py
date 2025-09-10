@@ -10,7 +10,13 @@ from app.constants import (
     YES_NO_CHOICES,
 )
 from app.fields import GovUKTableRadioField
-from app.validators import ValidateCompaniesHouseNumber, ValidateGovDateField, ValidatePastDate, ValidateSearchResults
+from app.validators import (
+    ValidateCompaniesHouseNumber,
+    ValidateGovDateField,
+    ValidatePastDate,
+    ValidateSearchResults,
+    ValidateVATRegistrationNumber,
+)
 from app.widgets import GovDateInput, GovRadioInput, GovTextInput
 
 from ...fields import GovDateField
@@ -236,3 +242,28 @@ class HeadOfficeContactDetailsForm(OfficeContactDetailsForm):
         # Get provider name from session if available
         new_provider_name = session.get("new_provider", {}).get("firm_name", "Unknown")
         return new_provider_name
+
+
+class VATRegistrationForm(BaseForm):
+    title = "Head office: \nVAT registration number (optional)"
+    url = "add-vat-number"
+    submit_button_text = "Submit"
+
+    @property
+    def caption(self):
+        # Get provider name from session if available
+        new_provider_name = session.get("new_provider", {}).get("firm_name", "Unknown")
+        return new_provider_name
+
+    vat_registration_number = StringField(
+        "",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--xl",
+            classes="govuk-!-width-one-half",
+            hint="This is 9 numbers, sometimes with ‘GB’ at the start, for example 123456789 or GB123456789.",
+        ),
+        validators=[
+            Optional(),
+            ValidateVATRegistrationNumber(message="Enter the VAT registration number in the correct format"),
+        ],
+    )
