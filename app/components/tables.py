@@ -24,6 +24,15 @@ class TableStructure(TypedDict, total=False):
     html_renderer: Callable[[dict[str, str]], str] | str | None  # Function that takes row data, returns HTML string
 
 
+class Card(TypedDict, total=False):
+    """Card used for rendering a header area to a GOV.UK summary list. Only supported by TransposedDataTables"""
+
+    title: str
+    action_text: str | None
+    action_url: str | None
+    action_visually_hidden_text: str | None
+
+
 class Cell(TypedDict, total=False):
     """Represents a single table cell in the rendered output."""
 
@@ -139,10 +148,15 @@ class TransposedDataTable(DataTable):
     first_cell_is_header = True  # The first cell in each row will be a bold table header
 
     def __init__(
-        self, structure: list[TableStructure], data: Data | RowData, headings: list[str] | None = None
+        self,
+        structure: list[TableStructure],
+        data: Data | RowData,
+        headings: list[str] | None = None,
+        card: Card | None = None,
     ) -> None:
         """Helper class for generating the head and rows required for displaying transposed GOV.UK Tables."""
         super().__init__(structure, data)
+        self.card = card
 
         if headings is not None:
             expected_heading_count = len(self.data) + 1
@@ -175,6 +189,44 @@ class TransposedDataTable(DataTable):
 
     def get_headings(self) -> list[dict[str, str]]:
         return [{"text": heading, "classes": ""} for heading in self.headings]
+
+    def to_summary_govuk_params(self, **kwargs) -> dict[str, Any]:
+        """Convert transposed table to govukSummaryList dictionary for template rendering.
+        Usage: {{ govukSummaryList(table.to_summary_govuk_params()) }}
+
+        """
+        table_rows = self.get_rows()
+        summary_rows = []
+
+        for row in table_rows:
+            if len(row) == 2:  # Should have at least key and one value
+                summary_rows.append({"key": row[0], "value": row[1]})
+
+        params = {
+            "rows": summary_rows,
+            "classes": DEFAULT_TABLE_CLASSES,
+        }
+
+        if self.card:
+            card = {"title": {"text": self.card.get("title")}}
+            if self.card.get("action_text"):
+                card.update(
+                    {
+                        "actions": {
+                            "items": [
+                                {
+                                    "text": self.card["action_text"],
+                                    "href": self.card["action_url"],
+                                    "visuallyHiddenText": self.card.get("action_visually_hidden_text"),
+                                }
+                            ]
+                        }
+                    }
+                )
+            params["card"] = card
+
+        params.update(kwargs)
+        return params
 
 
 class RadioDataTable(DataTable):
