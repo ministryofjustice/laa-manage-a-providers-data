@@ -154,7 +154,7 @@ class HeadOfficeContactDetailsFormView(BaseFormView):
         return render_template(self.template, **self.get_context_data(form, **kwargs))
 
     def post(self, *args, **kwargs) -> Response | str:
-        self.check_parent_provider_exists_in_session()
+        self.get_valid_firm_or_abort()
 
         firm = Firm(**session.get("new_provider"))
         form = self.get_form_class()(firm=firm)
