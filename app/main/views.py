@@ -136,11 +136,11 @@ class ViewProvider(MethodView):
         contact_table_structure = []
         contact_data = {}
 
-        add_field(contact_table_structure, contact_data, "Liason manager", "Job title")
-        add_field(contact_table_structure, contact_data, "0118 9998819", "Telephone number")
-        add_field(contact_table_structure, contact_data, "name@domain.com", "Email address")
-        add_field(contact_table_structure, contact_data, "domain.com", "Website")
-        add_field(contact_table_structure, contact_data, "1st Jan 2025", "Active from")
+        add_field(contact_table_structure, contact_data, "Liaison manager", "Job title")
+        add_field(contact_table_structure, contact_data, "Value", "Telephone number")
+        add_field(contact_table_structure, contact_data, "Value", "Email address")
+        add_field(contact_table_structure, contact_data, "Value", "Website")
+        add_field(contact_table_structure, contact_data, "Value", "Active from")
 
         card: Card = {"title": "Firstname Lastname", "action_text": "Change liaison manager", "action_url": "#"}
 
