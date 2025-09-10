@@ -89,9 +89,9 @@ def test_add_new_lsp(page):
     page.get_by_role("button", name="Cheque payment: Skip this step").click()
 
     # Add liaison manager details
-    page.get_by_role("textbox", name="First name").fill("Alice")
-    page.get_by_role("textbox", name="Last name").fill("Johnson")
-    page.get_by_role("textbox", name="Email address").fill("alice.johnson@testlsp.com")
+    page.get_by_role("textbox", name="First name").fill("Bob")
+    page.get_by_role("textbox", name="Last name").fill("Jones")
+    page.get_by_role("textbox", name="Email address").fill("bob.jones@testlsp.com")
     page.get_by_role("textbox", name="Telephone number").fill("01234567890")
     page.get_by_role("button", name="Continue").click()
 
@@ -100,6 +100,7 @@ def test_add_new_lsp(page):
     page.get_by_role("button", name="Search").click()
     # Select the contract manager
     page.get_by_role("radio", name="Select this row").click()
+    page.get_by_role("button", name="Submit").click()
 
     # Assert our LSP information is displayed correctly
     expect(page.get_by_text("New legal services provider successfully created")).to_be_visible()
@@ -110,6 +111,7 @@ def test_add_new_lsp(page):
     expect(page.get_by_role("cell", name="Charity")).to_be_visible()
     expect(page.get_by_role("cell", name="/01/2020")).to_be_visible()
     expect(page.get_by_role("cell", name="12345678")).to_be_visible()
+    expect(page.get_by_role("cell", name="Alice Johnson")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
