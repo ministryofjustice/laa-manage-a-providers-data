@@ -85,6 +85,9 @@ def test_add_new_lsp(page):
     page.get_by_role("textbox").fill("123456789")
     page.get_by_role("button", name="Submit").click()
 
+    # Skip adding bank account information
+    page.get_by_role("button", name="Cheque payment: Skip this step").click()
+
     # Assert our LSP information is displayed correctly
     expect(page.get_by_text("New legal services provider successfully created")).to_be_visible()
     expect(page.get_by_role("alert", name="Success").locator("div").first).to_be_visible()
