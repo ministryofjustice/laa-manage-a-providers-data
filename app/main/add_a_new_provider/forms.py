@@ -420,7 +420,7 @@ class AssignContractManagerForm(BaseForm):
 
     contract_manager = StringField(
         "Contract manager",
-        validators=[InputRequired(message="Select a contract manager")],
+        validators=[InputRequired(message="Select a contract manager or search again")],
     )
 
     def __init__(self, search_term=None, page=1, selected_value=None, *args, **kwargs):

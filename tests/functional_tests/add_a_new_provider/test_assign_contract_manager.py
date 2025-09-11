@@ -63,7 +63,9 @@ def test_assign_contract_manager_form_loads_correctly(page: Page):
     expect(page.get_by_role("heading", name="Assign contract manager")).to_be_visible()
 
     # Verify the hint text
-    expect(page.get_by_text("If you cannot find the contract manager you want to assign, contact .")).to_be_visible()
+    expect(
+        page.get_by_text("Contact mapd@justice.gov.uk if you cannot find the contract manager you want to assign.")
+    ).to_be_visible()
 
     # Verify form elements are present
     expect(page.get_by_role("textbox", name="Search for a contract manager")).to_be_visible()
@@ -145,7 +147,7 @@ def test_assign_contract_manager_form_validation_no_selection(page: Page):
     page.get_by_role("button", name="Submit").click()
 
     # Should show validation error
-    expect(page.get_by_text("Error: Select a contract manager")).to_be_visible()
+    expect(page.get_by_text("Error: Select a contract manager or search again")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
