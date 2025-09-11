@@ -8,7 +8,7 @@ from unittest.mock import Mock
 
 from pydantic import ValidationError
 
-from app.models import BankAccount, Firm, Office
+from app.models import BankAccount, Contact, Firm, Office
 
 
 class ProviderDataApiError(Exception):
@@ -47,6 +47,7 @@ def _load_mock_data() -> Dict[str, Any]:
     contracts_data = _load_fixture(os.path.join(fixtures_dir, "contracts.json"))
     schedules_data = _load_fixture(os.path.join(fixtures_dir, "schedules.json"))
     bank_accounts_data = _load_fixture(os.path.join(fixtures_dir, "bank_accounts.json"))
+    contacts_data = _load_fixture(os.path.join(fixtures_dir, "contacts.json"))
 
     # Store all data as-is for internal use
     return {
@@ -55,6 +56,7 @@ def _load_mock_data() -> Dict[str, Any]:
         "contracts": contracts_data.get("contracts", []),
         "schedules": schedules_data.get("schedules", []),
         "bank_accounts": bank_accounts_data.get("bank_accounts", []),
+        "contacts": contacts_data.get("contacts", []),
     }
 
 
@@ -505,3 +507,73 @@ class MockProviderDataApi:
                 return updated_account
 
         raise ProviderDataApiError(f"Bank account not found for office {office_code}")
+
+    def get_office_contacts(self, firm_id: int, office_code: str) -> List[Contact]:
+        """
+        Get all contacts for a specific office.
+
+        Args:
+            firm_id: The firm ID
+            office_code: The office code
+
+        Returns:
+            List of Contact model instances
+        """
+        if not isinstance(firm_id, int) or firm_id <= 0:
+            raise ValueError("firm_id must be a positive integer")
+        if not office_code or not isinstance(office_code, str):
+            raise ValueError("office_code must be a non-empty string")
+
+        office_data = self._find_office_data(firm_id, office_code)
+        if office_data is None:
+            return []
+
+        office_id = office_data.get("firmOfficeId")
+        if not office_id:
+            return []
+
+        # Find all contacts for this office
+        contacts = []
+        for contact in self._mock_data["contacts"]:
+            if contact.get("vendorSiteId") == office_id:
+                try:
+                    contacts.append(Contact(**contact))
+                except ValidationError as e:
+                    self.logger.error(f"Invalid contact data in mock for office {office_code}: {e}")
+                    raise ProviderDataApiError(f"Invalid contact data: {e}")
+
+        return contacts
+
+    def create_office_contact(self, firm_id: int, office_code: str, contact: Contact) -> Contact:
+        """
+        Create a contact for an office.
+
+        Args:
+            firm_id: The firm ID
+            office_code: The office code
+            contact: Contact model instance to create
+
+        Returns:
+            Contact: The created Contact model instance
+
+        Raises:
+            ProviderDataApiError: If office doesn't exist
+        """
+        if not isinstance(firm_id, int) or firm_id <= 0:
+            raise ValueError("firm_id must be a positive integer")
+        if not office_code or not isinstance(office_code, str):
+            raise ValueError("office_code must be a non-empty string")
+
+        office_data = self._find_office_data(firm_id, office_code)
+        if office_data is None:
+            raise ProviderDataApiError(f"Office {office_code} not found for firm {firm_id}")
+
+        office_id = office_data.get("firmOfficeId")
+
+        # Set the vendor_site_id to the office ID
+        updated_contact = contact.model_copy(update={"vendor_site_id": office_id})
+
+        # Add to mock data
+        self._mock_data["contacts"].append(updated_contact.to_api_dict())
+
+        return updated_contact

@@ -1,7 +1,7 @@
 from flask import current_app, session
 from wtforms import RadioField, SubmitField
 from wtforms.fields.simple import StringField
-from wtforms.validators import InputRequired, Length, Optional
+from wtforms.validators import Email, InputRequired, Length, Optional
 
 from app.constants import (
     ADVOCATE_LEVEL_CHOICES,
@@ -322,4 +322,77 @@ class BankAccountForm(BaseForm):
 
     skip_button = SubmitField(
         "Cheque payment: Skip this step", widget=GovSubmitInput(classes="govuk-button--secondary govuk-!-margin-left-2")
+    )
+
+
+class LiaisonManagerForm(BaseForm):
+    title = "Add liaison manager"
+    url = "add-liaison-manager"
+    submit_button_text = "Submit"
+
+    @property
+    def caption(self):
+        # Get provider name from session if available
+        new_provider_name = session.get("new_provider", {}).get("firm_name", "Unknown")
+        return new_provider_name
+
+    first_name = StringField(
+        "First name",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-!-width-one-third",
+        ),
+        validators=[
+            InputRequired(message="Enter the first name"),
+            Length(max=100, message="First name must be 100 characters or less"),
+        ],
+    )
+
+    last_name = StringField(
+        "Last name",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-!-width-one-third",
+        ),
+        validators=[
+            InputRequired(message="Enter the last name"),
+            Length(max=100, message="Last name must be 100 characters or less"),
+        ],
+    )
+
+    email_address = StringField(
+        "Email address",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-!-width-two-thirds",
+        ),
+        validators=[
+            InputRequired(message="Enter the email address"),
+            Email(message="Enter a valid email address"),
+            Length(max=255, message="Email address must be 255 characters or less"),
+        ],
+    )
+
+    telephone_number = StringField(
+        "Telephone number",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-!-width-one-third",
+        ),
+        validators=[
+            InputRequired(message="Enter the telephone number"),
+            Length(max=20, message="Telephone number must be 20 characters or less"),
+        ],
+    )
+
+    website = StringField(
+        "Website (optional)",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-!-width-one-third",
+        ),
+        validators=[
+            Optional(),
+            Length(max=255, message="Website must be 255 characters or less"),
+        ],
     )
