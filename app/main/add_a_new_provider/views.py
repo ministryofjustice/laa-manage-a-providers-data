@@ -113,7 +113,7 @@ class HeadOfficeContactDetailsFormView(BaseFormView):
     """Form view for the Head office contact details page"""
 
     next_step_mapping = {
-        "Chambers": "main.create_provider",
+        "Chambers": "main.add_liaison_manager",
         "Legal Services Provider": "main.add_vat_number",
     }
 
@@ -215,7 +215,7 @@ class VATRegistrationFormView(FullWidthBaseFormView):
 
 
 class BankAccountFormView(FullWidthBaseFormView):
-    success_endpoint = "main.create_provider"
+    success_endpoint = "main.add_liaison_manager"
 
     def form_valid(self, form):
         session["new_head_office_bank_account"] = {
@@ -256,6 +256,58 @@ class BankAccountFormView(FullWidthBaseFormView):
         if request.form.get("skip_button"):
             # Skip storing bank account data and go to next step
             return redirect(url_for(self.success_endpoint))
+
+        firm = Firm(**session.get("new_provider"))
+        form = self.get_form_class()(firm=firm)
+
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form, **kwargs)
+
+
+class LiaisonManagerFormView(FullWidthBaseFormView):
+    success_endpoint = "main.create_provider"
+
+    def form_valid(self, form):
+        session["new_liaison_manager"] = {
+            "first_name": form.data.get("first_name"),
+            "last_name": form.data.get("last_name"),
+            "email_address": form.data.get("email_address"),
+            "telephone_number": form.data.get("telephone_number"),
+            "website": form.data.get("website"),
+            "job_title": "Liaison Manager",  # All contacts are liaison managers in MAPD
+            "primary": "Y",  # We are adding a new head office so this will be the primary contact
+        }
+
+        return super().form_valid(form)
+
+    @staticmethod
+    def get_valid_firm_or_abort():
+        if not session.get("new_provider"):
+            abort(400)
+
+        valid_parent_types = [choice[0] for choice in PARENT_FIRM_TYPE_CHOICES]
+        if session.get("new_provider").get("firm_type") not in valid_parent_types:
+            abort(400)
+
+    def get(self, context, **kwargs):
+        self.get_valid_firm_or_abort()
+
+        # Check if the new head office data exists in the session
+        if not session.get("new_head_office"):
+            abort(400)
+
+        firm = Firm(**session.get("new_provider"))
+        form = self.get_form_class()(firm=firm)
+        return render_template(self.template, **self.get_context_data(form, **kwargs))
+
+    def post(self, *args, **kwargs) -> Response | str:
+        self.get_valid_firm_or_abort()
+
+        # Check if the new head office data exists in the session
+        if not session.get("new_head_office"):
+            abort(400)
 
         firm = Firm(**session.get("new_provider"))
         form = self.get_form_class()(firm=firm)

@@ -137,10 +137,8 @@ def test_chambers_successful_form_submission_minimal_fields(page: Page):
     page.get_by_role("textbox", name="DX centre").fill("Chambers Centre")
     page.get_by_role("button", name="Submit").click()
 
-    # Check we are on the view provider page
-    # TODO: Update this when full flow implemented
-    expect(page.get_by_role("heading", name="Test Chambers")).to_be_visible()
-    expect(page.get_by_text("New chambers successfully created")).to_be_visible()
+    # Should redirect to add liaison manager page
+    expect(page.get_by_role("heading", name="Add liaison manager")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -162,10 +160,8 @@ def test_chambers_successful_form_submission_all_fields(page: Page):
     page.get_by_role("textbox", name="DX centre").fill("Chambers Centre")
     page.get_by_role("button", name="Submit").click()
 
-    # Check we are on the view provider page
-    # TODO: Update this when full flow implemented
-    expect(page.get_by_role("heading", name="Test Chambers")).to_be_visible()
-    expect(page.get_by_text("New chambers successfully created")).to_be_visible()
+    # Should redirect to add liaison manager page
+    expect(page.get_by_role("heading", name="Add liaison manager")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -181,10 +177,8 @@ def test_chambers_optional_fields_not_required(page: Page):
     # Leave optional fields empty: address_line_2-4, county, telephone number, DX number & centre
     page.get_by_role("button", name="Submit").click()
 
-    # Check we are on the view provider page
-    # TODO: Update this when full flow implemented
-    expect(page.get_by_role("heading", name="Test Chambers")).to_be_visible()
-    expect(page.get_by_text("New chambers successfully created")).to_be_visible()
+    # Should redirect to add liaison manager page
+    expect(page.get_by_role("heading", name="Add liaison manager")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
