@@ -26,12 +26,12 @@ PARENT_FIRM_TYPE_CHOICES = [
 ]
 
 CONSTITUTIONAL_STATUS_CHOICES = [
+    ("Partnership", "Partnership"),
+    ("Limited Company", "Limited Company"),
+    ("Sole Practitioner", "Sole Practitioner"),
+    ("LLP", "Limited Liability Partnership (LLP)"),
     ("Charity", "Charity"),
     ("Government Funded Organisation", "Government Funded Organisation"),
-    ("LLP", "LLP"),
-    ("Limited Company", "Limited Company"),
-    ("Partnership", "Partnership"),
-    ("Sole Practitioner", "Sole Practitioner"),
 ]
 
 ADVOCATE_LEVEL_CHOICES = [
