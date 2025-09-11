@@ -78,7 +78,7 @@ def test_indemnity_date_future_date_validation(page: Page):
     navigate_to_lsp_details(page)
 
     # Fill required fields and future date
-    page.get_by_role("radio", name="Partnership").click()
+    page.get_by_role("radio", name="Partnership", exact=True).click()
     page.locator("input[id='indemnity_received_date-day']").fill("1")
     page.locator("input[id='indemnity_received_date-month']").fill("1")
     page.locator("input[id='indemnity_received_date-year']").fill("2030")  # Future date
@@ -95,7 +95,7 @@ def test_indemnity_date_invalid_date_validation(page: Page):
     navigate_to_lsp_details(page)
 
     # Fill required fields and invalid date
-    page.get_by_role("radio", name="Partnership").click()
+    page.get_by_role("radio", name="Partnership", exact=True).click()
     page.locator("input[id='indemnity_received_date-day']").fill("32")  # Invalid day
     page.locator("input[id='indemnity_received_date-month']").fill("13")  # Invalid month
     page.locator("input[id='indemnity_received_date-year']").fill("2023")
@@ -112,7 +112,7 @@ def test_indemnity_date_valid_past_date(page: Page):
     navigate_to_lsp_details(page)
 
     # Fill all fields with valid past date
-    page.get_by_role("radio", name="Partnership").click()
+    page.get_by_role("radio", name="Partnership", exact=True).click()
     page.locator("input[id='indemnity_received_date-day']").fill("1")
     page.locator("input[id='indemnity_received_date-month']").fill("1")
     page.locator("input[id='indemnity_received_date-year']").fill("2020")  # Past date
