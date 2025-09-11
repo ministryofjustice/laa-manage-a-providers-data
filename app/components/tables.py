@@ -270,7 +270,7 @@ class RadioDataTable(DataTable):
             <div class="govuk-radios__item govuk-radios--small">
                 <input class="govuk-radios__input" type="radio" name="{self.radio_field_name}" 
                        value="{radio_value}" id="{radio_id}" {checked_attr}>
-                <label class="govuk-radios__label" for="{radio_id}">
+                <label class="govuk-radios__label govuk-!-padding-0" for="{radio_id}">
                     <span class="govuk-visually-hidden">Select this row</span>
                 </label>
             </div>

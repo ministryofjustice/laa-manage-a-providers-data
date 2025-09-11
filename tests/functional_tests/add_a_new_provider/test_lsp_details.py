@@ -28,7 +28,7 @@ def test_lsp_details_page_loads_via_ui(page: Page):
     expect(page.get_by_role("textbox", name="Month")).to_be_visible()
     expect(page.get_by_role("textbox", name="Year")).to_be_visible()
     expect(page.get_by_role("textbox", name="Companies House number")).to_be_visible()
-    expect(page.get_by_role("button", name="Submit")).to_be_visible()
+    expect(page.get_by_role("button", name="Continue")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -38,7 +38,7 @@ def test_constitutional_status_validation_required(page: Page):
 
     # Fill other required fields but not constitutional status
     page.get_by_role("textbox", name="Companies House number").fill("12345678")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should show validation error
     expect(page.get_by_text("Error: Select the constitutional status")).to_be_visible()
@@ -52,7 +52,7 @@ def test_companies_house_number_validation_format(page: Page):
     # Fill required fields and invalid Companies House number
     page.get_by_role("radio", name="Limited company").click()
     page.get_by_role("textbox", name="Companies House number").fill("INVALID")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should show validation error
     expect(page.get_by_text("Error: Companies House number must be 8 characters")).to_be_visible()
@@ -66,7 +66,7 @@ def test_companies_house_number_valid_format(page: Page):
     # Fill all required fields with valid data
     page.get_by_role("radio", name="Limited company").click()
     page.get_by_role("textbox", name="Companies House number").fill("12345678")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should not show validation error and should navigate away
     expect(page.get_by_text("Error: Companies House number must be 8 characters")).not_to_be_visible()
@@ -83,7 +83,7 @@ def test_indemnity_date_future_date_validation(page: Page):
     page.locator("input[id='indemnity_received_date-month']").fill("1")
     page.locator("input[id='indemnity_received_date-year']").fill("2030")  # Future date
     page.get_by_role("textbox", name="Companies House number").fill("12345678")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should show validation error
     expect(page.get_by_text("Error: Date must be today or in the past")).to_be_visible()
@@ -100,7 +100,7 @@ def test_indemnity_date_invalid_date_validation(page: Page):
     page.locator("input[id='indemnity_received_date-month']").fill("13")  # Invalid month
     page.locator("input[id='indemnity_received_date-year']").fill("2023")
     page.get_by_role("textbox", name="Companies House number").fill("12345678")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should show validation error
     expect(page.get_by_text("Error: Date must be a real date")).to_be_visible()
@@ -117,7 +117,7 @@ def test_indemnity_date_valid_past_date(page: Page):
     page.locator("input[id='indemnity_received_date-month']").fill("1")
     page.locator("input[id='indemnity_received_date-year']").fill("2020")  # Past date
     page.get_by_role("textbox", name="Companies House number").fill("12345678")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should not show date validation error and should navigate away
     expect(page.get_by_text("Error: Date must be today or in the past")).not_to_be_visible()
@@ -134,7 +134,7 @@ def test_successful_form_submission_with_all_fields(page: Page):
     page.locator("input[id='indemnity_received_date-month']").fill("6")
     page.locator("input[id='indemnity_received_date-year']").fill("2023")
     page.get_by_role("textbox", name="Companies House number").fill("12345678")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -145,7 +145,7 @@ def test_minimal_valid_form_submission(page: Page):
     # Fill only required fields
     page.get_by_role("radio", name="Sole practitioner").click()
     page.get_by_role("textbox", name="Companies House number").fill("AB123456")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -156,4 +156,4 @@ def test_indemnity_date_optional(page: Page):
     # Fill only required fields, leave indemnity date empty
     page.get_by_role("radio", name="Charity").click()
     page.get_by_role("textbox", name="Companies House number").fill("12345678")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()

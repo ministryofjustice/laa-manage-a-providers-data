@@ -19,7 +19,7 @@ def navigate_to_liaison_manager_via_lsp(page: Page):
     page.get_by_role("textbox", name="Month").fill("01")
     page.get_by_role("textbox", name="Year").fill("2020")
     page.get_by_role("textbox", name="Companies House number").fill("12345678")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Fill head office contact details form
     page.get_by_role("textbox", name="Address line 1").fill("123 Head Office Street")
@@ -29,18 +29,18 @@ def navigate_to_liaison_manager_via_lsp(page: Page):
     page.get_by_role("textbox", name="Email address").fill("headoffice@testlsp.com")
     page.get_by_role("textbox", name="DX number").fill("DX123456")
     page.get_by_role("textbox", name="DX centre").fill("Head Office Centre")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Fill VAT registration form (optional, skip by submitting empty)
     expect(page.get_by_role("heading", name="Head office: VAT Registration number (optional)")).to_be_visible()
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Fill bank account form
     expect(page.get_by_role("heading", name="Head office: Bank account details")).to_be_visible()
     page.get_by_role("textbox", name="Account name").fill("Test Business Account")
     page.get_by_role("textbox", name="Sort code").fill("123456")
     page.get_by_role("textbox", name="Account number").fill("12345678")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should now be on the Liaison Manager page
     expect(page.get_by_role("heading", name="Add liaison manager")).to_be_visible()
@@ -66,7 +66,7 @@ def navigate_to_liaison_manager_via_chambers(page: Page):
     page.get_by_role("textbox", name="Email address").fill("chambers@testchambers.com")
     page.get_by_role("textbox", name="DX number").fill("DX123456")
     page.get_by_role("textbox", name="DX centre").fill("Chambers Centre")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should now be on the Liaison Manager page
     expect(page.get_by_role("heading", name="Add liaison manager")).to_be_visible()
@@ -87,7 +87,7 @@ def test_liaison_manager_form_loads_correctly_lsp_flow(page: Page):
     expect(page.get_by_role("textbox", name="Email address")).to_be_visible()
     expect(page.get_by_role("textbox", name="Telephone number")).to_be_visible()
     expect(page.get_by_role("textbox", name="Website (optional)")).to_be_visible()
-    expect(page.get_by_role("button", name="Submit")).to_be_visible()
+    expect(page.get_by_role("button", name="Continue")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -104,7 +104,9 @@ def test_liaison_manager_form_loads_correctly_chambers_flow(page: Page):
     expect(page.get_by_role("textbox", name="Email address")).to_be_visible()
     expect(page.get_by_role("textbox", name="Telephone number")).to_be_visible()
     expect(page.get_by_role("textbox", name="Website (optional)")).to_be_visible()
-    expect(page.get_by_role("button", name="Submit")).to_be_visible()
+    expect(
+        page.get_by_role("button", name="Submit")
+    ).to_be_visible()  # Chambers shows submit as this is the final page of the chambers flow.
 
 
 @pytest.mark.usefixtures("live_server")
@@ -136,7 +138,7 @@ def test_liaison_manager_form_successful_submission_lsp(page: Page):
     page.get_by_role("textbox", name="Email address").fill("john.smith@testlsp.com")
     page.get_by_role("textbox", name="Telephone number").fill("01234567890")
     page.get_by_role("textbox", name="Website (optional)").fill("https://www.testlsp.com")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should complete the flow successfully
     current_url = page.url
@@ -154,7 +156,9 @@ def test_liaison_manager_form_successful_submission_chambers(page: Page):
     page.get_by_role("textbox", name="Email address").fill("jane.doe@testchambers.com")
     page.get_by_role("textbox", name="Telephone number").fill("09876543210")
     page.get_by_role("textbox", name="Website (optional)").fill("https://www.testchambers.com")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role(
+        "button", name="Submit"
+    ).click()  # Chambers shows submit as this is the final page of the chambers flow.
 
     # Should complete the flow successfully
     current_url = page.url
@@ -172,7 +176,7 @@ def test_liaison_manager_form_successful_submission_without_website(page: Page):
     page.get_by_role("textbox", name="Email address").fill("alice.johnson@testlsp.com")
     page.get_by_role("textbox", name="Telephone number").fill("01234567890")
     # Leave website empty
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should complete the flow successfully
     current_url = page.url
@@ -185,7 +189,7 @@ def test_liaison_manager_form_required_field_validation(page: Page):
     navigate_to_liaison_manager_via_lsp(page)
 
     # Submit without filling required fields
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should show validation errors for required fields
     expect(page.get_by_text("Error: Enter the first name")).to_be_visible()
@@ -204,7 +208,7 @@ def test_liaison_manager_form_invalid_email_validation(page: Page):
     page.get_by_role("textbox", name="Last name").fill("Smith")
     page.get_by_role("textbox", name="Email address").fill("invalid-email")
     page.get_by_role("textbox", name="Telephone number").fill("01234567890")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should show email validation error
     expect(page.get_by_text("Error: Enter a valid email address")).to_be_visible()
@@ -224,7 +228,7 @@ def test_liaison_manager_form_long_field_validation(page: Page):
     page.get_by_role("textbox", name="Last name").fill(long_name)
     page.get_by_role("textbox", name="Telephone number").fill(long_phone)
     page.get_by_role("textbox", name="Website (optional)").fill(long_website)
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should show validation errors
     expect(page.get_by_text("Error: First name must be 100 characters or less")).to_be_visible()

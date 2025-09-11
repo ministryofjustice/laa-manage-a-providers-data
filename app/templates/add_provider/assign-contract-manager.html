@@ -1,0 +1,66 @@
+{% extends "form.html" %}
+
+{%- from 'govuk_frontend_jinja/components/input/macro.html' import govukInput -%}
+{%- from 'components/moj-pagination.html' import mojPagination -%}
+{%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
+{%- from "govuk_frontend_jinja/components/warning-text/macro.html" import govukWarningText %}
+
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% if form and form.errors %}
+            {{ govukErrorSummary(wtforms_errors(form)) }}
+        {% endif %}
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+              {{ govukNotificationBanner({'type': category, 'html': message}) }}
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <h1 class="govuk-heading-xl">{{ form.title }}</h1>
+
+      <p class="govuk-hint govuk-body govuk-!-margin-bottom-6">Contact <a class="govuk-link" href="mailto: mapd@justice.gov.uk">mapd@justice.gov.uk</a> if you cannot find the contract manager you want to assign.</p>
+
+      <form method="get" class="govuk-!-margin-bottom-6">
+          <div class="govuk-form-group--search">
+            {{ form.search() }}
+            {{ govukButton({'text': 'Search', 'classes': 'govuk-button--secondary'}) }}
+          </div>
+      </form>
+
+      {% if form.search_term %}
+        <h2 class="govuk-heading-m">{{ form.num_results }} search {{ "result" if form.num_results == 1 else "results" }} for '{{ form.search_term }}'</h2>
+      {% endif %}
+
+      {% if form.num_results > 0 %}
+        <form method="post">
+          {{ form.hidden_tag() }}
+
+          <div class="govuk-form-group {% if form.contract_manager.errors %} govuk-form-group--error{% endif %}">
+
+            {% if form.contract_manager.errors %}
+                <p class="govuk-error-message">
+                  <span class="govuk-visually-hidden">Error:</span> {{ form.contract_manager.errors[0] }}
+                </p>
+            {% endif %}
+
+            {{ govukTable(form.contract_manager_table.to_govuk_params(selected_value=form.selected_value)) }}
+
+          </div>
+
+          {{ mojPagination(currentPage=form.page, numShownPerPage=form.contract_managers_shown_per_page, numResults=form.num_results, searchTerm=form.search_term) }}
+
+          <br>
+
+          {{ govukButton({'text': 'Submit'}) }}
+        </form>
+      {% endif %}
+    </div>
+  </div>
+
+{% endblock %}
