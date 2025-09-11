@@ -5,6 +5,7 @@ from flask import abort, current_app, redirect, render_template, request, url_fo
 from flask.views import MethodView
 
 from app.components.tables import Card, DataTable, TableStructure, TransposedDataTable, add_field
+from app.main.forms import firm_name_html, get_firm_statuses
 from app.main.utils import create_provider_from_session
 from app.models import Firm, Office
 from app.utils.formatting import (
@@ -42,7 +43,7 @@ class ViewProvider(MethodView):
         "Chambers": "view-provider-chambers.html",
     }
 
-    def __init__(self, subpage: Literal["contact", "offices"] = "contact"):
+    def __init__(self, subpage: Literal["contact", "offices", "barristers-and-advocates"] = "contact"):
         if subpage:
             self.subpage = subpage
 
@@ -151,6 +152,40 @@ class ViewProvider(MethodView):
         )
         return contact_table
 
+    def get_advocates_table(self, firm: Firm) -> DataTable | None:
+        pda = current_app.extensions["pda"]
+        child_firms = pda.get_provider_children(firm_id=firm.firm_id, only_firm_type="Advocate")
+
+        if len(child_firms) == 0:
+            return None
+
+        columns: list[TableStructure] = [
+            {"text": "Name", "id": "firm_name", "html_renderer": firm_name_html},
+            {"text": "Account number", "id": "firm_number"},
+            {"text": "SRA roll number", "id": "bar_council_roll"},
+            {"text": "Status", "html_renderer": get_firm_statuses},  # Add status tags here when available.
+        ]
+        table = DataTable(structure=columns, data=[child.to_internal_dict() for child in child_firms])
+
+        return table
+
+    def get_barristers_table(self, firm: Firm) -> DataTable | None:
+        pda = current_app.extensions["pda"]
+        child_firms = pda.get_provider_children(firm_id=firm.firm_id, only_firm_type="Barrister")
+
+        if len(child_firms) == 0:
+            return None
+
+        columns: list[TableStructure] = [
+            {"text": "Name", "id": "firm_name", "html_renderer": firm_name_html},
+            {"text": "Account number", "id": "firm_number"},
+            {"text": "Bar Council roll number", "id": "bar_council_roll"},
+            {"text": "Status", "html_renderer": get_firm_statuses},  # Add status tags here when available.
+        ]
+        table = DataTable(structure=columns, data=[child.to_internal_dict() for child in child_firms])
+
+        return table
+
     def get_context(self, firm):
         pda = current_app.extensions["pda"]
 
@@ -179,6 +214,10 @@ class ViewProvider(MethodView):
 
         if self.subpage == "contact":
             context.update({"contact_table": self.get_contact_table(firm)})
+
+        if self.subpage == "barristers-and-advocates":
+            context.update({"barristers_table": self.get_barristers_table(firm)})
+            context.update({"advocates_table": self.get_advocates_table(firm)})
 
         return context
 
