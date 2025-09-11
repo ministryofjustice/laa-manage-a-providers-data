@@ -1,8 +1,8 @@
 import pytest
-from flask import url_for
 from playwright.sync_api import Page, expect
 
 
+@pytest.mark.usefixtures("live_server")
 def test_barristers_and_advocates_visible(page: Page) -> None:
     page.get_by_role("button", name="Start now").click()
     page.get_by_role("button", name="Search").click()
@@ -17,6 +17,7 @@ def test_barristers_and_advocates_visible(page: Page) -> None:
     expect(page.get_by_role("button", name="Add another advocate")).to_be_visible()
 
 
+@pytest.mark.usefixtures("live_server")
 def test_correct_message_when_no_barristers_or_advocates(page: Page) -> None:
     page.get_by_role("button", name="Start now").click()
     page.get_by_role("button", name="Search").click()
