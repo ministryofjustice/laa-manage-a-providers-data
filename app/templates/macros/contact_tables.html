@@ -1,0 +1,24 @@
+{% from 'govuk_frontend_jinja/components/summary-list/macro.html' import govukSummaryList %}
+{% from 'govuk_frontend_jinja/components/details/macro.html' import govukDetails %}
+
+{% macro contactCards(contact_tables) %}
+    {% if contact_tables %}
+        <h3 class="govuk-heading-m">Contacts</h3>
+        {# First contact shown directly #}
+        {{ govukSummaryList(contact_tables[0].to_summary_govuk_params()) }}
+        
+        {# Additional contacts in one details component #}
+        {% if contact_tables|length > 1 %}
+            {% set additional_contacts_html %}
+                {% for contact_table in contact_tables[1:] %}
+                    {{ govukSummaryList(contact_table.to_summary_govuk_params()) }}
+                {% endfor %}
+            {% endset %}
+            
+            {{ govukDetails({
+                "summaryText": "Show " ~ (contact_tables|length - 1) ~ " additional contact" ~ ("s" if contact_tables|length > 2 else ""),
+                "html": additional_contacts_html
+            }) }}
+        {% endif %}
+    {% endif %}
+{% endmacro %}

@@ -40,9 +40,9 @@ def format_date(date_string: Optional[str]) -> str:
     try:
         # Parse ISO format date
         date_obj = datetime.fromisoformat(date_string)
-        # Format as DD/MM/YYYY
-        return date_obj.strftime("%d/%m/%Y")
-    except (ValueError, AttributeError):
+        # Format as "20 Jan 2023"
+        return date_obj.strftime("%-d %b %Y")
+    except (ValueError, TypeError):
         # If it's not a valid ISO date, return as-is
         return date_string
 

@@ -112,7 +112,7 @@ def test_lsp_contact(page):
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
 
-    page.get_by_role("link", name="METROPOLITAN LAW CENTRE").click()
+    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
 
     # Contact subpage visible on landing
     expect(page.get_by_role("heading", name="Contacts")).to_be_visible()

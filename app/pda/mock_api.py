@@ -3,6 +3,7 @@ import logging
 import os
 import random
 import string
+from datetime import date
 from typing import Any, Dict, List, Optional
 from unittest.mock import Mock
 
@@ -570,8 +571,12 @@ class MockProviderDataApi:
 
         office_id = office_data.get("firmOfficeId")
 
-        # Set the vendor_site_id to the office ID
-        updated_contact = contact.model_copy(update={"vendor_site_id": office_id})
+        # Set the vendor_site_id to the office ID and active_from to today in ISO format
+        updates = {"vendor_site_id": office_id}
+        if not contact.active_from:
+            updates["active_from"] = date.today().isoformat()
+
+        updated_contact = contact.model_copy(update=updates)
 
         # Add to mock data
         self._mock_data["contacts"].append(updated_contact.to_api_dict())
