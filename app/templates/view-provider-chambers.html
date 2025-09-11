@@ -29,6 +29,11 @@
   {% endif %}
 
   {% if subpage == "contact" %}
+    {% if contact_details_table %}
+      <h3 class="govuk-heading-m">Contact details</h3>
+      {{ govukSummaryList(contact_details_table.to_summary_govuk_params()) }}
+    {% endif %}
+
     <h3 class="govuk-heading-m">Contact</h3>
     {{ govukSummaryList(contact_table.to_summary_govuk_params()) }}
 
