@@ -303,6 +303,9 @@ class ViewProvider(MethodView):
             context.update({"office_tables": office_tables})
 
         if self.subpage == "contact":
+            if firm.firm_type == "Chambers" and head_office:
+                context.update({"contact_details_table": self.get_chambers_contact_details_table(firm, head_office)})
+
             context.update({"contact_tables": self.get_contact_tables(firm, head_office)})
             if firm.firm_type == "Chambers" and head_office:
                 context.update({"contact_details_table": self.get_chambers_contact_details_table(firm, head_office)})
