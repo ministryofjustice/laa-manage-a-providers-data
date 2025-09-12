@@ -4,7 +4,7 @@ from playwright.sync_api import Page, expect
 
 
 def navigate_to_liaison_manager_via_lsp(page: Page):
-    """Helper function to navigate to Liaison Manager form via the LSP flow."""
+    """Helper function to navigate to Liaison manager form via the LSP flow."""
     # Start with add parent provider
     page.goto(url_for("main.add_parent_provider", _external=True))
 
@@ -19,7 +19,7 @@ def navigate_to_liaison_manager_via_lsp(page: Page):
     page.get_by_role("textbox", name="Month").fill("01")
     page.get_by_role("textbox", name="Year").fill("2020")
     page.get_by_role("textbox", name="Companies House number").fill("12345678")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Fill head office contact details form
     page.get_by_role("textbox", name="Address line 1").fill("123 Head Office Street")
@@ -29,26 +29,26 @@ def navigate_to_liaison_manager_via_lsp(page: Page):
     page.get_by_role("textbox", name="Email address").fill("headoffice@testlsp.com")
     page.get_by_role("textbox", name="DX number").fill("DX123456")
     page.get_by_role("textbox", name="DX centre").fill("Head Office Centre")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Fill VAT registration form (optional, skip by submitting empty)
     expect(page.get_by_role("heading", name="Head office: VAT Registration number (optional)")).to_be_visible()
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Fill bank account form
     expect(page.get_by_role("heading", name="Head office: Bank account details")).to_be_visible()
     page.get_by_role("textbox", name="Account name").fill("Test Business Account")
     page.get_by_role("textbox", name="Sort code").fill("123456")
     page.get_by_role("textbox", name="Account number").fill("12345678")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
-    # Should now be on the Liaison Manager page
+    # Should now be on the Liaison manager page
     expect(page.get_by_role("heading", name="Add liaison manager")).to_be_visible()
     expect(page.get_by_text("Test Legal Services Provider")).to_be_visible()  # Caption should show provider name
 
 
 def navigate_to_liaison_manager_via_chambers(page: Page):
-    """Helper function to navigate to Liaison Manager form via the Chambers flow."""
+    """Helper function to navigate to Liaison manager form via the Chambers flow."""
     # Start with add parent provider
     page.goto(url_for("main.add_parent_provider", _external=True))
 
@@ -66,16 +66,16 @@ def navigate_to_liaison_manager_via_chambers(page: Page):
     page.get_by_role("textbox", name="Email address").fill("chambers@testchambers.com")
     page.get_by_role("textbox", name="DX number").fill("DX123456")
     page.get_by_role("textbox", name="DX centre").fill("Chambers Centre")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
-    # Should now be on the Liaison Manager page
+    # Should now be on the Liaison manager page
     expect(page.get_by_role("heading", name="Add liaison manager")).to_be_visible()
     expect(page.get_by_text("Test Chambers")).to_be_visible()  # Caption should show provider name
 
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_loads_correctly_lsp_flow(page: Page):
-    """Test that the Liaison Manager form loads correctly via LSP flow."""
+    """Test that the Liaison manager form loads correctly via LSP flow."""
     navigate_to_liaison_manager_via_lsp(page)
 
     # Verify the page title
@@ -87,12 +87,12 @@ def test_liaison_manager_form_loads_correctly_lsp_flow(page: Page):
     expect(page.get_by_role("textbox", name="Email address")).to_be_visible()
     expect(page.get_by_role("textbox", name="Telephone number")).to_be_visible()
     expect(page.get_by_role("textbox", name="Website (optional)")).to_be_visible()
-    expect(page.get_by_role("button", name="Submit")).to_be_visible()
+    expect(page.get_by_role("button", name="Continue")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_loads_correctly_chambers_flow(page: Page):
-    """Test that the Liaison Manager form loads correctly via Chambers flow."""
+    """Test that the Liaison manager form loads correctly via Chambers flow."""
     navigate_to_liaison_manager_via_chambers(page)
 
     # Verify the page title
@@ -104,12 +104,14 @@ def test_liaison_manager_form_loads_correctly_chambers_flow(page: Page):
     expect(page.get_by_role("textbox", name="Email address")).to_be_visible()
     expect(page.get_by_role("textbox", name="Telephone number")).to_be_visible()
     expect(page.get_by_role("textbox", name="Website (optional)")).to_be_visible()
-    expect(page.get_by_role("button", name="Submit")).to_be_visible()
+    expect(
+        page.get_by_role("button", name="Submit")
+    ).to_be_visible()  # Chambers shows submit as this is the final page of the chambers flow.
 
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_caption_shows_provider_name_lsp(page: Page):
-    """Test that the Liaison Manager form caption shows the LSP provider name from the session."""
+    """Test that the Liaison manager form caption shows the LSP provider name from the session."""
     navigate_to_liaison_manager_via_lsp(page)
 
     # The caption should show the provider name from the session
@@ -118,7 +120,7 @@ def test_liaison_manager_form_caption_shows_provider_name_lsp(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_caption_shows_provider_name_chambers(page: Page):
-    """Test that the Liaison Manager form caption shows the Chambers provider name from the session."""
+    """Test that the Liaison manager form caption shows the Chambers provider name from the session."""
     navigate_to_liaison_manager_via_chambers(page)
 
     # The caption should show the provider name from the session
@@ -127,7 +129,7 @@ def test_liaison_manager_form_caption_shows_provider_name_chambers(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_successful_submission_lsp(page: Page):
-    """Test successful Liaison Manager form submission with valid data via LSP flow."""
+    """Test successful Liaison manager form submission with valid data via LSP flow."""
     navigate_to_liaison_manager_via_lsp(page)
 
     # Fill with valid liaison manager details
@@ -136,7 +138,7 @@ def test_liaison_manager_form_successful_submission_lsp(page: Page):
     page.get_by_role("textbox", name="Email address").fill("john.smith@testlsp.com")
     page.get_by_role("textbox", name="Telephone number").fill("01234567890")
     page.get_by_role("textbox", name="Website (optional)").fill("https://www.testlsp.com")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should complete the flow successfully
     current_url = page.url
@@ -145,7 +147,7 @@ def test_liaison_manager_form_successful_submission_lsp(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_successful_submission_chambers(page: Page):
-    """Test successful Liaison Manager form submission with valid data via Chambers flow."""
+    """Test successful Liaison manager form submission with valid data via Chambers flow."""
     navigate_to_liaison_manager_via_chambers(page)
 
     # Fill with valid liaison manager details
@@ -154,7 +156,9 @@ def test_liaison_manager_form_successful_submission_chambers(page: Page):
     page.get_by_role("textbox", name="Email address").fill("jane.doe@testchambers.com")
     page.get_by_role("textbox", name="Telephone number").fill("09876543210")
     page.get_by_role("textbox", name="Website (optional)").fill("https://www.testchambers.com")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role(
+        "button", name="Submit"
+    ).click()  # Chambers shows submit as this is the final page of the chambers flow.
 
     # Should complete the flow successfully
     current_url = page.url
@@ -163,7 +167,7 @@ def test_liaison_manager_form_successful_submission_chambers(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_successful_submission_without_website(page: Page):
-    """Test successful Liaison Manager form submission without optional website field."""
+    """Test successful Liaison manager form submission without optional website field."""
     navigate_to_liaison_manager_via_lsp(page)
 
     # Fill with valid details but skip optional website
@@ -172,7 +176,7 @@ def test_liaison_manager_form_successful_submission_without_website(page: Page):
     page.get_by_role("textbox", name="Email address").fill("alice.johnson@testlsp.com")
     page.get_by_role("textbox", name="Telephone number").fill("01234567890")
     # Leave website empty
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should complete the flow successfully
     current_url = page.url
@@ -181,11 +185,11 @@ def test_liaison_manager_form_successful_submission_without_website(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_required_field_validation(page: Page):
-    """Test Liaison Manager form validation for required fields."""
+    """Test Liaison manager form validation for required fields."""
     navigate_to_liaison_manager_via_lsp(page)
 
     # Submit without filling required fields
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should show validation errors for required fields
     expect(page.get_by_text("Error: Enter the first name")).to_be_visible()
@@ -196,7 +200,7 @@ def test_liaison_manager_form_required_field_validation(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_invalid_email_validation(page: Page):
-    """Test Liaison Manager form validation with invalid email."""
+    """Test Liaison manager form validation with invalid email."""
     navigate_to_liaison_manager_via_lsp(page)
 
     # Fill with invalid email
@@ -204,7 +208,7 @@ def test_liaison_manager_form_invalid_email_validation(page: Page):
     page.get_by_role("textbox", name="Last name").fill("Smith")
     page.get_by_role("textbox", name="Email address").fill("invalid-email")
     page.get_by_role("textbox", name="Telephone number").fill("01234567890")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should show email validation error
     expect(page.get_by_text("Error: Enter a valid email address")).to_be_visible()
@@ -212,7 +216,7 @@ def test_liaison_manager_form_invalid_email_validation(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_long_field_validation(page: Page):
-    """Test Liaison Manager form validation with fields that are too long."""
+    """Test Liaison manager form validation with fields that are too long."""
     navigate_to_liaison_manager_via_lsp(page)
 
     # Fill with fields that are too long
@@ -224,7 +228,7 @@ def test_liaison_manager_form_long_field_validation(page: Page):
     page.get_by_role("textbox", name="Last name").fill(long_name)
     page.get_by_role("textbox", name="Telephone number").fill(long_phone)
     page.get_by_role("textbox", name="Website (optional)").fill(long_website)
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should show validation errors
     expect(page.get_by_text("Error: First name must be 100 characters or less")).to_be_visible()
@@ -235,14 +239,14 @@ def test_liaison_manager_form_long_field_validation(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_without_head_office_session_gives_error(page: Page):
-    """Test that accessing Liaison Manager form without head office session data gives 400 error."""
+    """Test that accessing Liaison manager form without head office session data gives 400 error."""
     # Start provider flow but don't complete head office details
     page.goto(url_for("main.add_parent_provider", _external=True))
     page.get_by_role("textbox", name="Provider name").fill("Test LSP")
     page.get_by_role("radio", name="Legal services provider").click()
     page.get_by_role("button", name="Continue").click()
 
-    # Try to access Liaison Manager form directly without completing head office details
+    # Try to access Liaison manager form directly without completing head office details
     page.goto(url_for("main.add_liaison_manager", _external=True))
 
     # Should get 400 error since head office session data doesn't exist

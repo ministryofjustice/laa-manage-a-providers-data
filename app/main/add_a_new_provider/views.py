@@ -267,7 +267,14 @@ class BankAccountFormView(FullWidthBaseFormView):
 
 
 class LiaisonManagerFormView(FullWidthBaseFormView):
-    success_endpoint = "main.create_provider"
+    next_step_mapping = {
+        "Chambers": "main.create_provider",
+        "Legal Services Provider": "main.assign_contract_manager",
+    }
+
+    def get_success_url(self, form):
+        provider_type = session.get("new_provider", {}).get("firm_type")
+        return url_for(self.next_step_mapping.get(provider_type, "main.create_provider"))
 
     def form_valid(self, form):
         session["new_liaison_manager"] = {
@@ -276,7 +283,7 @@ class LiaisonManagerFormView(FullWidthBaseFormView):
             "email_address": form.data.get("email_address"),
             "telephone_number": form.data.get("telephone_number"),
             "website": form.data.get("website"),
-            "job_title": "Liaison Manager",  # All contacts are liaison managers in MAPD
+            "job_title": "Liaison manager",  # All contacts are liaison managers in MAPD
             "primary": "Y",  # We are adding a new head office so this will be the primary contact
         }
 
@@ -311,6 +318,57 @@ class LiaisonManagerFormView(FullWidthBaseFormView):
 
         firm = Firm(**session.get("new_provider"))
         form = self.get_form_class()(firm=firm)
+
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form, **kwargs)
+
+
+class AssignContractManagerFormView(BaseFormView):
+    """Form view for the assign contract manager form"""
+
+    template = "add_provider/assign-contract-manager.html"
+    success_endpoint = "main.create_provider"
+
+    def form_valid(self, form):
+        session.get("new_provider").update({"contract_manager": form.data.get("contract_manager")})
+        return super().form_valid(form)
+
+    @staticmethod
+    def get_valid_firm_or_abort():
+        if not session.get("new_provider"):
+            abort(400)
+
+        if session.get("new_provider").get("firm_type") != "Legal Services Provider":
+            abort(400)
+
+    def get(self, context, **kwargs):
+        self.get_valid_firm_or_abort()
+
+        # Check if the new head office data exists in the session
+        if not session.get("new_head_office"):
+            abort(400)
+
+        search_term = request.args.get("search", "").strip()
+        page = int(request.args.get("page", 1))
+        form = self.get_form_class()(search_term=search_term, page=page)
+
+        if search_term:
+            form.search.validate(form)
+
+        return render_template(self.get_template(), **self.get_context_data(form, **kwargs))
+
+    def post(self, context, **kwargs) -> Response | str:
+        self.get_valid_firm_or_abort()
+
+        # Check if the new head office data exists in the session
+        if not session.get("new_head_office"):
+            abort(400)
+
+        search_term = request.args.get("search", "").strip()
+        page = int(request.args.get("page", 1))
+        form = self.get_form_class()(search_term=search_term, page=page)
 
         if form.validate_on_submit():
             return self.form_valid(form)
