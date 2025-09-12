@@ -3,6 +3,7 @@ from wtforms import RadioField, SubmitField
 from wtforms.fields.simple import StringField
 from wtforms.validators import Email, InputRequired, Length, Optional
 
+from app.components.tables import RadioDataTable, TableStructure
 from app.constants import (
     ADVOCATE_LEVEL_CHOICES,
     CONSTITUTIONAL_STATUS_CHOICES,
@@ -51,7 +52,6 @@ class AddProviderForm(BaseForm):
 class LspDetailsForm(BaseForm):
     title = "Legal services provider details"
     url = "additional-details-legal-services-provider"
-    submit_button_text = "Submit"
 
     @property
     def caption(self):
@@ -231,6 +231,7 @@ class HeadOfficeContactDetailsForm(OfficeContactDetailsForm):
     """This form is used both for LSP Head Office contact details and Chambers contact details as both populate the firm's head office information. They are just displayed differently to end users."""
 
     url = "add-contact-details"
+    submit_button_text = "Continue"
 
     @property
     def title(self):
@@ -249,7 +250,6 @@ class HeadOfficeContactDetailsForm(OfficeContactDetailsForm):
 class VATRegistrationForm(BaseForm):
     title = "Head office: \nVAT registration number (optional)"
     url = "add-vat-number"
-    submit_button_text = "Submit"
 
     @property
     def caption(self):
@@ -274,7 +274,6 @@ class VATRegistrationForm(BaseForm):
 class BankAccountForm(BaseForm):
     title = "Head office: \nBank account details"
     url = "add-bank-account"
-    submit_button_text = "Submit"
 
     @property
     def caption(self):
@@ -328,7 +327,11 @@ class BankAccountForm(BaseForm):
 class LiaisonManagerForm(BaseForm):
     title = "Add liaison manager"
     url = "add-liaison-manager"
-    submit_button_text = "Submit"
+
+    @property
+    def submit_button_text(self):
+        new_provider_type = session.get("new_provider", {}).get("firm_type")
+        return "Submit" if new_provider_type == "Chambers" else "Continue"
 
     @property
     def caption(self):
@@ -396,3 +399,82 @@ class LiaisonManagerForm(BaseForm):
             Length(max=255, message="Website must be 255 characters or less"),
         ],
     )
+
+
+class AssignContractManagerForm(BaseForm):
+    title = "Assign contract manager"
+    url = "assign-contract-manager"
+    template = "add_provider/assign-contract-manager.html"
+    success_url = "main.create_provider"
+    submit_button_text = "Submit"
+
+    search = StringField(
+        "Search for a contract manager",
+        widget=GovTextInput(
+            form_group_classes="govuk-!-width-two-thirds",
+            heading_class="govuk-fieldset__legend--s",
+            hint="You can search by name or employee ID",
+        ),
+        validators=[Length(max=100, message="Search term must be 100 characters or less")],
+    )
+
+    contract_manager = StringField(
+        "Contract manager",
+        validators=[InputRequired(message="Select a contract manager or search again")],
+    )
+
+    def __init__(self, search_term=None, page=1, selected_value=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Static list of 12 fake contract managers
+        self.contract_managers = [
+            {"name": "Alice Johnson"},
+            {"name": "Robert Smith"},
+            {"name": "Sarah Wilson"},
+            {"name": "Michael Brown"},
+            {"name": "Emma Davis"},
+            {"name": "Lewis Green"},
+            {"name": "Olivia Garcia"},
+            {"name": "William Martinez"},
+            {"name": "Sophia Anderson"},
+            {"name": "David Taylor"},
+            {"name": "Isabella Thomas"},
+            {"name": "Christopher Lee"},
+        ]
+
+        # Set search field data
+        self.search_term = search_term
+        if search_term:
+            self.search.data = search_term
+
+        # Filter contract managers based on search term
+        filtered_managers = self.contract_managers
+        if self.search_term:
+            search_lower = self.search_term.lower()
+            filtered_managers = [
+                manager for manager in self.contract_managers if (search_lower in manager["name"].lower())
+            ]
+
+        self.page = page
+        self.contract_managers_shown_per_page = 10
+        self.num_results = len(filtered_managers)
+
+        # Limit results and populate choices
+        start_id = self.contract_managers_shown_per_page * (self.page - 1)
+        end_id = self.contract_managers_shown_per_page * (self.page - 1) + self.contract_managers_shown_per_page
+
+        filtered_managers = filtered_managers[start_id:end_id]
+
+        # Create RadioDataTable for contract managers
+        table_structure: list[TableStructure] = [
+            {"text": "Name", "id": "name", "classes": "govuk-!-width-full"},
+        ]
+        self.contract_manager_table = RadioDataTable(
+            structure=table_structure,
+            data=filtered_managers,
+            radio_field_name="contract_manager",
+            radio_value_key="name",
+        )
+
+        # Store selected value for table rendering
+        self.selected_value = selected_value
