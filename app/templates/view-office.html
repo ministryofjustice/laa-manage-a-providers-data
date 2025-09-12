@@ -51,21 +51,41 @@
       "label": "Sub navigation",
       "items": [{
         "text": "Overview",
-        "href": "#",
-        "active": true
+        "href": url_for("main.view_office_overview", firm=firm, office=office),
+        "active": subpage == "overview"
       }, {
         "text": "Contact",
-        "href": "#",
+        "href": url_for("main.view_office_contact", firm=firm, office=office),
+        "active": subpage == "contact"
       }, {
         "text": "Bank accounts and payment",
-        "href": "#",
+        "href": url_for("main.view_office_bank_accounts_and_payment", firm=firm, office=office),
+        "active": subpage == "bank-accounts-and-payment"
       }]
     }) }}
 
-    {% if overview_table %}
-      <h2 class="govuk-heading-m">Overview</h2>
-      {{ govukTable(overview_table.to_govuk_params()) }}
+    {% if subpage == "overview" %}
+        {% if overview_table %}
+          <h2 class="govuk-heading-m">Overview</h2>
+          {{ govukTable(overview_table.to_govuk_params()) }}
+        {% endif %}
     {% endif %}
 
+    {% if subpage == "contact" %}
+        <h2 class="govuk-heading-m">Contact</h2>
+    {% endif %}
+
+    {% if subpage == "bank-accounts-and-payment" %}
+        <h2 class="govuk-heading-m">Payment information</h2>
+
+        <h2 class="govuk-heading-m">VAT registration number</h2>
+
+        <h2 class="govuk-heading-m">Bank accounts</h2>
+
+        {{ govukButton({
+            "text": "Add bank account",
+            "href": "#"
+        }) }}
+    {% endif %}
 
 {% endblock %}

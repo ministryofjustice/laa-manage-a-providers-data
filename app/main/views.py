@@ -299,24 +299,41 @@ class ViewProvider(MethodView):
 class ViewOffice(MethodView):
     template = "view-office.html"
 
+    def __init__(self, subpage: Literal["overview", "contact", "bank-accounts-and-payment"] = "overview"):
+        if subpage:
+            self.subpage = subpage
+
     @staticmethod
     def parent_provider_name_html(parent_provider: Firm):
         return f"<a class='govuk-link', href={url_for('main.view_provider', firm=parent_provider.firm_id)}>{parent_provider.firm_name}</a>"
+
+    def get_context(self, firm: Firm, office: Office | None = None) -> Dict:
+        context = {"firm": firm, "office": office, "message": "Hello world", "subpage": self.subpage}
+
+        if self.subpage == "bank-accounts-and-payment":
+            context.update({"message": "Hello Mr Banks"})
+
+        if self.subpage == "overview":
+            # Overview section
+            overview_rows, overview_data = [], {}
+            add_field(
+                overview_rows, overview_data, firm.firm_name, "Parent provider",
+                html=self.parent_provider_name_html(firm)
+            )
+            add_field(overview_rows, overview_data, office.firm_office_code, "Account number")
+            add_field(overview_rows, overview_data, office.head_office, "Head office", format_head_office)
+            add_field(overview_rows, overview_data, firm.firm_type, "Supplier type", format_firm_type)
+
+            # Create tables
+            overview_table = TransposedDataTable(structure=overview_rows, data=overview_data) if overview_rows else None
+            context.update({"overview_table": overview_table})
+
+        return context
 
     def get(self, firm: Firm, office: Office | None = None):
         if not firm or not office:
             abort(404)
 
-        # Overview section
-        overview_rows, overview_data = [], {}
-        add_field(
-            overview_rows, overview_data, firm.firm_name, "Parent provider", html=self.parent_provider_name_html(firm)
-        )
-        add_field(overview_rows, overview_data, office.firm_office_code, "Account number")
-        add_field(overview_rows, overview_data, office.head_office, "Head office", format_head_office)
-        add_field(overview_rows, overview_data, firm.firm_type, "Supplier type", format_firm_type)
+        context = self.get_context(firm, office)
 
-        # Create tables
-        overview_table = TransposedDataTable(structure=overview_rows, data=overview_data) if overview_rows else None
-
-        return render_template(self.template, overview_table=overview_table, firm=firm, office=office)
+        return render_template(self.template, **context)
