@@ -3,7 +3,7 @@ import json
 
 from flask import current_app, flash, session
 
-from app.models import BankAccount, Firm, Office
+from app.models import BankAccount, Contact, Firm, Office
 from app.pda.mock_api import MockProviderDataApi
 
 
@@ -81,6 +81,24 @@ def add_new_bank_account(
     return new_bank_account
 
 
+def add_new_contact(contact: Contact, firm_id: int, office_code: str, show_success_message: bool = True) -> Contact:
+    """Adds a new contact to an office in the PDA, currently only the mock PDA supports this functionality."""
+
+    pda = current_app.extensions.get("pda")
+    if not pda:
+        raise RuntimeError("Provider Data API not initialized")
+
+    if not isinstance(pda, MockProviderDataApi):
+        raise RuntimeError("Provider Data API does not support this functionality yet.")
+
+    new_contact = pda.create_office_contact(firm_id, office_code, contact)
+
+    if show_success_message:
+        flash(f"<b>Contact successfully created for office {office_code}</b>", "success")
+
+    return new_contact
+
+
 def create_provider_from_session() -> Firm | None:
     """Create a new provider, office, and bank account from session data."""
     firm_data = session.get("new_provider")
@@ -107,6 +125,18 @@ def create_provider_from_session() -> Firm | None:
             bank_account = BankAccount(**bank_account_data)
             add_new_bank_account(
                 bank_account,
+                firm_id=firm.firm_id,
+                office_code=new_office.firm_office_code,
+                show_success_message=False,
+            )
+
+        # Create liaison manager contact if data exists
+        if liaison_manager_data := session.get("new_liaison_manager"):
+            del session["new_liaison_manager"]
+
+            contact = Contact(**liaison_manager_data)
+            add_new_contact(
+                contact,
                 firm_id=firm.firm_id,
                 office_code=new_office.firm_office_code,
                 show_success_message=False,

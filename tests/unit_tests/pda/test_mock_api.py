@@ -2,7 +2,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from app.models import BankAccount, Firm, Office
+from app.models import BankAccount, Contact, Firm, Office
 from app.pda.mock_api import (
     MockProviderDataApi,
     ProviderDataApiError,
@@ -56,6 +56,7 @@ class TestDataLoadFunctions:
             {"contracts": [{"contractId": 1}]},  # contracts.json
             {"schedules": [{"scheduleId": 1}]},  # schedules.json
             {"bank_accounts": [{"vendorSiteId": 101}]},  # bank_accounts.json
+            {"contacts": [{"vendorSiteId": 101}]},  # contacts.json
         ]
 
         result = _load_mock_data()
@@ -66,9 +67,10 @@ class TestDataLoadFunctions:
             "contracts": [{"contractId": 1}],
             "schedules": [{"scheduleId": 1}],
             "bank_accounts": [{"vendorSiteId": 101}],
+            "contacts": [{"vendorSiteId": 101}],  # contacts.json
         }
         assert result == expected
-        assert mock_load_fixture.call_count == 5
+        assert mock_load_fixture.call_count == 6
 
     def test_generate_unique_office_code(self):
         """Test generation of unique office code."""
@@ -623,3 +625,163 @@ class TestMockProviderDataApi:
 
         actual = mock_api.get_provider_children(50)
         assert actual == expected
+
+    def test_get_office_contacts_success(self, mock_api):
+        """Test getting contacts for an office."""
+        mock_api._mock_data = {
+            "offices": [{"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101}],
+            "contacts": [
+                {
+                    "vendorSiteId": 101,
+                    "firstName": "John",
+                    "lastName": "Smith",
+                    "emailAddress": "john.smith@example.com",
+                    "telephoneNumber": "0123 456 7890",
+                    "website": "https://www.example.com",
+                    "jobTitle": "Liaison Manager",
+                    "primary": "Y",
+                },
+                {
+                    "vendorSiteId": 101,
+                    "firstName": "Jane",
+                    "lastName": "Doe",
+                    "emailAddress": "jane.doe@example.com",
+                    "telephoneNumber": "0123 456 7891",
+                    "website": None,
+                    "jobTitle": "Liaison Manager",
+                    "primary": "N",
+                },
+                {
+                    "vendorSiteId": 102,
+                    "firstName": "Bob",
+                    "lastName": "Brown",
+                    "emailAddress": "bob.brown@example.com",
+                    "jobTitle": "Liaison Manager",
+                    "primary": "Y",
+                },
+            ],
+        }
+
+        result = mock_api.get_office_contacts(1, "1A001L")
+
+        assert len(result) == 2
+        assert result[0].first_name == "John"
+        assert result[0].primary == "Y"
+        assert result[1].first_name == "Jane"
+        assert result[1].primary == "N"
+
+    def test_get_office_contacts_empty(self, mock_api):
+        """Test getting contacts when none exist."""
+        mock_api._mock_data = {
+            "offices": [{"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101}],
+            "contacts": [],
+        }
+
+        result = mock_api.get_office_contacts(1, "1A001L")
+
+        assert result == []
+
+    def test_get_office_contacts_office_not_found(self, mock_api):
+        """Test getting contacts when office doesn't exist."""
+        mock_api._mock_data = {"offices": [], "contacts": []}
+
+        result = mock_api.get_office_contacts(1, "NONEXISTENT")
+
+        assert result == []
+
+    def test_get_office_contacts_invalid_params(self, mock_api):
+        """Test validation of parameters."""
+        with pytest.raises(ValueError, match="firm_id must be a positive integer"):
+            mock_api.get_office_contacts(0, "1A001L")
+
+        with pytest.raises(ValueError, match="office_code must be a non-empty string"):
+            mock_api.get_office_contacts(1, "")
+
+    def test_create_office_contact_success(self, mock_api):
+        """Test creating a contact for an office."""
+        mock_api._mock_data = {
+            "offices": [{"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101}],
+            "contacts": [],
+        }
+
+        contact = Contact(
+            vendor_site_id=999,  # This should be overridden
+            first_name="Jane",
+            last_name="Doe",
+            email_address="jane.doe@example.com",
+            telephone_number="0987 654 3210",
+            website="https://www.test.example",
+            job_title="Liaison Manager",
+            primary="Y",
+        )
+
+        result = mock_api.create_office_contact(1, "1A001L", contact)
+
+        assert result.vendor_site_id == 101  # Should be set to office ID
+        assert result.first_name == "Jane"
+        assert result.primary == "Y"
+        assert len(mock_api._mock_data["contacts"]) == 1
+
+    def test_create_office_contact_multiple_allowed(self, mock_api):
+        """Test creating multiple contacts for the same office."""
+        mock_api._mock_data = {
+            "offices": [{"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101}],
+            "contacts": [
+                {
+                    "vendorSiteId": 101,
+                    "firstName": "John",
+                    "lastName": "Smith",
+                    "emailAddress": "john.smith@example.com",
+                    "jobTitle": "Liaison Manager",
+                    "primary": "Y",
+                }
+            ],
+        }
+
+        contact = Contact(
+            vendor_site_id=101,
+            first_name="Jane",
+            last_name="Doe",
+            email_address="jane.doe@example.com",
+            job_title="Liaison Manager",
+            primary="N",
+        )
+
+        result = mock_api.create_office_contact(1, "1A001L", contact)
+
+        assert result.first_name == "Jane"
+        assert result.primary == "N"
+        assert len(mock_api._mock_data["contacts"]) == 2
+
+    def test_create_office_contact_office_not_found(self, mock_api):
+        """Test creating contact when office doesn't exist."""
+        mock_api._mock_data = {"offices": [], "contacts": []}
+
+        contact = Contact(
+            vendor_site_id=101,
+            first_name="John",
+            last_name="Smith",
+            email_address="john.smith@example.com",
+            job_title="Liaison Manager",
+            primary="Y",
+        )
+
+        with pytest.raises(ProviderDataApiError, match="Office NONEXISTENT not found"):
+            mock_api.create_office_contact(1, "NONEXISTENT", contact)
+
+    def test_create_office_contact_invalid_params(self, mock_api):
+        """Test validation of parameters for create contact."""
+        contact = Contact(
+            vendor_site_id=101,
+            first_name="Test",
+            last_name="User",
+            email_address="test@example.com",
+            job_title="Liaison Manager",
+            primary="Y",
+        )
+
+        with pytest.raises(ValueError, match="firm_id must be a positive integer"):
+            mock_api.create_office_contact(0, "1A001L", contact)
+
+        with pytest.raises(ValueError, match="office_code must be a non-empty string"):
+            mock_api.create_office_contact(1, "", contact)

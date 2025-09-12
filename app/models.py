@@ -40,6 +40,10 @@ class Firm(BaseModel):
     women_owned_flag: YN = Field(alias="womenOwnedFlag", default=None)
     website_url: str | None = Field(alias="websiteUrl", min_length=1, default=None)
 
+    contract_manager: str | None = Field(
+        alias="contractManager", default=None
+    )  # This does not exist in PDA and is here for the purpose of testing
+
     def to_api_dict(self) -> dict:
         """Export as camelCase dictionary for API calls."""
         return self.model_dump(by_alias=True, exclude_none=True)
@@ -142,6 +146,44 @@ class BankAccount(BaseModel):
     county: Optional[str] = Field(default=None)
     country: str = Field(default="GB")
     zip: Optional[str] = Field(default=None)
+
+    def to_api_dict(self) -> dict:
+        """Export as camelCase dictionary for API calls."""
+        return self.model_dump(by_alias=True, exclude_none=True)
+
+    def to_internal_dict(self) -> dict:
+        """Export as snake_case dictionary for internal use."""
+        return self.model_dump(by_alias=False, exclude_none=True)
+
+    @property
+    def firm_office_id(self) -> int:
+        """Convenience property to access vendor_site_id as firm_office_id."""
+        return self.vendor_site_id
+
+
+class Contact(BaseModel):
+    """Contact model
+
+    Represents contact details for an office.
+    Supports both snake_case (internal) and camelCase (API) field names.
+    """
+
+    model_config = ConfigDict(
+        populate_by_name=True,  # Accept both snake_case AND camelCase
+        str_strip_whitespace=True,  # Auto-strip whitespace from strings
+        validate_assignment=True,  # Validate when fields are assigned
+        extra="forbid",  # Don't allow extra fields
+    )
+
+    # vendorSiteId maps to firm_office_id
+    vendor_site_id: int = Field(alias="vendorSiteId", gt=0, default=None)  # This is the firm_office_id
+    first_name: str = Field(alias="firstName", min_length=1, default=None)
+    last_name: str = Field(alias="lastName", min_length=1, default=None)
+    email_address: str = Field(alias="emailAddress", min_length=1, default=None)
+    telephone_number: Optional[str] = Field(alias="telephoneNumber", default=None)
+    website: Optional[str] = Field(default=None)
+    job_title: Optional[str] = Field(alias="jobTitle", default=None)
+    primary: str = Field(default="N")
 
     def to_api_dict(self) -> dict:
         """Export as camelCase dictionary for API calls."""

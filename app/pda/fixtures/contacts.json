@@ -1,0 +1,84 @@
+{
+  "contacts": [
+    {
+      "vendorSiteId": 101,
+      "firstName": "Sarah",
+      "lastName": "Johnson",
+      "emailAddress": "sarah.johnson@smithpartners.example",
+      "telephoneNumber": "0116 123 4567",
+      "website": "https://www.smithpartners.example",
+      "jobTitle": "Liaison Manager",
+      "primary": "Y"
+    },
+    {
+      "vendorSiteId": 101,
+      "firstName": "David",
+      "lastName": "Smith",
+      "emailAddress": "david.smith@smithpartners.example",
+      "telephoneNumber": "0116 123 4568",
+      "website": null,
+      "jobTitle": "Liaison Manager",
+      "primary": "N"
+    },
+    {
+      "vendorSiteId": 102,
+      "firstName": "Michael",
+      "lastName": "Thompson",
+      "emailAddress": "m.thompson@johnsonlegal.example",
+      "telephoneNumber": "0121 987 6543",
+      "website": "https://www.johnsonlegal.example",
+      "jobTitle": "Liaison Manager",
+      "primary": "Y"
+    },
+    {
+      "vendorSiteId": 103,
+      "firstName": "Emma",
+      "lastName": "Brown",
+      "emailAddress": "emma.brown@brownassociates.example",
+      "telephoneNumber": "0161 555 0123",
+      "website": "https://www.brownassociates.example",
+      "jobTitle": "Liaison Manager",
+      "primary": "Y"
+    },
+    {
+      "vendorSiteId": 103,
+      "firstName": "Sophie",
+      "lastName": "Williams",
+      "emailAddress": "sophie.williams@brownassociates.example",
+      "telephoneNumber": "0161 555 0124",
+      "website": null,
+      "jobTitle": "Liaison Manager",
+      "primary": "N"
+    },
+    {
+      "vendorSiteId": 104,
+      "firstName": "James",
+      "lastName": "Davis",
+      "emailAddress": "james.davis@davischambers.example",
+      "telephoneNumber": "0113 444 5566",
+      "website": "https://www.davischambers.example",
+      "jobTitle": "Liaison Manager",
+      "primary": "Y"
+    },
+    {
+      "vendorSiteId": 105,
+      "firstName": "Rachel",
+      "lastName": "Wilson",
+      "emailAddress": "rachel.wilson@wilsonlegal.example",
+      "telephoneNumber": "0151 777 8899",
+      "website": null,
+      "jobTitle": "Liaison Manager",
+      "primary": "Y"
+    },
+    {
+      "vendorSiteId": 201,
+      "firstName": "Robert",
+      "lastName": "MacLeod",
+      "emailAddress": "robert.macleod@scottishlegal.example",
+      "telephoneNumber": "0131 222 3344",
+      "website": "https://www.scottishlegal.example",
+      "jobTitle": "Liaison Manager",
+      "primary": "Y"
+    }
+  ]
+}

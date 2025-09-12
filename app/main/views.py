@@ -102,6 +102,7 @@ class ViewProvider(MethodView):
         if firm.firm_type != "Legal Services Provider":
             add_field(main_rows, main_data, firm.company_house_number, "Companies House number")
         add_field(main_rows, main_data, firm.bar_council_roll, "Bar Council roll number")
+        add_field(main_rows, main_data, firm.contract_manager, "Contract manager")
 
         main_table = TransposedDataTable(structure=main_rows, data=main_data) if main_rows else None
 

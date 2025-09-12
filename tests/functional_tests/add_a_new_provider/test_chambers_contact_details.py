@@ -41,7 +41,7 @@ def test_chambers_form_loads_correctly(page: Page):
     expect(page.get_by_role("textbox", name="Email address")).to_be_visible()
     expect(page.get_by_role("textbox", name="DX number")).to_be_visible()
     expect(page.get_by_role("textbox", name="DX centre")).to_be_visible()
-    expect(page.get_by_role("button", name="Submit")).to_be_visible()
+    expect(page.get_by_role("button", name="Continue")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -67,7 +67,7 @@ def test_chambers_required_fields_validation(page: Page):
     navigate_to_chambers_contact_details(page)
 
     # Try to submit without filling required fields
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should show validation errors for required fields
     expect(page.get_by_text("Error: Enter address line 1, typically the building and street")).to_be_visible()
@@ -85,7 +85,7 @@ def test_chambers_email_validation(page: Page):
     page.get_by_role("textbox", name="Town or city").fill("Chambers City")
     page.get_by_role("textbox", name="Postcode").fill("CH1 2MB")
     page.get_by_role("textbox", name="Email address").fill("invalid-email")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should show email validation error
     expect(page.get_by_text("Error: Enter a valid email address")).to_be_visible()
@@ -100,7 +100,7 @@ def test_chambers_postcode_validation(page: Page):
     page.get_by_role("textbox", name="Address line 1").fill("123 Chambers Street")
     page.get_by_role("textbox", name="Town or city").fill("Chambers City")
     page.get_by_role("textbox", name="Postcode").fill("INVALID")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should show postcode validation error
     expect(page.get_by_text("Error: Enter a valid UK postcode")).to_be_visible()
@@ -116,7 +116,7 @@ def test_chambers_field_length_validation(page: Page):
     page.get_by_role("textbox", name="Address line 1").fill(long_address)
     page.get_by_role("textbox", name="Town or city").fill("Chambers City")
     page.get_by_role("textbox", name="Postcode").fill("CH1 2MB")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should show length validation error
     expect(page.get_by_text("Error: Address line 1 must be 240 characters or fewer")).to_be_visible()
@@ -135,12 +135,10 @@ def test_chambers_successful_form_submission_minimal_fields(page: Page):
     page.get_by_role("textbox", name="Email address").fill("contact@testchambers.com")
     page.get_by_role("textbox", name="DX number").fill("DX789123")
     page.get_by_role("textbox", name="DX centre").fill("Chambers Centre")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
-    # Check we are on the view provider page
-    # TODO: Update this when full flow implemented
-    expect(page.get_by_role("heading", name="Test Chambers")).to_be_visible()
-    expect(page.get_by_text("New chambers successfully created")).to_be_visible()
+    # Should redirect to add liaison manager page
+    expect(page.get_by_role("heading", name="Add liaison manager")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -160,12 +158,10 @@ def test_chambers_successful_form_submission_all_fields(page: Page):
     page.get_by_role("textbox", name="Email address").fill("contact@testchambers.com")
     page.get_by_role("textbox", name="DX number").fill("DX789123")
     page.get_by_role("textbox", name="DX centre").fill("Chambers Centre")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
-    # Check we are on the view provider page
-    # TODO: Update this when full flow implemented
-    expect(page.get_by_role("heading", name="Test Chambers")).to_be_visible()
-    expect(page.get_by_text("New chambers successfully created")).to_be_visible()
+    # Should redirect to add liaison manager page
+    expect(page.get_by_role("heading", name="Add liaison manager")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -179,12 +175,10 @@ def test_chambers_optional_fields_not_required(page: Page):
     page.get_by_role("textbox", name="Postcode").fill("CH1 2MB")
     page.get_by_role("textbox", name="Email address").fill("contact@testchambers.com")
     # Leave optional fields empty: address_line_2-4, county, telephone number, DX number & centre
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
-    # Check we are on the view provider page
-    # TODO: Update this when full flow implemented
-    expect(page.get_by_role("heading", name="Test Chambers")).to_be_visible()
-    expect(page.get_by_text("New chambers successfully created")).to_be_visible()
+    # Should redirect to add liaison manager page
+    expect(page.get_by_role("heading", name="Add liaison manager")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
