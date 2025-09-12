@@ -7,7 +7,7 @@
       "emailAddress": "sarah.johnson@smithpartners.com",
       "telephoneNumber": "0116 123 4567",
       "website": "https://www.smithpartners.com",
-      "jobTitle": "Liaison Manager",
+      "jobTitle": "Liaison manager",
       "primary": "Y",
       "activeFrom": "2024-01-15"
     },
@@ -18,7 +18,7 @@
       "emailAddress": "david.smith@smithpartners.com",
       "telephoneNumber": "0116 123 4568",
       "website": null,
-      "jobTitle": "Liaison Manager",
+      "jobTitle": "Liaison manager",
       "primary": "N",
       "activeFrom": "2024-03-10"
     },
@@ -29,7 +29,7 @@
       "emailAddress": "alice.brown@smithpartners.com",
       "telephoneNumber": "0116 123 4569",
       "website": "https://www.alicebrown.com",
-      "jobTitle": "Liaison Manager",
+      "jobTitle": "Liaison manager",
       "primary": "N",
       "activeFrom": "2024-06-22"
     },
@@ -40,7 +40,7 @@
       "emailAddress": "m.thompson@johnsonlegal.com",
       "telephoneNumber": "0121 987 6543",
       "website": "https://www.johnsonlegal.com",
-      "jobTitle": "Liaison Manager",
+      "jobTitle": "Liaison manager",
       "primary": "Y",
       "activeFrom": "2023-11-05"
     },
@@ -51,7 +51,7 @@
       "emailAddress": "emma.brown@brownassociates.com",
       "telephoneNumber": "0161 555 0123",
       "website": "https://www.brownassociates.com",
-      "jobTitle": "Liaison Manager",
+      "jobTitle": "Liaison manager",
       "primary": "Y",
       "activeFrom": "2024-02-28"
     },
@@ -62,7 +62,7 @@
       "emailAddress": "sophie.williams@brownassociates.com",
       "telephoneNumber": "0161 555 0124",
       "website": null,
-      "jobTitle": "Liaison Manager",
+      "jobTitle": "Liaison manager",
       "primary": "N",
       "activeFrom": "2024-05-12"
     },
@@ -73,7 +73,7 @@
       "emailAddress": "james.davis@davischambers.com",
       "telephoneNumber": "0113 444 5566",
       "website": "https://www.davischambers.com",
-      "jobTitle": "Liaison Manager",
+      "jobTitle": "Liaison manager",
       "primary": "Y",
       "activeFrom": "2023-09-18"
     },
@@ -84,7 +84,7 @@
       "emailAddress": "rachel.wilson@wilsonlegal.com",
       "telephoneNumber": "0151 777 8899",
       "website": null,
-      "jobTitle": "Liaison Manager",
+      "jobTitle": "Liaison manager",
       "primary": "Y",
       "activeFrom": "2024-04-07"
     },
@@ -95,7 +95,7 @@
       "emailAddress": "robert.macleod@scottishlegal.com",
       "telephoneNumber": "0131 222 3344",
       "website": "https://www.scottishlegal.com",
-      "jobTitle": "Liaison Manager",
+      "jobTitle": "Liaison manager",
       "primary": "Y",
       "activeFrom": "2023-12-20"
     }
