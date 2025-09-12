@@ -184,6 +184,7 @@ class Contact(BaseModel):
     website: Optional[str] = Field(default=None)
     job_title: Optional[str] = Field(alias="jobTitle", default=None)
     primary: str = Field(default="N")
+    active_from: Optional[str] = Field(alias="activeFrom", default=None)
 
     def to_api_dict(self) -> dict:
         """Export as camelCase dictionary for API calls."""

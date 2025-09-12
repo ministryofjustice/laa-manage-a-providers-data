@@ -4,7 +4,7 @@ from playwright.sync_api import Page, expect
 
 
 def navigate_to_liaison_manager_via_lsp(page: Page):
-    """Helper function to navigate to Liaison Manager form via the LSP flow."""
+    """Helper function to navigate to Liaison manager form via the LSP flow."""
     # Start with add parent provider
     page.goto(url_for("main.add_parent_provider", _external=True))
 
@@ -42,13 +42,13 @@ def navigate_to_liaison_manager_via_lsp(page: Page):
     page.get_by_role("textbox", name="Account number").fill("12345678")
     page.get_by_role("button", name="Continue").click()
 
-    # Should now be on the Liaison Manager page
+    # Should now be on the Liaison manager page
     expect(page.get_by_role("heading", name="Add liaison manager")).to_be_visible()
     expect(page.get_by_text("Test Legal Services Provider")).to_be_visible()  # Caption should show provider name
 
 
 def navigate_to_liaison_manager_via_chambers(page: Page):
-    """Helper function to navigate to Liaison Manager form via the Chambers flow."""
+    """Helper function to navigate to Liaison manager form via the Chambers flow."""
     # Start with add parent provider
     page.goto(url_for("main.add_parent_provider", _external=True))
 
@@ -68,14 +68,14 @@ def navigate_to_liaison_manager_via_chambers(page: Page):
     page.get_by_role("textbox", name="DX centre").fill("Chambers Centre")
     page.get_by_role("button", name="Continue").click()
 
-    # Should now be on the Liaison Manager page
+    # Should now be on the Liaison manager page
     expect(page.get_by_role("heading", name="Add liaison manager")).to_be_visible()
     expect(page.get_by_text("Test Chambers")).to_be_visible()  # Caption should show provider name
 
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_loads_correctly_lsp_flow(page: Page):
-    """Test that the Liaison Manager form loads correctly via LSP flow."""
+    """Test that the Liaison manager form loads correctly via LSP flow."""
     navigate_to_liaison_manager_via_lsp(page)
 
     # Verify the page title
@@ -92,7 +92,7 @@ def test_liaison_manager_form_loads_correctly_lsp_flow(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_loads_correctly_chambers_flow(page: Page):
-    """Test that the Liaison Manager form loads correctly via Chambers flow."""
+    """Test that the Liaison manager form loads correctly via Chambers flow."""
     navigate_to_liaison_manager_via_chambers(page)
 
     # Verify the page title
@@ -111,7 +111,7 @@ def test_liaison_manager_form_loads_correctly_chambers_flow(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_caption_shows_provider_name_lsp(page: Page):
-    """Test that the Liaison Manager form caption shows the LSP provider name from the session."""
+    """Test that the Liaison manager form caption shows the LSP provider name from the session."""
     navigate_to_liaison_manager_via_lsp(page)
 
     # The caption should show the provider name from the session
@@ -120,7 +120,7 @@ def test_liaison_manager_form_caption_shows_provider_name_lsp(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_caption_shows_provider_name_chambers(page: Page):
-    """Test that the Liaison Manager form caption shows the Chambers provider name from the session."""
+    """Test that the Liaison manager form caption shows the Chambers provider name from the session."""
     navigate_to_liaison_manager_via_chambers(page)
 
     # The caption should show the provider name from the session
@@ -129,7 +129,7 @@ def test_liaison_manager_form_caption_shows_provider_name_chambers(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_successful_submission_lsp(page: Page):
-    """Test successful Liaison Manager form submission with valid data via LSP flow."""
+    """Test successful Liaison manager form submission with valid data via LSP flow."""
     navigate_to_liaison_manager_via_lsp(page)
 
     # Fill with valid liaison manager details
@@ -147,7 +147,7 @@ def test_liaison_manager_form_successful_submission_lsp(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_successful_submission_chambers(page: Page):
-    """Test successful Liaison Manager form submission with valid data via Chambers flow."""
+    """Test successful Liaison manager form submission with valid data via Chambers flow."""
     navigate_to_liaison_manager_via_chambers(page)
 
     # Fill with valid liaison manager details
@@ -167,7 +167,7 @@ def test_liaison_manager_form_successful_submission_chambers(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_successful_submission_without_website(page: Page):
-    """Test successful Liaison Manager form submission without optional website field."""
+    """Test successful Liaison manager form submission without optional website field."""
     navigate_to_liaison_manager_via_lsp(page)
 
     # Fill with valid details but skip optional website
@@ -185,7 +185,7 @@ def test_liaison_manager_form_successful_submission_without_website(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_required_field_validation(page: Page):
-    """Test Liaison Manager form validation for required fields."""
+    """Test Liaison manager form validation for required fields."""
     navigate_to_liaison_manager_via_lsp(page)
 
     # Submit without filling required fields
@@ -200,7 +200,7 @@ def test_liaison_manager_form_required_field_validation(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_invalid_email_validation(page: Page):
-    """Test Liaison Manager form validation with invalid email."""
+    """Test Liaison manager form validation with invalid email."""
     navigate_to_liaison_manager_via_lsp(page)
 
     # Fill with invalid email
@@ -216,7 +216,7 @@ def test_liaison_manager_form_invalid_email_validation(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_long_field_validation(page: Page):
-    """Test Liaison Manager form validation with fields that are too long."""
+    """Test Liaison manager form validation with fields that are too long."""
     navigate_to_liaison_manager_via_lsp(page)
 
     # Fill with fields that are too long
@@ -239,14 +239,14 @@ def test_liaison_manager_form_long_field_validation(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_liaison_manager_form_without_head_office_session_gives_error(page: Page):
-    """Test that accessing Liaison Manager form without head office session data gives 400 error."""
+    """Test that accessing Liaison manager form without head office session data gives 400 error."""
     # Start provider flow but don't complete head office details
     page.goto(url_for("main.add_parent_provider", _external=True))
     page.get_by_role("textbox", name="Provider name").fill("Test LSP")
     page.get_by_role("radio", name="Legal services provider").click()
     page.get_by_role("button", name="Continue").click()
 
-    # Try to access Liaison Manager form directly without completing head office details
+    # Try to access Liaison manager form directly without completing head office details
     page.goto(url_for("main.add_liaison_manager", _external=True))
 
     # Should get 400 error since head office session data doesn't exist

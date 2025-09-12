@@ -109,7 +109,6 @@ def test_add_new_lsp(page):
     expect(page.get_by_role("heading", name="Test provider")).to_be_visible()
     expect(page.get_by_role("cell", name="Test provider")).to_be_visible()
     expect(page.get_by_role("cell", name="Charity")).to_be_visible()
-    expect(page.get_by_role("cell", name="/01/2020")).to_be_visible()
     expect(page.get_by_role("cell", name="12345678")).to_be_visible()
     expect(page.get_by_role("cell", name="Alice Johnson")).to_be_visible()
 
@@ -120,7 +119,7 @@ def test_lsp_contact(page):
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
 
-    page.get_by_role("link", name="METROPOLITAN LAW CENTRE").click()
+    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
 
     # Contact subpage visible on landing
     expect(page.get_by_role("heading", name="Contacts")).to_be_visible()

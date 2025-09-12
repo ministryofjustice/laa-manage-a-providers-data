@@ -1,4 +1,5 @@
 {% extends 'view-provider.html' %}
+{% from 'macros/contact_tables.html' import contactCards %}
 
 {% block actionButtons %}
   {{ govukButton({
@@ -44,8 +45,6 @@
   {% endif %}
 
 {% if subpage == "contact" %}
-    <h3 class="govuk-heading-m">Contacts</h3>
-    {{ govukSummaryList(contact_table.to_summary_govuk_params()) }}
-
+    {{ contactCards(contact_tables) }}
 {% endif %}
 {% endblock %}

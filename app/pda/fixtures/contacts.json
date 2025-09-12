@@ -4,81 +4,100 @@
       "vendorSiteId": 101,
       "firstName": "Sarah",
       "lastName": "Johnson",
-      "emailAddress": "sarah.johnson@smithpartners.example",
+      "emailAddress": "sarah.johnson@smithpartners.com",
       "telephoneNumber": "0116 123 4567",
-      "website": "https://www.smithpartners.example",
-      "jobTitle": "Liaison Manager",
-      "primary": "Y"
+      "website": "https://www.smithpartners.com",
+      "jobTitle": "Liaison manager",
+      "primary": "Y",
+      "activeFrom": "2024-01-15"
     },
     {
       "vendorSiteId": 101,
       "firstName": "David",
       "lastName": "Smith",
-      "emailAddress": "david.smith@smithpartners.example",
+      "emailAddress": "david.smith@smithpartners.com",
       "telephoneNumber": "0116 123 4568",
       "website": null,
-      "jobTitle": "Liaison Manager",
-      "primary": "N"
+      "jobTitle": "Liaison manager",
+      "primary": "N",
+      "activeFrom": "2024-03-10"
+    },
+    {
+      "vendorSiteId": 101,
+      "firstName": "Alice",
+      "lastName": "Brown",
+      "emailAddress": "alice.brown@smithpartners.com",
+      "telephoneNumber": "0116 123 4569",
+      "website": "https://www.alicebrown.com",
+      "jobTitle": "Liaison manager",
+      "primary": "N",
+      "activeFrom": "2024-06-22"
     },
     {
       "vendorSiteId": 102,
       "firstName": "Michael",
       "lastName": "Thompson",
-      "emailAddress": "m.thompson@johnsonlegal.example",
+      "emailAddress": "m.thompson@johnsonlegal.com",
       "telephoneNumber": "0121 987 6543",
-      "website": "https://www.johnsonlegal.example",
-      "jobTitle": "Liaison Manager",
-      "primary": "Y"
+      "website": "https://www.johnsonlegal.com",
+      "jobTitle": "Liaison manager",
+      "primary": "Y",
+      "activeFrom": "2023-11-05"
     },
     {
       "vendorSiteId": 103,
       "firstName": "Emma",
       "lastName": "Brown",
-      "emailAddress": "emma.brown@brownassociates.example",
+      "emailAddress": "emma.brown@brownassociates.com",
       "telephoneNumber": "0161 555 0123",
-      "website": "https://www.brownassociates.example",
-      "jobTitle": "Liaison Manager",
-      "primary": "Y"
+      "website": "https://www.brownassociates.com",
+      "jobTitle": "Liaison manager",
+      "primary": "Y",
+      "activeFrom": "2024-02-28"
     },
     {
       "vendorSiteId": 103,
       "firstName": "Sophie",
       "lastName": "Williams",
-      "emailAddress": "sophie.williams@brownassociates.example",
+      "emailAddress": "sophie.williams@brownassociates.com",
       "telephoneNumber": "0161 555 0124",
       "website": null,
-      "jobTitle": "Liaison Manager",
-      "primary": "N"
+      "jobTitle": "Liaison manager",
+      "primary": "N",
+      "activeFrom": "2024-05-12"
     },
     {
       "vendorSiteId": 104,
       "firstName": "James",
       "lastName": "Davis",
-      "emailAddress": "james.davis@davischambers.example",
+      "emailAddress": "james.davis@davischambers.com",
       "telephoneNumber": "0113 444 5566",
-      "website": "https://www.davischambers.example",
-      "jobTitle": "Liaison Manager",
-      "primary": "Y"
+      "website": "https://www.davischambers.com",
+      "jobTitle": "Liaison manager",
+      "primary": "Y",
+      "activeFrom": "2023-09-18"
     },
     {
       "vendorSiteId": 105,
       "firstName": "Rachel",
       "lastName": "Wilson",
-      "emailAddress": "rachel.wilson@wilsonlegal.example",
+      "emailAddress": "rachel.wilson@wilsonlegal.com",
       "telephoneNumber": "0151 777 8899",
       "website": null,
-      "jobTitle": "Liaison Manager",
-      "primary": "Y"
+      "jobTitle": "Liaison manager",
+      "primary": "Y",
+      "activeFrom": "2024-04-07"
     },
     {
       "vendorSiteId": 201,
       "firstName": "Robert",
       "lastName": "MacLeod",
-      "emailAddress": "robert.macleod@scottishlegal.example",
+      "emailAddress": "robert.macleod@scottishlegal.com",
       "telephoneNumber": "0131 222 3344",
-      "website": "https://www.scottishlegal.example",
-      "jobTitle": "Liaison Manager",
-      "primary": "Y"
+      "website": "https://www.scottishlegal.com",
+      "jobTitle": "Liaison manager",
+      "primary": "Y",
+      "activeFrom": "2023-12-20"
     }
   ]
 }

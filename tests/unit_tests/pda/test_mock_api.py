@@ -638,7 +638,7 @@ class TestMockProviderDataApi:
                     "emailAddress": "john.smith@example.com",
                     "telephoneNumber": "0123 456 7890",
                     "website": "https://www.example.com",
-                    "jobTitle": "Liaison Manager",
+                    "jobTitle": "Liaison manager",
                     "primary": "Y",
                 },
                 {
@@ -648,7 +648,7 @@ class TestMockProviderDataApi:
                     "emailAddress": "jane.doe@example.com",
                     "telephoneNumber": "0123 456 7891",
                     "website": None,
-                    "jobTitle": "Liaison Manager",
+                    "jobTitle": "Liaison manager",
                     "primary": "N",
                 },
                 {
@@ -656,7 +656,7 @@ class TestMockProviderDataApi:
                     "firstName": "Bob",
                     "lastName": "Brown",
                     "emailAddress": "bob.brown@example.com",
-                    "jobTitle": "Liaison Manager",
+                    "jobTitle": "Liaison manager",
                     "primary": "Y",
                 },
             ],
@@ -711,7 +711,7 @@ class TestMockProviderDataApi:
             email_address="jane.doe@example.com",
             telephone_number="0987 654 3210",
             website="https://www.test.example",
-            job_title="Liaison Manager",
+            job_title="Liaison manager",
             primary="Y",
         )
 
@@ -732,7 +732,7 @@ class TestMockProviderDataApi:
                     "firstName": "John",
                     "lastName": "Smith",
                     "emailAddress": "john.smith@example.com",
-                    "jobTitle": "Liaison Manager",
+                    "jobTitle": "Liaison manager",
                     "primary": "Y",
                 }
             ],
@@ -743,7 +743,7 @@ class TestMockProviderDataApi:
             first_name="Jane",
             last_name="Doe",
             email_address="jane.doe@example.com",
-            job_title="Liaison Manager",
+            job_title="Liaison manager",
             primary="N",
         )
 
@@ -762,7 +762,7 @@ class TestMockProviderDataApi:
             first_name="John",
             last_name="Smith",
             email_address="john.smith@example.com",
-            job_title="Liaison Manager",
+            job_title="Liaison manager",
             primary="Y",
         )
 
@@ -776,7 +776,7 @@ class TestMockProviderDataApi:
             first_name="Test",
             last_name="User",
             email_address="test@example.com",
-            job_title="Liaison Manager",
+            job_title="Liaison manager",
             primary="Y",
         )
 

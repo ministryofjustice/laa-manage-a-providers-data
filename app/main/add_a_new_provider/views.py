@@ -283,7 +283,7 @@ class LiaisonManagerFormView(FullWidthBaseFormView):
             "email_address": form.data.get("email_address"),
             "telephone_number": form.data.get("telephone_number"),
             "website": form.data.get("website"),
-            "job_title": "Liaison Manager",  # All contacts are liaison managers in MAPD
+            "job_title": "Liaison manager",  # All contacts are liaison managers in MAPD
             "primary": "Y",  # We are adding a new head office so this will be the primary contact
         }
 
