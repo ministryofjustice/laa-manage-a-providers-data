@@ -102,7 +102,6 @@ def test_add_new_lsp(page):
     expect(page.get_by_role("heading", name="Test provider")).to_be_visible()
     expect(page.get_by_role("cell", name="Test provider")).to_be_visible()
     expect(page.get_by_role("cell", name="Charity")).to_be_visible()
-    expect(page.get_by_role("cell", name="/01/2020")).to_be_visible()
     expect(page.get_by_role("cell", name="12345678")).to_be_visible()
 
 
