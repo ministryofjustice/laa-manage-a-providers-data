@@ -27,18 +27,18 @@ def test_empty_search_shows_all_providers(page):
     expect(page.get_by_role("columnheader", name="Provider type")).to_be_visible()
     expect(page.get_by_role("columnheader", name="Provider number")).to_be_visible()
     expect(page.get_by_role("columnheader", name="Status")).to_be_visible()
-    expect(page.get_by_text("Showing 1 to 10 of 10 results")).to_be_visible()
+    expect(page.get_by_text("Showing 1 to 14 of 14 results")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
 def test_search_shows_correct__providers(page):
     page.get_by_role("button", name="Start now").click()
-    page.get_by_role("textbox", name="Find a provider").fill("Smith")
+    page.get_by_role("textbox", name="Find a provider").fill("Metro")
     page.get_by_role("button", name="Search").click()
-    expect(page.get_by_role("heading", name="search result for ‘Smith’")).to_be_visible()
-    expect(page.get_by_role("cell", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.get_by_role("heading", name="search result for ‘Metro’")).to_be_visible()
+    expect(page.get_by_role("cell", name="METROPOLITAN LAW CENTRE")).to_be_visible()
     expect(page.get_by_role("cell", name="Legal Services Provider")).to_be_visible()
-    expect(page.get_by_role("cell", name="1")).to_be_visible()
+    expect(page.get_by_role("cell", name="3")).to_be_visible()
     expect(page.get_by_role("cell", name="No statuses")).to_be_visible()
     expect(page.get_by_text("Showing 1 to 1 of 1 results")).to_be_visible()
 
