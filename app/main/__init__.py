@@ -36,6 +36,6 @@ bp.add_url_rule(
     view_func=ViewOffice.as_view("view_office_contact", subpage="contact"),
 )
 bp.add_url_rule(
-    "/provider/<firm:firm>/office/<office:office>/bank-accounts-and-payment",
-    view_func=ViewOffice.as_view("view_office_bank_accounts_and_payment", subpage="bank-accounts-and-payment"),
+    "/provider/<firm:firm>/office/<office:office>/bank-payment-details",
+    view_func=ViewOffice.as_view("view_office_bank_payment_details", subpage="bank-payment-details"),
 )

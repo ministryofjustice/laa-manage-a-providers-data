@@ -7,7 +7,7 @@ from flask.views import MethodView
 from app.components.tables import Card, DataTable, TableStructure, TransposedDataTable, add_field
 from app.main.forms import firm_name_html, get_firm_statuses
 from app.main.utils import create_provider_from_session
-from app.models import Firm, Office
+from app.models import Firm, Office, BankAccount
 from app.utils.formatting import (
     format_advocate_level,
     format_constitutional_status,
@@ -134,42 +134,6 @@ class ViewProvider(MethodView):
 
         return office_tables
 
-    def get_contact_tables(self, firm: Firm, head_office: Office = None) -> list[DataTable]:
-        if not head_office or not firm.firm_id:
-            return []
-
-        # Get contacts for the head office
-        pda = current_app.extensions["pda"]
-        contacts = pda.get_office_contacts(firm.firm_id, head_office.firm_office_code)
-
-        if not contacts:
-            return []
-
-        # Sort contacts: primary first, then others
-        primary_contacts = [c for c in contacts if c.primary == "Y"]
-        other_contacts = [c for c in contacts if c.primary != "Y"]
-        sorted_contacts = primary_contacts + other_contacts
-
-        contact_tables = []
-
-        for contact in sorted_contacts:
-            contact_table_structure = []
-            contact_data = {}
-
-            add_field(contact_table_structure, contact_data, contact.job_title, "Job title")
-            add_field(contact_table_structure, contact_data, contact.telephone_number, "Telephone number")
-            add_field(contact_table_structure, contact_data, contact.email_address, "Email address")
-            add_field(contact_table_structure, contact_data, contact.website, "Website")
-            add_field(contact_table_structure, contact_data, contact.active_from, "Active from", format_date)
-
-            card_title = f"{contact.first_name} {contact.last_name}"
-            card: Card = {"title": card_title, "action_text": "Change liaison manager", "action_url": "#"}
-
-            contact_table = TransposedDataTable(structure=contact_table_structure, data=contact_data, card=card)
-            contact_tables.append(contact_table)
-
-        return contact_tables
-
     @staticmethod
     def child_firm_office_html(row_data: dict[str, str]) -> str:
         """
@@ -276,7 +240,7 @@ class ViewProvider(MethodView):
             context.update({"office_tables": office_tables})
 
         if self.subpage == "contact":
-            context.update({"contact_tables": self.get_contact_tables(firm, head_office)})
+            context.update({"contact_tables": get_contact_tables(firm, head_office)})
 
         if self.subpage == "barristers-and-advocates":
             context.update({"barristers_table": self.get_barristers_table(firm)})
@@ -296,10 +260,47 @@ class ViewProvider(MethodView):
         return render_template(template, subpage=self.subpage, **context)
 
 
+def get_contact_tables(firm: Firm, head_office: Office = None) -> list[DataTable]:
+    if not head_office or not firm.firm_id:
+        return []
+
+    # Get contacts for the head office
+    pda = current_app.extensions["pda"]
+    contacts = pda.get_office_contacts(firm.firm_id, head_office.firm_office_code)
+
+    if not contacts:
+        return []
+
+    # Sort contacts: primary first, then others
+    primary_contacts = [c for c in contacts if c.primary == "Y"]
+    other_contacts = [c for c in contacts if c.primary != "Y"]
+    sorted_contacts = primary_contacts + other_contacts
+
+    contact_tables = []
+
+    for contact in sorted_contacts:
+        contact_table_structure = []
+        contact_data = {}
+
+        add_field(contact_table_structure, contact_data, contact.job_title, "Job title")
+        add_field(contact_table_structure, contact_data, contact.telephone_number, "Telephone number")
+        add_field(contact_table_structure, contact_data, contact.email_address, "Email address")
+        add_field(contact_table_structure, contact_data, contact.website, "Website")
+        add_field(contact_table_structure, contact_data, contact.active_from, "Active from", format_date)
+
+        card_title = f"{contact.first_name} {contact.last_name}"
+        card: Card = {"title": card_title, "action_text": "Change liaison manager", "action_url": "#"}
+
+        contact_table = TransposedDataTable(structure=contact_table_structure, data=contact_data, card=card)
+        contact_tables.append(contact_table)
+
+    return contact_tables
+
+
 class ViewOffice(MethodView):
     template = "view-office.html"
 
-    def __init__(self, subpage: Literal["overview", "contact", "bank-accounts-and-payment"] = "overview"):
+    def __init__(self, subpage: Literal["overview", "contact", "bank-payment-details"] = "overview"):
         if subpage:
             self.subpage = subpage
 
@@ -307,11 +308,20 @@ class ViewOffice(MethodView):
     def parent_provider_name_html(parent_provider: Firm):
         return f"<a class='govuk-link', href={url_for('main.view_provider', firm=parent_provider.firm_id)}>{parent_provider.firm_name}</a>"
 
-    def get_context(self, firm: Firm, office: Office | None = None) -> Dict:
+    def get_vat_registration_table(self, firm: Firm, office: Office) -> DataTable:
+        return []
+
+    def get_context(self, firm: Firm, office: Office) -> Dict:
         context = {"firm": firm, "office": office, "message": "Hello world", "subpage": self.subpage}
 
-        if self.subpage == "bank-accounts-and-payment":
-            context.update({"message": "Hello Mr Banks"})
+        if self.subpage == "bank-payment-details":
+            pda = current_app.extensions["pda"]
+            bank_account: BankAccount = pda.get_office_bank_account(
+                firm_id=firm.firm_id, office_code=office.firm_office_code
+            )
+
+        if self.subpage == "contact":
+            context.update({"contact_tables": get_contact_tables(firm, office)})
 
         if self.subpage == "overview":
             # Overview section
