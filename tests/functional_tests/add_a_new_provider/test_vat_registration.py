@@ -19,7 +19,7 @@ def navigate_to_vat_registration(page: Page):
     page.get_by_role("textbox", name="Month").fill("01")
     page.get_by_role("textbox", name="Year").fill("2020")
     page.get_by_role("textbox", name="Companies House number").fill("12345678")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Fill head office contact details form
     page.get_by_role("textbox", name="Address line 1").fill("123 Head Office Street")
@@ -29,7 +29,7 @@ def navigate_to_vat_registration(page: Page):
     page.get_by_role("textbox", name="Email address").fill("headoffice@testlsp.com")
     page.get_by_role("textbox", name="DX number").fill("DX123456")
     page.get_by_role("textbox", name="DX centre").fill("Head Office Centre")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should now be on the VAT registration page
     expect(page.get_by_role("heading", name="Head office: VAT Registration number (optional)")).to_be_visible()
@@ -49,7 +49,7 @@ def test_vat_form_loads_correctly(page: Page):
     expect(
         page.get_by_text("This is 9 numbers, sometimes with ‘GB’ at the start, for example 123456789 or GB123456789.")
     ).to_be_visible()  # Hint text
-    expect(page.get_by_role("button", name="Submit")).to_be_visible()
+    expect(page.get_by_role("button", name="Continue")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -67,7 +67,7 @@ def test_vat_form_is_optional_can_submit_empty(page: Page):
     navigate_to_vat_registration(page)
 
     # Submit without entering VAT number (should be allowed as it's optional)
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should redirect to create provider page (successful completion)
     expect(page.get_by_text("Head office: VAT Registration number (optional)")).not_to_be_visible()
@@ -84,7 +84,7 @@ def test_vat_form_valid_number_submission(page: Page):
 
     # Fill with valid VAT number (9 digits)
     page.get_by_role("textbox").fill("123456789")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should redirect to create provider page
     expect(page.get_by_text("Head office: VAT Registration number (optional)")).not_to_be_visible()
@@ -99,7 +99,7 @@ def test_vat_form_valid_gb_number_submission(page: Page):
 
     # Fill with valid GB VAT number
     page.get_by_role("textbox").fill("GB123456789")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should redirect to create provider page
     expect(page.get_by_text("Head office: VAT Registration number (optional)")).not_to_be_visible()
@@ -114,7 +114,7 @@ def test_vat_form_invalid_number_validation(page: Page):
 
     # Fill with invalid VAT number (too short)
     page.get_by_role("textbox").fill("12345")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should show validation error
     expect(page.get_by_text("Error: Enter the VAT registration number in the correct format")).to_be_visible()
@@ -127,7 +127,7 @@ def test_vat_form_invalid_format_validation(page: Page):
 
     # Fill with invalid format (contains letters in wrong places)
     page.get_by_role("textbox").fill("GB12345ABC")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should show validation error
     expect(page.get_by_text("Error: Enter the VAT registration number in the correct format")).to_be_visible()
@@ -162,7 +162,7 @@ def test_vat_form_data_stored_in_session(page: Page):
 
     # Fill with valid VAT number
     page.get_by_role("textbox").fill("987654321")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # The form should redirect successfully, indicating data was processed
     expect(page.get_by_text("Head office: VAT Registration number (optional)")).not_to_be_visible()
@@ -214,7 +214,7 @@ def test_lsp_flow_includes_vat_step(page: Page):
     page.get_by_role("textbox", name="Month").fill("01")
     page.get_by_role("textbox", name="Year").fill("2020")
     page.get_by_role("textbox", name="Companies House number").fill("12345678")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Head office contact details
     page.get_by_role("textbox", name="Address line 1").fill("123 Test Street")
@@ -224,14 +224,14 @@ def test_lsp_flow_includes_vat_step(page: Page):
     page.get_by_role("textbox", name="Email address").fill("test@lsp.com")
     page.get_by_role("textbox", name="DX number").fill("DX123456")
     page.get_by_role("textbox", name="DX centre").fill("Test Centre")
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should reach VAT registration page (not skip it)
     expect(page.get_by_text("Head office: VAT Registration number (optional)")).to_be_visible()
     expect(page.get_by_text("Flow Test LSP")).to_be_visible()
 
     # Complete VAT step (leave empty)
-    page.get_by_role("button", name="Submit").click()
+    page.get_by_role("button", name="Continue").click()
 
     # Should complete the flow
     current_url = page.url
