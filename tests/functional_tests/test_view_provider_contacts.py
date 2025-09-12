@@ -17,7 +17,7 @@ def test_view_provider_contacts_primary_contact_displayed(page: Page):
     expect(page.get_by_text("sarah.johnson@smithpartners.com")).to_be_visible()
     expect(page.get_by_text("0116 123 4567")).to_be_visible()
     expect(page.get_by_text("https://www.smithpartners.com")).to_be_visible()
-    expect(page.get_by_text("Liaison Manager", exact=True)).to_have_count(3)
+    expect(page.get_by_text("Liaison manager", exact=True)).to_have_count(3)
 
     # Check that the active from date is displayed (Sarah Johnson's date: 2024-01-15)
     expect(page.get_by_text("15 January 2024")).to_be_visible()
