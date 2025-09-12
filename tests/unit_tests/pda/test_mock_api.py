@@ -572,7 +572,7 @@ class TestMockProviderDataApi:
 
         expected = [
             Firm(**{"firmId": 2, "firmName": "Advocate 2", "parentFirmId": 1, "firmType": "Advocate"}),
-            Firm(**{"firmId": 3, "firmName": "Barrister 3", "parentFirmId": 1, "firmType": "Barrister"})
+            Firm(**{"firmId": 3, "firmName": "Barrister 3", "parentFirmId": 1, "firmType": "Barrister"}),
         ]
 
         actual = mock_api.get_provider_children(1)
@@ -589,9 +589,7 @@ class TestMockProviderDataApi:
             ],
         }
 
-        expected = [
-            Firm(**{"firmId": 2, "firmName": "Advocate 2", "parentFirmId": 1, "firmType": "Advocate"})
-        ]
+        expected = [Firm(**{"firmId": 2, "firmName": "Advocate 2", "parentFirmId": 1, "firmType": "Advocate"})]
 
         actual = mock_api.get_provider_children(1, only_firm_type="Advocate")
         assert actual == expected
@@ -625,4 +623,3 @@ class TestMockProviderDataApi:
 
         actual = mock_api.get_provider_children(50)
         assert actual == expected
-    
