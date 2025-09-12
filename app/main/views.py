@@ -1,5 +1,5 @@
 import logging
-from typing import Literal, NoReturn, List
+from typing import Literal, NoReturn, List, Dict
 
 from flask import abort, current_app, redirect, render_template, request, url_for
 from flask.views import MethodView
@@ -158,18 +158,22 @@ class ViewProvider(MethodView):
         Renders the office account number as a link using an extra `office_firm` attribute in the data to link to the
         firm.
         """
-        _office_code = row_data.get("firm_office_code", "")
-        _office_firm = row_data.get("office_firm", "")
-        return f"<a class='govuk-link' href='{url_for('main.view_office', firm=_office_firm, office=_office_code)}'>{_office_code}</a>"
+        _office_code = row_data.get("account_number", "")
+        _office_firm = row_data.get("_account_number_firm_id", "")
+        if _office_code not in (None, ""):
+            return f"<a class='govuk-link' href='{url_for('main.view_office', firm=_office_firm, office=_office_code)}'>{_office_code}</a>"
+        return "Unknown"
 
-    def get_child_firm_office_table_data(self, parent_firm: Firm, child_firms: List[Firm], use_parent: bool = True):
+    def get_child_firm_office_table_data(self, child_firms: List[Firm]) -> List[Dict]:
         """
-        Adds the `firm_office_code` to each child, defaulting to the parent office if the child does not have
-        their own office.
+        Adds the `account_number` to each child, which is taken from the `firm_office_code` value of the head office
+        of the child.
 
-        parent_firm: The parent of the children
-        child_firms: List of Firms to show in the table
-        use_parent: Boolean, determines if parent office should be used if a child does not have their own office.
+        If the child does not have a head office, a warning will be logged and the `account_number` will be empty. For
+        the link to the office to work, each child also has `_account_number_firm_id` populated with the child firm id.
+
+        Args:
+            child_firms: List of Firms to show in the table
         """
         pda = current_app.extensions["pda"]
 
@@ -177,20 +181,14 @@ class ViewProvider(MethodView):
         aggregated_data = []
         for child in child_firms:
             child_data = child.to_internal_dict()
-            offices = pda.get_provider_offices(child.firm_id)
-            if len(offices) > 0:
-                if len(offices) > 1:
-                    logger.warning(f"Found multiple offices for {child.firm_id}, displaying first")
-                child_data["firm_office_code"] = offices[0].firm_office_code
-                child_data["office_firm"] = child.firm_id
-            elif use_parent:
-                # No offices for child, so get head office for parent
-                head_office: Office = pda.get_head_office(parent_firm.firm_id)
-                child_data["firm_office_code"] = head_office.firm_office_code
-                child_data["office_firm"] = parent_firm.firm_id
+            child_head_office = pda.get_head_office(child.firm_id)
+            if child_head_office:
+                child_data["account_number"] = child_head_office.firm_office_code
+                child_data["_account_number_firm_id"] = child.firm_id
             else:
-                child_data["firm_office_code"] = ""
-                child_data["office_firm"] = parent_firm.firm_id
+                logger.warning(f"Firm {child.firm_id} does not have a head office.")
+                child_data["account_number"] = ""
+                child_data["_account_number_firm_id"] = ""
 
             aggregated_data.append(child_data)
 
@@ -198,27 +196,27 @@ class ViewProvider(MethodView):
 
     def get_barristers_table(self, firm: Firm) -> DataTable | None:
         pda = current_app.extensions["pda"]
-        child_firms = pda.get_provider_children(firm_id=firm.firm_id, only_firm_type="Barrister")
+        child_barristers = pda.get_provider_children(firm_id=firm.firm_id, only_firm_type="Barrister")
 
-        if len(child_firms) == 0:
+        if len(child_barristers) == 0:
             return None
 
         columns: list[TableStructure] = [
             {"text": "Name", "id": "firm_name", "html_renderer": firm_name_html},
-            {"text": "Account number", "id": "firm_office_code", "html_renderer": self.child_firm_office_html},
+            {"text": "Account number", "id": "account_number", "html_renderer": self.child_firm_office_html},
             {"text": "Bar Council roll number", "id": "bar_council_roll"},
             {"text": "Status", "html_renderer": get_firm_statuses},  # Add status tags here when available.
         ]
-        child_firm_office_table_data = self.get_child_firm_office_table_data(firm, child_firms)
+        child_firm_office_table_data = self.get_child_firm_office_table_data(child_barristers)
         table = DataTable(structure=columns, data=child_firm_office_table_data)
 
         return table
 
     def get_advocates_table(self, firm: Firm) -> DataTable | None:
         pda = current_app.extensions["pda"]
-        child_firms = pda.get_provider_children(firm_id=firm.firm_id, only_firm_type="Advocate")
+        child_advocates = pda.get_provider_children(firm_id=firm.firm_id, only_firm_type="Advocate")
 
-        if len(child_firms) == 0:
+        if len(child_advocates) == 0:
             return None
 
         columns: list[TableStructure] = [
@@ -228,7 +226,7 @@ class ViewProvider(MethodView):
             {"text": "Status", "html_renderer": get_firm_statuses},  # Add status tags here when available.
         ]
 
-        child_firm_office_table_data = self.get_child_firm_office_table_data(firm, child_firms)
+        child_firm_office_table_data = self.get_child_firm_office_table_data(child_advocates)
         table = DataTable(structure=columns, data=child_firm_office_table_data)
 
         return table
