@@ -1,10 +1,11 @@
 import logging
-from typing import Literal, NoReturn
+from typing import Literal, NoReturn, List, Dict
 
 from flask import abort, current_app, redirect, render_template, request, url_for
 from flask.views import MethodView
 
 from app.components.tables import Card, DataTable, TableStructure, TransposedDataTable, add_field
+from app.main.forms import firm_name_html, get_firm_statuses
 from app.main.utils import create_provider_from_session
 from app.models import Firm, Office
 from app.utils.formatting import (
@@ -42,7 +43,7 @@ class ViewProvider(MethodView):
         "Chambers": "view-provider-chambers.html",
     }
 
-    def __init__(self, subpage: Literal["contact", "offices"] = "contact"):
+    def __init__(self, subpage: Literal["contact", "offices", "barristers-and-advocates"] = "contact"):
         if subpage:
             self.subpage = subpage
 
@@ -169,6 +170,85 @@ class ViewProvider(MethodView):
 
         return contact_tables
 
+    @staticmethod
+    def child_firm_office_html(row_data: dict[str, str]) -> str:
+        """
+        Renders the office account number as a link using an extra `office_firm` attribute in the data to link to the
+        firm.
+        """
+        _office_code = row_data.get("account_number", "")
+        _office_firm = row_data.get("_account_number_firm_id", "")
+        if _office_code not in (None, ""):
+            return f"<a class='govuk-link' href='{url_for('main.view_office', firm=_office_firm, office=_office_code)}'>{_office_code}</a>"
+        return "Unknown"
+
+    def get_child_firm_office_table_data(self, child_firms: List[Firm]) -> List[Dict]:
+        """
+        Adds the `account_number` to each child, which is taken from the `firm_office_code` value of the head office
+        of the child.
+
+        If the child does not have a head office, a warning will be logged and the `account_number` will be empty. For
+        the link to the office to work, each child also has `_account_number_firm_id` populated with the child firm id.
+
+        Args:
+            child_firms: List of Firms to show in the table
+        """
+        pda = current_app.extensions["pda"]
+
+        # Aggregate the child firm with its office
+        aggregated_data = []
+        for child in child_firms:
+            child_data = child.to_internal_dict()
+            child_head_office = pda.get_head_office(child.firm_id)
+            if child_head_office:
+                child_data["account_number"] = child_head_office.firm_office_code
+                child_data["_account_number_firm_id"] = child.firm_id
+            else:
+                logger.warning(f"Firm {child.firm_id} does not have a head office.")
+                child_data["account_number"] = ""
+                child_data["_account_number_firm_id"] = ""
+
+            aggregated_data.append(child_data)
+
+        return aggregated_data
+
+    def get_barristers_table(self, firm: Firm) -> DataTable | None:
+        pda = current_app.extensions["pda"]
+        child_barristers = pda.get_provider_children(firm_id=firm.firm_id, only_firm_type="Barrister")
+
+        if len(child_barristers) == 0:
+            return None
+
+        columns: list[TableStructure] = [
+            {"text": "Name", "id": "firm_name", "html_renderer": firm_name_html},
+            {"text": "Account number", "id": "account_number", "html_renderer": self.child_firm_office_html},
+            {"text": "Bar Council roll number", "id": "bar_council_roll"},
+            {"text": "Status", "html_renderer": get_firm_statuses},  # Add status tags here when available.
+        ]
+        child_firm_office_table_data = self.get_child_firm_office_table_data(child_barristers)
+        table = DataTable(structure=columns, data=child_firm_office_table_data)
+
+        return table
+
+    def get_advocates_table(self, firm: Firm) -> DataTable | None:
+        pda = current_app.extensions["pda"]
+        child_advocates = pda.get_provider_children(firm_id=firm.firm_id, only_firm_type="Advocate")
+
+        if len(child_advocates) == 0:
+            return None
+
+        columns: list[TableStructure] = [
+            {"text": "Name", "id": "firm_name", "html_renderer": firm_name_html},
+            {"text": "Account number", "id": "firm_office_code", "html_renderer": self.child_firm_office_html},
+            {"text": "SRA roll number", "id": "bar_council_roll"},
+            {"text": "Status", "html_renderer": get_firm_statuses},  # Add status tags here when available.
+        ]
+
+        child_firm_office_table_data = self.get_child_firm_office_table_data(child_advocates)
+        table = DataTable(structure=columns, data=child_firm_office_table_data)
+
+        return table
+
     def get_context(self, firm):
         pda = current_app.extensions["pda"]
 
@@ -197,6 +277,10 @@ class ViewProvider(MethodView):
 
         if self.subpage == "contact":
             context.update({"contact_tables": self.get_contact_tables(firm, head_office)})
+
+        if self.subpage == "barristers-and-advocates":
+            context.update({"barristers_table": self.get_barristers_table(firm)})
+            context.update({"advocates_table": self.get_advocates_table(firm)})
 
         return context
 

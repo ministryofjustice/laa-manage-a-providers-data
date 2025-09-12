@@ -2,9 +2,8 @@
 {% from 'macros/contact_tables.html' import contactCards %}
 
 {% block actionButtons %}
-
   {{ govukButton({
-    "text": "Make provider inactive",
+    "text": "Make chambers inactive",
     "classes": "govuk-button--secondary",
   }) }}
 
@@ -19,18 +18,44 @@
       "active": subpage == "contact"
     }, {
       "text": "Barristers and advocates",
-
+      "href": url_for("main.view_provider_barristers_and_advocates", firm=firm),
       "active": subpage == "barristers-and-advocates"
     }]
   }) }}
 
-  {% if subpage == "barristers-and-advocates" %}
-
-      <h3 class="govuk-heading-m">Barristers and advocates</h3>
-  {% endif %}
-
   {% if subpage == "contact" %}
    {{ contactCards(contact_tables) }}
-
   {% endif %}
+
+  {% if subpage == "barristers-and-advocates" %}
+    {% if barristers_table %}
+        <h3 class="govuk-heading-m">Barristers</h3>
+        {{ govukTable(barristers_table.to_govuk_params()) }}
+        {{ govukButton({
+            "text": "Add another barrister",
+
+        }) }}
+    {% else %}
+        <h3 class="govuk-heading-m">No barristers assigned to this chambers</h3>
+        {{ govukButton({
+            "text": "Add a barrister",
+
+        }) }}
+    {% endif %}
+
+    {% if advocates_table %}
+        <h3 class="govuk-heading-m">Advocates</h3>
+        {{ govukTable(advocates_table.to_govuk_params()) }}
+        {{ govukButton({
+            "text": "Add another advocate",
+
+        }) }}
+    {% else %}
+        <h3 class="govuk-heading-m">No advocates assigned to this chambers</h3>
+        {{ govukButton({
+            "text": "Add an advocate",
+
+        }) }}
+    {% endif %}
+
 {% endblock %}

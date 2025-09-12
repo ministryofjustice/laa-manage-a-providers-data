@@ -9,6 +9,7 @@ from unittest.mock import Mock
 
 from pydantic import ValidationError
 
+from app.constants import FirmType
 from app.models import BankAccount, Contact, Firm, Office
 
 
@@ -242,6 +243,35 @@ class MockProviderDataApi:
 
         # Return empty list if no users data exists for this firm
         return self._mock_data.get("users", {}).get(firm_id, [])
+
+    def get_provider_children(self, firm_id: int, only_firm_type: FirmType | None = None) -> List[Firm]:
+        """
+        Get all firms for which the specified firm_id is their parentFirmId, optionally
+        filtering to only include a specified firm type.
+
+        Args:
+            firm_id: The parent firm ID
+            only_firm_type: Optional firm type.
+
+        Returns:
+            List of Firm model instances, which may be empty.
+        """
+        if not isinstance(firm_id, int) or firm_id <= 0:
+            raise ValueError("firm_id must be a positive integer")
+
+        provider_children = []
+
+        for firm in self._mock_data["firms"]:
+            if firm.get("parentFirmId") == firm_id:
+                try:
+                    cleaned_firm = _clean_data(firm)
+                    child_firm = Firm(**cleaned_firm)
+                    if only_firm_type is None or child_firm.firm_type == only_firm_type:
+                        provider_children.append(child_firm)
+                except ValidationError as e:
+                    self.logger.error(f"Invalid firm data in mock for firm {firm_id}: {e}")
+
+        return provider_children
 
     def get_office_contract_details(self, firm_id: int, office_code: str) -> Optional[Dict[str, Any]]:
         """
