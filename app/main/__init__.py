@@ -29,13 +29,13 @@ bp.add_url_rule(
 bp.add_url_rule("/provider/<firm:firm>/office/<office:office>", view_func=ViewOffice.as_view("view_office"))
 bp.add_url_rule(
     "/provider/<firm:firm>/office/<office:office>/overview",
-    view_func=ViewOffice.as_view("view_office_overview", subpage="overview")
+    view_func=ViewOffice.as_view("view_office_overview", subpage="overview"),
 )
 bp.add_url_rule(
     "/provider/<firm:firm>/office/<office:office>/contact",
-    view_func=ViewOffice.as_view("view_office_contact", subpage="contact")
+    view_func=ViewOffice.as_view("view_office_contact", subpage="contact"),
 )
 bp.add_url_rule(
     "/provider/<firm:firm>/office/<office:office>/bank-accounts-and-payment",
-    view_func=ViewOffice.as_view("view_office_bank_accounts_and_payment", subpage="bank-accounts-and-payment")
+    view_func=ViewOffice.as_view("view_office_bank_accounts_and_payment", subpage="bank-accounts-and-payment"),
 )

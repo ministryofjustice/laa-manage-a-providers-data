@@ -317,8 +317,11 @@ class ViewOffice(MethodView):
             # Overview section
             overview_rows, overview_data = [], {}
             add_field(
-                overview_rows, overview_data, firm.firm_name, "Parent provider",
-                html=self.parent_provider_name_html(firm)
+                overview_rows,
+                overview_data,
+                firm.firm_name,
+                "Parent provider",
+                html=self.parent_provider_name_html(firm),
             )
             add_field(overview_rows, overview_data, office.firm_office_code, "Account number")
             add_field(overview_rows, overview_data, office.head_office, "Head office", format_head_office)
