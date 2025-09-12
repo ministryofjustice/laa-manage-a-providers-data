@@ -8,6 +8,7 @@ from unittest.mock import Mock
 
 from pydantic import ValidationError
 
+from app.constants import FirmType
 from app.models import BankAccount, Firm, Office
 
 
@@ -240,7 +241,7 @@ class MockProviderDataApi:
         # Return empty list if no users data exists for this firm
         return self._mock_data.get("users", {}).get(firm_id, [])
 
-    def get_provider_children(self, firm_id: int, only_firm_type: str | None = None) -> List[Firm]:
+    def get_provider_children(self, firm_id: int, only_firm_type: FirmType | None = None) -> List[Firm]:
         """
         Get all firms for which the specified firm_id is their parentFirmId, optionally
         filtering to only include a specified firm type.
