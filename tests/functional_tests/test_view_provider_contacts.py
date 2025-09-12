@@ -92,7 +92,6 @@ def test_view_provider_contacts_details_component_functionality(page: Page):
     page.goto(url_for("main.view_provider_contact", firm=1, _external=True))
 
     # Details should start closed
-    details = page.locator("details")
     # Additional contact should not be visible
     expect(page.get_by_text("David Smith", exact=True)).not_to_be_visible()
 
