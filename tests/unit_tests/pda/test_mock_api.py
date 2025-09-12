@@ -559,3 +559,70 @@ class TestMockProviderDataApi:
 
         with pytest.raises(ProviderDataApiError, match="Office NONEXISTENT not found"):
             mock_api.update_office_bank_account(1, "NONEXISTENT", bank_account)
+
+    def test_get_provider_children_success(self, mock_api):
+        mock_api._mock_data = {
+            "firms": [
+                {"firmId": 1, "firmName": "Parent Firm"},
+                {"firmId": 2, "firmName": "Advocate 2", "parentFirmId": 1, "firmType": "Advocate"},
+                {"firmId": 3, "firmName": "Barrister 3", "parentFirmId": 1, "firmType": "Barrister"},
+                {"firmId": 4, "firmName": "Empty Firm 4"},
+            ],
+        }
+
+        expected = [
+            Firm(**{"firmId": 2, "firmName": "Advocate 2", "parentFirmId": 1, "firmType": "Advocate"}),
+            Firm(**{"firmId": 3, "firmName": "Barrister 3", "parentFirmId": 1, "firmType": "Barrister"})
+        ]
+
+        actual = mock_api.get_provider_children(1)
+        assert len(actual) == 2
+        assert actual == expected
+
+    def test_get_provider_children_filter_type(self, mock_api):
+        mock_api._mock_data = {
+            "firms": [
+                {"firmId": 1, "firmName": "Parent Firm"},
+                {"firmId": 2, "firmName": "Advocate 2", "parentFirmId": 1, "firmType": "Advocate"},
+                {"firmId": 3, "firmName": "Barrister 3", "parentFirmId": 1, "firmType": "Barrister"},
+                {"firmId": 4, "firmName": "Empty Firm 4"},
+            ],
+        }
+
+        expected = [
+            Firm(**{"firmId": 2, "firmName": "Advocate 2", "parentFirmId": 1, "firmType": "Advocate"})
+        ]
+
+        actual = mock_api.get_provider_children(1, only_firm_type="Advocate")
+        assert actual == expected
+
+    def test_get_provider_children_no_children(self, mock_api):
+        mock_api._mock_data = {
+            "firms": [
+                {"firmId": 1, "firmName": "Parent Firm"},
+                {"firmId": 2, "firmName": "Advocate 2", "parentFirmId": 1, "firmType": "Advocate"},
+                {"firmId": 3, "firmName": "Barrister 3", "parentFirmId": 1, "firmType": "Barrister"},
+                {"firmId": 4, "firmName": "Empty Firm 4"},
+            ],
+        }
+
+        expected = []
+
+        actual = mock_api.get_provider_children(4)
+        assert actual == expected
+
+    def test_get_provider_children_parent_not_found(self, mock_api):
+        mock_api._mock_data = {
+            "firms": [
+                {"firmId": 1, "firmName": "Parent Firm"},
+                {"firmId": 2, "firmName": "Advocate 2", "parentFirmId": 1, "firmType": "Advocate"},
+                {"firmId": 3, "firmName": "Barrister 3", "parentFirmId": 1, "firmType": "Barrister"},
+                {"firmId": 4, "firmName": "Empty Firm 4"},
+            ],
+        }
+
+        expected = []
+
+        actual = mock_api.get_provider_children(50)
+        assert actual == expected
+    
