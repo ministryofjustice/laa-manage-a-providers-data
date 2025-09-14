@@ -22,6 +22,43 @@ from app.views import BaseFormView
 logger = logging.getLogger(__name__)
 
 
+def get_contact_tables(firm: Firm, head_office: Office = None) -> list[DataTable]:
+    if not head_office or not firm.firm_id:
+        return []
+
+    # Get contacts for the head office
+    pda = current_app.extensions["pda"]
+    contacts = pda.get_office_contacts(firm.firm_id, head_office.firm_office_code)
+
+    if not contacts:
+        return []
+
+    # Sort contacts: primary first, then others
+    primary_contacts = [c for c in contacts if c.primary == "Y"]
+    other_contacts = [c for c in contacts if c.primary != "Y"]
+    sorted_contacts = primary_contacts + other_contacts
+
+    contact_tables = []
+
+    for contact in sorted_contacts:
+        contact_table_structure = []
+        contact_data = {}
+
+        add_field(contact_table_structure, contact_data, contact.job_title, "Job title")
+        add_field(contact_table_structure, contact_data, contact.telephone_number, "Telephone number")
+        add_field(contact_table_structure, contact_data, contact.email_address, "Email address")
+        add_field(contact_table_structure, contact_data, contact.website, "Website")
+        add_field(contact_table_structure, contact_data, contact.active_from, "Active from", format_date)
+
+        card_title = f"{contact.first_name} {contact.last_name}"
+        card: Card = {"title": card_title, "action_text": "Change liaison manager", "action_url": "#"}
+
+        contact_table = TransposedDataTable(structure=contact_table_structure, data=contact_data, card=card)
+        contact_tables.append(contact_table)
+
+    return contact_tables
+
+
 class ProviderList(BaseFormView):
     """View for provider list"""
 
@@ -260,43 +297,6 @@ class ViewProvider(MethodView):
         return render_template(template, subpage=self.subpage, **context)
 
 
-def get_contact_tables(firm: Firm, head_office: Office = None) -> list[DataTable]:
-    if not head_office or not firm.firm_id:
-        return []
-
-    # Get contacts for the head office
-    pda = current_app.extensions["pda"]
-    contacts = pda.get_office_contacts(firm.firm_id, head_office.firm_office_code)
-
-    if not contacts:
-        return []
-
-    # Sort contacts: primary first, then others
-    primary_contacts = [c for c in contacts if c.primary == "Y"]
-    other_contacts = [c for c in contacts if c.primary != "Y"]
-    sorted_contacts = primary_contacts + other_contacts
-
-    contact_tables = []
-
-    for contact in sorted_contacts:
-        contact_table_structure = []
-        contact_data = {}
-
-        add_field(contact_table_structure, contact_data, contact.job_title, "Job title")
-        add_field(contact_table_structure, contact_data, contact.telephone_number, "Telephone number")
-        add_field(contact_table_structure, contact_data, contact.email_address, "Email address")
-        add_field(contact_table_structure, contact_data, contact.website, "Website")
-        add_field(contact_table_structure, contact_data, contact.active_from, "Active from", format_date)
-
-        card_title = f"{contact.first_name} {contact.last_name}"
-        card: Card = {"title": card_title, "action_text": "Change liaison manager", "action_url": "#"}
-
-        contact_table = TransposedDataTable(structure=contact_table_structure, data=contact_data, card=card)
-        contact_tables.append(contact_table)
-
-    return contact_tables
-
-
 class ViewOffice(MethodView):
     template = "view-office.html"
 
@@ -308,8 +308,28 @@ class ViewOffice(MethodView):
     def parent_provider_name_html(parent_provider: Firm):
         return f"<a class='govuk-link', href={url_for('main.view_provider', firm=parent_provider.firm_id)}>{parent_provider.firm_name}</a>"
 
+    def get_payment_information_table(self, firm: Firm, office: Office) -> DataTable:
+        rows, data = [], {}
+        add_field(rows, data, "Electronic","Payment method")
+        return TransposedDataTable(structure=rows, data=data)
+
     def get_vat_registration_table(self, firm: Firm, office: Office) -> DataTable:
-        return []
+        rows, data  = [], {}
+        add_field(rows, data, office.vat_registration_number if office.vat_registration_number else "Unknown", "VAT registration number")
+        return TransposedDataTable(structure=rows, data=data)
+
+    def get_bank_account_table(self, bank_account: BankAccount) -> DataTable | None:
+        if bank_account is None:
+            return None
+        structure, data  = [], {}
+
+        add_field(structure, data, bank_account.bank_account_name, "Account name")
+        add_field(structure, data, bank_account.account_number, "Account number")
+        add_field(structure, data, bank_account.sort_code, "Sort code")
+        # Effective date from still to be implemented
+
+        card: Card = {"title": bank_account.bank_account_name, "action_text": "Change bank account", "action_url": "#"}
+        return TransposedDataTable(structure=structure, data=data, card=card)
 
     def get_context(self, firm: Firm, office: Office) -> Dict:
         context = {"firm": firm, "office": office, "message": "Hello world", "subpage": self.subpage}
@@ -319,6 +339,11 @@ class ViewOffice(MethodView):
             bank_account: BankAccount = pda.get_office_bank_account(
                 firm_id=firm.firm_id, office_code=office.firm_office_code
             )
+            context.update({
+                "vat_registration_table": self.get_vat_registration_table(firm, office),
+                "payment_information_table": self.get_payment_information_table(firm, office),
+                "bank_account_table": self.get_bank_account_table(bank_account)
+            })
 
         if self.subpage == "contact":
             context.update({"contact_tables": get_contact_tables(firm, office)})

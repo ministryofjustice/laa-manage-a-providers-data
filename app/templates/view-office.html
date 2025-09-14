@@ -61,7 +61,7 @@
       }, {
         "text": "Bank accounts and payment",
         "href": url_for("main.view_office_bank_payment_details", firm=firm, office=office),
-        "active": subpage == "bank-accounts-and-payment"
+        "active": subpage == "bank-payment-details"
       }]
     }) }}
 
@@ -78,11 +78,15 @@
 
     {% if subpage == "bank-payment-details" %}
         <h2 class="govuk-heading-m">Payment information</h2>
+        {{ govukTable(payment_information_table.to_govuk_params()) }}
 
         <h2 class="govuk-heading-m">VAT registration number</h2>
-
+        {{ govukTable(vat_registration_table.to_govuk_params()) }}
 
         <h2 class="govuk-heading-m">Bank accounts</h2>
+        {% if bank_account_table %}
+            {{ govukTable(bank_account_table.to_govuk_params()) }}
+        {% endif %}
 
         {{ govukButton({
             "text": "Add bank account",

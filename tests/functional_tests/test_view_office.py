@@ -105,3 +105,39 @@ def test_office_breadcrumbs(page):
     # Should navigate to provider page
     expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
     expect(page.get_by_role("link", name="Contact")).to_be_visible()  # Provider nav tabs
+
+
+@pytest.mark.usefixtures("live_server")
+def test_office_bank_payment_details(page):
+    navigate_to_office_page(page)
+    page.get_by_role("link", name="Bank accounts and payment").click()
+    expect(page.get_by_role("heading", name="Payment information")).to_be_visible()
+    expect(page.get_by_role("heading", name="VAT registration number")).to_be_visible()
+
+    expect(page.get_by_role("heading", name="Bank accounts")).to_be_visible()
+    expect(page.get_by_role("rowheader", name="Account name")).to_be_visible()
+    expect(page.get_by_role("cell", name="Smith & Partners Solicitors")).to_be_visible()
+    expect(page.get_by_role("rowheader", name="Account number")).to_be_visible()
+    expect(page.get_by_role("cell", name="12345678")).to_be_visible()
+    expect(page.get_by_role("rowheader", name="Sort code")).to_be_visible()
+    expect(page.get_by_role("rowheader", name="Sort code")).to_be_visible()
+    expect(page.get_by_role("cell", name="203045")).to_be_visible()
+    expect(page.get_by_role("button", name="Add bank account")).to_be_visible()
+
+
+@pytest.mark.usefixtures("live_server")
+def test_office_contact(page):
+    navigate_to_office_page(page)
+    page.get_by_role("link", name="Contact").click()
+    expect(page.get_by_role("heading", name="Sarah Johnson")).to_be_visible()
+    expect(page.get_by_role("term").filter(has_text="Job title")).to_be_visible()
+    expect(page.get_by_role("definition").filter(has_text="Liaison manager")).to_be_visible()
+    expect(page.get_by_role("term").filter(has_text="Telephone number")).to_be_visible()
+    expect(page.get_by_text("123 4567")).to_be_visible()
+    expect(page.get_by_role("term").filter(has_text="Email address")).to_be_visible()
+    expect(page.get_by_text("sarah.johnson@smithpartners.")).to_be_visible()
+    expect(page.get_by_text("Show 2 additional contacts")).to_be_visible()
+
+    page.get_by_text("Show 2 additional contacts").click()
+    expect(page.get_by_role("link", name="Change liaison manager  (David Smith)")).to_be_visible()
+    expect(page.get_by_role("link", name="Change liaison manager  (Alice Brown)")).to_be_visible()
