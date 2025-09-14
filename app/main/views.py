@@ -310,18 +310,23 @@ class ViewOffice(MethodView):
 
     def get_payment_information_table(self, firm: Firm, office: Office) -> DataTable:
         rows, data = [], {}
-        add_field(rows, data, "Electronic","Payment method")
+        add_field(rows, data, "Electronic", "Payment method")
         return TransposedDataTable(structure=rows, data=data)
 
     def get_vat_registration_table(self, firm: Firm, office: Office) -> DataTable:
-        rows, data  = [], {}
-        add_field(rows, data, office.vat_registration_number if office.vat_registration_number else "Unknown", "VAT registration number")
+        rows, data = [], {}
+        add_field(
+            rows,
+            data,
+            office.vat_registration_number if office.vat_registration_number else "Unknown",
+            "VAT registration number",
+        )
         return TransposedDataTable(structure=rows, data=data)
 
     def get_bank_account_table(self, bank_account: BankAccount) -> DataTable | None:
         if bank_account is None:
             return None
-        structure, data  = [], {}
+        structure, data = [], {}
 
         add_field(structure, data, bank_account.bank_account_name, "Account name")
         add_field(structure, data, bank_account.account_number, "Account number")
@@ -339,11 +344,13 @@ class ViewOffice(MethodView):
             bank_account: BankAccount = pda.get_office_bank_account(
                 firm_id=firm.firm_id, office_code=office.firm_office_code
             )
-            context.update({
-                "vat_registration_table": self.get_vat_registration_table(firm, office),
-                "payment_information_table": self.get_payment_information_table(firm, office),
-                "bank_account_table": self.get_bank_account_table(bank_account)
-            })
+            context.update(
+                {
+                    "vat_registration_table": self.get_vat_registration_table(firm, office),
+                    "payment_information_table": self.get_payment_information_table(firm, office),
+                    "bank_account_table": self.get_bank_account_table(bank_account),
+                }
+            )
 
         if self.subpage == "contact":
             context.update({"contact_tables": get_contact_tables(firm, office)})
