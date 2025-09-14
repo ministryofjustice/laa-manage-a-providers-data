@@ -25,20 +25,13 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {% if subpage == "contact" %}
-    {% if contact_details_table %}
-      <h3 class="govuk-heading-m">Contact details</h3>
-      {{ govukTable(contact_details_table.to_govuk_params()) }}
-    {% endif %}
+        {% if contact_details_table %}
+          <h3 class="govuk-heading-m">Contact details</h3>
+          {{ govukTable(contact_details_table.to_govuk_params()) }}
+        {% endif %}
         {{ contactCards(contact_tables) }}
       {% endif %}
-
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      {% if subpage == "contact" %}
-        <h3 class="govuk-heading-m">Contact</h3>
-        {{ govukSummaryList(contact_table.to_summary_govuk_params()) }}
-        {{ contactCards(contact_tables) }}
-      {% endif %}
+  {% endif %}
 
       {% if subpage == "barristers-and-advocates" %}
 
