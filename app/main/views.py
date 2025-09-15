@@ -308,16 +308,20 @@ class ViewOffice(MethodView):
 
     def get_payment_information_table(self, firm: Firm, office: Office) -> DataTable:
         rows, data = [], {}
-        add_field(rows, data, "Electronic", "Payment method")
+        # Storage of payment method to be implemented
+        edit_payment_information_link = "<a class='govuk-link', href='#'>Change</a>"
+        add_field(rows, data, " ", "Payment method", html=edit_payment_information_link)
         return TransposedDataTable(structure=rows, data=data)
 
     def get_vat_registration_table(self, firm: Firm, office: Office) -> DataTable:
         rows, data = [], {}
+        edit_vat_registration_link = "<a class='govuk-link', href='#'>Add VAT registration number</a>"
         add_field(
             rows,
             data,
-            office.vat_registration_number if office.vat_registration_number else "Unknown",
+            office.vat_registration_number if office.vat_registration_number else " ",
             "VAT registration number",
+            html=edit_vat_registration_link,
         )
         return TransposedDataTable(structure=rows, data=data)
 
