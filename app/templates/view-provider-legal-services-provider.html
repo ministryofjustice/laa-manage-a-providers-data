@@ -27,24 +27,29 @@
     }]
   }) }}
 
-  {% if subpage == "offices" %}
-    {% if "head" in office_tables %}
-      <h3 class="govuk-heading-m">Head office</h3>
-      {{ govukTable(office_tables.head.to_govuk_params()) }}
-    {% endif %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
-    {% if "other" in office_tables %}
-      <h3 class="govuk-heading-m">Offices</h3>
-      {{ govukTable(office_tables.other.to_govuk_params()) }}
-    {% endif %}
+      {% if subpage == "offices" %}
+        {% if "head" in office_tables %}
+          <h3 class="govuk-heading-m">Head office</h3>
+          {{ govukTable(office_tables.head.to_govuk_params()) }}
+        {% endif %}
 
-    {{ govukButton({
-    "text": "Add an office",
-    "href": url_for("main.add_office", firm=firm)
-    }) }}
-  {% endif %}
+        {% if "other" in office_tables %}
+          <h3 class="govuk-heading-m">Offices</h3>
+          {{ govukTable(office_tables.other.to_govuk_params()) }}
+        {% endif %}
 
-{% if subpage == "contact" %}
-    {{ contactCards(contact_tables) }}
-{% endif %}
+        {{ govukButton({
+        "text": "Add an office",
+        "href": url_for("main.add_office", firm=firm)
+        }) }}
+      {% endif %}
+
+      {% if subpage == "contact" %}
+        {{ contactCards(contact_tables) }}
+      {% endif %}
+    </div>
+  </div>
 {% endblock %}
