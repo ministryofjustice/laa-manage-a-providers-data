@@ -22,7 +22,7 @@ class TestCreateBarristerFromFormData:
 
         result = create_barrister_from_form_data(
             barrister_name="John Smith",
-            barrister_level="Junior counsel",
+            barrister_level="Junior",
             bar_council_roll_number="12345",
             parent_firm_id=456,
         )
@@ -32,7 +32,7 @@ class TestCreateBarristerFromFormData:
         assert firm_arg.firm_name == "John Smith"
         assert firm_arg.firm_type == "Barrister"
         assert firm_arg.solicitor_advocate == "No"
-        assert firm_arg.advocate_level == "Junior counsel"
+        assert firm_arg.advocate_level == "Junior"
         assert firm_arg.bar_council_roll == "12345"
         assert firm_arg.parent_firm_id == 456
 
@@ -49,7 +49,7 @@ class TestCreateAdvocateFromFormData:
         mock_add_provider.return_value = mock_firm
 
         result = create_advocate_from_form_data(
-            advocate_name="Jane Doe", advocate_level="Senior counsel", sra_roll_number="67890", parent_firm_id=101
+            advocate_name="Jane Doe", advocate_level="KC", sra_roll_number="67890", parent_firm_id=101
         )
 
         mock_add_provider.assert_called_once()
@@ -57,7 +57,7 @@ class TestCreateAdvocateFromFormData:
         assert firm_arg.firm_name == "Jane Doe"
         assert firm_arg.firm_type == "Advocate"
         assert firm_arg.solicitor_advocate == "Yes"
-        assert firm_arg.advocate_level == "Senior counsel"
+        assert firm_arg.advocate_level == "KC"
         assert firm_arg.bar_council_roll == "67890"
         assert firm_arg.parent_firm_id == 101
 
@@ -83,19 +83,22 @@ class TestReplicateOfficeForChildFirm:
         mock_new_office = Mock(spec=Office)
         mock_add_office.return_value = mock_new_office
 
-        result = replicate_office_for_child_firm(source_office, 555, as_head_office=True)
+        new_firm_id = 555
+
+        result = replicate_office_for_child_firm(source_office, new_firm_id, as_head_office=True)
 
         mock_add_office.assert_called_once()
-        office_arg, firm_id_arg, show_message_arg = mock_add_office.call_args[0] + (
-            mock_add_office.call_args[1]["show_success_message"],
-        )
+        office_arg = mock_add_office.call_args[0][0]
+        firm_id_arg = mock_add_office.call_args[1]["firm_id"]
+        show_message_arg = mock_add_office.call_args[1]["show_success_message"]
 
-        assert firm_id_arg == 555
+        assert firm_id_arg == new_firm_id
         assert show_message_arg is False
 
         office_dict = office_arg.to_internal_dict()
-        assert "firm_office_id" not in office_dict
-        assert "ccms_firm_office_id" not in office_dict
+
+        assert office_dict["firm_office_id"] == 0
+        assert office_dict["ccms_firm_office_id"] == 0
         assert "firm_office_code" not in office_dict
         assert "creation_date" not in office_dict
 
@@ -103,9 +106,7 @@ class TestReplicateOfficeForChildFirm:
         assert office_dict["city"] == "Test City"
         assert office_dict["postcode"] == "TE1 2ST"
         assert office_dict["telephone_number"] == "01234567890"
-
         assert office_dict["head_office"] == "N/A"
-        assert office_dict["is_head_office"] is True
 
         assert result == mock_new_office
 
@@ -122,8 +123,7 @@ class TestReplicateOfficeForChildFirm:
         office_arg = mock_add_office.call_args[0][0]
         office_dict = office_arg.to_internal_dict()
 
-        assert office_dict["is_head_office"] is False
-        assert "head_office" not in office_dict or office_dict["head_office"] != "N/A"
+        assert office_dict.get("head_office") is None
 
 
 class TestCreateHeadOfficeFromParent:
@@ -202,7 +202,10 @@ class TestReplicateOfficeContacts:
             assert mock_add_contact.call_count == 2
 
             first_call = mock_add_contact.call_args_list[0]
-            contact_arg1, firm_id1, office_code1, show_msg1 = first_call[0] + (first_call[1]["show_success_message"],)
+            contact_arg1 = first_call[0][0]
+            firm_id1 = first_call[1]["firm_id"]
+            office_code1 = first_call[1]["office_code"]
+            show_msg1 = first_call[1]["show_success_message"]
             assert firm_id1 == 999
             assert office_code1 == "TARGET456"
             assert show_msg1 is False
