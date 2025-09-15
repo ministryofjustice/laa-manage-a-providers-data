@@ -1,0 +1,12 @@
+{%- from 'govuk_frontend_jinja/components/notification-banner/macro.html' import govukNotificationBanner -%}
+
+
+{% macro renderFlashMessages() %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        {{ govukNotificationBanner({'type': category, 'html': message}) }}
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+{% endmacro %}

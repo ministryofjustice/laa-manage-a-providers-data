@@ -4,6 +4,7 @@
 {%- from 'components/moj-pagination.html' import mojPagination -%}
 {%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
 {%- from "govuk_frontend_jinja/components/warning-text/macro.html" import govukWarningText %}
+{%- from 'macros/flash_messages.html' import renderFlashMessages %}
 
 
 {% block content %}
@@ -14,13 +15,7 @@
             {{ govukErrorSummary(wtforms_errors(form)) }}
         {% endif %}
 
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          {% for category, message in messages %}
-              {{ govukNotificationBanner({'type': category, 'html': message}) }}
-          {% endfor %}
-        {% endif %}
-      {% endwith %}
+      {{ renderFlashMessages() }}
 
       <h1 class="govuk-heading-xl">{{ form.title }}</h1>
 
