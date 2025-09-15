@@ -478,3 +478,85 @@ class AssignContractManagerForm(BaseForm):
 
         # Store selected value for table rendering
         self.selected_value = selected_value
+
+
+class AddBarristerForm(BaseForm):
+    title = "Barrister details"
+    url = "provider/<firm:firm>/add-barrister"
+    submit_button_text = "Submit"
+
+    def __init__(self, firm=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.firm = firm
+
+    @property
+    def caption(self):
+        if self.firm:
+            return self.firm.firm_name
+        return "Unknown chambers"
+
+    barrister_name = StringField(
+        "Barrister name",
+        widget=GovTextInput(heading_class="govuk-fieldset__legend--s", classes="govuk-!-width-one-half"),
+        validators=[
+            InputRequired(message="Enter barrister name"),
+            Length(max=255, message="Barrister name must be 255 characters or less"),
+        ],
+    )
+
+    barrister_level = RadioField(
+        "Barrister level",
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--s"),
+        choices=ADVOCATE_LEVEL_CHOICES,
+        validators=[InputRequired(message="Select barrister level")],
+    )
+
+    bar_council_roll_number = StringField(
+        "Bar Council roll number",
+        widget=GovTextInput(heading_class="govuk-fieldset__legend--s", classes="govuk-!-width-one-half"),
+        validators=[
+            InputRequired(message="Enter Bar Council roll number"),
+            Length(max=15, message="Bar Council roll number must be 15 characters or less"),
+        ],
+    )
+
+
+class AddAdvocateForm(BaseForm):
+    title = "Advocate details"
+    url = "provider/<firm:firm>/add-advocate"
+    submit_button_text = "Submit"
+
+    def __init__(self, firm=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.firm = firm
+
+    @property
+    def caption(self):
+        if self.firm:
+            return self.firm.firm_name
+        return "Unknown chambers"
+
+    advocate_name = StringField(
+        "Advocate name",
+        widget=GovTextInput(heading_class="govuk-fieldset__legend--s", classes="govuk-!-width-one-half"),
+        validators=[
+            InputRequired(message="Enter advocate name"),
+            Length(max=255, message="Advocate name must be 255 characters or less"),
+        ],
+    )
+
+    advocate_level = RadioField(
+        "Advocate level",
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--s"),
+        choices=ADVOCATE_LEVEL_CHOICES,
+        validators=[InputRequired(message="Select advocate level")],
+    )
+
+    sra_roll_number = StringField(
+        "SRA roll number",
+        widget=GovTextInput(heading_class="govuk-fieldset__legend--s", classes="govuk-!-width-one-half"),
+        validators=[
+            InputRequired(message="Enter SRA roll number"),
+            Length(max=15, message="SRA roll number must be 15 characters or less"),
+        ],
+    )
