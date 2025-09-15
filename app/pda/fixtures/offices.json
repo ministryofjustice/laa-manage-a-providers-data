@@ -21,7 +21,7 @@
   "faxAreaCode": null,
   "faxNumber": null,
   "emailAddress": "office1@provider1.uk",
-  "vatRegistrationNumber": null,
+  "vatRegistrationNumber": "GB123456789",
   "headOffice": "N/A",
   "creationDate": "2024-09-12",
   "lscRegion": "Midlands",
