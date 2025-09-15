@@ -3,10 +3,10 @@
 {%  set govukRebrand = True %}
 
 {%- from 'govuk_frontend_jinja/components/error-summary/macro.html' import govukErrorSummary-%}
-{%- from 'govuk_frontend_jinja/components/notification-banner/macro.html' import govukNotificationBanner -%}
 {%- from 'govuk_frontend_jinja/components/phase-banner/macro.html' import govukPhaseBanner -%}
 {%- from 'govuk_frontend_jinja/components/service-navigation/macro.html' import govukServiceNavigation -%}
 {%- from 'components/header.html' import mojHeader %}
+{%- from 'macros/flash_messages.html' import renderFlashMessages %}
 
 {% block pageTitle %}{{config['SERVICE_NAME']}} – GOV.UK{% endblock %}
 
@@ -41,13 +41,7 @@
         {{ govukErrorSummary(wtforms_errors(form)) }}
       {% endif %}
 
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          {% for category, message in messages %}
-              {{ govukNotificationBanner({'type': category, 'html': message}) }}
-          {% endfor %}
-        {% endif %}
-      {% endwith %}
+      {{ renderFlashMessages() }}
 
       {% block pageContent %}{% endblock %}
     </div>
