@@ -112,16 +112,24 @@ def test_office_bank_payment_details(page):
     navigate_to_office_page(page)
     page.get_by_role("link", name="Bank accounts and payment").click()
     expect(page.get_by_role("heading", name="Payment information")).to_be_visible()
-    expect(page.get_by_role("heading", name="VAT registration number")).to_be_visible()
+    expect(page.get_by_role("link", name="Add")).to_be_visible()
+
+    expect(page.get_by_role("rowheader", name="VAT registration number")).to_be_visible()
+    expect(page.get_by_role("cell", name="GB123456789")).to_be_visible()
+    expect(page.get_by_role("link", name="Change", exact=True)).to_be_visible()
 
     expect(page.get_by_role("heading", name="Bank accounts")).to_be_visible()
-    expect(page.get_by_role("rowheader", name="Account name")).to_be_visible()
-    expect(page.get_by_role("cell", name="Smith & Partners Solicitors")).to_be_visible()
-    expect(page.get_by_role("rowheader", name="Account number")).to_be_visible()
-    expect(page.get_by_role("cell", name="12345678")).to_be_visible()
-    expect(page.get_by_role("rowheader", name="Sort code")).to_be_visible()
-    expect(page.get_by_role("rowheader", name="Sort code")).to_be_visible()
-    expect(page.get_by_role("cell", name="203045")).to_be_visible()
+    expect(page.get_by_role("heading", name="Smith & Partners Solicitors")).to_be_visible()
+    expect(page.get_by_role("link", name="Change bank account  (Smith")).to_be_visible()
+    expect(page.get_by_text("Account name")).to_be_visible()
+    expect(page.get_by_role("definition").filter(has_text="Smith & Partners Solicitors")).to_be_visible()
+
+    expect(page.get_by_text("Account number")).to_be_visible()
+    expect(page.get_by_text("12345678", exact=True)).to_be_visible()
+
+    expect(page.get_by_text("Sort code")).to_be_visible()
+    expect(page.get_by_text("203045")).to_be_visible()
+
     expect(page.get_by_role("button", name="Add bank account")).to_be_visible()
 
 
@@ -141,3 +149,15 @@ def test_office_contact(page):
     page.get_by_text("Show 2 additional contacts").click()
     expect(page.get_by_role("link", name="Change liaison manager  (David Smith)")).to_be_visible()
     expect(page.get_by_role("link", name="Change liaison manager  (Alice Brown)")).to_be_visible()
+
+
+@pytest.mark.usefixtures("live_server")
+def test_office_no_vat_registration_number(page):
+    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Search").click()
+    page.get_by_role("link", name="METROPOLITAN LAW CENTRE").click()
+    page.get_by_role("link", name="Offices").click()
+    page.get_by_role("link", name="3A001L").click()
+    page.get_by_role("link", name="Bank accounts and payment").click()
+    expect(page.get_by_role("rowheader", name="VAT registration number")).to_be_visible()
+    expect(page.get_by_role("link", name="Add VAT registration number")).to_be_visible()

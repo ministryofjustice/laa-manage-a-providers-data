@@ -306,27 +306,50 @@ class ViewOffice(MethodView):
         if subpage:
             self.subpage = subpage
 
+    def change_link_for_payment_method(self, row_data: Dict[str, str]) -> str | None:
+        firm_id = row_data.get("firm_id", None)
+        office_id = row_data.get("firm_office_id", None)
+        existing_payment_method = row_data.get("payment_method", None)
+        link_action = "Add" if existing_payment_method in ("", " ", None) else "Change"
+        if firm_id and office_id:
+            return f"<a class='govuk-link', href='#'>{link_action}</a>"
+        return None
+
+    def change_link_for_vat_registration(self, row_data: Dict[str, str]):
+        office_id = row_data.get("firm_office_id", None)
+        existing_vat_registration = row_data.get("vat_registration_number", None)
+        link_action = "Add VAT registration number" if existing_vat_registration in ("", " ", None) else "Change"
+        if office_id:
+            return f"<a class='govuk-link', href='#'>{link_action}</a>"
+        return None
+
     def get_payment_information_table(self, firm: Firm, office: Office) -> DataTable:
-        rows, data = [], {}
-        # Storage of payment method to be implemented
-        edit_payment_information_link = "<a class='govuk-link', href='#'>Change</a>"
-        add_field(rows, data, " ", "Payment method", html=edit_payment_information_link)
-        return TransposedDataTable(structure=rows, data=data)
+        # Always three cells
+        rows, data = [], {"firm_id": firm.firm_id, "firm_office_id": office.firm_office_id}
+        # No value, as we don't store it yet
+        add_field(rows, data, " ", "Payment method")
+        return TransposedDataTable(structure=rows, data=data, change_link=self.change_link_for_payment_method)
 
     def get_vat_registration_table(self, firm: Firm, office: Office) -> DataTable:
-        rows, data = [], {}
-        edit_vat_registration_link = "<a class='govuk-link', href='#'>Add VAT registration number</a>"
+        rows, data = [], {"firm_id": firm.firm_id, "firm_office_id": office.firm_office_id}
+        # Two cells if there is no current value, else three cells
+        has_existing_value = office.vat_registration_number is not None
+        value = office.vat_registration_number if has_existing_value else " "
+        replace_value_with_add_link = not has_existing_value
+        change_link = self.change_link_for_vat_registration if has_existing_value else None
         add_field(
             rows,
             data,
-            office.vat_registration_number if office.vat_registration_number else " ",
+            value,
             "VAT registration number",
-            html=edit_vat_registration_link,
+            html=f"<a class='govuk-link', href='#'>Add VAT registration number</a>"
+            if replace_value_with_add_link
+            else None,
         )
-        return TransposedDataTable(structure=rows, data=data)
+        return TransposedDataTable(structure=rows, data=data, change_link=change_link)
 
     def get_office_overvierw_table(self, firm: Firm, office: Office) -> DataTable:
-        overview_rows, overview_data = [], {}
+        overview_rows, overview_data = [], {"firm_id": firm.firm_id}
         add_field(
             overview_rows,
             overview_data,
