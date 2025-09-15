@@ -59,6 +59,12 @@ def get_contact_tables(firm: Firm, head_office: Office = None) -> list[DataTable
     return contact_tables
 
 
+def provider_name_html(provider: Firm):
+    return (
+        f"<a class='govuk-link', href={url_for('main.view_provider', firm=provider.firm_id)}>{provider.firm_name}</a>"
+    )
+
+
 class ProviderList(BaseFormView):
     """View for provider list"""
 
@@ -84,10 +90,6 @@ class ViewProvider(MethodView):
         if subpage:
             self.subpage = subpage
 
-    @staticmethod
-    def parent_provider_name_html(parent_provider: Firm):
-        return f"<a class='govuk-link', href={url_for('main.view_provider', firm=parent_provider.firm_id)}>{parent_provider.firm_name}</a>"
-
     def get_main_table(self, firm, head_office, parent_provider) -> DataTable:
         main_rows, main_data = [], {}
         add_field(main_rows, main_data, firm.firm_name, "Provider name")
@@ -102,7 +104,7 @@ class ViewProvider(MethodView):
                 main_data,
                 parent_provider.firm_name,
                 "Parent provider name",
-                html=self.parent_provider_name_html(parent_provider),
+                html=provider_name_html(parent_provider),
             )
             add_field(main_rows, main_data, parent_provider.firm_number, "Parent provider number")
 
@@ -304,10 +306,6 @@ class ViewOffice(MethodView):
         if subpage:
             self.subpage = subpage
 
-    @staticmethod
-    def parent_provider_name_html(parent_provider: Firm):
-        return f"<a class='govuk-link', href={url_for('main.view_provider', firm=parent_provider.firm_id)}>{parent_provider.firm_name}</a>"
-
     def get_payment_information_table(self, firm: Firm, office: Office) -> DataTable:
         rows, data = [], {}
         add_field(rows, data, "Electronic", "Payment method")
@@ -322,6 +320,23 @@ class ViewOffice(MethodView):
             "VAT registration number",
         )
         return TransposedDataTable(structure=rows, data=data)
+
+    def get_office_overvierw_table(self, firm: Firm, office: Office) -> DataTable:
+        overview_rows, overview_data = [], {}
+        add_field(
+            overview_rows,
+            overview_data,
+            firm.firm_name,
+            "Parent provider",
+            html=provider_name_html(firm),
+        )
+        add_field(overview_rows, overview_data, office.firm_office_code, "Account number")
+        add_field(overview_rows, overview_data, office.head_office, "Head office", format_head_office)
+        add_field(overview_rows, overview_data, firm.firm_type, "Supplier type", format_firm_type)
+
+        # Create tables
+        overview_table = TransposedDataTable(structure=overview_rows, data=overview_data) if overview_rows else None
+        return overview_table
 
     def get_bank_account_table(self, bank_account: BankAccount) -> DataTable | None:
         if bank_account is None:
@@ -356,22 +371,7 @@ class ViewOffice(MethodView):
             context.update({"contact_tables": get_contact_tables(firm, office)})
 
         if self.subpage == "overview":
-            # Overview section
-            overview_rows, overview_data = [], {}
-            add_field(
-                overview_rows,
-                overview_data,
-                firm.firm_name,
-                "Parent provider",
-                html=self.parent_provider_name_html(firm),
-            )
-            add_field(overview_rows, overview_data, office.firm_office_code, "Account number")
-            add_field(overview_rows, overview_data, office.head_office, "Head office", format_head_office)
-            add_field(overview_rows, overview_data, firm.firm_type, "Supplier type", format_firm_type)
-
-            # Create tables
-            overview_table = TransposedDataTable(structure=overview_rows, data=overview_data) if overview_rows else None
-            context.update({"overview_table": overview_table})
+            context.update({"overview_table": self.get_office_overvierw_table(firm, office)})
 
         return context
 
