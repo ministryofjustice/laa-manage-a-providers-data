@@ -22,44 +22,48 @@
     }]
   }) }}
 
-  {% if subpage == "contact" %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if subpage == "contact" %}
     {% if contact_details_table %}
       <h3 class="govuk-heading-m">Contact details</h3>
       {{ govukTable(contact_details_table.to_govuk_params()) }}
     {% endif %}
-    {{ contactCards(contact_tables) }}
-  {% endif %}
+        {{ contactCards(contact_tables) }}
+      {% endif %}
 
-  {% if subpage == "barristers-and-advocates" %}
-    {% if barristers_table %}
-        <h3 class="govuk-heading-m">Barristers</h3>
-        {{ govukTable(barristers_table.to_govuk_params()) }}
-        {{ govukButton({
-            "text": "Add another barrister",
+      {% if subpage == "barristers-and-advocates" %}
+        {% if barristers_table %}
+            <h3 class="govuk-heading-m">Barristers</h3>
+            {{ govukTable(barristers_table.to_govuk_params()) }}
+            {{ govukButton({
+                "text": "Add another barrister",
 
-        }) }}
-    {% else %}
-        <h3 class="govuk-heading-m">No barristers assigned to this chambers</h3>
-        {{ govukButton({
-            "text": "Add a barrister",
+            }) }}
+        {% else %}
+            <h3 class="govuk-heading-m">No barristers assigned to this chambers</h3>
+            {{ govukButton({
+                "text": "Add a barrister",
 
-        }) }}
-    {% endif %}
+            }) }}
+        {% endif %}
 
-    {% if advocates_table %}
-        <h3 class="govuk-heading-m">Advocates</h3>
-        {{ govukTable(advocates_table.to_govuk_params()) }}
-        {{ govukButton({
-            "text": "Add another advocate",
+        {% if advocates_table %}
+            <h3 class="govuk-heading-m">Advocates</h3>
+            {{ govukTable(advocates_table.to_govuk_params()) }}
+            {{ govukButton({
+                "text": "Add another advocate",
 
-        }) }}
-    {% else %}
-        <h3 class="govuk-heading-m">No advocates assigned to this chambers</h3>
-        {{ govukButton({
-            "text": "Add an advocate",
+            }) }}
+        {% else %}
+            <h3 class="govuk-heading-m">No advocates assigned to this chambers</h3>
+            {{ govukButton({
+                "text": "Add an advocate",
 
-        }) }}
-    {% endif %}
-  {% endif %}
+            }) }}
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
 
 {% endblock %}

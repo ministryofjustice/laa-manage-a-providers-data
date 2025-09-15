@@ -8,6 +8,7 @@
 {%- from 'components/moj_sub_navigation.html' import mojSubNavigation %}
 {%- from 'components/back_link.html' import govukBackLink -%}
 {%- from 'components/address.html' import addressDisplay -%}
+{%- from 'macros/flash_messages.html' import renderFlashMessages %}
 
 {% block beforeContent %}
   {{ super() }}
@@ -24,48 +25,59 @@
   }) }}
 {% endblock %}
 
-{% block pageContent %}
-    <span class="govuk-caption-xl">{{ firm.firm_name }}</span>
-    <h1 class="govuk-heading-xl">Office: {{ office.firm_office_code }}</h1>
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
-    {{ addressDisplay(office) }}
+      {{ renderFlashMessages() }}
 
-    <br>
+      <span class="govuk-caption-xl">{{ firm.firm_name }}</span>
+      <h1 class="govuk-heading-xl">Office: {{ office.firm_office_code }}</h1>
 
-    {{ govukButton({
-      "text": "Make inactive",
-      "classes": "govuk-button--secondary"
-    }) }}
+      {{ addressDisplay(office) }}
 
-    {{ govukButton({
-      "text": "Hold payments",
-      "classes": "govuk-button--secondary govuk-!-margin-left-3",
-    }) }}
+      <br>
 
-    {{ govukButton({
-      "text": "Record office intervention",
-      "classes": "govuk-button--secondary govuk-!-margin-left-3",
-    }) }}
+      {{ govukButton({
+        "text": "Make inactive",
+        "classes": "govuk-button--secondary"
+      }) }}
 
-    {{ mojSubNavigation({
-      "label": "Sub navigation",
-      "items": [{
-        "text": "Overview",
-        "href": "#",
-        "active": true
-      }, {
-        "text": "Contact",
-        "href": "#",
-      }, {
-        "text": "Bank accounts and payment",
-        "href": "#",
-      }]
-    }) }}
+      {{ govukButton({
+        "text": "Hold payments",
+        "classes": "govuk-button--secondary govuk-!-margin-left-3",
+      }) }}
 
-    {% if overview_table %}
-      <h2 class="govuk-heading-m">Overview</h2>
-      {{ govukTable(overview_table.to_govuk_params()) }}
-    {% endif %}
+      {{ govukButton({
+        "text": "Record office intervention",
+        "classes": "govuk-button--secondary govuk-!-margin-left-3",
+      }) }}
+    </div>
+    <div class="govuk-grid-column-full">
+
+      {{ mojSubNavigation({
+        "label": "Sub navigation",
+        "items": [{
+          "text": "Overview",
+          "href": "#",
+          "active": true
+        }, {
+          "text": "Contact",
+          "href": "#",
+        }, {
+          "text": "Bank accounts and payment",
+          "href": "#",
+        }]
+      }) }}
+
+    </div>
+    <div class="govuk-grid-column-two-thirds">
+      {% if overview_table %}
+        <h2 class="govuk-heading-m">Overview</h2>
+        {{ govukTable(overview_table.to_govuk_params()) }}
+      {% endif %}
+    </div>
+  </div>
 
 
 {% endblock %}
