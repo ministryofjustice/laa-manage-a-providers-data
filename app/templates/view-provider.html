@@ -11,7 +11,7 @@
 
 {% block beforeContent %}
   {{ super() }}
-  {{ govukBackLink({"text": "Back to all providers"}) }}
+  {{ govukBackLink({"text": "Back to all providers", "href": url_for("main.providers") }) }}
 {% endblock %}
 
 {% block content %}
