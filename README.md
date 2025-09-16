@@ -198,3 +198,7 @@ Members of the development team have the necessary permissions to manage user as
   This package was modified(by subclassing) to support our specific use cases:
   - **Logout Handling**: The default implementation had issues correctly detecting the request scheme (`http` vs `https`) for constructing the post-logout redirect URI.
   - **`login_required` Behavior**: In certain environments (e.g., local development and automated tests), we needed a way to bypass Entra ID authentication
+
+
+### Business logic documentation
+- [Add advocates/ barristers](docs/add-barrister-advocate.md) 

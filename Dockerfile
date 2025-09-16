@@ -23,6 +23,7 @@ RUN apt-get update \
     libpq-dev \
     libsqlite3-0 \
     libxml2 \
+    imagemagick \
     && rm -rf /var/lib/apt/lists/*
 
 # Upgrade libslt1 to install the latest security update

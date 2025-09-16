@@ -143,3 +143,145 @@ def create_provider_from_session() -> Firm | None:
             )
 
     return firm
+
+
+def create_barrister_from_form_data(
+    barrister_name: str, barrister_level: str, bar_council_roll_number: str, parent_firm_id: int
+) -> Firm:
+    """Create a new barrister provider from form data."""
+    firm_data = {
+        "firm_name": barrister_name,
+        "firm_type": "Barrister",
+        "solicitor_advocate": "No",
+        "advocate_level": barrister_level,
+        "bar_council_roll": bar_council_roll_number,
+        "parent_firm_id": parent_firm_id,
+    }
+
+    firm = Firm(**firm_data)
+    new_firm = add_new_provider(firm)
+
+    # Create head office with same address as parent chambers
+    _create_head_office_from_parent(new_firm.firm_id, parent_firm_id)
+
+    return new_firm
+
+
+def create_advocate_from_form_data(
+    advocate_name: str, advocate_level: str, sra_roll_number: str, parent_firm_id: int
+) -> Firm:
+    """Create a new advocate provider from form data."""
+    firm_data = {
+        "firm_name": advocate_name,
+        "firm_type": "Advocate",
+        "solicitor_advocate": "Yes",
+        "advocate_level": advocate_level,
+        "bar_council_roll": sra_roll_number,
+        "parent_firm_id": parent_firm_id,
+    }
+
+    firm = Firm(**firm_data)
+    new_firm = add_new_provider(firm)
+
+    # Create head office with same address as parent chambers
+    _create_head_office_from_parent(new_firm.firm_id, parent_firm_id)
+
+    return new_firm
+
+
+def replicate_office_for_child_firm(source_office: Office, new_firm_id: int, as_head_office: bool = True) -> Office:
+    """Replicate an office for a child firm using the source office's address details.
+
+    Args:
+        source_office: The office to replicate from
+        new_firm_id: The ID of the new firm to create the office for
+        as_head_office: Whether the new office should be marked as a head office
+
+    Returns:
+        New Office object with same address but fresh IDs
+    """
+    # Fields to exclude when replicating (will be auto-generated or set differently)
+    exclude_fields = {
+        "firm_office_id",
+        "ccms_firm_office_id",
+        "firm_office_code",
+        "creation_date",  # Should be current date for new office
+    }
+
+    # Get all office data
+    office_data = source_office.to_internal_dict()
+
+    # Remove excluded fields
+    for field in exclude_fields:
+        office_data.pop(field, None)
+
+    # Set head office status based on parameter
+    if as_head_office:
+        office_data["head_office"] = "N/A"
+        office_data["is_head_office"] = True
+    else:
+        office_data["is_head_office"] = False
+
+    # Create new office
+    new_office = Office(**office_data)
+    return add_new_office(new_office, firm_id=new_firm_id, show_success_message=False)
+
+
+def _create_head_office_from_parent(new_firm_id: int, parent_firm_id: int) -> Office:
+    """Create a head office for a new barrister/advocate using the parent chambers' head office address and contacts."""
+    pda = current_app.extensions.get("pda")
+    if not pda:
+        raise RuntimeError("Provider Data API not initialized")
+
+    # Get the parent firm's head office
+    parent_offices = pda.get_provider_offices(parent_firm_id)
+    parent_head_office = None
+
+    for office in parent_offices:
+        if office.get_is_head_office():
+            parent_head_office = office
+            break
+
+    if not parent_head_office:
+        raise RuntimeError(f"No head office found for parent firm {parent_firm_id}")
+
+    # Create the new office
+    new_office = replicate_office_for_child_firm(parent_head_office, new_firm_id, as_head_office=True)
+
+    # Copy contacts from parent office to new office
+    _replicate_office_contacts(
+        parent_firm_id, parent_head_office.firm_office_code, new_firm_id, new_office.firm_office_code
+    )
+
+    return new_office
+
+
+def _replicate_office_contacts(
+    source_firm_id: int, source_office_code: str, target_firm_id: int, target_office_code: str
+) -> list[Contact]:
+    """Replicate contacts from a source office to a target office."""
+    pda = current_app.extensions.get("pda")
+    if not pda:
+        raise RuntimeError("Provider Data API not initialized")
+
+    # Get contacts from source office
+    source_contacts = pda.get_office_contacts(source_firm_id, source_office_code)
+
+    if not source_contacts:
+        return []
+
+    replicated_contacts = []
+
+    for contact in source_contacts:
+        # Copy contact data, excluding fields that should be fresh for new office
+        contact_data = contact.to_internal_dict()
+        contact_data.pop("vendor_site_id", None)  # Will be set to new office ID
+
+        # Create new contact for target office
+        new_contact = Contact(**contact_data)
+        replicated_contact = add_new_contact(
+            new_contact, firm_id=target_firm_id, office_code=target_office_code, show_success_message=False
+        )
+        replicated_contacts.append(replicated_contact)
+
+    return replicated_contacts
