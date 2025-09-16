@@ -15,10 +15,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     gcc \
     python3-dev \
-    libpq-dev \
-    libxml2 \
-    libxslt1.1 \
-    libxslt1-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Clean up cached package files & index files for a smaller image size
