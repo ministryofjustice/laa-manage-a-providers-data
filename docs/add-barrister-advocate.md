@@ -13,7 +13,7 @@ When a barrister/advocate is created, three entities are generated:
 - **firm_type**: "Barrister" or "Advocate" 
 - **solicitor_advocate**: "No" for barristers, "Yes" for advocates
 - **advocate_level**: Selected from form
-- **bar_council_roll**: Bar council roll number of barristers or Solicitors Regulation Authority roll number for advocates
+- **bar_council_roll**: Bar council roll number for barristers or Solicitors Regulation Authority roll number for advocates
 - **parent_firm_id**: Links to parent chambers
 
 #### 2. Head Office (Replicated from Chamber's head office)
