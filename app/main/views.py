@@ -14,6 +14,7 @@ from app.utils.formatting import (
     format_date,
     format_firm_type,
     format_head_office,
+    format_office_address_multi_line_html,
     format_office_address_one_line,
     format_yes_no,
 )
@@ -133,6 +134,32 @@ class ViewProvider(MethodView):
             office_tables.update({"other": other_offices_data_table})
 
         return office_tables
+
+    def get_chambers_contact_details_table(self, firm, head_office: Office) -> TransposedDataTable:
+        """Gets information about the chambers head office"""
+        contact_details_table_structure = []
+        contact_details_data = {}
+
+        add_field(
+            contact_details_table_structure,
+            contact_details_data,
+            "test",
+            "Address",
+            html=format_office_address_multi_line_html(head_office),
+        )
+        add_field(contact_details_table_structure, contact_details_data, head_office.email_address, "Email address")
+        add_field(
+            contact_details_table_structure, contact_details_data, head_office.telephone_number, "Telephone number"
+        )
+        add_field(contact_details_table_structure, contact_details_data, head_office.dx_number, "DX number")
+        add_field(contact_details_table_structure, contact_details_data, head_office.dx_centre, "DX centre")
+
+        contact_details_table = (
+            TransposedDataTable(structure=contact_details_table_structure, data=contact_details_data)
+            if contact_details_data
+            else None
+        )
+        return contact_details_table
 
     def get_contact_tables(self, firm: Firm, head_office: Office = None) -> list[DataTable]:
         if not head_office or not firm.firm_id:
@@ -276,7 +303,12 @@ class ViewProvider(MethodView):
             context.update({"office_tables": office_tables})
 
         if self.subpage == "contact":
+            if firm.firm_type == "Chambers" and head_office:
+                context.update({"contact_details_table": self.get_chambers_contact_details_table(firm, head_office)})
+
             context.update({"contact_tables": self.get_contact_tables(firm, head_office)})
+            if firm.firm_type == "Chambers" and head_office:
+                context.update({"contact_details_table": self.get_chambers_contact_details_table(firm, head_office)})
 
         if self.subpage == "barristers-and-advocates":
             context.update({"barristers_table": self.get_barristers_table(firm)})
