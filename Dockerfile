@@ -10,24 +10,13 @@ RUN npm run build
 
 FROM $BASE_IMAGE AS base
 ARG REQUIREMENTS_FILE=requirements-production.txt
-# Update package directory and install latest versions, then clean apt lists
-RUN apt-get update \
-    && apt-get install  --only-upgrade -y \
-    perl-base \
-    libxslt1.1 \
-    libxslt1-dev \
-    libc-bin \
-    linux-libc-dev \
-    libexpat1 \
-    libperl5.36 \
-    libpq-dev \
-    libsqlite3-0 \
-    libxml2 \
-    imagemagick \
-    && rm -rf /var/lib/apt/lists/*
-
-# Update package lists and install required packages
+# Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    gcc \
+    python3-dev \
+    libpq-dev \
+    libxml2 \
     libxslt1.1 \
     libxslt1-dev \
     && rm -rf /var/lib/apt/lists/*
