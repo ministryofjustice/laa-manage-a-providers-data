@@ -342,7 +342,7 @@ class ViewOffice(MethodView):
             data,
             value,
             "VAT registration number",
-            html=f"<a class='govuk-link', href='#'>Add VAT registration number</a>"
+            html="<a class='govuk-link', href='#'>Add VAT registration number</a>"
             if replace_value_with_add_link
             else None,
         )
