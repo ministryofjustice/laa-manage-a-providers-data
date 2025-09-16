@@ -131,3 +131,39 @@ def test_lsp_contact(page):
     expect(page.locator("dl")).to_contain_text("Website")
     expect(page.locator("dl")).to_contain_text("Active from")
     expect(page.get_by_role("link", name="Change liaison manager")).to_be_visible()
+
+
+@pytest.mark.usefixtures("live_server")
+def test_back_link_lsp(page):
+    page.get_by_role("button", name="Start now").click()
+    # Perform a blank search to view all providers
+    page.get_by_role("button", name="Search").click()
+    page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
+
+    page.get_by_role("link", name="Back to all providers").click()
+    expect(page.get_by_role("heading", name="Provider records")).to_be_visible()
+
+    page.get_by_role("button", name="Search").click()
+    page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
+
+    page.get_by_role("link", name="Offices").click()
+    page.get_by_role("link", name="Back to all providers").click()
+    expect(page.get_by_role("heading", name="Provider records")).to_be_visible()
+
+
+@pytest.mark.usefixtures("live_server")
+def test_back_link_chambers(page):
+    page.get_by_role("button", name="Start now").click()
+    # Perform a blank search to view all providers
+    page.get_by_role("button", name="Search").click()
+    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
+
+    page.get_by_role("link", name="Back to all providers").click()
+    expect(page.get_by_role("heading", name="Provider records")).to_be_visible()
+
+    page.get_by_role("button", name="Search").click()
+    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
+
+    page.get_by_role("link", name="Barristers and advocates").click()
+    page.get_by_role("link", name="Back to all providers").click()
+    expect(page.get_by_role("heading", name="Provider records")).to_be_visible()
