@@ -2,6 +2,7 @@ from flask import Response, abort, redirect, render_template, request, session, 
 
 from app.constants import PARENT_FIRM_TYPE_CHOICES
 from app.main.add_a_new_provider import AssignChambersForm
+from app.main.utils import create_advocate_from_form_data, create_barrister_from_form_data
 from app.models import Firm
 from app.views import BaseFormView, FullWidthBaseFormView
 
@@ -372,5 +373,73 @@ class AssignContractManagerFormView(BaseFormView):
 
         if form.validate_on_submit():
             return self.form_valid(form)
+        else:
+            return self.form_invalid(form, **kwargs)
+
+
+class AddBarristerFormView(BaseFormView):
+    """Form view for the add barrister form"""
+
+    def get_success_url(self, form, firm):
+        return url_for("main.view_provider_barristers_and_advocates", firm=firm)
+
+    def get_chambers_or_abort(self, firm):
+        if not firm or firm.firm_type != "Chambers":
+            abort(404)
+
+    def form_valid(self, form, firm):
+        create_barrister_from_form_data(
+            barrister_name=form.data.get("barrister_name"),
+            barrister_level=form.data.get("barrister_level"),
+            bar_council_roll_number=form.data.get("bar_council_roll_number"),
+            parent_firm_id=firm.firm_id,
+        )
+        return redirect(self.get_success_url(form, firm))
+
+    def get(self, context, firm, **kwargs):
+        self.get_chambers_or_abort(firm)
+        form = self.get_form_class()(firm=firm)
+        return render_template(self.get_template(), **self.get_context_data(form, **kwargs))
+
+    def post(self, context, firm, **kwargs) -> Response | str:
+        self.get_chambers_or_abort(firm)
+        form = self.get_form_class()(firm=firm)
+
+        if form.validate_on_submit():
+            return self.form_valid(form, firm)
+        else:
+            return self.form_invalid(form, **kwargs)
+
+
+class AddAdvocateFormView(BaseFormView):
+    """Form view for the add advocate form"""
+
+    def get_success_url(self, form, firm):
+        return url_for("main.view_provider_barristers_and_advocates", firm=firm)
+
+    def get_chambers_or_abort(self, firm):
+        if not firm or firm.firm_type != "Chambers":
+            abort(404)
+
+    def form_valid(self, form, firm):
+        create_advocate_from_form_data(
+            advocate_name=form.data.get("advocate_name"),
+            advocate_level=form.data.get("advocate_level"),
+            sra_roll_number=form.data.get("sra_roll_number"),
+            parent_firm_id=firm.firm_id,
+        )
+        return redirect(self.get_success_url(form, firm))
+
+    def get(self, context, firm, **kwargs):
+        self.get_chambers_or_abort(firm)
+        form = self.get_form_class()(firm=firm)
+        return render_template(self.get_template(), **self.get_context_data(form, **kwargs))
+
+    def post(self, context, firm, **kwargs) -> Response | str:
+        self.get_chambers_or_abort(firm)
+        form = self.get_form_class()(firm=firm)
+
+        if form.validate_on_submit():
+            return self.form_valid(form, firm)
         else:
             return self.form_invalid(form, **kwargs)

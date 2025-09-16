@@ -79,11 +79,11 @@ def test_view_provider_contacts_summary_list_structure(page: Page):
     page.goto(url_for("main.view_provider_contact", firm=2, _external=True))
 
     # Check that required fields are present in the summary list
-    expect(page.get_by_text("Job title")).to_be_visible()
-    expect(page.get_by_text("Telephone number")).to_be_visible()
-    expect(page.get_by_text("Email address")).to_be_visible()
-    expect(page.get_by_text("Website")).to_be_visible()
-    expect(page.get_by_text("Active from")).to_be_visible()
+    expect(page.locator("dl")).to_contain_text("Job title")
+    expect(page.locator("dl")).to_contain_text("Telephone number")
+    expect(page.locator("dl")).to_contain_text("Email address")
+    expect(page.locator("dl")).to_contain_text("Website")
+    expect(page.locator("dl")).to_contain_text("Active from")
 
 
 @pytest.mark.usefixtures("live_server")

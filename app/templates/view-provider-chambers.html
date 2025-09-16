@@ -6,7 +6,6 @@
     "text": "Make chambers inactive",
     "classes": "govuk-button--secondary",
   }) }}
-
 {% endblock %}
 
 {% block firmTypeSubNavigation %}
@@ -26,22 +25,26 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {% if subpage == "contact" %}
-       {{ contactCards(contact_tables) }}
+        {% if contact_details_table %}
+          <h3 class="govuk-heading-m">Contact details</h3>
+          {{ govukTable(contact_details_table.to_govuk_params()) }}
+        {% endif %}
+        {{ contactCards(contact_tables) }}
       {% endif %}
-
+      
       {% if subpage == "barristers-and-advocates" %}
         {% if barristers_table %}
             <h3 class="govuk-heading-m">Barristers</h3>
             {{ govukTable(barristers_table.to_govuk_params()) }}
             {{ govukButton({
                 "text": "Add another barrister",
-
+                "href": url_for("main.add_barrister_form", firm=firm)
             }) }}
         {% else %}
             <h3 class="govuk-heading-m">No barristers assigned to this chambers</h3>
             {{ govukButton({
                 "text": "Add a barrister",
-
+                "href": url_for("main.add_barrister_form", firm=firm)
             }) }}
         {% endif %}
 
@@ -50,17 +53,16 @@
             {{ govukTable(advocates_table.to_govuk_params()) }}
             {{ govukButton({
                 "text": "Add another advocate",
-
+                "href": url_for("main.add_advocate_form", firm=firm)
             }) }}
         {% else %}
             <h3 class="govuk-heading-m">No advocates assigned to this chambers</h3>
             {{ govukButton({
                 "text": "Add an advocate",
-
+                "href": url_for("main.add_advocate_form", firm=firm)
             }) }}
         {% endif %}
       {% endif %}
     </div>
   </div>
-
 {% endblock %}

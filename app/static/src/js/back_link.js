@@ -6,6 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!backButton) {
         return;
     }
+
+    if (backButton.hasAttribute("href")) {
+        return;
+    }
     
     backButton.addEventListener('click', (e) => {
         e.preventDefault();
