@@ -1,5 +1,5 @@
 import logging
-from typing import Literal, NoReturn, List, Dict
+from typing import Dict, List, Literal, NoReturn
 
 from flask import abort, current_app, redirect, render_template, request, url_for
 from flask.views import MethodView
@@ -171,15 +171,12 @@ class ViewProvider(MethodView):
         return contact_tables
 
     @staticmethod
-    def child_firm_office_html(row_data: dict[str, str]) -> str:
+    def get_account_number_or_default(account_number: str | None) -> str:
         """
-        Renders the office account number as a link using an extra `office_firm` attribute in the data to link to the
-        firm.
+        Renders the office account number, defaulting to "Unknown" if no account number is provided.
         """
-        _office_code = row_data.get("account_number", "")
-        _office_firm = row_data.get("_account_number_firm_id", "")
-        if _office_code not in (None, ""):
-            return f"<a class='govuk-link' href='{url_for('main.view_office', firm=_office_firm, office=_office_code)}'>{_office_code}</a>"
+        if account_number not in (None, ""):
+            return account_number
         return "Unknown"
 
     def get_child_firm_office_table_data(self, child_firms: List[Firm]) -> List[Dict]:
@@ -221,7 +218,7 @@ class ViewProvider(MethodView):
 
         columns: list[TableStructure] = [
             {"text": "Name", "id": "firm_name", "html_renderer": firm_name_html},
-            {"text": "Account number", "id": "account_number", "html_renderer": self.child_firm_office_html},
+            {"text": "Account number", "id": "account_number", "format_text": self.get_account_number_or_default},
             {"text": "Bar Council roll number", "id": "bar_council_roll"},
             {"text": "Status", "html_renderer": get_firm_statuses},  # Add status tags here when available.
         ]
@@ -239,7 +236,7 @@ class ViewProvider(MethodView):
 
         columns: list[TableStructure] = [
             {"text": "Name", "id": "firm_name", "html_renderer": firm_name_html},
-            {"text": "Account number", "id": "firm_office_code", "html_renderer": self.child_firm_office_html},
+            {"text": "Account number", "id": "firm_office_code", "format_text": self.get_account_number_or_default},
             {"text": "SRA roll number", "id": "bar_council_roll"},
             {"text": "Status", "html_renderer": get_firm_statuses},  # Add status tags here when available.
         ]
