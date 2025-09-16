@@ -31,10 +31,38 @@
         {% endif %}
         {{ contactCards(contact_tables) }}
       {% endif %}
-  {% endif %}
-
+      
       {% if subpage == "barristers-and-advocates" %}
+        {% if barristers_table %}
+            <h3 class="govuk-heading-m">Barristers</h3>
+            {{ govukTable(barristers_table.to_govuk_params()) }}
+            {{ govukButton({
+                "text": "Add another barrister",
 
-        <h3 class="govuk-heading-m">Barristers and advocates</h3>
+            }) }}
+        {% else %}
+            <h3 class="govuk-heading-m">No barristers assigned to this chambers</h3>
+            {{ govukButton({
+                "text": "Add a barrister",
+
+            }) }}
+        {% endif %}
+
+        {% if advocates_table %}
+            <h3 class="govuk-heading-m">Advocates</h3>
+            {{ govukTable(advocates_table.to_govuk_params()) }}
+            {{ govukButton({
+                "text": "Add another advocate",
+
+            }) }}
+        {% else %}
+            <h3 class="govuk-heading-m">No advocates assigned to this chambers</h3>
+            {{ govukButton({
+                "text": "Add an advocate",
+
+            }) }}
+        {% endif %}
       {% endif %}
+    </div>
+  </div>
 {% endblock %}
