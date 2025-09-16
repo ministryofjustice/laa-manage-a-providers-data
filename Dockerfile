@@ -13,8 +13,6 @@ ARG REQUIREMENTS_FILE=requirements-production.txt
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
-    gcc \
-    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Clean up cached package files & index files for a smaller image size
