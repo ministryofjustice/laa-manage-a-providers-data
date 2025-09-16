@@ -9,6 +9,7 @@ from app.constants import (
     CONSTITUTIONAL_STATUS_CHOICES,
     PARENT_FIRM_TYPE_CHOICES,
     YES_NO_CHOICES,
+    PAYMENT_METHOD_CHOICES,
 )
 from app.fields import GovUKTableRadioField
 from app.validators import (
@@ -560,3 +561,4 @@ class AddAdvocateForm(BaseForm):
             Length(max=15, message="Solicitors Regulation Authority roll number must be 15 characters or less"),
         ],
     )
+

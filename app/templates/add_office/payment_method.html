@@ -1,0 +1,24 @@
+{% extends 'form.html' %}
+
+{%- from 'govuk_frontend_jinja/components/button/macro.html' import govukButton -%}
+
+{% block form %}
+  {{ form.hidden_tag() }}
+  {% if not form | has_page_heading %}
+    {% if office_code and address %}
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Office: {{ office_code }}</h1>
+      <p class="govuk-body">{{ address }}</p>
+    {% endif %}
+    <h1 class="govuk-heading-xl">{{ form.title }}</h1>
+  {% endif %}
+
+  {{ form.payment_method }}
+
+  {% set submitButtonText = form.submit_button_text or "Continue" %}
+
+  <div class="govuk-button-group">
+    {{ govukButton({
+      'text': submitButtonText
+    }) }}
+  </div>
+{% endblock %}

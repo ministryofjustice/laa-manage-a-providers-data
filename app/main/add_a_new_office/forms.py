@@ -3,9 +3,9 @@ from wtforms.fields.choices import RadioField
 from wtforms.fields.simple import StringField
 from wtforms.validators import Email, InputRequired, Length, Optional
 
-from app.constants import YES_NO_CHOICES
+from app.constants import YES_NO_CHOICES, PAYMENT_METHOD_CHOICES
 from app.forms import BaseForm
-from app.models import Firm
+from app.models import Firm, Office
 from app.validators import ValidatePostcode
 from app.widgets import GovRadioInput, GovTextInput
 
@@ -18,14 +18,13 @@ class AddOfficeForm(BaseForm):
 
     def __init__(self, firm: Firm, *args, **kwargs):
         self.firm = firm
-        super(AddOfficeForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def caption(self):
-        if not self.firm:
-            return "Unknown"
-
-        return self.firm.firm_name
+        if self.firm:
+            return self.firm.firm_name
+        return "Unknown office"
 
     office_name = StringField(
         "Office name",
@@ -152,4 +151,51 @@ class OfficeContactDetailsForm(BaseForm):
             Optional(),
             Length(max=50, message="DX centre must be 50 characters or fewer"),
         ],
+    )
+
+class PaymentMethodForm(BaseForm):
+    title = "Payment method"
+    url = "provider/<firm:firm>/office/<office:office>/payment-method"
+    template = "add_office/payment_method.html"
+    submit_button_text = "Save"
+
+    def __init__(self, firm=None, office=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.firm = firm
+        self.office = office
+
+    @property
+    def caption(self):
+        if not self.firm:
+            return "Unknown office"
+            
+        if not self.office:
+            return self.firm.firm_name
+            
+        # Get office code to display to user
+        office_code = getattr(self.office, 'firm_office_code')
+        
+        address_parts = [
+            self.office.address_line_1,
+            self.office.address_line_2,
+            self.office.address_line_3,
+            self.office.address_line_4,
+            self.office.city,
+            self.office.county,
+            self.office.postcode
+        ]
+        
+        # Join non-empty parts with commas
+        address = ", ".join(part for part in address_parts if part)
+        
+        return {
+            'office_code': office_code,
+            'address': address
+        }
+
+    payment_method = RadioField(
+        "Payment method",
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
+        validators=[InputRequired(message="Select a payment method")],
+        choices=PAYMENT_METHOD_CHOICES,
     )

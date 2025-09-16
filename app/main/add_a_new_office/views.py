@@ -86,3 +86,46 @@ class OfficeContactDetailsFormView(BaseFormView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form, **kwargs)
+
+class PaymentMethodFormView(BaseFormView):
+    """Form view for the payment method form""" 
+
+    def get_success_url(self, form, firm, office=None):
+        if office:
+            return url_for("main.view_office", firm=firm.firm_id, office_id=office.office_id)
+        return url_for("main.view_office", firm=firm.firm_id)
+    
+    def form_valid(self, form): 
+        if not hasattr(form, 'firm') or not hasattr(form, 'office'):
+            abort(400)
+
+        # Update the office with payment method
+        form.office.payment_method = form.data.get("payment_method")
+        form.office.save()
+
+        return redirect(self.get_success_url(form.firm, form.office))
+
+    def get(self, context, firm: Firm, office: Office = None, **kwargs):
+        if not office:
+            abort(404)
+
+        form = self.get_form_class()(firm=firm, office=office)
+        context = self.get_context_data(form, **kwargs)
+        
+        # Add caption data to context if it's a dictionary
+        caption_data = form.caption
+        if isinstance(caption_data, dict):
+            context.update(caption_data)
+            
+        return render_template(self.template, **context)
+
+    def post(self, firm: Firm, office: Office = None, *args, **kwargs) -> Response | str:
+        if not office:
+            abort(404)
+            
+        form = self.get_form_class()(firm=firm, office=office)
+
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form, **kwargs)

@@ -1,6 +1,6 @@
 from app.main import bp
-from app.main.add_a_new_office.forms import AddOfficeForm, OfficeContactDetailsForm
-from app.main.add_a_new_office.views import AddOfficeFormView, OfficeContactDetailsFormView
+from app.main.add_a_new_office.forms import AddOfficeForm, OfficeContactDetailsForm, PaymentMethodForm
+from app.main.add_a_new_office.views import AddOfficeFormView, OfficeContactDetailsFormView, PaymentMethodFormView
 from app.utils import register_form_view
 
 
@@ -11,6 +11,12 @@ def register_views():
         view_class=OfficeContactDetailsFormView,
         blueprint=bp,
         endpoint="add_office_contact_details",
+    )
+    register_form_view(
+        form_class=PaymentMethodForm,
+        view_class=PaymentMethodFormView,
+        blueprint=bp,
+        endpoint="payment_method_form",
     )
 
 
