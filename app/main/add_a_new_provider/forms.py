@@ -499,7 +499,7 @@ class AddBarristerForm(BaseForm):
         "Barrister name",
         widget=GovTextInput(heading_class="govuk-fieldset__legend--s", classes="govuk-!-width-one-half"),
         validators=[
-            InputRequired(message="Enter barrister name"),
+            InputRequired(message="Enter the barrister name"),
             Length(max=255, message="Barrister name must be 255 characters or less"),
         ],
     )
@@ -508,14 +508,14 @@ class AddBarristerForm(BaseForm):
         "Barrister level",
         widget=GovRadioInput(heading_class="govuk-fieldset__legend--s"),
         choices=ADVOCATE_LEVEL_CHOICES,
-        validators=[InputRequired(message="Select barrister level")],
+        validators=[InputRequired(message="Select the barrister level")],
     )
 
     bar_council_roll_number = StringField(
         "Bar Council roll number",
         widget=GovTextInput(heading_class="govuk-fieldset__legend--s", classes="govuk-!-width-one-half"),
         validators=[
-            InputRequired(message="Enter Bar Council roll number"),
+            InputRequired(message="Enter the Bar Council roll number"),
             Length(max=15, message="Bar Council roll number must be 15 characters or less"),
         ],
     )
@@ -540,7 +540,7 @@ class AddAdvocateForm(BaseForm):
         "Advocate name",
         widget=GovTextInput(heading_class="govuk-fieldset__legend--s", classes="govuk-!-width-one-half"),
         validators=[
-            InputRequired(message="Enter advocate name"),
+            InputRequired(message="Enter the advocate name"),
             Length(max=255, message="Advocate name must be 255 characters or less"),
         ],
     )
@@ -549,14 +549,14 @@ class AddAdvocateForm(BaseForm):
         "Advocate level",
         widget=GovRadioInput(heading_class="govuk-fieldset__legend--s"),
         choices=ADVOCATE_LEVEL_CHOICES,
-        validators=[InputRequired(message="Select advocate level")],
+        validators=[InputRequired(message="Select the advocate level")],
     )
 
     sra_roll_number = StringField(
-        "SRA roll number",
+        "Solicitors Regulation Authority roll number",
         widget=GovTextInput(heading_class="govuk-fieldset__legend--s", classes="govuk-!-width-one-half"),
         validators=[
-            InputRequired(message="Enter SRA roll number"),
-            Length(max=15, message="SRA roll number must be 15 characters or less"),
+            InputRequired(message="Enter the Solicitors Regulation Authority roll number"),
+            Length(max=15, message="Solicitors Regulation Authority roll number must be 15 characters or less"),
         ],
     )

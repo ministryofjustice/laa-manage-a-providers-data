@@ -51,9 +51,9 @@ def test_add_barrister_validation_errors(page: Page) -> None:
     page.get_by_role("button", name="Submit").click()
 
     # Check validation error messages
-    expect(page.locator("#main-content")).to_contain_text("Enter barrister name")
-    expect(page.locator("#main-content")).to_contain_text("Select barrister level")
-    expect(page.locator("#main-content")).to_contain_text("Enter Bar Council roll number")
+    expect(page.locator("#main-content")).to_contain_text("Enter the barrister name")
+    expect(page.locator("#main-content")).to_contain_text("Select the barrister level")
+    expect(page.locator("#main-content")).to_contain_text("Enter the Bar Council roll number")
 
 
 @pytest.mark.usefixtures("live_server")
@@ -92,7 +92,7 @@ def test_add_advocate_form_loads_from_chambers(page: Page) -> None:
     expect(page.get_by_role("heading", name="Advocate details")).to_be_visible()
     expect(page.get_by_text("Advocate name")).to_be_visible()
     expect(page.get_by_text("Advocate level")).to_be_visible()
-    expect(page.get_by_text("SRA roll number")).to_be_visible()
+    expect(page.get_by_text("Solicitors Regulation Authority roll number")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -108,9 +108,9 @@ def test_add_advocate_validation_errors(page: Page) -> None:
     page.get_by_role("button", name="Submit").click()
 
     # Check validation error messages
-    expect(page.locator("#main-content")).to_contain_text("Enter advocate name")
-    expect(page.locator("#main-content")).to_contain_text("Select advocate level")
-    expect(page.locator("#main-content")).to_contain_text("Enter SRA roll number")
+    expect(page.locator("#main-content")).to_contain_text("Enter the advocate name")
+    expect(page.locator("#main-content")).to_contain_text("Select the advocate level")
+    expect(page.locator("#main-content")).to_contain_text("Enter the Solicitors Regulation Authority roll number")
 
 
 @pytest.mark.usefixtures("live_server")
@@ -126,7 +126,7 @@ def test_add_advocate_successful_submission(page: Page) -> None:
     # Fill out the form
     page.get_by_label("Advocate name").fill("Jane Doe")
     page.get_by_role("radio", name="King's Counsel").click()
-    page.get_by_label("SRA roll number").fill("67890")
+    page.get_by_label("Solicitors Regulation Authority roll number").fill("67890")
 
     page.get_by_role("button", name="Submit").click()
 
@@ -173,13 +173,15 @@ def test_add_advocate_field_validation_lengths(page: Page) -> None:
     long_roll_number = "1" * 16  # Over 15-character limit
 
     page.get_by_label("Advocate name").fill(long_name)
-    page.get_by_label("SRA roll number").fill(long_roll_number)
+    page.get_by_label("Solicitors Regulation Authority roll number").fill(long_roll_number)
     page.get_by_role("radio", name="Junior").click()
 
     page.get_by_role("button", name="Submit").click()
 
     expect(page.locator("#main-content")).to_contain_text("Advocate name must be 255 characters or less")
-    expect(page.locator("#main-content")).to_contain_text("SRA roll number must be 15 characters or less")
+    expect(page.locator("#main-content")).to_contain_text(
+        "Solicitors Regulation Authority roll number must be 15 characters or less"
+    )
 
 
 @pytest.mark.usefixtures("live_server")

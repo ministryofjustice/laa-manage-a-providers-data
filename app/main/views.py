@@ -237,7 +237,7 @@ class ViewProvider(MethodView):
         columns: list[TableStructure] = [
             {"text": "Name", "id": "firm_name", "html_renderer": firm_name_html},
             {"text": "Account number", "id": "firm_office_code", "format_text": self.get_account_number_or_default},
-            {"text": "SRA roll number", "id": "bar_council_roll"},
+            {"text": "Solicitors Regulation Authority roll number", "id": "bar_council_roll"},
             {"text": "Status", "html_renderer": get_firm_statuses},  # Add status tags here when available.
         ]
 
