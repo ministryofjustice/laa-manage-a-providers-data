@@ -18,7 +18,7 @@
     }, {
       "text": "Barristers and advocates",
       "href": url_for("main.view_provider_barristers_and_advocates", firm=firm),
-      "active": subpage == "barristers-and-advocates"
+      "active": subpage == "barristers-advocates"
     }]
   }) }}
 
@@ -32,7 +32,7 @@
         {{ contactCards(contact_tables) }}
       {% endif %}
       
-      {% if subpage == "barristers-and-advocates" %}
+      {% if subpage == "barristers-advocates" %}
         {% if barristers_table %}
             <h3 class="govuk-heading-m">Barristers</h3>
             {{ govukTable(barristers_table.to_govuk_params()) }}

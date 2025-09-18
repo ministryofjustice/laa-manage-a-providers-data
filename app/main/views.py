@@ -154,7 +154,7 @@ class ViewProvider(MethodView):
         ],
     }
 
-    def __init__(self, subpage: Literal["contact", "offices", "barristers-and-advocates"] = "contact"):
+    def __init__(self, subpage: Literal["contact", "offices", "barristers-advocates"] = "contact"):
         if subpage:
             self.subpage = subpage
 
@@ -398,7 +398,7 @@ class ViewProvider(MethodView):
             if firm.firm_type == "Chambers" and head_office:
                 context.update({"contact_details_table": self.get_chambers_contact_details_table(firm, head_office)})
 
-        if self.subpage == "barristers-and-advocates":
+        if self.subpage == "barristers-advocates":
             context.update({"barristers_table": self.get_barristers_table(firm)})
             context.update({"advocates_table": self.get_advocates_table(firm)})
 
