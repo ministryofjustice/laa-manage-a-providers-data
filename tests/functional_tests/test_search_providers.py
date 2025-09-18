@@ -4,7 +4,7 @@ from playwright.sync_api import expect
 
 @pytest.mark.usefixtures("live_server")
 def test_search_providers_page_ui_loads(page):
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
     expect(page.get_by_role("heading", name="Provider records")).to_be_visible()
     expect(page.get_by_text("Find a provider")).to_be_visible()
     expect(page.get_by_text("You can search by name,")).to_be_visible()
@@ -21,7 +21,7 @@ def test_search_providers_page_ui_loads(page):
 
 @pytest.mark.usefixtures("live_server")
 def test_empty_search_shows_all_providers(page):
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
     page.get_by_role("button", name="Search").click()
     expect(page.get_by_role("columnheader", name="Provider name")).to_be_visible()
     expect(page.get_by_role("columnheader", name="Provider type")).to_be_visible()
@@ -32,7 +32,7 @@ def test_empty_search_shows_all_providers(page):
 
 @pytest.mark.usefixtures("live_server")
 def test_search_shows_correct__providers(page):
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
     page.get_by_role("textbox", name="Find a provider").fill("Metro")
     page.get_by_role("button", name="Search").click()
     expect(page.get_by_role("heading", name="search result for ‘Metro’")).to_be_visible()
@@ -45,7 +45,7 @@ def test_search_shows_correct__providers(page):
 
 @pytest.mark.usefixtures("live_server")
 def test_invalid_search_shows_error_message(page):
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
     page.get_by_role("textbox", name="Find a provider").fill("INVALID")
     page.get_by_role("button", name="Search").click()
     expect(
