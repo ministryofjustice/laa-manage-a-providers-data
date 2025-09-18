@@ -176,6 +176,11 @@ class ViewProvider(MethodView):
             # Apply default if value is None or empty string, assuming hide_if_null is False
             if value in (None, "") and not field.get("hide_if_null", False):
                 value = field.get("default", "No data")
+            else:
+                if formatter := field.get("formatter"):
+                    if not isinstance(formatter, Callable):
+                        raise ValueError(f"{formatter} is not a callable")
+                    value = formatter(value)
 
             # Render the HTML if required
             if html_renderer := field.get("html_renderer"):
@@ -188,7 +193,6 @@ class ViewProvider(MethodView):
                 main_data,
                 value=value,
                 label=field.get("label"),
-                formatter=field.get("formatter"),
                 html=field.get("html"),
             )
 
