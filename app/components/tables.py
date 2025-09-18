@@ -153,10 +153,22 @@ class TransposedDataTable(DataTable):
         data: Data | RowData,
         headings: list[str] | None = None,
         card: Card | None = None,
+        change_link: Callable | None = None,
     ) -> None:
-        """Helper class for generating the head and rows required for displaying transposed GOV.UK Tables."""
+        """
+        Helper class for generating the head and rows required for displaying transposed GOV.UK Tables.
+
+        Args:
+            structure:
+            data:
+            headings:
+            card:
+            change_link: Optional callable which adds an extra cell containing the output of
+            a call to the `change_link` with the row data.
+        """
         super().__init__(structure, data)
         self.card = card
+        self.change_link = change_link
 
         if headings is not None:
             expected_heading_count = len(self.data) + 1
@@ -182,6 +194,16 @@ class TransposedDataTable(DataTable):
             for row_data in self.data:
                 cell = self._get_cell(header=structure_item, row_data=row_data)
                 row_cells.append(cell)
+
+                # If we have a callable method to create a link...
+                if callable(self.change_link):
+                    # ...and the method has enough data to create a link...
+                    change_link = self.change_link(row_data)
+                    if change_link:
+                        # ...add an extra cell with the link to change it.
+                        row_cells.append(
+                            {"text": "Change", "classes": structure_item.get("classes", ""), "html": change_link}
+                        )
 
             rows.append(row_cells)
 
