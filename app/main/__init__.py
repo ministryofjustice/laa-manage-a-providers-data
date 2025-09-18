@@ -25,6 +25,10 @@ bp.add_url_rule(
     "/provider/<firm:firm>/barristers-and-advocates",
     view_func=ViewProvider.as_view("view_provider_barristers_and_advocates", subpage="barristers-and-advocates"),
 )
+bp.add_url_rule(
+    "/provider/<firm:firm>/bank-accounts-and-payments",
+    view_func=ViewProvider.as_view("view_provider_bank_accounts_payments", subpage="bank-accounts-payments"),
+)
 
 bp.add_url_rule("/provider/<firm:firm>/office/<office:office>", view_func=ViewOffice.as_view("view_office"))
 bp.add_url_rule(

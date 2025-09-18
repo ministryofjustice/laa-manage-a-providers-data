@@ -1,0 +1,69 @@
+{% extends 'view-provider.html' %}
+{% from 'macros/contact_tables.html' import contactCards %}
+{%- from "govuk_frontend_jinja/components/breadcrumbs/macro.html" import govukBreadcrumbs -%}
+
+{% block beforeContent %}
+  {% if parent_provider %}
+    {{ govukBreadcrumbs({
+      "items": [
+        {
+          "text": parent_provider.firm_name,
+          "href": url_for("main.view_provider", firm=parent_provider)
+        },
+        {
+          "text": firm.firm_name,
+          "href": url_for("main.view_provider", firm=firm)
+        }]
+    }) }}
+  {% else %}
+    {# Fallback if no Firm has no associated Chambers #}
+    {{ govukBackLink({"text": "Back to all providers", "href": url_for("main.providers") }) }}
+  {% endif %}
+{% endblock %}
+
+{% block actionButtons %}
+  {{ govukButton({
+    "text": "Make inactive",
+    "classes": "govuk-button--secondary",
+  }) }}
+  {{ govukButton({
+    "text": "Hold payments",
+    "classes": "govuk-button--secondary govuk-!-margin-left-3",
+  }) }}
+  {{ govukButton({
+    "text": "Record intervention",
+    "classes": "govuk-button--secondary govuk-!-margin-left-3",
+  }) }}
+{% endblock %}
+
+{% block firmTypeSubNavigation %}
+	{{ mojSubNavigation({
+    "label": "Sub navigation",
+    "items": [{
+      "text": "Contact",
+      "href": url_for("main.view_provider_contact", firm=firm),
+      "active": subpage == "contact"
+    }, {
+      "text": "Bank accounts and payments",
+      "href": url_for("main.view_provider_bank_accounts_payments", firm=firm),
+      "active": subpage == "bank-accounts-payments"
+    }]
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if subpage == "contact" %}
+        {% if contact_details_table %}
+          <h3 class="govuk-heading-m">Contact details</h3>
+          {{ govukTable(contact_details_table.to_govuk_params()) }}
+        {% endif %}
+        {{ contactCards(contact_tables) }}
+      {% endif %}
+      
+      {% if subpage == "bank-accounts-payments" %}
+        {# TODO: To be added by addition PR #}
+        <p class="govuk-body">This will be added by a future ticket</p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

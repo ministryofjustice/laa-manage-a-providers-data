@@ -28,9 +28,6 @@ def test_view_provider_page_ui_loads(page):
     expect(page.get_by_role("rowheader", name="Constitutional status")).to_be_visible()
     expect(page.get_by_role("cell", name="Partnership")).to_be_visible()
 
-    expect(page.get_by_role("rowheader", name="Not for profit organisation")).to_be_visible()
-    expect(page.get_by_role("cell", name="No", exact=True)).to_be_visible()
-
 
 @pytest.mark.usefixtures("live_server")
 def test_view_parent_provider(page):
@@ -43,14 +40,11 @@ def test_view_parent_provider(page):
     page.get_by_role("link", name="DAVIES & ASSOCIATES").click()
 
     # Assert we can see the parent provider
-    expect(page.get_by_role("rowheader", name="Parent provider name")).to_be_visible()
-    expect(page.get_by_role("cell", name="JOHNSON LEGAL SERVICES")).to_be_visible()
-
-    expect(page.get_by_role("rowheader", name="Parent provider number")).to_be_visible()
-    expect(page.get_by_role("cell", name="2")).to_be_visible()
+    expect(page.get_by_role("rowheader", name="Chambers")).to_be_visible()
+    expect(page.get_by_role("row", name="Chambers JOHNSON LEGAL SERVICES").get_by_role("link")).to_be_visible()
 
     # Click parent provider
-    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
+    page.get_by_role("row", name="Chambers JOHNSON LEGAL SERVICES").get_by_role("link").click()
     expect(page.get_by_role("rowheader", name="Provider name")).to_be_visible()
     expect(page.get_by_role("cell", name="JOHNSON LEGAL SERVICES")).to_be_visible()
     expect(page.get_by_role("rowheader", name="Provider number")).to_be_visible()
@@ -149,6 +143,90 @@ def test_back_link_lsp(page):
     page.get_by_role("link", name="Offices").click()
     page.get_by_role("link", name="Back to all providers").click()
     expect(page.get_by_role("heading", name="Provider records")).to_be_visible()
+
+
+@pytest.mark.usefixtures("live_server")
+def test_view_advocate_provider_main_table(page):
+    page.get_by_role("button", name="Start now").click()
+
+    # Perform a blank search to view all providers
+    page.get_by_role("button", name="Search").click()
+
+    # Click on an Advocate provider
+    page.get_by_role("link", name="DAVIES & ASSOCIATES").click()
+
+    # Check Advocate-specific main table fields
+    expect(page.get_by_role("rowheader", name="Advocate name")).to_be_visible()
+    expect(page.get_by_role("cell", name="DAVIES & ASSOCIATES")).to_be_visible()
+
+    expect(page.get_by_role("rowheader", name="Advocate number")).to_be_visible()
+    expect(page.get_by_role("cell", name="4", exact=True)).to_be_visible()
+
+    expect(page.get_by_role("rowheader", name="Account number")).to_be_visible()
+
+    # Check that Chambers link is visible and clickable
+    expect(page.get_by_role("rowheader", name="Chambers")).to_be_visible()
+    expect(page.get_by_role("cell").locator("a[href*='/provider/2']")).to_be_visible()
+
+    # Check for Advocate level field (even if no data)
+    expect(page.get_by_role("rowheader", name="Advocate level")).to_be_visible()
+
+    # Check for SRA roll number field
+    expect(page.get_by_role("rowheader", name="Solicitors Regulation Authority roll number")).to_be_visible()
+
+
+@pytest.mark.usefixtures("live_server")
+def test_view_barrister_provider_main_table(page):
+    page.get_by_role("button", name="Start now").click()
+
+    # Perform a blank search to view all providers
+    page.get_by_role("button", name="Search").click()
+
+    # Click on a Barrister provider - need to navigate via Chambers first
+    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
+    page.get_by_role("link", name="Barristers and advocates").click()
+
+    # Click on a barrister
+    page.get_by_role("link", name="Karen Sillen").click()
+
+    # Check Barrister-specific main table fields
+    expect(page.get_by_role("rowheader", name="Barrister name")).to_be_visible()
+    expect(page.get_by_role("cell", name="Karen Sillen")).to_be_visible()
+
+    expect(page.get_by_role("rowheader", name="Barrister number")).to_be_visible()
+    expect(page.get_by_role("cell", name="13", exact=True)).to_be_visible()
+
+    expect(page.get_by_role("rowheader", name="Account number")).to_be_visible()
+
+    # Check that Chambers link is visible and clickable
+    expect(page.get_by_role("rowheader", name="Chambers")).to_be_visible()
+    expect(page.get_by_role("cell").locator("a[href*='/provider/2']")).to_be_visible()
+
+    # Check for Barrister level field
+    expect(page.get_by_role("rowheader", name="Barrister level")).to_be_visible()
+
+    # Check for Bar Council roll number field
+    expect(page.get_by_role("rowheader", name="Bar Council roll number")).to_be_visible()
+
+
+@pytest.mark.usefixtures("live_server")
+def test_view_chambers_provider_main_table(page):
+    page.get_by_role("button", name="Start now").click()
+
+    # Perform a blank search to view all providers
+    page.get_by_role("button", name="Search").click()
+
+    # Click on a Chambers provider
+    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
+
+    # Check Chambers-specific main table fields (simplified compared to LSP)
+    expect(page.get_by_role("rowheader", name="Provider name")).to_be_visible()
+    expect(page.get_by_role("cell", name="JOHNSON LEGAL SERVICES")).to_be_visible()
+
+    expect(page.get_by_role("rowheader", name="Provider number")).to_be_visible()
+    expect(page.get_by_role("cell", name="2", exact=True)).to_be_visible()
+
+    expect(page.get_by_role("rowheader", name="Account number")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
