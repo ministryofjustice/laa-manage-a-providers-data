@@ -37,7 +37,7 @@ def test_view_office_navigation_tabs(page):
     # Check sub-navigation tabs
     expect(page.get_by_role("link", name="Overview")).to_be_visible()
     expect(page.get_by_role("link", name="Contact")).to_be_visible()
-    expect(page.get_by_role("link", name="Bank accounts and payment")).to_be_visible()
+    expect(page.get_by_role("link", name="Bank account and payments")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -110,7 +110,7 @@ def test_office_breadcrumbs(page):
 @pytest.mark.usefixtures("live_server")
 def test_office_bank_payment_details(page):
     navigate_to_office_page(page)
-    page.get_by_role("link", name="Bank accounts and payment").click()
+    page.get_by_role("link", name="Bank account and payments").click()
     expect(page.get_by_role("heading", name="Payment information")).to_be_visible()
     expect(page.get_by_role("link", name="Add")).to_be_visible()
 
@@ -158,6 +158,6 @@ def test_office_no_vat_registration_number(page):
     page.get_by_role("link", name="METROPOLITAN LAW CENTRE").click()
     page.get_by_role("link", name="Offices").click()
     page.get_by_role("link", name="3A001L").click()
-    page.get_by_role("link", name="Bank accounts and payment").click()
+    page.get_by_role("link", name="Bank account and payments").click()
     expect(page.get_by_role("rowheader", name="VAT registration number")).to_be_visible()
     expect(page.get_by_role("link", name="Add VAT registration number")).to_be_visible()
