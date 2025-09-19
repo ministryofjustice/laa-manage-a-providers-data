@@ -316,11 +316,7 @@ class ViewOffice(MethodView):
 
     def get_payment_information_table(self, firm: Firm, office: Office) -> DataTable:
         table = TransposedDataTable()
-        table.add_row(
-            value=" ",
-            label="Payment method",
-            row_action_urls={"enter": "#", "change": "#"}
-        )
+        table.add_row(value=" ", label="Payment method", row_action_urls={"enter": "#", "change": "#"})
         return table
 
     def get_vat_registration_table(self, firm: Firm, office: Office) -> DataTable:
@@ -328,7 +324,7 @@ class ViewOffice(MethodView):
         table.add_row(
             value=office.vat_registration_number or " ",
             label="VAT registration number",
-            row_action_urls={"enter": "#", "change": "#"}
+            row_action_urls={"enter": "#", "change": "#"},
         )
         return table
 

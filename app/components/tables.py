@@ -13,6 +13,7 @@ class TableStructure(TypedDict, total=False):
     Defines how a range of cells are labelled and rendered, with the range being a column (in a regular
     table) or a row (in a transposed table) of values with the same label.
     """
+
     text: str  # Display text of the header
     format: CellFormat | None  # Format of the table cell, "numeric" wil right align the cell
     classes: str | None  # CSS classes to add to the table column, as comma separated class names.
@@ -202,7 +203,9 @@ class TransposedDataTable(DataTable):
             if not isinstance(column, dict):
                 raise ValueError(f"Table structure item {i} must be a dict, got {type(column).__name__}")
 
-    def add_row(self, value, label, formatter=None, html=None, row_action_urls: dict[RowActionTypes, str] | None = None) -> bool:
+    def add_row(
+        self, value, label, formatter=None, html=None, row_action_urls: dict[RowActionTypes, str] | None = None
+    ) -> bool:
         """
         Helper to add a single field to this table, optionally specifying which row actions should
         be added by including appropriately keyed URLs.
@@ -244,7 +247,11 @@ class TransposedDataTable(DataTable):
         if empty_value_has_row_action:
             # If we do not have a value but do have a link to enter a new value, show the HTML change link
             # where the value would normally go.
-            structure_item.update({"html_renderer": f"<a class='govuk-link', href='{row_action_urls.get("enter")}'>Enter {label.lower()}</a>"})
+            structure_item.update(
+                {
+                    "html_renderer": f"<a class='govuk-link', href='{row_action_urls.get('enter')}'>Enter {label.lower()}</a>"
+                }
+            )
         else:
             # We have a value, so configure as requested
             if html:
