@@ -4,7 +4,7 @@ from typing import Dict, List, Literal, NoReturn
 from flask import abort, current_app, redirect, render_template, request, url_for
 from flask.views import MethodView
 
-from app.components.tables import Card, DataTable, TableStructure, TransposedDataTable, add_field
+from app.components.tables import Card, DataTable, TableStructure, TransposedDataTable
 from app.main.forms import firm_name_html, get_firm_statuses
 from app.main.utils import create_provider_from_session
 from app.models import Firm, Office, BankAccount
@@ -42,19 +42,17 @@ def get_contact_tables(firm: Firm, head_office: Office = None) -> list[DataTable
     contact_tables = []
 
     for contact in sorted_contacts:
-        contact_table_structure = []
-        contact_data = {}
-
-        add_field(contact_table_structure, contact_data, contact.job_title, "Job title")
-        add_field(contact_table_structure, contact_data, contact.telephone_number, "Telephone number")
-        add_field(contact_table_structure, contact_data, contact.email_address, "Email address")
-        add_field(contact_table_structure, contact_data, contact.website, "Website")
-        add_field(contact_table_structure, contact_data, contact.active_from, "Active from", format_date)
-
         card_title = f"{contact.first_name} {contact.last_name}"
         card: Card = {"title": card_title, "action_text": "Change liaison manager", "action_url": "#"}
 
-        contact_table = TransposedDataTable(structure=contact_table_structure, data=contact_data, card=card)
+        contact_table = TransposedDataTable(card=card)
+
+        contact_table.add_row(contact.job_title, "Job title")
+        contact_table.add_row(contact.telephone_number, "Telephone number")
+        contact_table.add_row(contact.email_address, "Email address")
+        contact_table.add_row(contact.website, "Website")
+        contact_table.add_row(contact.active_from, "Active from", format_date)
+
         contact_tables.append(contact_table)
 
     return contact_tables
@@ -92,61 +90,52 @@ class ViewProvider(MethodView):
             self.subpage = subpage
 
     def get_main_table(self, firm, head_office, parent_provider) -> DataTable:
-        main_rows, main_data = [], {}
-        add_field(main_rows, main_data, firm.firm_name, "Provider name")
-        add_field(main_rows, main_data, firm.firm_number, "Provider number")
+        main_table = TransposedDataTable()
+
+        main_table.add_row(firm.firm_name, "Provider name")
+        main_table.add_row(firm.firm_number, "Provider number")
 
         if head_office:
-            add_field(main_rows, main_data, head_office.firm_office_code, "Account number")
+            main_table.add_row(head_office.firm_office_code, "Account number")
 
         if parent_provider:
-            add_field(
-                main_rows,
-                main_data,
+            main_table.add_row(
                 parent_provider.firm_name,
                 "Parent provider name",
                 html=provider_name_html(parent_provider),
             )
-            add_field(main_rows, main_data, parent_provider.firm_number, "Parent provider number")
+            main_table.add_row(parent_provider.firm_number, "Parent provider number")
 
         # Additional data
 
         if firm.firm_type == "Legal Services Provider":
             # Show these fields even without entries, so they can always be changed
-            add_field(
-                main_rows,
-                main_data,
+            main_table.add_row(
                 firm.indemnity_received_date if firm.indemnity_received_date not in (None, "") else "Not provided",
                 "Indemnity received date",
                 format_date,
             )
-            add_field(
-                main_rows,
-                main_data,
+            main_table.add_row(
                 firm.company_house_number if firm.company_house_number not in (None, "") else "Not provided",
                 "Companies House number",
             )
 
-        add_field(
-            main_rows,
-            main_data,
+        main_table.add_row(
             firm.constitutional_status,
             "Constitutional status",
             format_constitutional_status,
         )
         if firm.firm_type != "Legal Services Provider":
-            add_field(main_rows, main_data, firm.indemnity_received_date, "Indemnity received date", format_date)
-        add_field(main_rows, main_data, firm.non_profit_organisation, "Not for profit organisation", format_yes_no)
-        add_field(main_rows, main_data, firm.solicitor_advocate, "Solicitor advocate", format_yes_no)
-        add_field(main_rows, main_data, firm.advocate_level, "Advocate level", format_advocate_level)
+            main_table.add_row(firm.indemnity_received_date, "Indemnity received date", format_date)
+        main_table.add_row(firm.non_profit_organisation, "Not for profit organisation", format_yes_no)
+        main_table.add_row(firm.solicitor_advocate, "Solicitor advocate", format_yes_no)
+        main_table.add_row(firm.advocate_level, "Advocate level", format_advocate_level)
         if firm.firm_type != "Legal Services Provider":
-            add_field(main_rows, main_data, firm.company_house_number, "Companies House number")
-        add_field(main_rows, main_data, firm.bar_council_roll, "Bar Council roll number")
-        add_field(main_rows, main_data, firm.contract_manager, "Contract manager")
+            main_table.add_row(firm.company_house_number, "Companies House number")
+        main_table.add_row(firm.bar_council_roll, "Bar Council roll number")
+        main_table.add_row(firm.contract_manager, "Contract manager")
 
-        main_table = TransposedDataTable(structure=main_rows, data=main_data) if main_rows else None
-
-        return main_table
+        return main_table if main_table.is_populated() else None
 
     def get_office_tables(self, firm, head_office: Office, other_offices: list[Office]) -> dict[str, DataTable]:
         """Gets two data tables one for the main office and one for other offices."""
@@ -176,65 +165,19 @@ class ViewProvider(MethodView):
 
     def get_chambers_contact_details_table(self, firm, head_office: Office) -> TransposedDataTable:
         """Gets information about the chambers head office"""
-        contact_details_table_structure = []
-        contact_details_data = {}
+        table = TransposedDataTable()
 
-        add_field(
-            contact_details_table_structure,
-            contact_details_data,
+        table.add_row(
             "test",
             "Address",
             html=format_office_address_multi_line_html(head_office),
         )
-        add_field(contact_details_table_structure, contact_details_data, head_office.email_address, "Email address")
-        add_field(
-            contact_details_table_structure, contact_details_data, head_office.telephone_number, "Telephone number"
-        )
-        add_field(contact_details_table_structure, contact_details_data, head_office.dx_number, "DX number")
-        add_field(contact_details_table_structure, contact_details_data, head_office.dx_centre, "DX centre")
+        table.add_row(head_office.email_address, "Email address")
+        table.add_row(head_office.telephone_number, "Telephone number")
+        table.add_row(head_office.dx_number, "DX number")
+        table.add_row(head_office.dx_centre, "DX centre")
 
-        contact_details_table = (
-            TransposedDataTable(structure=contact_details_table_structure, data=contact_details_data)
-            if contact_details_data
-            else None
-        )
-        return contact_details_table
-
-    def get_contact_tables(self, firm: Firm, head_office: Office = None) -> list[DataTable]:
-        if not head_office or not firm.firm_id:
-            return []
-
-        # Get contacts for the head office
-        pda = current_app.extensions["pda"]
-        contacts = pda.get_office_contacts(firm.firm_id, head_office.firm_office_code)
-
-        if not contacts:
-            return []
-
-        # Sort contacts: primary first, then others
-        primary_contacts = [c for c in contacts if c.primary == "Y"]
-        other_contacts = [c for c in contacts if c.primary != "Y"]
-        sorted_contacts = primary_contacts + other_contacts
-
-        contact_tables = []
-
-        for contact in sorted_contacts:
-            contact_table_structure = []
-            contact_data = {}
-
-            add_field(contact_table_structure, contact_data, contact.job_title, "Job title")
-            add_field(contact_table_structure, contact_data, contact.telephone_number, "Telephone number")
-            add_field(contact_table_structure, contact_data, contact.email_address, "Email address")
-            add_field(contact_table_structure, contact_data, contact.website, "Website")
-            add_field(contact_table_structure, contact_data, contact.active_from, "Active from", format_date)
-
-            card_title = f"{contact.first_name} {contact.last_name}"
-            card: Card = {"title": card_title, "action_text": "Change liaison manager", "action_url": "#"}
-
-            contact_table = TransposedDataTable(structure=contact_table_structure, data=contact_data, card=card)
-            contact_tables.append(contact_table)
-
-        return contact_tables
+        return table
 
     @staticmethod
     def get_account_number_or_default(account_number: str | None) -> str:
@@ -342,7 +285,7 @@ class ViewProvider(MethodView):
             if firm.firm_type == "Chambers" and head_office:
                 context.update({"contact_details_table": self.get_chambers_contact_details_table(firm, head_office)})
 
-            context.update({"contact_tables": self.get_contact_tables(firm, head_office)})
+            context.update({"contact_tables": get_contact_tables(firm, head_office)})
             if firm.firm_type == "Chambers" and head_office:
                 context.update({"contact_details_table": self.get_chambers_contact_details_table(firm, head_office)})
 
@@ -371,77 +314,43 @@ class ViewOffice(MethodView):
         if subpage:
             self.subpage = subpage
 
-    def change_link_for_payment_method(self, row_data: Dict[str, str]) -> str | None:
-        firm_id = row_data.get("firm_id", None)
-        office_id = row_data.get("firm_office_id", None)
-        existing_payment_method = row_data.get("payment_method", None)
-        link_action = "Add" if existing_payment_method in ("", " ", None) else "Change"
-        if firm_id and office_id:
-            return f"<a class='govuk-link', href='#'>{link_action}</a>"
-        return None
-
-    def change_link_for_vat_registration(self, row_data: Dict[str, str]):
-        office_id = row_data.get("firm_office_id", None)
-        existing_vat_registration = row_data.get("vat_registration_number", None)
-        link_action = "Add VAT registration number" if existing_vat_registration in ("", " ", None) else "Change"
-        if office_id:
-            return f"<a class='govuk-link', href='#'>{link_action}</a>"
-        return None
-
     def get_payment_information_table(self, firm: Firm, office: Office) -> DataTable:
-        # Always three cells
-        rows, data = [], {"firm_id": firm.firm_id, "firm_office_id": office.firm_office_id}
-        # No value, as we don't store it yet
-        add_field(rows, data, " ", "Payment method")
-        return TransposedDataTable(structure=rows, data=data, change_link=self.change_link_for_payment_method)
+        table = TransposedDataTable()
+        table.add_row(
+            value=" ",
+            label="Payment method",
+            row_action_urls={"enter": "#", "change": "#"}
+        )
+        return table
 
     def get_vat_registration_table(self, firm: Firm, office: Office) -> DataTable:
-        rows, data = [], {"firm_id": firm.firm_id, "firm_office_id": office.firm_office_id}
-        # Two cells if there is no current value, else three cells
-        has_existing_value = office.vat_registration_number is not None
-        value = office.vat_registration_number if has_existing_value else " "
-        replace_value_with_add_link = not has_existing_value
-        change_link = self.change_link_for_vat_registration if has_existing_value else None
-        add_field(
-            rows,
-            data,
-            value,
-            "VAT registration number",
-            html="<a class='govuk-link', href='#'>Add VAT registration number</a>"
-            if replace_value_with_add_link
-            else None,
+        table = TransposedDataTable()
+        table.add_row(
+            value=office.vat_registration_number or " ",
+            label="VAT registration number",
+            row_action_urls={"enter": "#", "change": "#"}
         )
-        return TransposedDataTable(structure=rows, data=data, change_link=change_link)
+        return table
 
-    def get_office_overvierw_table(self, firm: Firm, office: Office) -> DataTable:
-        overview_rows, overview_data = [], {"firm_id": firm.firm_id}
-        add_field(
-            overview_rows,
-            overview_data,
-            firm.firm_name,
-            "Parent provider",
-            html=provider_name_html(firm),
-        )
-        add_field(overview_rows, overview_data, office.firm_office_code, "Account number")
-        add_field(overview_rows, overview_data, office.head_office, "Head office", format_head_office)
-        add_field(overview_rows, overview_data, firm.firm_type, "Supplier type", format_firm_type)
-
-        # Create tables
-        overview_table = TransposedDataTable(structure=overview_rows, data=overview_data) if overview_rows else None
-        return overview_table
+    def get_office_overview_table(self, firm: Firm, office: Office) -> DataTable:
+        table = TransposedDataTable(data={"firm_id": firm.firm_id})
+        table.add_row(firm.firm_name, "Parent provider", html=provider_name_html(firm))
+        table.add_row(office.firm_office_code, "Account number")
+        table.add_row(office.head_office, "Head office", format_head_office)
+        table.add_row(firm.firm_type, "Supplier type", format_firm_type)
+        return table
 
     def get_bank_account_table(self, bank_account: BankAccount) -> DataTable | None:
         if bank_account is None:
             return None
-        structure, data = [], {}
-
-        add_field(structure, data, bank_account.bank_account_name, "Account name")
-        add_field(structure, data, bank_account.account_number, "Account number")
-        add_field(structure, data, bank_account.sort_code, "Sort code")
-        # Effective date from still to be implemented
 
         card: Card = {"title": bank_account.bank_account_name, "action_text": "Change bank account", "action_url": "#"}
-        return TransposedDataTable(structure=structure, data=data, card=card)
+        table = TransposedDataTable(card=card)
+        table.add_row(bank_account.bank_account_name, "Account name")
+        table.add_row(bank_account.account_number, "Account number")
+        table.add_row(bank_account.sort_code, "Sort code")
+        # Effective date from still to be implemented
+        return table
 
     def get_context(self, firm: Firm, office: Office) -> Dict:
         context = {"firm": firm, "office": office, "message": "Hello world", "subpage": self.subpage}
@@ -463,7 +372,7 @@ class ViewOffice(MethodView):
             context.update({"contact_tables": get_contact_tables(firm, office)})
 
         if self.subpage == "overview":
-            context.update({"overview_table": self.get_office_overvierw_table(firm, office)})
+            context.update({"overview_table": self.get_office_overview_table(firm, office)})
 
         return context
 
