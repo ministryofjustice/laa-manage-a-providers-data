@@ -58,4 +58,5 @@ def register_views():
         form_class=AddAdvocateForm, view_class=AddAdvocateFormView, blueprint=bp, endpoint="add_advocate_form"
     )
 
+
 register_views()

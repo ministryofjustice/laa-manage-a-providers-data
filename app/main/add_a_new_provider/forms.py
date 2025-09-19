@@ -9,7 +9,6 @@ from app.constants import (
     CONSTITUTIONAL_STATUS_CHOICES,
     PARENT_FIRM_TYPE_CHOICES,
     YES_NO_CHOICES,
-    PAYMENT_METHOD_CHOICES,
 )
 from app.fields import GovUKTableRadioField
 from app.validators import (

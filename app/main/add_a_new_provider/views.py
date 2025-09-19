@@ -1,6 +1,6 @@
 from flask import Response, abort, redirect, render_template, request, session, url_for
 
-from app.constants import PARENT_FIRM_TYPE_CHOICES,PAYMENT_METHOD_CHOICES
+from app.constants import PARENT_FIRM_TYPE_CHOICES
 from app.main.add_a_new_provider import AssignChambersForm
 from app.main.utils import create_advocate_from_form_data, create_barrister_from_form_data
 from app.models import Firm
