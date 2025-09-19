@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=python:3.13-bookworm
+ARG BASE_IMAGE=python:3.13-slim-bookworm
 
 FROM node:lts-iron AS node_build
 WORKDIR /home/node
@@ -10,25 +10,10 @@ RUN npm run build
 
 FROM $BASE_IMAGE AS base
 ARG REQUIREMENTS_FILE=requirements-production.txt
-# Update package directory and install latest versions, then clean apt lists
-RUN apt-get update \
-    && apt-get install  --only-upgrade -y \
-    perl-base \
-    libxslt1.1 \
-    libxslt1-dev \
-    libc-bin \
-    linux-libc-dev \
-    libexpat1 \
-    libperl5.36 \
-    libpq-dev \
-    libsqlite3-0 \
-    libxml2 \
-    imagemagick \
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
     && rm -rf /var/lib/apt/lists/*
-
-# Upgrade libslt1 to install the latest security update
-# https://nvd.nist.gov/vuln/detail/CVE-2025-7424
-RUN apt-get install --only-upgrade libxslt1.1 libxslt1-dev -y
 
 # Clean up cached package files & index files for a smaller image size
 RUN apt-get clean
