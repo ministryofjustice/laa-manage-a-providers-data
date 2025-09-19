@@ -4,7 +4,7 @@ from playwright.sync_api import expect
 
 @pytest.mark.usefixtures("live_server")
 def test_view_provider_page_ui_loads(page):
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
 
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
@@ -34,7 +34,7 @@ def test_view_provider_page_ui_loads(page):
 
 @pytest.mark.usefixtures("live_server")
 def test_view_parent_provider(page):
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
 
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
@@ -62,7 +62,7 @@ def test_view_parent_provider(page):
 @pytest.mark.usefixtures("live_server")
 def test_add_new_lsp(page):
     # Add a legal services provider
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
     page.get_by_role("button", name="Add a new parent provider").click()
     page.get_by_role("textbox", name="Provider name").fill("Test provider")
     page.get_by_role("radio", name="Legal services provider").check()
@@ -115,7 +115,7 @@ def test_add_new_lsp(page):
 
 @pytest.mark.usefixtures("live_server")
 def test_lsp_contact(page):
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
 
@@ -135,7 +135,7 @@ def test_lsp_contact(page):
 
 @pytest.mark.usefixtures("live_server")
 def test_back_link_lsp(page):
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
     page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
@@ -153,7 +153,7 @@ def test_back_link_lsp(page):
 
 @pytest.mark.usefixtures("live_server")
 def test_back_link_chambers(page):
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
     page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()

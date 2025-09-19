@@ -4,7 +4,7 @@ from playwright.sync_api import expect
 
 def navigate_to_office_page(page):
     """Helper function to navigate to an office page via UI flow."""
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
 
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
@@ -76,7 +76,7 @@ def test_view_office_parent_provider_link(page):
 @pytest.mark.usefixtures("live_server")
 def test_office_page_navigation_from_offices_list(page):
     """Test navigation from offices list to individual office page."""
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
 
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()

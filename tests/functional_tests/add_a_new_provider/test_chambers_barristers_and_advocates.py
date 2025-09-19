@@ -4,7 +4,7 @@ from playwright.sync_api import Page, expect
 
 @pytest.mark.usefixtures("live_server")
 def test_barristers_and_advocates_visible(page: Page) -> None:
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
     page.get_by_role("button", name="Search").click()
     page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
     expect(page.get_by_role("link", name="Barristers and advocates")).to_be_visible()
@@ -19,7 +19,7 @@ def test_barristers_and_advocates_visible(page: Page) -> None:
 
 @pytest.mark.usefixtures("live_server")
 def test_correct_message_when_no_barristers_or_advocates(page: Page) -> None:
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
     page.get_by_role("button", name="Search").click()
     page.get_by_role("link", name="NORTHERN LEGAL CHAMBERS").click()
     page.get_by_role("link", name="Barristers and advocates").click()
