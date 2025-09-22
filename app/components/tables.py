@@ -303,8 +303,12 @@ class TransposedDataTable(DataTable):
                 for action, url in [("Add", row_action_add_url), ("Change", row_action_change_url)]:
                     if url is None:
                         continue
-                    link_html = f'<a class="govuk-link" href="{url}">{action}<span class="govuk-visually-hidden"> {label}</span></a>'
-                    action_cell = {"text": "Add", "html": link_html, "format": "numeric"}
+                    action_cell = {"text": action, "href": url, "visuallyHiddenText": label}
+                    # If we do not have a card, we are presenting as a table, so specify the actual link
+                    if not self.card:
+                        action_cell["html"] = (
+                            f'<a class="govuk-link" href="{url}">{action}<span class="govuk-visually-hidden"> {label}</span></a>'
+                        )
                     row_cells.append(action_cell)
 
             rows.append(row_cells)
@@ -329,6 +333,11 @@ class TransposedDataTable(DataTable):
         for row in table_rows:
             if len(row) >= 2:  # Should have at least key and one value, and sometimes row action cells
                 summary_rows.append({"key": row[0], "value": row[1]})
+            # If we have more than the key and value, the rest are row actions (add | change)
+            if len(row) > 2:
+                print(summary_rows[-1])
+                summary_rows[-1]["actions"] = {"items": row[2:]}
+                print(summary_rows[-1])
 
         params = {
             "rows": summary_rows,
