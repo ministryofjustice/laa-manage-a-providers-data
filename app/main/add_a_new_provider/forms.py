@@ -375,6 +375,7 @@ class LiaisonManagerForm(BaseForm):
             Length(max=255, message="Email address must be 255 characters or less"),
         ],
         filters=[
+            # Remove all leading and trailing whitespace from field before processing it
             lambda data: data.strip() if data else None,
         ],
     )
