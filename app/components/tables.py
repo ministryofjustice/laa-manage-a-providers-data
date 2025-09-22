@@ -239,9 +239,7 @@ class TransposedDataTable(DataTable):
         # Convert label to snake_case for the ID
         field_id = label.lower().replace(" ", "_")
 
-        empty_value_has_row_action = (
-            value in (None, "", " ") and not html and row_action_urls.get("enter", None) is not None
-        )
+        empty_value_has_row_action = not value and not html and row_action_urls.get("enter", None) is not None
 
         structure_item = {"text": label, "id": field_id, "classes": "govuk-!-width-one-half"}
         if empty_value_has_row_action:
@@ -313,6 +311,7 @@ class TransposedDataTable(DataTable):
 
         return rows
 
+    @property
     def is_populated(self):
         return len(self.structure) > 0
 

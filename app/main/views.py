@@ -135,7 +135,7 @@ class ViewProvider(MethodView):
         main_table.add_row(firm.bar_council_roll, "Bar Council roll number")
         main_table.add_row(firm.contract_manager, "Contract manager")
 
-        return main_table if main_table.is_populated() else None
+        return main_table if main_table.is_populated else None
 
     def get_office_tables(self, firm, head_office: Office, other_offices: list[Office]) -> dict[str, DataTable]:
         """Gets two data tables one for the main office and one for other offices."""
@@ -316,20 +316,20 @@ class ViewOffice(MethodView):
 
     def get_payment_information_table(self, firm: Firm, office: Office) -> DataTable:
         table = TransposedDataTable()
-        table.add_row(value=" ", label="Payment method", row_action_urls={"enter": "#", "change": "#"})
+        table.add_row(value=None, label="Payment method", row_action_urls={"enter": "#", "change": "#"})
         return table
 
     def get_vat_registration_table(self, firm: Firm, office: Office) -> DataTable:
         table = TransposedDataTable()
         table.add_row(
-            value=office.vat_registration_number or " ",
+            value=office.vat_registration_number,
             label="VAT registration number",
             row_action_urls={"enter": "#", "change": "#"},
         )
         return table
 
     def get_office_overview_table(self, firm: Firm, office: Office) -> DataTable:
-        table = TransposedDataTable(data={"firm_id": firm.firm_id})
+        table = TransposedDataTable()
         table.add_row(firm.firm_name, "Parent provider", html=provider_name_html(firm))
         table.add_row(office.firm_office_code, "Account number")
         table.add_row(office.head_office, "Head office", format_head_office)
