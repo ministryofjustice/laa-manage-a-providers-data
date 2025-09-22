@@ -242,7 +242,7 @@ class TransposedDataTable(DataTable):
         html=None,
         row_action_urls: dict[RowActionTypes, str] | None = None,
         default_value: str = "No data",
-    ) -> bool:
+    ):
         """
         Helper to add a single field to this table, optionally specifying which row actions should
         be added by including appropriately keyed URLs.
@@ -281,8 +281,11 @@ class TransposedDataTable(DataTable):
                     "html_renderer": f"<a class='govuk-link', href='{row_action_urls.get('enter')}'>Enter {uncapitalize(label)}</a>"
                 }
             )
+            # Note we are not adding any other row actions even if provided.
         else:
-            # Ensure value is populated
+            # Format the displayed value if we have a formatter and a value to format...
+            value = formatter(value) if formatter and value else value
+            # ...but use the unformatted default_value if there was no value.
             value = value if value else default_value
 
             if html:
@@ -293,7 +296,7 @@ class TransposedDataTable(DataTable):
         self.structure.append(structure_item)
         if len(self.data) == 0:
             self.data.append({})
-        self.data[-1][field_id] = formatter(value) if formatter else value
+        self.data[-1][field_id] = value
 
         self._validate_data(self.data)
         self._validate_structure(self.structure)
@@ -312,7 +315,7 @@ class TransposedDataTable(DataTable):
             List of Lists (one per row), each inner list containing Cells
         """
         rows = []
-        for index, structure_item in enumerate(self.structure):
+        for structure_item in self.structure:
             # First cell is the field name/header
             row_cells = [{"text": structure_item.get("text", ""), "classes": structure_item.get("classes", "")}]
 
@@ -322,8 +325,8 @@ class TransposedDataTable(DataTable):
                 row_cells.append(cell)
 
                 # Row Actions (as additional cells)
-                # 'Enter' actions are rendered where the value would be, so here
-                # we are only looking for 'Add' or 'Change' row actions
+                # 'Enter' actions are rendered where the value would be, so here we are only looking
+                # for 'Add' or 'Change' row actions
                 row_action_add_url = structure_item.get("row_action_urls", {}).get("add", None)
                 row_action_change_url = structure_item.get("row_action_urls", {}).get("change", None)
                 label = uncapitalize(structure_item.get("text", ""))
