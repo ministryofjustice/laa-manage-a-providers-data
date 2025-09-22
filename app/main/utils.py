@@ -1,10 +1,11 @@
 import html
 import json
+from datetime import date
 
 from flask import current_app, flash, session
 
 from app.models import BankAccount, Contact, Firm, Office
-from app.pda.mock_api import MockProviderDataApi
+from app.pda.mock_api import MockProviderDataApi, ProviderDataApiError
 
 
 def get_full_info_html(data):
@@ -97,6 +98,74 @@ def add_new_contact(contact: Contact, firm_id: int, office_code: str, show_succe
         flash(f"<b>Contact successfully created for office {office_code}</b>", "success")
 
     return new_contact
+
+
+def change_liaison_manager(contact: Contact, firm_id: int, show_success_message: bool = True) -> Contact:
+    """Change the liaison manager for ALL offices of a firm, making the new contact primary across the firm.
+
+    Creates a new contact record for each office of the firm, making the new person the primary
+    liaison manager for every office. All existing liaison managers across all offices become non-primary.
+
+    Args:
+        contact: Contact model instance for the new liaison manager
+        firm_id: The firm ID
+        show_success_message: Whether to show a success flash message (default: True)
+
+    Returns:
+        Contact: The contact record for the head office (or first office if no head office)
+
+    Raises:
+        RuntimeError: If Provider Data API not initialized
+        ValueError: If firm_id is not a positive integer
+        ProviderDataApiError: If firm doesn't exist or has no offices
+        NotImplementedError: If the API doesn't support contact management yet
+    """
+    pda = current_app.extensions.get("pda")
+    if not pda:
+        raise RuntimeError("Provider Data API not initialized")
+
+    if not isinstance(firm_id, int) or firm_id <= 0:
+        raise ValueError("firm_id must be a positive integer")
+
+    # Get all offices for this firm
+    firm_offices = pda.get_provider_offices(firm_id)
+    if not firm_offices:
+        raise ProviderDataApiError(f"No offices found for firm {firm_id}")
+
+    # Find head office for return value
+    head_office = pda.get_head_office(firm_id)
+    return_office = head_office if head_office else firm_offices[0]
+
+    # Set all existing liaison managers to non-primary across all offices
+    for office in firm_offices:
+        contacts = pda.get_office_contacts(firm_id, office.firm_office_code)
+        for existing_contact in contacts:
+            if existing_contact.job_title == "Liaison manager" and existing_contact.primary == "Y":
+                # Set this contact to non-primary
+                updated_contact = existing_contact.model_copy(update={"primary": "N"})
+                pda.update_contact(firm_id, office.firm_office_code, updated_contact)
+
+    # Create new primary liaison manager contact for each office
+    created_contacts = []
+    for office in firm_offices:
+        # Set default active_from if not provided
+        contact_updates = {"vendor_site_id": office.firm_office_id, "job_title": "Liaison manager", "primary": "Y"}
+        if not contact.active_from:
+            contact_updates["active_from"] = date.today().isoformat()
+
+        office_contact = contact.model_copy(update=contact_updates)
+        created_contact = pda.create_office_contact(firm_id, office.firm_office_code, office_contact)
+        created_contacts.append(created_contact)
+
+    # Return the contact for the head office (or first office)
+    return_contact = next(
+        (c for c in created_contacts if c.vendor_site_id == return_office.firm_office_id), created_contacts[0]
+    )
+
+    if show_success_message:
+        flash(f"<b>{return_contact.first_name} {return_contact.last_name} is the new liaison manager</b>", "success")
+
+    return return_contact
 
 
 def create_provider_from_session() -> Firm | None:

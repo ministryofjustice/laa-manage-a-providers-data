@@ -1,9 +1,13 @@
+from datetime import date
 from unittest.mock import Mock, patch
 
+import pytest
 from flask import Blueprint
 from flask_wtf import FlaskForm
 from wtforms import StringField
 
+from app.main.utils import change_liaison_manager
+from app.models import Contact
 from app.utils import register_form_view
 from app.views import BaseFormView
 
@@ -191,3 +195,131 @@ class TestRegisterFormViewIntegration:
         # Verify it was called
         mock_blueprint.add_url_rule.assert_called_once()
         mock_view_class.as_view.assert_called_once()
+
+
+class TestChangeLiaisonManager:
+    def test_successful_change_with_mock_api(self, app):
+        """Test successful liaison manager change with MockPDA."""
+        mock_contact = Contact(
+            first_name="Jane", last_name="Doe", email_address="jane.doe@example.com", telephone_number="01234567890"
+        )
+
+        with app.test_request_context():
+            result = change_liaison_manager(mock_contact, 1)
+
+            assert result.first_name == "Jane"
+            assert result.last_name == "Doe"
+            assert result.email_address == "jane.doe@example.com"
+            assert result.job_title == "Liaison manager"
+            assert result.primary == "Y"
+
+    def test_invalid_firm_id_raises_value_error(self, app):
+        """Test that ValueError is raised for invalid firm_id."""
+        mock_contact = Contact(
+            first_name="Jane", last_name="Doe", email_address="jane.doe@example.com", telephone_number="01234567890"
+        )
+
+        with app.test_request_context():
+            with pytest.raises(ValueError, match="firm_id must be a positive integer"):
+                change_liaison_manager(mock_contact, 0)
+
+            with pytest.raises(ValueError, match="firm_id must be a positive integer"):
+                change_liaison_manager(mock_contact, -1)
+
+    def test_success_with_existing_liaison_managers(self, app):
+        """Test setting a new primary liaison manager when existing ones exist."""
+        with app.test_request_context():
+            mock_api = app.extensions["pda"]
+            mock_api._mock_data = {
+                "firms": [{"firmId": 1, "firmName": "Test Firm"}],
+                "offices": [{"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101, "headOffice": "N/A"}],
+                "contacts": [
+                    {
+                        "vendorSiteId": 101,
+                        "firstName": "John",
+                        "lastName": "Smith",
+                        "emailAddress": "john.smith@example.com",
+                        "jobTitle": "Liaison manager",
+                        "primary": "Y",
+                        "activeFrom": "2024-01-01",
+                    }
+                ],
+            }
+
+            new_contact = Contact(
+                first_name="Alice",
+                last_name="Johnson",
+                email_address="alice.johnson@example.com",
+                telephone_number="01234567890",
+            )
+
+            result = change_liaison_manager(new_contact, 1)
+
+            assert result.vendor_site_id == 101
+            assert result.first_name == "Alice"
+            assert result.last_name == "Johnson"
+            assert result.email_address == "alice.johnson@example.com"
+            assert result.primary == "Y"
+            assert result.job_title == "Liaison manager"
+
+    def test_creates_contacts_for_all_offices(self, app):
+        """Test that contacts are created for all offices of the firm."""
+        with app.test_request_context():
+            mock_api = app.extensions["pda"]
+            mock_api._mock_data = {
+                "firms": [{"firmId": 1, "firmName": "Test Firm"}],
+                "offices": [
+                    {"_firmId": 1, "firmOfficeCode": "HEAD01", "firmOfficeId": 101, "headOffice": "N/A"},
+                    {"_firmId": 1, "firmOfficeCode": "BRANCH01", "firmOfficeId": 102, "headOffice": "101"},
+                    {"_firmId": 1, "firmOfficeCode": "BRANCH02", "firmOfficeId": 103, "headOffice": "101"},
+                ],
+                "contacts": [],
+            }
+
+            new_contact = Contact(
+                first_name="Multi",
+                last_name="Office",
+                email_address="multi.office@example.com",
+            )
+
+            result = change_liaison_manager(new_contact, 1)
+
+            assert result.vendor_site_id == 101
+            assert result.primary == "Y"
+
+            contacts = mock_api._mock_data["contacts"]
+            liaison_contacts = [c for c in contacts if c.get("jobTitle") == "Liaison manager"]
+            assert len(liaison_contacts) == 3
+
+            for contact in liaison_contacts:
+                assert contact["firstName"] == "Multi"
+                assert contact["lastName"] == "Office"
+                assert contact["emailAddress"] == "multi.office@example.com"
+                assert contact["primary"] == "Y"
+
+            office_ids = [c["vendorSiteId"] for c in liaison_contacts]
+            assert 101 in office_ids
+            assert 102 in office_ids
+            assert 103 in office_ids
+
+    def test_sets_active_from_date(self, app):
+        """Test that active_from is set to today's date when not provided."""
+        with app.test_request_context():
+            mock_api = app.extensions["pda"]
+            mock_api._mock_data = {
+                "firms": [{"firmId": 1, "firmName": "Test Firm"}],
+                "offices": [{"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101, "headOffice": "N/A"}],
+                "contacts": [],
+            }
+
+            new_contact = Contact(
+                first_name="Test",
+                last_name="User",
+                email_address="test@example.com",
+            )
+
+            result = change_liaison_manager(new_contact, 1)
+
+            assert result.active_from is not None
+            expected_date = date.today().isoformat()
+            assert result.active_from == expected_date
