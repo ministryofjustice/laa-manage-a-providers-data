@@ -192,9 +192,16 @@ class ViewProvider(MethodView):
             card_title = f"{contact.first_name} {contact.last_name}"
             card: Card = {
                 "title": card_title,
-                "action_text": "Change liaison manager",
-                "action_url": url_for("main.add_new_liaison_manager", firm=firm),
             }
+
+            if contact in primary_contacts:
+                # Only the primary contact card has the action to change the Liaison Manager
+                card.update(
+                    {
+                        "action_text": "Change liaison manager",
+                        "action_url": url_for("main.add_new_liaison_manager", firm=firm),
+                    }
+                )
 
             contact_table = TransposedDataTable(structure=contact_table_structure, data=contact_data, card=card)
             contact_tables.append(contact_table)
