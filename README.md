@@ -142,10 +142,16 @@ pre-commit install
 ### Diagnosing pre-commit issues
 
 Manually run the pre-commit steps with extra information either as a whole or individually to work out where the issue
-is:
+is.
+
+Before diagnosing issues, clear the cache to start with a clean environment:
 
 ```shell
-# Run all the checks with a bit more information displayed
+pre-commit clean
+```
+
+Run all checks, but with a bit more information displayed:
+```shell
 pre-commit run -v
 ```
 

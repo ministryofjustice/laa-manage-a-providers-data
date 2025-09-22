@@ -146,8 +146,11 @@ def test_office_contact(page):
 
 @pytest.mark.usefixtures("live_server")
 def test_office_no_vat_registration_number(page):
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
+
+    # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
+
     page.get_by_role("link", name="METROPOLITAN LAW CENTRE").click()
     page.get_by_role("link", name="Offices").click()
     page.get_by_role("link", name="3A001L").click()
