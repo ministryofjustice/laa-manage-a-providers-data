@@ -161,6 +161,37 @@ class DataTable:
         return params
 
 
+def uncapitalize(s: str) -> str:
+    """
+    Lower-case only the first character unless a heuristic detects the first word is an acronym.
+    Almost the reverse of `str.capitalize` and useful when strings contain acronyms which should
+    not be lower-cased.
+
+    Handles strings starting with an acronym:
+    >>> uncapitalize('VAT number')
+    'VAT number'
+
+    Handles acronyms inside strings
+    >>> uncapitalize('Primary MAPD account')
+    'primary MAPD account'
+
+    Handles regular strings
+    >>> uncapitalize('Correspondence address')
+    'correspondence address'
+
+    Args:
+        s: String to be changed
+
+    Returns:
+        String
+    """
+    if s is None:
+        return s
+    starts_with_acronym = len(s) > 1 and s[1].isupper()
+    continuation_cased = s if starts_with_acronym else s.replace(s[0], s[0].lower(), 1)
+    return continuation_cased
+
+
 class TransposedDataTable(DataTable):
     """
     Renders the headings down the side, rather than along the top, and is intended to be
@@ -204,17 +235,23 @@ class TransposedDataTable(DataTable):
                 raise ValueError(f"Table structure item {i} must be a dict, got {type(column).__name__}")
 
     def add_row(
-        self, value, label, formatter=None, html=None, row_action_urls: dict[RowActionTypes, str] | None = None
+        self,
+        value,
+        label,
+        formatter=None,
+        html=None,
+        row_action_urls: dict[RowActionTypes, str] | None = None,
+        default_value: str = "No data",
     ) -> bool:
         """
         Helper to add a single field to this table, optionally specifying which row actions should
         be added by including appropriately keyed URLs.
 
-        If `value` is empty AND there is no row action URL for `enter`, the row will not be added.
-
         Uses the label converted to snake_case as the `id` linking the TableStructure item and the data value.
 
         If `row_action_urls` are specified, the corresponding action link will be included if appropriate.
+        The `enter` row action generates an HTML link where the value would normally go, but only when there is no
+        value and the `enter` URL is given, otherwise the `default_value` will be presented.
         See `TransposedDataTable.get_rows` for more information.
 
         Args:
@@ -223,37 +260,31 @@ class TransposedDataTable(DataTable):
             formatter: Optional Callable, used to convert `value` into the presented string in the cell
             html: Optional Callable, used during table generation to provide the HTML for the cell
             row_action_urls: Optional dict, using `RowActionTypes` as key and a URL as value.
-
-        Returns:
-            bool: True if a cell will be used to represent the value, False otherwise
+            default_value: Optional string used when there is no value and no `enter` URL in `row_action_urls`
         """
         if row_action_urls is None:
             row_action_urls = {}
 
-        # Do not add a cell for the value if it is empty AND does not have a corresponding action to populate it
-        if not value and row_action_urls.get("enter", None) is None:
-            return False
-
         # Convert label to snake_case for the ID
         field_id = label.lower().replace(" ", "_")
 
-        empty_value_has_row_action = value in (None, "", " ") and row_action_urls.get("enter", None) is not None
-        two_cells = empty_value_has_row_action
-        structure_item = {
-            "text": label,
-            "id": field_id,
-            "classes": "govuk-!-width-one-half" if two_cells else "govuk-!-width-one-third",
-        }
+        empty_value_has_row_action = (
+            value in (None, "", " ") and not html and row_action_urls.get("enter", None) is not None
+        )
+
+        structure_item = {"text": label, "id": field_id, "classes": "govuk-!-width-one-half"}
         if empty_value_has_row_action:
             # If we do not have a value but do have a link to enter a new value, show the HTML change link
             # where the value would normally go.
             structure_item.update(
                 {
-                    "html_renderer": f"<a class='govuk-link', href='{row_action_urls.get('enter')}'>Enter {label.lower()}</a>"
+                    "html_renderer": f"<a class='govuk-link', href='{row_action_urls.get('enter')}'>Enter {uncapitalize(label)}</a>"
                 }
             )
         else:
-            # We have a value, so configure as requested
+            # Ensure value is populated
+            value = value if value else default_value
+
             if html:
                 structure_item.update({"html_renderer": html})
             if row_action_urls:
@@ -266,7 +297,6 @@ class TransposedDataTable(DataTable):
 
         self._validate_data(self.data)
         self._validate_structure(self.structure)
-        return True
 
     def get_rows(self) -> list[Row]:
         """Generate transposed table rows.
@@ -296,14 +326,13 @@ class TransposedDataTable(DataTable):
                 # we are only looking for 'Add' or 'Change' row actions
                 row_action_add_url = structure_item.get("row_action_urls", {}).get("add", None)
                 row_action_change_url = structure_item.get("row_action_urls", {}).get("change", None)
+                label = uncapitalize(structure_item.get("text", ""))
 
-                if row_action_add_url:
-                    link_html = f'<a class="govuk-link" href="{row_action_add_url}">Add<span class="govuk-visually-hidden"> {structure_item.get("text", "")}</span></a>'
+                for action, url in [("Add", row_action_add_url), ("Change", row_action_change_url)]:
+                    if url is None:
+                        continue
+                    link_html = f'<a class="govuk-link" href="{url}">{action}<span class="govuk-visually-hidden"> {label}</span></a>'
                     action_cell = {"text": "Add", "html": link_html, "format": "numeric"}
-                    row_cells.append(action_cell)
-                if row_action_change_url:
-                    link_html = f'<a class="govuk-link" href="{row_action_change_url}">Change<span class="govuk-visually-hidden"> {structure_item.get("text", "")}</span></a>'
-                    action_cell = {"text": "Change", "html": link_html, "format": "numeric"}
                     row_cells.append(action_cell)
 
             rows.append(row_cells)

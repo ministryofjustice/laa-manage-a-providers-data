@@ -7,7 +7,7 @@ from flask.views import MethodView
 from app.components.tables import Card, DataTable, TableStructure, TransposedDataTable
 from app.main.forms import firm_name_html, get_firm_statuses
 from app.main.utils import create_provider_from_session
-from app.models import Firm, Office, BankAccount
+from app.models import BankAccount, Firm, Office
 from app.utils.formatting import (
     format_advocate_level,
     format_constitutional_status,
@@ -349,7 +349,7 @@ class ViewOffice(MethodView):
         return table
 
     def get_context(self, firm: Firm, office: Office) -> Dict:
-        context = {"firm": firm, "office": office, "message": "Hello world", "subpage": self.subpage}
+        context = {"firm": firm, "office": office, "subpage": self.subpage}
 
         if self.subpage == "bank-payment-details":
             pda = current_app.extensions["pda"]
