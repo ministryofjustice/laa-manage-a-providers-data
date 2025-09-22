@@ -162,7 +162,6 @@ class ViewProvider(MethodView):
         return contact_details_table
 
     def get_contact_tables(self, firm: Firm, head_office: Office = None) -> list[DataTable]:
-        # Test
         if not head_office or not firm.firm_id:
             return []
 
