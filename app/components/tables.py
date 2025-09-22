@@ -1,6 +1,8 @@
 from collections.abc import Callable
 from typing import Any, Literal, TypedDict
 
+from app.utils.formatting import format_uncapitalized
+
 DEFAULT_TABLE_CLASSES = "govuk-table--small-text-until-tablet"
 SORTABLE_TABLE_MODULE = "moj-sortable-table"
 
@@ -161,37 +163,6 @@ class DataTable:
         return params
 
 
-def uncapitalize(s: str) -> str:
-    """
-    Lower-case only the first character unless a heuristic detects the first word is an acronym.
-    Almost the reverse of `str.capitalize` and useful when strings contain acronyms which should
-    not be lower-cased.
-
-    Handles strings starting with an acronym:
-    >>> uncapitalize('VAT number')
-    'VAT number'
-
-    Handles acronyms inside strings
-    >>> uncapitalize('Primary MAPD account')
-    'primary MAPD account'
-
-    Handles regular strings
-    >>> uncapitalize('Correspondence address')
-    'correspondence address'
-
-    Args:
-        s: String to be changed
-
-    Returns:
-        String
-    """
-    if s is None:
-        return s
-    starts_with_acronym = len(s) > 1 and s[1].isupper()
-    continuation_cased = s if starts_with_acronym else s.replace(s[0], s[0].lower(), 1)
-    return continuation_cased
-
-
 class TransposedDataTable(DataTable):
     """
     Renders the headings down the side, rather than along the top, and is intended to be
@@ -278,7 +249,7 @@ class TransposedDataTable(DataTable):
             # where the value would normally go.
             structure_item.update(
                 {
-                    "html_renderer": f"<a class='govuk-link', href='{row_action_urls.get('enter')}'>Enter {uncapitalize(label)}</a>"
+                    "html_renderer": f"<a class='govuk-link', href='{row_action_urls.get('enter')}'>Enter {format_uncapitalized(label)}</a>"
                 }
             )
             # Note we are not adding any other row actions even if provided.
@@ -329,7 +300,7 @@ class TransposedDataTable(DataTable):
                 # for 'Add' or 'Change' row actions
                 row_action_add_url = structure_item.get("row_action_urls", {}).get("add", None)
                 row_action_change_url = structure_item.get("row_action_urls", {}).get("change", None)
-                label = uncapitalize(structure_item.get("text", ""))
+                label = format_uncapitalized(structure_item.get("text", ""))
 
                 for action, url in [("Add", row_action_add_url), ("Change", row_action_change_url)]:
                     if url is None:
