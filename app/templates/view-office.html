@@ -8,6 +8,8 @@
 {%- from 'components/moj_sub_navigation.html' import mojSubNavigation %}
 {%- from 'components/back_link.html' import govukBackLink -%}
 {%- from 'components/address.html' import addressDisplay -%}
+{% from 'macros/contact_tables.html' import contactCards %}
+{% from 'govuk_frontend_jinja/components/summary-list/macro.html' import govukSummaryList %}
 {%- from 'macros/flash_messages.html' import renderFlashMessages %}
 
 {% block beforeContent %}
@@ -55,29 +57,56 @@
     </div>
     <div class="govuk-grid-column-full">
 
-      {{ mojSubNavigation({
-        "label": "Sub navigation",
-        "items": [{
-          "text": "Overview",
-          "href": "#",
-          "active": true
-        }, {
-          "text": "Contact",
-          "href": "#",
-        }, {
-          "text": "Bank accounts and payment",
-          "href": "#",
-        }]
-      }) }}
+    {{ mojSubNavigation({
+      "label": "Sub navigation",
+      "items": [{
+        "text": "Overview",
+        "href": url_for("main.view_office_overview", firm=firm, office=office),
+        "active": subpage == "overview"
+      }, {
+        "text": "Contact",
+        "href": url_for("main.view_office_contact", firm=firm, office=office),
+        "active": subpage == "contact"
+      }, {
+        "text": "Bank accounts and payment",
+        "href": url_for("main.view_office_bank_payment_details", firm=firm, office=office),
+        "active": subpage == "bank-payment-details"
+      }]
+    }) }}
 
     </div>
     <div class="govuk-grid-column-two-thirds">
-      {% if overview_table %}
-        <h2 class="govuk-heading-m">Overview</h2>
-        {{ govukTable(overview_table.to_govuk_params()) }}
-      {% endif %}
+
+    {% if subpage == "overview" %}
+        {% if overview_table %}
+          <h2 class="govuk-heading-m">Overview</h2>
+          {{ govukTable(overview_table.to_govuk_params()) }}
+        {% endif %}
+    {% endif %}
+    
+    {% if subpage == "contact" %}
+        {{ contactCards(contact_tables) }}
+    {% endif %}
+
+    {% if subpage == "bank-payment-details" %}
+        <h2 class="govuk-heading-m">Payment information</h2>
+        {{ govukSummaryList(payment_information_table.to_summary_govuk_params()) }}
+
+        <h2 class="govuk-heading-m">VAT registration number</h2>
+        {{ govukSummaryList(vat_registration_table.to_summary_govuk_params()) }}
+
+        <h2 class="govuk-heading-m">Bank accounts</h2>
+        {% if bank_account_table %}
+            {{ govukSummaryList(bank_account_table.to_summary_govuk_params()) }}
+        {% endif %}
+
+        {{ govukButton({
+            "text": "Add bank account",
+            "href": "#"
+        }) }}
+    {% endif %}
+      
     </div>
   </div>
-
 
 {% endblock %}

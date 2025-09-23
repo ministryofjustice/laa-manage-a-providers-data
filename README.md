@@ -139,6 +139,33 @@ The following will:
 ```shell
 pre-commit install
 ```
+### Diagnosing pre-commit issues
+
+Manually run the pre-commit steps with extra information either as a whole or individually to work out where the issue
+is.
+
+Before diagnosing issues, clear the cache to start with a clean environment:
+
+```shell
+pre-commit clean
+```
+
+Run all checks, but with a bit more information displayed:
+```shell
+pre-commit run -v
+```
+
+It can be useful to run individual steps. In this case we have an issue shown as an `isort` failure, so we manually
+run just that step with extra information.
+```shell
+pre-commit run -v isort
+```
+
+And it is possible to exclude specific steps. In this case we want to make sure all the steps other than `ruff` pass:
+```shell
+SKIP=ruff pre-commit run -v
+```
+
 ### Manually running linting
 The Ruff linter looks for code quality issues. Ensure there are no ruff issues before committing. 
 

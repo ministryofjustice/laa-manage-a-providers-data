@@ -1,7 +1,7 @@
 from wtforms.fields import DateField
 from wtforms.fields.choices import RadioField
 
-from app.components.tables import RadioDataTable, TableStructure
+from app.components.tables import RadioDataTable, TableStructureItem
 
 
 class GovDateField(DateField):
@@ -83,7 +83,7 @@ class GovUKTableRadioField(RadioField):
         self,
         label: str = None,
         validators: list = None,
-        structure: list[TableStructure] = None,
+        structure: list[TableStructureItem] = None,
         radio_value_key: str = "id",
         **kwargs,
     ):
