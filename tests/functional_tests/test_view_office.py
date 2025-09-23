@@ -112,10 +112,11 @@ def test_office_bank_payment_details(page):
     navigate_to_office_page(page)
     page.get_by_role("link", name="Bank accounts and payment").click()
 
-    expect(page.get_by_role("rowheader", name="Payment method")).to_be_visible()
+    expect(page.get_by_role("definition").filter(has_text="Payment method")).to_be_visible()
     expect(page.get_by_role("link", name="Enter payment method")).to_be_visible()
 
-    expect(page.get_by_role("cell", name="GB123456789")).to_be_visible()
+    expect(page.get_by_role("definition").filter(has_text="VAT registration number")).to_be_visible()
+    expect(page.get_by_text("GB123456789")).to_be_visible()
     expect(page.get_by_role("link", name="Change   VAT registration")).to_be_visible()
 
     expect(page.get_by_text("Smith & Partners Solicitors Client Account Change bank account (Smith &")).to_be_visible()

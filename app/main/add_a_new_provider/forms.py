@@ -3,7 +3,7 @@ from wtforms import RadioField, SubmitField
 from wtforms.fields.simple import StringField
 from wtforms.validators import Email, InputRequired, Length, Optional
 
-from app.components.tables import RadioDataTable, TableStructure
+from app.components.tables import RadioDataTable, TableStructureItem
 from app.constants import (
     ADVOCATE_LEVEL_CHOICES,
     CONSTITUTIONAL_STATUS_CHOICES,
@@ -470,7 +470,7 @@ class AssignContractManagerForm(BaseForm):
         filtered_managers = filtered_managers[start_id:end_id]
 
         # Create RadioDataTable for contract managers
-        table_structure: list[TableStructure] = [
+        table_structure: list[TableStructureItem] = [
             {"text": "Name", "id": "name", "classes": "govuk-!-width-full"},
         ]
         self.contract_manager_table = RadioDataTable(

@@ -10,7 +10,7 @@ CellFormat = Literal["numeric"]  # Currently numeric is the only valid cell form
 RowActionTypes = Literal["enter", "add", "change"]  # Actions are 'enter' if value is missing, 'add' or 'change'
 
 
-class TableStructure(TypedDict, total=False):
+class TableStructureItem(TypedDict, total=False):
     """
     Defines how a range of cells are labelled and rendered, with the range being a column (in a regular
     table) or a row (in a transposed table) of values with the same label.
@@ -30,6 +30,13 @@ class TableStructure(TypedDict, total=False):
         Callable[[dict[str, str]], str] | str | None
     )  # Function that takes row data, returns text for display.
     html_renderer: Callable[[dict[str, str]], str] | str | None  # Function that takes row data, returns HTML string
+
+
+class SummaryTableStructureItem(TableStructureItem):
+    """
+    Adds row action support as optional URLs for each supported action.
+    """
+
     row_action_urls: dict[RowActionTypes, str] | None  # Optional URLs used if the cell needs corresponding row actions
 
 
@@ -61,7 +68,7 @@ class DataTable:
     first_cell_is_header = False
     sortable_table = True  # Adds the moj-sortable-table data module
 
-    def __init__(self, structure: list[TableStructure], data: Data | RowData) -> None:
+    def __init__(self, structure: list[TableStructureItem], data: Data | RowData) -> None:
         """
         Helper class for generating the head and rows required for displaying GOV.UK Tables.
         Tables usually represent many objects with shared attributes, whereas transposed tables
@@ -84,7 +91,7 @@ class DataTable:
         self.data = data
 
     @staticmethod
-    def _validate_structure(structure: list[TableStructure]) -> None:
+    def _validate_structure(structure: list[TableStructureItem]) -> None:
         if not isinstance(structure, list):
             raise ValueError(f"Table structure must be a list, got {type(structure).__name__}")
 
@@ -105,7 +112,7 @@ class DataTable:
                 raise ValueError(f"Data row {i} must be a dict, got {type(row).__name__}. Row content: {row}")
 
     @staticmethod
-    def _get_cell(header: TableStructure, row_data: RowData) -> Cell:
+    def _get_cell(header: TableStructureItem, row_data: RowData) -> Cell:
         header_id = header.get("id", "")
         if header_id in row_data:
             text = str(row_data[header_id])
@@ -163,7 +170,7 @@ class DataTable:
         return params
 
 
-class TransposedDataTable(DataTable):
+class SummaryList(DataTable):
     """
     Renders the headings down the side, rather than along the top, and is intended to be
     started in an empty state and populated using the `add_row` method.
@@ -175,7 +182,7 @@ class TransposedDataTable(DataTable):
 
     def __init__(
         self,
-        structure: list[TableStructure] | None = None,
+        structure: list[SummaryTableStructureItem] | None = None,
         data: Data | RowData | None = None,
         headings: list[str] | None = None,
         card: Card | None = None,
@@ -196,7 +203,7 @@ class TransposedDataTable(DataTable):
         self.headings = headings or []
 
     @staticmethod
-    def _validate_structure(structure: list[TableStructure]) -> None:
+    def _validate_structure(structure: list[SummaryTableStructureItem]) -> None:
         """Override DataTable method to allow empty table structure."""
         if not isinstance(structure, list):
             raise ValueError(f"Table structure must be a list, got {type(structure).__name__}")
@@ -293,7 +300,7 @@ class TransposedDataTable(DataTable):
                 cell = self._get_cell(header=structure_item, row_data=row_data)
                 row_cells.append(cell)
 
-                # Row Actions (as additional cells)
+                # Row Actions
                 # 'Enter' actions are rendered where the value would be, so here we are only looking
                 # for 'Add' or 'Change' row actions
                 row_action_add_url = structure_item.get("row_action_urls", {}).get("add", None)
@@ -304,11 +311,6 @@ class TransposedDataTable(DataTable):
                     if url is None:
                         continue
                     action_cell = {"text": action, "href": url, "visuallyHiddenText": label}
-                    # If we do not have a card, we are presenting as a table, so specify the actual link
-                    if not self.card:
-                        action_cell["html"] = (
-                            f'<a class="govuk-link" href="{url}">{action}<span class="govuk-visually-hidden"> {label}</span></a>'
-                        )
                     row_cells.append(action_cell)
 
             rows.append(row_cells)
@@ -335,9 +337,7 @@ class TransposedDataTable(DataTable):
                 summary_rows.append({"key": row[0], "value": row[1]})
             # If we have more than the key and value, the rest are row actions (add | change)
             if len(row) > 2:
-                print(summary_rows[-1])
                 summary_rows[-1]["actions"] = {"items": row[2:]}
-                print(summary_rows[-1])
 
         params = {
             "rows": summary_rows,
@@ -373,7 +373,7 @@ class RadioDataTable(DataTable):
     sortable_table = False  # Disable sorting when using radio buttons
 
     def __init__(
-        self, structure: list[TableStructure], data: Data | RowData, radio_field_name: str, radio_value_key: str
+        self, structure: list[TableStructureItem], data: Data | RowData, radio_field_name: str, radio_value_key: str
     ) -> None:
         """
         Initialize RadioDataTable.
