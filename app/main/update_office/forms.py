@@ -1,5 +1,5 @@
 from wtforms.fields.simple import StringField
-from wtforms.validators import Optional
+from wtforms.validators import Length, Optional
 
 from app.models import Firm, Office
 from app.validators import (
@@ -35,6 +35,7 @@ class UpdateVATRegistrationNumberForm(BaseForm):
         ),
         validators=[
             Optional(),
+            Length(max=20, message="VAT registration number must not be greater than 20 characters"),
             ValidateVATRegistrationNumber(message="Enter the VAT registration number in the correct format"),
         ],
     )
