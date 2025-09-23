@@ -1,7 +1,7 @@
 from flask import current_app, render_template
 
 from app import auth
-from app.components.tables import DataTable, TableStructure, TransposedDataTable
+from app.components.tables import DataTable, SummaryList, TableStructureItem
 from app.main import bp
 from app.main.utils import get_full_info_html
 
@@ -22,7 +22,7 @@ def status():
 @bp.get("/provider/<int:firm_id>/office/<string:office_code>/contracts")
 @auth.login_required
 def contracts(firm_id: int, office_code: str, context):
-    columns: list[TableStructure] = [
+    columns: list[TableStructureItem] = [
         {"text": "Category of Law", "id": "categoryOfLaw"},
         {"text": "Sub Category of Law", "id": "subCategoryLaw"},
         {"text": "Authorisation Type", "id": "authorisationType"},
@@ -51,7 +51,7 @@ def contracts(firm_id: int, office_code: str, context):
 @bp.get("/provider/<int:firm_id>/office/<string:office_code>/schedules")
 @auth.login_required
 def schedules(firm_id: int, office_code: str, context):
-    columns: list[TableStructure] = [
+    columns: list[TableStructureItem] = [
         {"text": "Contract Description", "id": "contractDescription"},
         {"text": "Contract Reference", "id": "contractReference"},
         {"text": "Contract Type", "id": "contractType"},
@@ -84,7 +84,7 @@ def schedules(firm_id: int, office_code: str, context):
 @bp.get("/provider/<int:firm_id>/office/<string:office_code>/bank-details")
 @auth.login_required
 def bank_details(firm_id: int, office_code: str, context):
-    rows: list[TableStructure] = [
+    rows: list[TableStructureItem] = [
         {"text": "Vendor Site ID", "id": "vendorSiteId"},
         {"text": "Bank Name", "id": "bankName"},
         {"text": "Bank Branch Name", "id": "bankBranchName"},
@@ -126,7 +126,7 @@ def bank_details(firm_id: int, office_code: str, context):
         "zip": "SW1A 1AA",
     }
 
-    table = TransposedDataTable(structure=rows, data=example_data)
+    table = SummaryList(structure=rows, data=example_data)
 
     return render_template(
         "bank-details.html", firm_id=firm_id, office_code=office_code, office_name=office_name, table=table

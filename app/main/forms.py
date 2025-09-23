@@ -2,7 +2,7 @@ from flask import current_app, url_for
 from wtforms.fields.simple import StringField
 from wtforms.validators import Length
 
-from app.components.tables import DataTable, TableStructure
+from app.components.tables import DataTable, TableStructureItem
 from app.forms import BaseForm
 from app.models import Firm
 from app.utils.formatting import format_sentence_case
@@ -65,7 +65,7 @@ class ProviderListForm(BaseForm):
         start_id = self.providers_shown_per_page * (self.page - 1)
         end_id = self.providers_shown_per_page * (self.page - 1) + self.providers_shown_per_page
 
-        columns: list[TableStructure] = [
+        columns: list[TableStructureItem] = [
             {"text": "Provider name", "id": "firm_name", "html_renderer": firm_name_html},
             {"text": "Provider type", "id": "firm_type", "format_text": format_sentence_case},
             {"text": "Provider number", "id": "firm_number"},

@@ -1,13 +1,21 @@
 from collections.abc import Callable
 from typing import Any, Literal, TypedDict
 
+from app.utils.formatting import format_uncapitalized
+
 DEFAULT_TABLE_CLASSES = "govuk-table--small-text-until-tablet"
 SORTABLE_TABLE_MODULE = "moj-sortable-table"
 
 CellFormat = Literal["numeric"]  # Currently numeric is the only valid cell format option
+RowActionTypes = Literal["enter", "add", "change"]  # Actions are 'enter' if value is missing, 'add' or 'change'
 
 
-class TableStructure(TypedDict, total=False):
+class TableStructureItem(TypedDict, total=False):
+    """
+    Defines how a range of cells are labelled and rendered, with the range being a column (in a regular
+    table) or a row (in a transposed table) of values with the same label.
+    """
+
     text: str  # Display text of the header
     format: CellFormat | None  # Format of the table cell, "numeric" wil right align the cell
     classes: str | None  # CSS classes to add to the table column, as comma separated class names.
@@ -22,6 +30,14 @@ class TableStructure(TypedDict, total=False):
         Callable[[dict[str, str]], str] | str | None
     )  # Function that takes row data, returns text for display.
     html_renderer: Callable[[dict[str, str]], str] | str | None  # Function that takes row data, returns HTML string
+
+
+class SummaryTableStructureItem(TableStructureItem):
+    """
+    Adds row action support as optional URLs for each supported action.
+    """
+
+    row_action_urls: dict[RowActionTypes, str] | None  # Optional URLs used if the cell needs corresponding row actions
 
 
 class Card(TypedDict, total=False):
@@ -52,8 +68,18 @@ class DataTable:
     first_cell_is_header = False
     sortable_table = True  # Adds the moj-sortable-table data module
 
-    def __init__(self, structure: list[TableStructure], data: Data | RowData) -> None:
-        """Helper class for generating the head and rows required for displaying GOV.UK Tables."""
+    def __init__(self, structure: list[TableStructureItem], data: Data | RowData) -> None:
+        """
+        Helper class for generating the head and rows required for displaying GOV.UK Tables.
+        Tables usually represent many objects with shared attributes, whereas transposed tables
+        usually represent a single object with many attributes.
+
+        Args:
+            structure: List of `TableStructure` used by the table to label and render the columns (regular table) or
+            rows (transposed table) of values.
+            data: The values for the cells, each dict given representing a 'row' (regular table) or 'column'
+             (transposed table), and having a key which matches the `id` property in the associated TableStructure item.
+        """
         self._validate_structure(structure)
 
         if isinstance(data, dict):
@@ -65,7 +91,7 @@ class DataTable:
         self.data = data
 
     @staticmethod
-    def _validate_structure(structure: list[TableStructure]) -> None:
+    def _validate_structure(structure: list[TableStructureItem]) -> None:
         if not isinstance(structure, list):
             raise ValueError(f"Table structure must be a list, got {type(structure).__name__}")
 
@@ -86,7 +112,7 @@ class DataTable:
                 raise ValueError(f"Data row {i} must be a dict, got {type(row).__name__}. Row content: {row}")
 
     @staticmethod
-    def _get_cell(header: TableStructure, row_data: RowData) -> Cell:
+    def _get_cell(header: TableStructureItem, row_data: RowData) -> Cell:
         header_id = header.get("id", "")
         if header_id in row_data:
             text = str(row_data[header_id])
@@ -144,18 +170,27 @@ class DataTable:
         return params
 
 
-class TransposedDataTable(DataTable):
+class SummaryList(DataTable):
+    """
+    Renders the headings down the side, rather than along the top, and is intended to be
+    started in an empty state and populated using the `add_row` method.
+
+    Transposed data tables can also have a 'Card' along the top to summarise information.
+    """
+
     first_cell_is_header = True  # The first cell in each row will be a bold table header
 
     def __init__(
         self,
-        structure: list[TableStructure],
-        data: Data | RowData,
+        structure: list[SummaryTableStructureItem] | None = None,
+        data: Data | RowData | None = None,
         headings: list[str] | None = None,
         card: Card | None = None,
     ) -> None:
-        """Helper class for generating the head and rows required for displaying transposed GOV.UK Tables."""
-        super().__init__(structure, data)
+        """
+        Helper class for generating the head and rows required for displaying transposed GOV.UK Tables.
+        """
+        super().__init__(structure if structure else [], data if data else [])
         self.card = card
 
         if headings is not None:
@@ -167,11 +202,93 @@ class TransposedDataTable(DataTable):
 
         self.headings = headings or []
 
+    @staticmethod
+    def _validate_structure(structure: list[SummaryTableStructureItem]) -> None:
+        """Override DataTable method to allow empty table structure."""
+        if not isinstance(structure, list):
+            raise ValueError(f"Table structure must be a list, got {type(structure).__name__}")
+
+        for i, column in enumerate(structure):
+            if not isinstance(column, dict):
+                raise ValueError(f"Table structure item {i} must be a dict, got {type(column).__name__}")
+
+    def add_row(
+        self,
+        value,
+        label,
+        formatter=None,
+        html=None,
+        row_action_urls: dict[RowActionTypes, str] | None = None,
+        default_value: str = "No data",
+    ):
+        """
+        Helper to add a single field to this table, optionally specifying which row actions should
+        be added by including appropriately keyed URLs.
+
+        Uses the label converted to snake_case as the `id` linking the TableStructure item and the data value.
+
+        If `row_action_urls` are specified, the corresponding action link will be included if appropriate.
+        The `enter` row action generates an HTML link where the value would normally go, but only when there is no
+        value and the `enter` URL is given, otherwise the `default_value` will be presented.
+        See `TransposedDataTable.get_rows` for more information.
+
+        Args:
+            value: String value to appear in a cell
+            label: String presentation label, also used as ID after conversion to snake_case
+            formatter: Optional Callable, used to convert `value` into the presented string in the cell
+            html: Optional Callable, used during table generation to provide the HTML for the cell
+            row_action_urls: Optional dict, using `RowActionTypes` as key and a URL as value.
+            default_value: Optional string used when there is no value and no `enter` URL in `row_action_urls`
+        """
+        if row_action_urls is None:
+            row_action_urls = {}
+
+        # Convert label to snake_case for the ID
+        field_id = label.lower().replace(" ", "_")
+
+        empty_value_has_row_action = not value and not html and row_action_urls.get("enter", None) is not None
+
+        structure_item = {"text": label, "id": field_id, "classes": "govuk-!-width-one-half"}
+        if empty_value_has_row_action:
+            # If we do not have a value but do have a link to enter a new value, show the HTML change link
+            # where the value would normally go.
+            structure_item.update(
+                {
+                    "html_renderer": f"<a class='govuk-link', href='{row_action_urls.get('enter')}'>Enter {format_uncapitalized(label)}</a>"
+                }
+            )
+            # Note we are not adding any other row actions even if provided.
+        else:
+            # Format the displayed value if we have a formatter and a value to format...
+            value = formatter(value) if formatter and value else value
+            # ...but use the unformatted default_value if there was no value.
+            value = value if value else default_value
+
+            if html:
+                structure_item.update({"html_renderer": html})
+            if row_action_urls:
+                structure_item.update({"row_action_urls": row_action_urls})
+
+        self.structure.append(structure_item)
+        if len(self.data) == 0:
+            self.data.append({})
+        self.data[-1][field_id] = value
+
+        self._validate_data(self.data)
+        self._validate_structure(self.structure)
+
     def get_rows(self) -> list[Row]:
         """Generate transposed table rows.
 
-        Each row corresponds to a field from the structure, with the first cell being
-        the field name and subsequent cells containing the field values for each data record.
+        Each row corresponds to a field from the structure, with the first cell being the field name and subsequent
+        cells containing the field values for each data record.
+
+        If `add` or `change` entries are in `row_action_urls` extra cells are added for the corresponding row actions.
+        The `enter` entry should be used in place of the cell value if there is no value: This is managed automatically
+         if adding data via `TransposedDataTable.add_row`
+
+        Returns:
+            List of Lists (one per row), each inner list containing Cells
         """
         rows = []
         for structure_item in self.structure:
@@ -183,9 +300,26 @@ class TransposedDataTable(DataTable):
                 cell = self._get_cell(header=structure_item, row_data=row_data)
                 row_cells.append(cell)
 
+                # Row Actions
+                # 'Enter' actions are rendered where the value would be, so here we are only looking
+                # for 'Add' or 'Change' row actions
+                row_action_add_url = structure_item.get("row_action_urls", {}).get("add", None)
+                row_action_change_url = structure_item.get("row_action_urls", {}).get("change", None)
+                label = format_uncapitalized(structure_item.get("text", ""))
+
+                for action, url in [("Add", row_action_add_url), ("Change", row_action_change_url)]:
+                    if url is None:
+                        continue
+                    action_cell = {"text": action, "href": url, "visuallyHiddenText": label}
+                    row_cells.append(action_cell)
+
             rows.append(row_cells)
 
         return rows
+
+    @property
+    def is_populated(self):
+        return len(self.structure) > 0
 
     def get_headings(self) -> list[dict[str, str]]:
         return [{"text": heading, "classes": ""} for heading in self.headings]
@@ -199,8 +333,11 @@ class TransposedDataTable(DataTable):
         summary_rows = []
 
         for row in table_rows:
-            if len(row) == 2:  # Should have at least key and one value
+            if len(row) >= 2:  # Should have at least key and one value, and sometimes row action cells
                 summary_rows.append({"key": row[0], "value": row[1]})
+            # If we have more than the key and value, the rest are row actions (add | change)
+            if len(row) > 2:
+                summary_rows[-1]["actions"] = {"items": row[2:]}
 
         params = {
             "rows": summary_rows,
@@ -236,7 +373,7 @@ class RadioDataTable(DataTable):
     sortable_table = False  # Disable sorting when using radio buttons
 
     def __init__(
-        self, structure: list[TableStructure], data: Data | RowData, radio_field_name: str, radio_value_key: str
+        self, structure: list[TableStructureItem], data: Data | RowData, radio_field_name: str, radio_value_key: str
     ) -> None:
         """
         Initialize RadioDataTable.
@@ -299,15 +436,3 @@ class RadioDataTable(DataTable):
         }
         params.update(kwargs)
         return params
-
-
-def add_field(rows, data, value, label, formatter=None, html=None):
-    """Helper to add a field to a data table if it has a value. Uses snake_case label as ID."""
-    if value:
-        # Convert label to snake_case for the ID
-        field_id = label.lower().replace(" ", "_")
-        row = {"text": label, "id": field_id, "classes": "govuk-!-width-one-half"}
-        if html:
-            row.update({"html_renderer": html})
-        rows.append(row)
-        data[field_id] = formatter(value) if formatter else value
