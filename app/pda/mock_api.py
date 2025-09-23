@@ -224,7 +224,7 @@ class MockProviderDataApi:
         for office in offices:
             # Child offices have headOffice = parent's office ID
             # Head offices have headOffice = "N/A"
-            if office.head_office == "N/A":
+            if office.get_is_head_office():
                 return office
         return None
 

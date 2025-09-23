@@ -8,6 +8,7 @@ from wtforms import StringField
 
 from app.main.utils import change_liaison_manager
 from app.models import Contact
+from app.pda.mock_api import MockProviderDataApi
 from app.utils import register_form_view
 from app.views import BaseFormView
 
@@ -198,6 +199,14 @@ class TestRegisterFormViewIntegration:
 
 
 class TestChangeLiaisonManager:
+    @pytest.fixture(autouse=True)
+    def setup_mock_api(self, app):
+        """Ensure each test starts with a clean MockProviderDataApi."""
+        with app.app_context():
+            mock_pda = MockProviderDataApi()
+            mock_pda.init_app(app)
+            app.extensions["pda"] = mock_pda
+
     def test_successful_change_with_mock_api(self, app):
         """Test successful liaison manager change with MockPDA."""
         mock_contact = Contact(
