@@ -1,6 +1,7 @@
 from flask import Blueprint
 
 from app.main.forms import ProviderListForm
+from app.main.update_office.views import UpdateVATRegistrationNumberFormView
 from app.main.views import ProviderList, ViewOffice, ViewProvider
 from app.utils import register_form_view
 
@@ -42,3 +43,8 @@ bp.add_url_rule(
 
 add_a_new_provider.register_views(bp)
 add_a_new_office.register_views(bp)
+
+bp.add_url_rule(
+    "/provider/<firm:firm>/office/<office:office>/add-vat-number",
+    view_func=UpdateVATRegistrationNumberFormView.as_view("add_office_vat_number"),
+)

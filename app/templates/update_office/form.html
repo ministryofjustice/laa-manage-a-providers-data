@@ -1,0 +1,9 @@
+{# This is the base form page that should be used or extended for all question pages. #}
+{% extends 'form.html' %}
+
+{% block caption %}
+  <span class="govuk-caption-xl">{{ form.caption }}</span>
+  <h1 class="govuk-heading-l govuk-!-margin-bottom-1">Office: {{ form.office.firm_office_code }}</h1>
+    <p class="govuk-body">{{ form.office.format_address() }}</p>
+  <h1 class="govuk-heading-xl">{{ form.title|replace('\n', '<br>')|safe }}</h1>
+{% endblock %}
