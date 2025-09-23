@@ -374,6 +374,10 @@ class LiaisonManagerForm(BaseForm):
             Email(message="Enter a valid email address"),
             Length(max=255, message="Email address must be 255 characters or less"),
         ],
+        filters=[
+            # Remove all leading and trailing whitespace from field before processing it
+            lambda data: data.strip() if data else None,
+        ],
     )
 
     telephone_number = StringField(

@@ -1,6 +1,8 @@
 import pytest
 from flask import get_flashed_messages, session
+from werkzeug.datastructures import MultiDict
 
+from app.main.add_a_new_provider.forms import LiaisonManagerForm
 from app.main.utils import add_new_provider, create_provider_from_session
 from app.models import Firm
 from app.pda.api import ProviderDataApi
@@ -105,6 +107,11 @@ class TestAddNewProvider:
             category, message = messages[0]
             assert category == "success"
             assert message == "<b>New legal services provider successfully created</b>"
+
+    def test_add_new_provider_liaison_manager_email_with_spaces(self, app):
+        form = LiaisonManagerForm(formdata=MultiDict({"email_address": " test@local.com "}))
+        form.validate()
+        assert "email_address" not in form.errors
 
 
 class TestCreateProviderFromSession:
