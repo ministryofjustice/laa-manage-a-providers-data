@@ -135,3 +135,34 @@ def format_office_address_multi_line_html(office_data: dict | Office) -> str:
 
     # Filter out None and empty string values, then join with commas
     return ",<br>".join(field.strip() for field in fields if field and field.strip())
+
+
+def format_uncapitalized(s: str) -> str:
+    """
+    Lower-case only the first character unless a heuristic detects the first word is an acronym.
+    Almost the reverse of `str.capitalize` and useful when strings contain acronyms which should
+    not be lower-cased.
+
+    Handles strings starting with an acronym:
+    >>> format_uncapitalized('VAT number')
+    'VAT number'
+
+    Handles acronyms inside strings
+    >>> format_uncapitalized('Primary MAPD account')
+    'primary MAPD account'
+
+    Handles regular strings
+    >>> format_uncapitalized('Correspondence address')
+    'correspondence address'
+
+    Args:
+        s: String to be changed
+
+    Returns:
+        String
+    """
+    if not s:
+        return s
+    starts_with_acronym = len(s) > 1 and s[1].isupper()
+    continuation_cased = s if starts_with_acronym else s.replace(s[0], s[0].lower(), 1)
+    return continuation_cased

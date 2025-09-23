@@ -4,7 +4,7 @@ from playwright.sync_api import expect
 
 def navigate_to_office_page(page):
     """Helper function to navigate to an office page via UI flow."""
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
 
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
@@ -76,7 +76,7 @@ def test_view_office_parent_provider_link(page):
 @pytest.mark.usefixtures("live_server")
 def test_office_page_navigation_from_offices_list(page):
     """Test navigation from offices list to individual office page."""
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
 
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
@@ -110,24 +110,18 @@ def test_office_breadcrumbs(page):
 @pytest.mark.usefixtures("live_server")
 def test_office_bank_payment_details(page):
     navigate_to_office_page(page)
-    page.get_by_role("link", name="Bank account and payments").click()
-    expect(page.get_by_role("heading", name="Payment information")).to_be_visible()
-    expect(page.get_by_role("link", name="Add")).to_be_visible()
+    page.get_by_role("link", name="Bank accounts and payment").click()
 
-    expect(page.get_by_role("rowheader", name="VAT registration number")).to_be_visible()
-    expect(page.get_by_role("cell", name="GB123456789")).to_be_visible()
-    expect(page.get_by_role("link", name="Change", exact=True)).to_be_visible()
+    expect(page.get_by_role("definition").filter(has_text="Payment method")).to_be_visible()
+    expect(page.get_by_role("link", name="Enter payment method")).to_be_visible()
 
-    expect(page.get_by_role("heading", name="Bank accounts")).to_be_visible()
-    expect(page.get_by_role("heading", name="Smith & Partners Solicitors")).to_be_visible()
-    expect(page.get_by_role("link", name="Change bank account  (Smith")).to_be_visible()
-    expect(page.get_by_text("Account name")).to_be_visible()
+    expect(page.get_by_role("definition").filter(has_text="VAT registration number")).to_be_visible()
+    expect(page.get_by_text("GB123456789")).to_be_visible()
+    expect(page.get_by_role("link", name="Change   VAT registration")).to_be_visible()
+
+    expect(page.get_by_text("Smith & Partners Solicitors Client Account Change bank account (Smith &")).to_be_visible()
     expect(page.get_by_role("definition").filter(has_text="Smith & Partners Solicitors")).to_be_visible()
-
-    expect(page.get_by_text("Account number")).to_be_visible()
     expect(page.get_by_text("12345678", exact=True)).to_be_visible()
-
-    expect(page.get_by_text("Sort code")).to_be_visible()
     expect(page.get_by_text("203045")).to_be_visible()
 
     expect(page.get_by_role("button", name="Add bank account")).to_be_visible()
@@ -153,11 +147,13 @@ def test_office_contact(page):
 
 @pytest.mark.usefixtures("live_server")
 def test_office_no_vat_registration_number(page):
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
+
+    # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
+
     page.get_by_role("link", name="METROPOLITAN LAW CENTRE").click()
     page.get_by_role("link", name="Offices").click()
     page.get_by_role("link", name="3A001L").click()
-    page.get_by_role("link", name="Bank account and payments").click()
-    expect(page.get_by_role("rowheader", name="VAT registration number")).to_be_visible()
-    expect(page.get_by_role("link", name="Add VAT registration number")).to_be_visible()
+    page.get_by_role("link", name="Bank accounts and payment").click()
+    expect(page.get_by_role("link", name="Enter vat registration number")).to_be_visible()

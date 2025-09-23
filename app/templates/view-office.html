@@ -68,7 +68,7 @@
         "href": url_for("main.view_office_contact", firm=firm, office=office),
         "active": subpage == "contact"
       }, {
-        "text": "Bank account and payments",
+        "text": "Bank accounts and payment",
         "href": url_for("main.view_office_bank_payment_details", firm=firm, office=office),
         "active": subpage == "bank-payment-details"
       }]
@@ -90,10 +90,10 @@
 
     {% if subpage == "bank-payment-details" %}
         <h2 class="govuk-heading-m">Payment information</h2>
-        {{ govukTable(payment_information_table.to_govuk_params()) }}
+        {{ govukSummaryList(payment_information_table.to_summary_govuk_params()) }}
 
         <h2 class="govuk-heading-m">VAT registration number</h2>
-        {{ govukTable(vat_registration_table.to_govuk_params()) }}
+        {{ govukSummaryList(vat_registration_table.to_summary_govuk_params()) }}
 
         <h2 class="govuk-heading-m">Bank accounts</h2>
         {% if bank_account_table %}

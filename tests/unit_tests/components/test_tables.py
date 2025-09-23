@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from app.components.tables import DEFAULT_TABLE_CLASSES, SORTABLE_TABLE_MODULE, DataTable, TransposedDataTable
+from app.components.tables import DEFAULT_TABLE_CLASSES, SORTABLE_TABLE_MODULE, DataTable, SummaryList
 
 
 class TestDataTable:
@@ -178,7 +178,7 @@ class TestTransposedDataTable:
         structure = [{"text": "Name", "id": "name"}]
         data = [{"name": "John"}]
 
-        table = TransposedDataTable(structure, data)
+        table = SummaryList(structure, data)
 
         assert table.structure == structure
         assert table.data == data
@@ -190,7 +190,7 @@ class TestTransposedDataTable:
         data = [{"name": "John"}, {"name": "Jane"}]
         headings = ["Field", "Person 1", "Person 2"]
 
-        table = TransposedDataTable(structure, data, headings)
+        table = SummaryList(structure, data, headings)
 
         assert table.headings == headings
 
@@ -200,14 +200,14 @@ class TestTransposedDataTable:
         headings = ["Field", "Person 1"]  # Should be 3 items
 
         with pytest.raises(ValueError, match="Headings length \\(2\\) must match data length \\+ 1 \\(3\\)"):
-            TransposedDataTable(structure, data, headings)
+            SummaryList(structure, data, headings)
 
     def test_init_with_single_dict_data(self):
         structure = [{"text": "Name", "id": "name"}]
         data = {"name": "John"}
         headings = ["Field", "Value"]
 
-        table = TransposedDataTable(structure, data, headings)
+        table = SummaryList(structure, data, headings)
 
         assert table.data == [{"name": "John"}]
         assert table.headings == headings
@@ -216,7 +216,7 @@ class TestTransposedDataTable:
         structure = [{"text": "Name", "id": "name"}, {"text": "Age", "id": "age", "format": "numeric"}]
         data = [{"name": "John", "age": "30"}, {"name": "Jane", "age": "25"}]
 
-        table = TransposedDataTable(structure, data)
+        table = SummaryList(structure, data)
         rows = table.get_rows()
 
         expected = [
@@ -229,7 +229,7 @@ class TestTransposedDataTable:
         structure = [{"text": "Name", "id": "name", "classes": "name-header"}]
         data = [{"name": "John"}]
 
-        table = TransposedDataTable(structure, data)
+        table = SummaryList(structure, data)
         rows = table.get_rows()
 
         assert rows[0][0] == {"text": "Name", "classes": "name-header"}
@@ -239,7 +239,7 @@ class TestTransposedDataTable:
         data = [{"name": "John"}]
         headings = ["Field", "Value"]
 
-        table = TransposedDataTable(structure, data, headings)
+        table = SummaryList(structure, data, headings)
         result_headings = table.get_headings()
 
         expected = [{"text": "Field", "classes": ""}, {"text": "Value", "classes": ""}]
@@ -249,7 +249,7 @@ class TestTransposedDataTable:
         structure = [{"text": "Name", "id": "name"}]
         data = [{"name": "John"}]
 
-        table = TransposedDataTable(structure, data)
+        table = SummaryList(structure, data)
         headings = table.get_headings()
 
         assert headings == []
@@ -258,7 +258,7 @@ class TestTransposedDataTable:
         structure = [{"text": "Name", "id": "name"}, {"text": "Age", "id": "age"}]
         data = [{"name": "John", "age": "30"}]
 
-        table = TransposedDataTable(structure, data)
+        table = SummaryList(structure, data)
         params = table.to_summary_govuk_params()
 
         expected_rows = [
@@ -280,7 +280,7 @@ class TestTransposedDataTable:
             "action_visually_hidden_text": "contact details",
         }
 
-        table = TransposedDataTable(structure, data, card=card)
+        table = SummaryList(structure, data, card=card)
         params = table.to_summary_govuk_params()
 
         expected_card = {
@@ -304,7 +304,7 @@ class TestTransposedDataTable:
         data = [{"name": "John"}]
         card = {"title": "Simple Card"}
 
-        table = TransposedDataTable(structure, data, card=card)
+        table = SummaryList(structure, data, card=card)
         params = table.to_summary_govuk_params()
 
         expected_card = {"title": {"text": "Simple Card"}}
@@ -314,7 +314,7 @@ class TestTransposedDataTable:
         structure = [{"text": "Name", "id": "name"}]
         data = [{"name": "John"}]
 
-        table = TransposedDataTable(structure, data)
+        table = SummaryList(structure, data)
         params = table.to_summary_govuk_params(classes="custom-class", custom_attr="value")
 
         assert params["classes"] == "custom-class"
@@ -328,7 +328,7 @@ class TestTransposedDataTable:
         ]
         data = [{"name": "John", "email": "JOHN@EXAMPLE.COM", "profile": "john"}]
 
-        table = TransposedDataTable(structure, data)
+        table = SummaryList(structure, data)
         params = table.to_summary_govuk_params()
 
         assert len(params["rows"]) == 3
@@ -373,7 +373,7 @@ class TestIntegration:
             {"name": "Jane", "city": "NYC"},  # Missing age
         ]
 
-        table = TransposedDataTable(structure, data)
+        table = SummaryList(structure, data)
         rows = table.get_rows()
 
         # Check that missing values become empty strings

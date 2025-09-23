@@ -1,4 +1,3 @@
-from app.main import bp
 from app.utils import register_form_view
 
 from .forms import (
@@ -29,7 +28,7 @@ from .views import (
 )
 
 
-def register_views():
+def register_views(bp):
     register_form_view(form_class=AddProviderForm, view_class=AddProviderFormView, blueprint=bp)
 
     register_form_view(form_class=LspDetailsForm, view_class=LspDetailsFormView, blueprint=bp)
@@ -57,6 +56,3 @@ def register_views():
     register_form_view(
         form_class=AddAdvocateForm, view_class=AddAdvocateFormView, blueprint=bp, endpoint="add_advocate_form"
     )
-
-
-register_views()
