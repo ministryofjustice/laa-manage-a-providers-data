@@ -18,7 +18,7 @@ class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
         return super().form_valid(form)
 
     def get(self, firm, office, *args, **kwargs):
-        form = self.get_form_class()(firm=firm, office=office)
+        form = self.get_form_class()(firm=firm, office=office, vat_registration_number=office.vat_registration_number)
         return render_template(self.template, **self.get_context_data(form, **kwargs))
 
     def post(self, firm, office, *args, **kwargs) -> Response | str:
