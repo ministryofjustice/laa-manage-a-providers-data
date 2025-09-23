@@ -57,13 +57,51 @@ def get_contact_tables(firm: Firm, head_office: Office = None) -> list[DataTable
     return contact_tables
 
 
+def get_payment_information_table(firm: Firm, office: Office) -> DataTable:
+    table = SummaryList()
+    table.add_row(value=None, label="Payment method", row_action_urls={"enter": "#", "change": "#"})
+    return table
+
+
+def get_vat_registration_table(firm: Firm, office: Office) -> DataTable:
+    table = SummaryList()
+    table.add_row(
+        value=office.vat_registration_number,
+        label="VAT registration number",
+        row_action_urls={"enter": "#", "change": "#"},
+    )
+    return table
+
+
+def get_office_overview_table(firm: Firm, office: Office) -> DataTable:
+    table = SummaryList()
+    table.add_row(firm.firm_name, "Parent provider", html=provider_name_html(firm))
+    table.add_row(office.firm_office_code, "Account number")
+    table.add_row(office.head_office, "Head office", format_head_office)
+    table.add_row(firm.firm_type, "Supplier type", format_firm_type)
+    return table
+
+
+def get_bank_account_table(bank_account: BankAccount) -> DataTable | None:
+    if bank_account is None:
+        return None
+
+    card: Card = {"title": bank_account.bank_account_name, "action_text": "Change bank account", "action_url": "#"}
+    table = SummaryList(card=card)
+    table.add_row(bank_account.bank_account_name, "Account name")
+    table.add_row(bank_account.account_number, "Account number")
+    table.add_row(bank_account.sort_code, "Sort code")
+    # Effective date from still to be implemented
+    return table
+
+
 def provider_name_html(provider: Firm | dict):
     if isinstance(provider, Firm):
         _firm_id = provider.firm_id
         _firm_name = provider.firm_name
     elif isinstance(provider, Dict):
-        _firm_id = provider.get("firm_id")
-        _firm_name = provider.get("firm_name")
+        _firm_id = int(provider.get("firm_id") or provider.get("advocate_number") or provider.get("barrister_number"))
+        _firm_name = provider.get("firm_name") or provider.get("advocate_name") or provider.get("barrister_name")
     else:
         raise ValueError(f"Provider {provider} must be a Provider or dict")
     return f"<a class='govuk-link', href={url_for('main.view_provider', firm=_firm_id)}>{_firm_name}</a>"
@@ -152,11 +190,13 @@ class ViewProvider(MethodView):
         ],
     }
 
-    def __init__(self, subpage: Literal["contact", "offices", "barristers-advocates"] = "contact"):
+    def __init__(
+        self, subpage: Literal["contact", "offices", "barristers-advocates", "bank-accounts-payment"] = "contact"
+    ):
         if subpage:
             self.subpage = subpage
 
-    def get_main_table(self, firm: Firm, head_office: Office | None, parent_firm: Firm | None) -> TransposedDataTable:
+    def get_main_table(self, firm: Firm, head_office: Office | None, parent_firm: Firm | None) -> SummaryList:
         data_source_map = {
             "firm": firm.to_internal_dict() if firm else {},
             "head_office": head_office.to_internal_dict() if head_office else {},
@@ -171,18 +211,21 @@ class ViewProvider(MethodView):
                 raise ValueError(f"{field.get('data_source', 'firm')} is not a valid data source")
 
             value = data_source.get(field["id"])
-            
+
             if not value and field.get("hide_if_null", False):
-              continue
+                continue
+
+            if html_renderer := field.get("html_renderer"):
+                if not isinstance(html_renderer, Callable):
+                    raise ValueError("html_renderer must be callable")
+                field["html"] = html_renderer(data_source)
 
             main_table.add_row(
-                main_rows,
-                main_data,
                 value=value,
                 label=field.get("label"),
                 formatter=field.get("formatter"),
                 html=field.get("html"),
-                default_value=field.get("default", "No data")
+                default_value=field.get("default", "No data"),
             )
 
         return main_table
@@ -315,6 +358,7 @@ class ViewProvider(MethodView):
         if firm.firm_id:
             # Get head office for account number
             head_office: Office = pda.get_head_office(firm.firm_id)
+            context.update({"head_office": head_office})
 
         if firm.parent_firm_id:
             # Get parent provider
@@ -345,6 +389,19 @@ class ViewProvider(MethodView):
             context.update({"barristers_table": self.get_barristers_table(firm)})
             context.update({"advocates_table": self.get_advocates_table(firm)})
 
+        if self.subpage == "bank-accounts-payment":
+            if head_office:
+                bank_account: BankAccount = pda.get_office_bank_account(
+                    firm_id=firm.firm_id, office_code=head_office.firm_office_code
+                )
+                context.update(
+                    {
+                        "vat_registration_table": get_vat_registration_table(firm, head_office),
+                        "payment_information_table": get_payment_information_table(firm, head_office),
+                        "bank_account_table": get_bank_account_table(bank_account),
+                    }
+                )
+
         return context
 
     def get(self, firm: Firm | None = None):
@@ -366,40 +423,6 @@ class ViewOffice(MethodView):
         if subpage:
             self.subpage = subpage
 
-    def get_payment_information_table(self, firm: Firm, office: Office) -> DataTable:
-        table = SummaryList()
-        table.add_row(value=None, label="Payment method", row_action_urls={"enter": "#", "change": "#"})
-        return table
-
-    def get_vat_registration_table(self, firm: Firm, office: Office) -> DataTable:
-        table = SummaryList()
-        table.add_row(
-            value=office.vat_registration_number,
-            label="VAT registration number",
-            row_action_urls={"enter": "#", "change": "#"},
-        )
-        return table
-
-    def get_office_overview_table(self, firm: Firm, office: Office) -> DataTable:
-        table = SummaryList()
-        table.add_row(firm.firm_name, "Parent provider", html=provider_name_html(firm))
-        table.add_row(office.firm_office_code, "Account number")
-        table.add_row(office.head_office, "Head office", format_head_office)
-        table.add_row(firm.firm_type, "Supplier type", format_firm_type)
-        return table
-
-    def get_bank_account_table(self, bank_account: BankAccount) -> DataTable | None:
-        if bank_account is None:
-            return None
-
-        card: Card = {"title": bank_account.bank_account_name, "action_text": "Change bank account", "action_url": "#"}
-        table = SummaryList(card=card)
-        table.add_row(bank_account.bank_account_name, "Account name")
-        table.add_row(bank_account.account_number, "Account number")
-        table.add_row(bank_account.sort_code, "Sort code")
-        # Effective date from still to be implemented
-        return table
-
     def get_context(self, firm: Firm, office: Office) -> Dict:
         context = {"firm": firm, "office": office, "subpage": self.subpage}
 
@@ -410,9 +433,9 @@ class ViewOffice(MethodView):
             )
             context.update(
                 {
-                    "vat_registration_table": self.get_vat_registration_table(firm, office),
-                    "payment_information_table": self.get_payment_information_table(firm, office),
-                    "bank_account_table": self.get_bank_account_table(bank_account),
+                    "vat_registration_table": get_vat_registration_table(firm, office),
+                    "payment_information_table": get_payment_information_table(firm, office),
+                    "bank_account_table": get_bank_account_table(bank_account),
                 }
             )
 
@@ -420,7 +443,7 @@ class ViewOffice(MethodView):
             context.update({"contact_tables": get_contact_tables(firm, office)})
 
         if self.subpage == "overview":
-            context.update({"overview_table": self.get_office_overview_table(firm, office)})
+            context.update({"overview_table": get_office_overview_table(firm, office)})
 
         return context
 
@@ -441,35 +464,10 @@ class ViewOffice(MethodView):
             return f"<a class='govuk-link', href='#'>{link_action}</a>"
         return None
 
-    def get_payment_information_table(self, firm: Firm, office: Office) -> DataTable:
-        # Always three cells
-        rows, data = [], {"firm_id": firm.firm_id, "firm_office_id": office.firm_office_id}
-        # No value, as we don't store it yet
-        add_field(rows, data, " ", "Payment method")
-        return TransposedDataTable(structure=rows, data=data, change_link=self.change_link_for_payment_method)
-
-    def get_vat_registration_table(self, firm: Firm, office: Office) -> DataTable:
-        rows, data = [], {"firm_id": firm.firm_id, "firm_office_id": office.firm_office_id}
-        # Two cells if there is no current value, else three cells
-        has_existing_value = office.vat_registration_number is not None
-        value = office.vat_registration_number if has_existing_value else " "
-        replace_value_with_add_link = not has_existing_value
-        change_link = self.change_link_for_vat_registration if has_existing_value else None
-        add_field(
-            rows,
-            data,
-            value,
-            "VAT registration number",
-            html="<a class='govuk-link', href='#'>Add VAT registration number</a>"
-            if replace_value_with_add_link
-            else None,
-        )
-        return TransposedDataTable(structure=rows, data=data, change_link=change_link)
-
     def get(self, firm: Firm, office: Office | None = None):
         if not firm or not office:
             abort(404)
- 
+
         context = self.get_context(firm, office)
 
         return render_template(self.template, **context)

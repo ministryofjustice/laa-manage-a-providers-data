@@ -186,14 +186,12 @@ class SummaryList(DataTable):
         data: Data | RowData | None = None,
         headings: list[str] | None = None,
         card: Card | None = None,
-        change_link: Callable | None = None,
     ) -> None:
         """
         Helper class for generating the head and rows required for displaying transposed GOV.UK Tables.
         """
         super().__init__(structure if structure else [], data if data else [])
         self.card = card
-        self.change_link = change_link
 
         if headings is not None:
             expected_heading_count = len(self.data) + 1

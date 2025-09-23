@@ -4,7 +4,7 @@ from playwright.sync_api import Page
 
 def navigate_to_chambers_contact_details(page: Page):
     """Helper function to navigate to Chambers Contact Details form via UI flow."""
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
 
     # Start with add parent provider
     page.goto(url_for("main.add_parent_provider", _external=True))

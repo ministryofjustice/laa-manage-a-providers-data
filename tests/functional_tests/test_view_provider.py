@@ -147,7 +147,7 @@ def test_back_link_lsp(page):
 
 @pytest.mark.usefixtures("live_server")
 def test_view_advocate_provider_main_table(page):
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
 
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
@@ -177,7 +177,7 @@ def test_view_advocate_provider_main_table(page):
 
 @pytest.mark.usefixtures("live_server")
 def test_view_barrister_provider_main_table(page):
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
 
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
@@ -211,7 +211,7 @@ def test_view_barrister_provider_main_table(page):
 
 @pytest.mark.usefixtures("live_server")
 def test_view_chambers_provider_main_table(page):
-    page.get_by_role("button", name="Start now").click()
+    page.get_by_role("button", name="Sign in").click()
 
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()

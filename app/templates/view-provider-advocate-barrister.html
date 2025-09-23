@@ -1,6 +1,7 @@
 {% extends 'view-provider.html' %}
 {% from 'macros/contact_tables.html' import contactCards %}
 {%- from "govuk_frontend_jinja/components/breadcrumbs/macro.html" import govukBreadcrumbs -%}
+{% from "govuk_frontend_jinja/components/warning-text/macro.html" import govukWarningText %}
 
 {% block beforeContent %}
   {% if parent_provider %}
@@ -45,8 +46,8 @@
       "active": subpage == "contact"
     }, {
       "text": "Bank account and payments",
-      "href": url_for("main.view_provider_bank_accounts_payments", firm=firm),
-      "active": subpage == "bank-accounts-payments"
+      "href": url_for("main.view_provider_bank_accounts_payment", firm=firm),
+      "active": subpage == "bank-accounts-payment"
     }]
   }) }}
 
@@ -60,9 +61,26 @@
         {{ contactCards(contact_tables) }}
       {% endif %}
       
-      {% if subpage == "bank-accounts-payments" %}
-        {# TODO: To be added by addition PR #}
-        <p class="govuk-body">This will be added by a future ticket</p>
+      {% if subpage == "bank-accounts-payment" %}
+        {% if head_office %}
+          <h2 class="govuk-heading-m">Payment information</h2>
+          {{ govukSummaryList(payment_information_table.to_summary_govuk_params()) }}
+
+          <h2 class="govuk-heading-m">VAT registration number</h2>
+          {{ govukSummaryList(vat_registration_table.to_summary_govuk_params()) }}
+
+          <h2 class="govuk-heading-m">Bank accounts</h2>
+          {% if bank_account_table %}
+              {{ govukSummaryList(bank_account_table.to_summary_govuk_params()) }}
+          {% endif %}
+
+          {{ govukButton({
+              "text": "Add bank account",
+              "href": "#"
+          }) }}
+        {% else %}
+          {{ govukWarningText({"text": "Firm has no head office so cannot show bank information"}) }}
+        {% endif %}
       {% endif %}
     </div>
   </div>
