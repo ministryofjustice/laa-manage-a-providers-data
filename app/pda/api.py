@@ -156,6 +156,19 @@ class ProviderDataApi:
         """
         return self._make_request("GET", endpoint, params=params)
 
+    def patch(self, endpoint: str, json: Dict[str, Any] = None) -> requests.Response:
+        """
+        Make a GET request to the specified endpoint.
+
+        Args:
+            endpoint: API endpoint path
+            json: Data to be sent as JSON
+
+        Returns:
+            requests.Response: The response object
+        """
+        return self._make_request("PATCH", endpoint, json=json)
+
     def _handle_response(
         self, response: requests.Response, empty_return: Union[Dict, List, None]
     ) -> Union[Dict, List, None]:
@@ -383,4 +396,13 @@ class ProviderDataApi:
             raise ValueError("office_code must be a non-empty string")
 
         response = self.get(f"/provider-firms/{firm_id}/provider-offices/{office_code}/bank-account-details")
+        return self._handle_response(response, {})
+
+    def update_office_vat_registration_number(
+        self, firm_id: int, office_code: str, vat_registration_number: str
+    ) -> int:
+        response = self.patch(
+            f"/provider-firms/{firm_id}/offices/{office_code}",
+            json=dict(vat_registration_number=vat_registration_number),
+        )
         return self._handle_response(response, {})

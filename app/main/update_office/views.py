@@ -1,4 +1,4 @@
-from flask import Response, render_template, url_for
+from flask import Response, current_app, render_template, url_for
 
 from app.forms import BaseForm
 from app.main.update_office.forms import UpdateVATRegistrationNumberForm
@@ -7,14 +7,17 @@ from app.views import FullWidthBaseFormView
 
 class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
     form_class = UpdateVATRegistrationNumberForm
-    success_endpoint = "main.view_office"
+    success_endpoint = "main.view_office_bank_payment_details"
     template = "update_office/form.html"
 
     def get_success_url(self, form: BaseForm | None = None) -> str:
         return url_for(self.success_endpoint, firm=form.firm, office=form.office)
 
     def form_valid(self, form):
-        # form.data.get("vat_registration_number") send to api
+        pda = current_app.extensions["pda"]
+        pda.update_office_vat_registration_number(
+            form.firm.firm_id, form.office.firm_office_code, form.data.get("vat_registration_number")
+        )
         return super().form_valid(form)
 
     def get(self, firm, office, *args, **kwargs):

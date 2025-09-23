@@ -612,3 +612,13 @@ class MockProviderDataApi:
         self._mock_data["contacts"].append(updated_contact.to_api_dict())
 
         return updated_contact
+
+    def update_office_vat_registration_number(
+        self, firm_id: int, office_code: str, vat_registration_number: str
+    ) -> int:
+        office = None
+        for item in self._mock_data["offices"]:
+            if item["firmOfficeCode"] == office_code:
+                office = item
+                break
+        office["vatRegistrationNumber"] = vat_registration_number
