@@ -361,41 +361,6 @@ class ViewOffice(MethodView):
         if subpage:
             self.subpage = subpage
 
-    def get_payment_information_table(self, firm: Firm, office: Office) -> DataTable:
-        table = SummaryList()
-        table.add_row(value=None, label="Payment method", row_action_urls={"enter": "#", "change": "#"})
-        return table
-
-    def get_vat_registration_table(self, firm: Firm, office: Office) -> DataTable:
-        table = SummaryList()
-        url = url_for("main.add_office_vat_number", firm=firm, office=office)
-        table.add_row(
-            value=office.vat_registration_number,
-            label="VAT registration number",
-            row_action_urls={"enter": url, "change": url},
-        )
-        return table
-
-    def get_office_overview_table(self, firm: Firm, office: Office) -> DataTable:
-        table = SummaryList()
-        table.add_row(firm.firm_name, "Parent provider", html=provider_name_html(firm))
-        table.add_row(office.firm_office_code, "Account number")
-        table.add_row(office.head_office, "Head office", format_head_office)
-        table.add_row(firm.firm_type, "Supplier type", format_firm_type)
-        return table
-
-    def get_bank_account_table(self, bank_account: BankAccount) -> DataTable | None:
-        if bank_account is None:
-            return None
-
-        card: Card = {"title": bank_account.bank_account_name, "action_text": "Change bank account", "action_url": "#"}
-        table = SummaryList(card=card)
-        table.add_row(bank_account.bank_account_name, "Account name")
-        table.add_row(bank_account.account_number, "Account number")
-        table.add_row(bank_account.sort_code, "Sort code")
-        # Effective date from still to be implemented
-        return table
-
     def get_context(self, firm: Firm, office: Office) -> Dict:
         context = {"firm": firm, "office": office, "subpage": self.subpage}
 
