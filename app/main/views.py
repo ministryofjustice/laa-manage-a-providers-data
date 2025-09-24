@@ -5,12 +5,11 @@ from flask import abort, current_app, redirect, render_template, request, url_fo
 from flask.views import MethodView
 
 from app.components.tables import Card, DataTable, SummaryList, TableStructureItem
+from app.main.constants import MAIN_TABLE_FIELD_CONFIG
 from app.main.forms import firm_name_html, get_firm_statuses
-from app.main.utils import create_provider_from_session
+from app.main.utils import create_provider_from_session, provider_name_html
 from app.models import BankAccount, Firm, Office
 from app.utils.formatting import (
-    format_advocate_level,
-    format_constitutional_status,
     format_date,
     format_firm_type,
     format_head_office,
@@ -95,18 +94,6 @@ def get_bank_account_table(bank_account: BankAccount) -> DataTable | None:
     return table
 
 
-def provider_name_html(provider: Firm | dict):
-    if isinstance(provider, Firm):
-        _firm_id = provider.firm_id
-        _firm_name = provider.firm_name
-    elif isinstance(provider, Dict):
-        _firm_id = int(provider.get("firm_id") or provider.get("advocate_number") or provider.get("barrister_number"))
-        _firm_name = provider.get("firm_name") or provider.get("advocate_name") or provider.get("barrister_name")
-    else:
-        raise ValueError(f"Provider {provider} must be a Provider or dict")
-    return f"<a class='govuk-link', href={url_for('main.view_provider', firm=_firm_id)}>{_firm_name}</a>"
-
-
 class ProviderList(BaseFormView):
     """View for provider list"""
 
@@ -130,66 +117,6 @@ class ViewProvider(MethodView):
         "Barrister": "view-provider-advocate-barrister.html",
     }
 
-    # Valid data sources to use in the main table configuration, default is firm
-    _VALID_DATA_SOURCES = ["firm", "parent_firm", "head_office"]
-
-    # Main table configuration for each firm type
-    MAIN_TABLE_FIELD_CONFIG = {
-        "Legal Services Provider": [
-            {"label": "Provider name", "id": "firm_name"},
-            {"label": "Provider number", "id": "firm_number"},
-            {"label": "Account number", "id": "firm_office_code", "data_source": "head_office"},
-            {"label": "Parent provider name", "id": "firm_name", "data_source": "parent_firm", "hide_if_null": True},
-            {
-                "label": "Parent provider number",
-                "id": "firm_number",
-                "data_source": "parent_firm",
-                "hide_if_null": True,
-            },
-            {
-                "label": "Constitutional status",
-                "id": "constitutional_status",
-                "formatter": format_constitutional_status,
-            },
-            {
-                "label": "Indemnity received date",
-                "id": "indemnity_received_date",
-                "formatter": format_date,
-                "default": "Not provided",
-            },
-            {"label": "Companies House number", "id": "company_house_number", "default": "Not provided"},
-            {"label": "Contract manager", "id": "contract_manager"},
-        ],
-        "Chambers": [
-            {"label": "Provider name", "id": "firm_name"},
-            {"label": "Provider number", "id": "firm_number"},
-            {"label": "Account number", "id": "firm_office_code", "data_source": "head_office"},
-            {"label": "Parent provider name", "id": "firm_name", "data_source": "parent_firm", "hide_if_null": True},
-            {
-                "label": "Parent provider number",
-                "id": "firm_number",
-                "data_source": "parent_firm",
-                "hide_if_null": True,
-            },
-        ],
-        "Barrister": [
-            {"label": "Barrister name", "id": "firm_name"},
-            {"label": "Barrister number", "id": "firm_number"},
-            {"label": "Account number", "id": "firm_office_code", "data_source": "head_office"},
-            {"label": "Chambers", "id": "firm_name", "html_renderer": provider_name_html, "data_source": "parent_firm"},
-            {"label": "Barrister level", "id": "advocate_level", "formatter": format_advocate_level},
-            {"label": "Bar Council roll number", "id": "bar_council_roll"},
-        ],
-        "Advocate": [
-            {"label": "Advocate name", "id": "firm_name"},
-            {"label": "Advocate number", "id": "firm_number"},
-            {"label": "Account number", "id": "firm_office_code", "data_source": "head_office"},
-            {"label": "Chambers", "id": "firm_name", "html_renderer": provider_name_html, "data_source": "parent_firm"},
-            {"label": "Advocate level", "id": "advocate_level", "formatter": format_advocate_level},
-            {"label": "Solicitors Regulation Authority roll number", "id": "bar_council_roll"},
-        ],
-    }
-
     def __init__(
         self, subpage: Literal["contact", "offices", "barristers-advocates", "bank-accounts-payment"] = "contact"
     ):
@@ -205,7 +132,7 @@ class ViewProvider(MethodView):
         main_table = SummaryList()
 
         # Add firm type specific fields
-        for field in self.MAIN_TABLE_FIELD_CONFIG.get(firm.firm_type, []):
+        for field in MAIN_TABLE_FIELD_CONFIG.get(firm.firm_type, []):
             data_source = data_source_map.get(field.get("data_source", "firm"), None)
             if data_source is None:
                 raise ValueError(f"{field.get('data_source', 'firm')} is not a valid data source")
