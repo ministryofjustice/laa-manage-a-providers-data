@@ -187,7 +187,7 @@ class ViewProvider(MethodView):
         table.add_row(head_office.telephone_number, "Telephone number")
         table.add_row(head_office.dx_number, "DX number")
         table.add_row(head_office.dx_centre, "DX centre")
-        
+
         return table
 
     @staticmethod
