@@ -112,7 +112,7 @@ def change_liaison_manager(contact: Contact, firm_id: int, show_success_message:
         show_success_message: Whether to show a success flash message (default: True)
 
     Returns:
-        Contact: The contact record for the head office (or first office if no head office)
+        Contact: The contact record for the head office (or first office found if no head office)
 
     Raises:
         RuntimeError: If Provider Data API not initialized
@@ -132,9 +132,9 @@ def change_liaison_manager(contact: Contact, firm_id: int, show_success_message:
     if not firm_offices:
         raise ProviderDataApiError(f"No offices found for firm {firm_id}")
 
-    # Find head office for return value
+    # Find head office for return value (use first office as fallback)
     head_office = pda.get_head_office(firm_id)
-    return_office = head_office if head_office else firm_offices[0]
+    return_office = head_office or firm_offices[0]
 
     # Set all existing liaison managers to non-primary across all offices
     for office in firm_offices:
@@ -146,21 +146,21 @@ def change_liaison_manager(contact: Contact, firm_id: int, show_success_message:
                 pda.update_contact(firm_id, office.firm_office_code, updated_contact)
 
     # Create new primary liaison manager contact for each office
-    created_contacts = []
+    contacts_by_office_id = {}
     for office in firm_offices:
-        # Set default active_from if not provided
-        contact_updates = {"vendor_site_id": office.firm_office_id, "job_title": "Liaison manager", "primary": "Y"}
-        if not contact.active_from:
-            contact_updates["active_from"] = date.today().isoformat()
+        contact_updates = {
+            "vendor_site_id": office.firm_office_id,
+            "job_title": "Liaison manager",
+            "primary": "Y",
+            "active_from": date.today().isoformat(),
+        }
 
         office_contact = contact.model_copy(update=contact_updates)
         created_contact = pda.create_office_contact(firm_id, office.firm_office_code, office_contact)
-        created_contacts.append(created_contact)
+        contacts_by_office_id[office.firm_office_id] = created_contact
 
     # Return the contact for the head office (or first office)
-    return_contact = next(
-        (c for c in created_contacts if c.vendor_site_id == return_office.firm_office_id), created_contacts[0]
-    )
+    return_contact = contacts_by_office_id[return_office.firm_office_id]
 
     if show_success_message:
         flash(f"<b>{return_contact.first_name} {return_contact.last_name} is the new liaison manager</b>", "success")
