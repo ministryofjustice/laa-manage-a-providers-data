@@ -398,11 +398,9 @@ class ProviderDataApi:
         response = self.get(f"/provider-firms/{firm_id}/provider-offices/{office_code}/bank-account-details")
         return self._handle_response(response, {})
 
-    def update_office_vat_registration_number(
-        self, firm_id: int, office_code: str, vat_registration_number: str
-    ) -> int:
+    def patch_office(self, firm_id: int, office_code: str, fields_to_update: dict):
         response = self.patch(
             f"/provider-firms/{firm_id}/offices/{office_code}",
-            json=dict(vat_registration_number=vat_registration_number),
+            json=fields_to_update,
         )
         return self._handle_response(response, {})

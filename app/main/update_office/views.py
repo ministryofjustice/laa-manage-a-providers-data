@@ -15,9 +15,8 @@ class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
 
     def form_valid(self, form):
         pda = current_app.extensions["pda"]
-        pda.update_office_vat_registration_number(
-            form.firm.firm_id, form.office.firm_office_code, form.data.get("vat_registration_number")
-        )
+        data = {"vatRegistrationNumber": form.data.get("vat_registration_number")}
+        pda.patch_office(form.firm.firm_id, form.office.firm_office_code, data)
         return super().form_valid(form)
 
     def get(self, firm, office, *args, **kwargs):
