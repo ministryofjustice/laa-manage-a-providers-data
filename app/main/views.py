@@ -75,10 +75,11 @@ def get_payment_information_table(firm: Firm, office: Office) -> DataTable:
 
 def get_vat_registration_table(firm: Firm, office: Office) -> DataTable:
     table = SummaryList()
+    url = url_for("main.add_office_vat_number", firm=firm, office=office)
     table.add_row(
         value=office.vat_registration_number,
         label="VAT registration number",
-        row_action_urls={"enter": "#", "change": "#"},
+        row_action_urls={"enter": url, "change": url},
     )
     return table
 
