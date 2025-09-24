@@ -363,7 +363,7 @@ class TestChangeLiaisonManager:
                 email_address="jane.doe@example.com",
             )
 
-            with patch("flask.flash") as mock_flash:
+            with patch("app.main.utils.flash") as mock_flash:
                 result = change_liaison_manager(new_contact, 1)
 
                 # Should still create new contact despite update failure
@@ -404,7 +404,7 @@ class TestChangeLiaisonManager:
                 email_address="jane.doe@example.com",
             )
 
-            with patch("flask.flash") as mock_flash:
+            with patch("app.main.utils.flash") as mock_flash:
                 result = change_liaison_manager(new_contact, 1)
 
                 # Should still return contact for head office
@@ -457,7 +457,7 @@ class TestChangeLiaisonManager:
                 email_address="jane.doe@example.com",
             )
 
-            with patch("flask.flash") as mock_flash:
+            with patch("app.main.utils.flash") as mock_flash:
                 result = change_liaison_manager(new_contact, 1)
 
                 # Should still return contact for head office (successful create)
