@@ -1,11 +1,14 @@
 import html
 import json
+import logging
 from datetime import date
 
 from flask import current_app, flash, session
 
 from app.models import BankAccount, Contact, Firm, Office
 from app.pda.mock_api import MockProviderDataApi, ProviderDataApiError
+
+logger = logging.getLogger(__name__)
 
 
 def get_full_info_html(data):
@@ -143,7 +146,14 @@ def change_liaison_manager(contact: Contact, firm_id: int, show_success_message:
             if existing_contact.job_title == "Liaison manager" and existing_contact.primary == "Y":
                 # Set this contact to non-primary
                 updated_contact = existing_contact.model_copy(update={"primary": "N"})
-                pda.update_contact(firm_id, office.firm_office_code, updated_contact)
+                try:
+                    pda.update_contact(firm_id, office.firm_office_code, updated_contact)
+                except ProviderDataApiError:
+                    error_message = (
+                        f"Failed to update {existing_contact.job_title} for office {office.firm_office_code}"
+                    )
+                    logger.error(error_message)
+                    flash(error_message, "error")
 
     # Create new primary liaison manager contact for each office
     contacts_by_office_id = {}
@@ -156,8 +166,13 @@ def change_liaison_manager(contact: Contact, firm_id: int, show_success_message:
         }
 
         office_contact = contact.model_copy(update=contact_updates)
-        created_contact = pda.create_office_contact(firm_id, office.firm_office_code, office_contact)
-        contacts_by_office_id[office.firm_office_id] = created_contact
+        try:
+            created_contact = pda.create_office_contact(firm_id, office.firm_office_code, office_contact)
+            contacts_by_office_id[office.firm_office_id] = created_contact
+        except ProviderDataApiError:
+            error_message = f"Failed to create {office_contact.job_title} for office {office.firm_office_code}"
+            logger.error(error_message)
+            flash(error_message, "error")
 
     # Return the contact for the head office (or first office)
     return_contact = contacts_by_office_id[return_office.firm_office_id]

@@ -1,5 +1,5 @@
 from datetime import date
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 from flask import Blueprint
@@ -8,7 +8,7 @@ from wtforms import StringField
 
 from app.main.utils import change_liaison_manager
 from app.models import Contact
-from app.pda.mock_api import MockProviderDataApi
+from app.pda.mock_api import MockProviderDataApi, ProviderDataApiError
 from app.utils import register_form_view
 from app.views import BaseFormView
 
@@ -332,3 +332,143 @@ class TestChangeLiaisonManager:
             assert result.active_from is not None
             expected_date = date.today().isoformat()
             assert result.active_from == expected_date
+
+    @patch("app.main.utils.logger")
+    def test_update_contact_error_handling(self, mock_logger, app):
+        """Test error handling when updating existing liaison manager fails."""
+        with app.test_request_context():
+            mock_api = app.extensions["pda"]
+            mock_api._mock_data = {
+                "firms": [{"firmId": 1, "firmName": "Test Firm"}],
+                "offices": [{"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101, "headOffice": "N/A"}],
+                "contacts": [
+                    {
+                        "vendorSiteId": 101,
+                        "firstName": "John",
+                        "lastName": "Smith",
+                        "emailAddress": "john.smith@example.com",
+                        "jobTitle": "Liaison manager",
+                        "primary": "Y",
+                        "activeFrom": "2024-01-01",
+                    }
+                ],
+            }
+
+            # Mock the update_contact method to raise an error
+            mock_api.update_contact = MagicMock(side_effect=ProviderDataApiError("Update failed"))
+
+            new_contact = Contact(
+                first_name="Jane",
+                last_name="Doe",
+                email_address="jane.doe@example.com",
+            )
+
+            with patch("flask.flash") as mock_flash:
+                result = change_liaison_manager(new_contact, 1)
+
+                # Should still create new contact despite update failure
+                assert result.first_name == "Jane"
+                assert result.last_name == "Doe"
+
+                # Should log error and flash error message
+                mock_logger.error.assert_called_once_with("Failed to update Liaison manager for office 1A001L")
+                mock_flash.assert_any_call("Failed to update Liaison manager for office 1A001L", "error")
+
+    @patch("app.main.utils.logger")
+    def test_create_contact_error_handling(self, mock_logger, app):
+        """Test error handling when creating new liaison manager fails."""
+        with app.test_request_context():
+            mock_api = app.extensions["pda"]
+            mock_api._mock_data = {
+                "firms": [{"firmId": 1, "firmName": "Test Firm"}],
+                "offices": [
+                    {"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101, "headOffice": "N/A"},
+                    {"_firmId": 1, "firmOfficeCode": "1A002L", "firmOfficeId": 102, "headOffice": "101"},
+                ],
+                "contacts": [],
+            }
+
+            # Mock create_office_contact to fail for one office
+            original_create = mock_api.create_office_contact
+
+            def side_effect(firm_id, office_code, contact):
+                if office_code == "1A002L":
+                    raise ProviderDataApiError("Create failed")
+                return original_create(firm_id, office_code, contact)
+
+            mock_api.create_office_contact = MagicMock(side_effect=side_effect)
+
+            new_contact = Contact(
+                first_name="Jane",
+                last_name="Doe",
+                email_address="jane.doe@example.com",
+            )
+
+            with patch("flask.flash") as mock_flash:
+                result = change_liaison_manager(new_contact, 1)
+
+                # Should still return contact for head office
+                assert result.vendor_site_id == 101
+                assert result.first_name == "Jane"
+
+                # Should log error and flash error message for failed office
+                mock_logger.error.assert_called_once_with("Failed to create Liaison manager for office 1A002L")
+                mock_flash.assert_any_call("Failed to create Liaison manager for office 1A002L", "error")
+
+    @patch("app.main.utils.logger")
+    def test_partial_failure_with_mixed_errors(self, mock_logger, app):
+        """Test handling when both update and create operations have failures."""
+        with app.test_request_context():
+            mock_api = app.extensions["pda"]
+            mock_api._mock_data = {
+                "firms": [{"firmId": 1, "firmName": "Test Firm"}],
+                "offices": [
+                    {"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101, "headOffice": "N/A"},
+                    {"_firmId": 1, "firmOfficeCode": "1A002L", "firmOfficeId": 102, "headOffice": "101"},
+                ],
+                "contacts": [
+                    {
+                        "vendorSiteId": 101,
+                        "firstName": "Old",
+                        "lastName": "Manager",
+                        "emailAddress": "old.manager@example.com",
+                        "jobTitle": "Liaison manager",
+                        "primary": "Y",
+                        "activeFrom": "2024-01-01",
+                    }
+                ],
+            }
+
+            # Mock both operations to fail
+            mock_api.update_contact = MagicMock(side_effect=ProviderDataApiError("Update failed"))
+
+            original_create = mock_api.create_office_contact
+
+            def create_side_effect(firm_id, office_code, contact):
+                if office_code == "1A002L":
+                    raise ProviderDataApiError("Create failed")
+                return original_create(firm_id, office_code, contact)
+
+            mock_api.create_office_contact = MagicMock(side_effect=create_side_effect)
+
+            new_contact = Contact(
+                first_name="Jane",
+                last_name="Doe",
+                email_address="jane.doe@example.com",
+            )
+
+            with patch("flask.flash") as mock_flash:
+                result = change_liaison_manager(new_contact, 1)
+
+                # Should still return contact for head office (successful create)
+                assert result.vendor_site_id == 101
+                assert result.first_name == "Jane"
+
+                # Should log both errors
+                assert mock_logger.error.call_count == 2
+                mock_logger.error.assert_any_call("Failed to update Liaison manager for office 1A001L")
+                mock_logger.error.assert_any_call("Failed to create Liaison manager for office 1A002L")
+
+                # Should flash both error messages
+                mock_flash.assert_any_call("Failed to update Liaison manager for office 1A001L", "error")
+                mock_flash.assert_any_call("Failed to create Liaison manager for office 1A002L", "error")
