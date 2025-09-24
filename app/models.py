@@ -112,18 +112,6 @@ class Office(BaseModel):
     def get_is_head_office(self):
         return self.head_office == "N/A"
 
-    def format_address(self):
-        lines = [
-            self.address_line_1,
-            self.address_line_2,
-            self.address_line_3,
-            self.address_line_4,
-            self.city,
-            self.county,
-            self.postcode,
-        ]
-        return ", ".join(filter(None, lines))
-
 
 class BankAccount(BaseModel):
     """Bank Account model

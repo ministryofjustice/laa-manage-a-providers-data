@@ -614,9 +614,7 @@ class MockProviderDataApi:
         return updated_contact
 
     def patch_office(self, firm_id: int, office_code: str, fields_to_update: dict):
-        office = None
-        for item in self._mock_data["offices"]:
-            if item["firmOfficeCode"] == office_code:
-                office = item
-                break
-        office.update(fields_to_update)
+        office = self._find_office_data(firm_id, office_code)
+        if office:
+            office.update(fields_to_update)
+        return office

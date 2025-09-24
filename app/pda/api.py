@@ -158,7 +158,7 @@ class ProviderDataApi:
 
     def patch(self, endpoint: str, json: Dict[str, Any] = None) -> requests.Response:
         """
-        Make a GET request to the specified endpoint.
+        Make a PATCH request to the specified endpoint.
 
         Args:
             endpoint: API endpoint path

@@ -1,12 +1,20 @@
+from typing import Any
+
 from flask import Response, current_app, render_template, url_for
 
 from app.forms import BaseForm
+from app.utils.formatting import format_office_address_one_line
 from app.views import FullWidthBaseFormView
 
 
 class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
     success_endpoint = "main.view_office_bank_payment_details"
     template = "update_office/form.html"
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update({"office_address": format_office_address_one_line(form.office)})
+        return context
 
     def get_success_url(self, form: BaseForm | None = None) -> str:
         return url_for(self.success_endpoint, firm=form.firm, office=form.office)
