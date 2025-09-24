@@ -34,8 +34,7 @@ class TestConfig(Config):
     WTF_CSRF_ENABLED = False
 
 
-# Use scope=function instead of scope=session as this ensures every tests get a fresh copy of the app
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def app(config=TestConfig):
     app = create_app(config, MockProviderDataApi)
     with app.app_context():
