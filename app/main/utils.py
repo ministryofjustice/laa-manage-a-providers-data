@@ -1,7 +1,7 @@
 import html
 import json
 
-from flask import current_app, flash, session
+from flask import current_app, flash, session, url_for
 
 from app.models import BankAccount, Contact, Firm, Office
 from app.pda.mock_api import MockProviderDataApi
@@ -22,6 +22,18 @@ def get_full_info_html(data):
     </details>
     """
     return html_content
+
+
+def provider_name_html(provider: Firm | dict):
+    if isinstance(provider, Firm):
+        _firm_id = provider.firm_id
+        _firm_name = provider.firm_name
+    elif isinstance(provider, dict):
+        _firm_id = int(provider.get("firm_id") or provider.get("advocate_number") or provider.get("barrister_number"))
+        _firm_name = provider.get("firm_name") or provider.get("advocate_name") or provider.get("barrister_name")
+    else:
+        raise ValueError(f"Provider {provider} must be a Provider or dict")
+    return f"<a class='govuk-link', href={url_for('main.view_provider', firm=_firm_id)}>{_firm_name}</a>"
 
 
 def add_new_provider(firm: Firm, show_success_message: bool = True) -> Firm:
