@@ -1,7 +1,6 @@
 from flask import Blueprint
 
 from app.main.forms import ProviderListForm
-from app.main.update_office.views import UpdateVATRegistrationNumberFormView
 from app.main.views import ProviderList, ViewOffice, ViewProvider
 from app.utils import register_form_view
 
@@ -10,7 +9,7 @@ bp = Blueprint("main", __name__, template_folder="templates")
 # Import modules after blueprint creation to avoid circular imports
 from app.main import middleware  # noqa: E402,F401
 from app.main import routes  # noqa: E402,F401
-from app.main import add_a_new_office, add_a_new_provider  # noqa: E402
+from app.main import add_a_new_office, add_a_new_provider, update_office  # noqa: E402
 
 register_form_view(form_class=ProviderListForm, view_class=ProviderList, blueprint=bp)
 
@@ -43,8 +42,4 @@ bp.add_url_rule(
 
 add_a_new_provider.register_views(bp)
 add_a_new_office.register_views(bp)
-
-bp.add_url_rule(
-    "/provider/<firm:firm>/office/<office:office>/add-vat-number",
-    view_func=UpdateVATRegistrationNumberFormView.as_view("add_office_vat_number"),
-)
+update_office.register_views(bp)

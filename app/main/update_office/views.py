@@ -1,12 +1,10 @@
 from flask import Response, current_app, render_template, url_for
 
 from app.forms import BaseForm
-from app.main.update_office.forms import UpdateVATRegistrationNumberForm
 from app.views import FullWidthBaseFormView
 
 
 class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
-    form_class = UpdateVATRegistrationNumberForm
     success_endpoint = "main.view_office_bank_payment_details"
     template = "update_office/form.html"
 

@@ -1,19 +1,7 @@
-import pytest
 from flask import url_for
 
 
 class TestUpdateVATRegistrationNumberFormView:
-    @pytest.fixture(autouse=True)
-    def setup_mock_api(self, app):
-        """Ensure each test starts with a clean MockProviderDataApi."""
-        with app.app_context():
-            # Always ensure we have MockProviderDataApi for these tests
-            from app.pda.mock_api import MockProviderDataApi
-
-            mock_pda = MockProviderDataApi()
-            mock_pda.init_app(app)
-            app.extensions["pda"] = mock_pda
-
     def test_post(self, app, client):
         """Test changing the VAT registration number of an office"""
         with app.app_context():

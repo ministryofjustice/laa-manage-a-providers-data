@@ -12,8 +12,8 @@ from ...forms import BaseForm
 
 class UpdateVATRegistrationNumberForm(BaseForm):
     title = "VAT registration number (optional)"
-    template = None
-    url = None
+    template = "update_office/form.html"
+    url = "/provider/<firm:firm>/office/<office:office>/add-vat-number"
     firm: Firm
     office: Office
 
