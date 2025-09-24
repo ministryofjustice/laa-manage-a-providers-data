@@ -31,6 +31,7 @@ class TestConfig(Config):
     RATELIMIT_ENABLED = False
     # Use memory storage for rate limiting in tests
     RATELIMIT_STORAGE_URI = "memory://"
+    WTF_CSRF_ENABLED = False
 
 
 @pytest.fixture(scope="session")
