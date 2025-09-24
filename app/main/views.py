@@ -41,7 +41,18 @@ def get_contact_tables(firm: Firm, head_office: Office = None) -> list[DataTable
 
     for contact in sorted_contacts:
         card_title = f"{contact.first_name} {contact.last_name}"
-        card: Card = {"title": card_title, "action_text": "Change liaison manager", "action_url": "#"}
+        card: Card = {
+            "title": card_title,
+        }
+
+        if contact in primary_contacts:
+            # Only the primary contact card has the action to change the Liaison Manager
+            card.update(
+                {
+                    "action_text": "Change liaison manager",
+                    "action_url": url_for("main.add_new_liaison_manager", firm=firm),
+                }
+            )
 
         contact_table = SummaryList(card=card)
 
