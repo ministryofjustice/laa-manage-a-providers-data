@@ -1,6 +1,6 @@
 from flask import url_for
 
-from app.main import ViewOffice
+from app.main.views import ViewOffice
 from app.models import Firm, Office
 
 
