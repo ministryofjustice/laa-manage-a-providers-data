@@ -55,3 +55,8 @@ YN_OR_NA_CHOICES = [
     ("N", "N"),
     ("N/A", "N/A"),
 ]
+
+PAYMENT_METHOD_CHOICES = [
+    ("Electronic", "Electronic"),
+    ("Cheque", "Cheque"),
+]

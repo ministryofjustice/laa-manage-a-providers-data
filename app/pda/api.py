@@ -6,7 +6,7 @@ from pydantic import ValidationError
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
-from app.models import Contact, Firm, Office
+from app.models import Firm, Office
 
 
 class ProviderDataApiError(Exception):
@@ -384,53 +384,3 @@ class ProviderDataApi:
 
         response = self.get(f"/provider-firms/{firm_id}/provider-offices/{office_code}/bank-account-details")
         return self._handle_response(response, {})
-
-    def get_office_contacts(self, firm_id: int, office_code: str) -> List[Contact]:
-        """
-        Get all contacts for a specific office.
-
-        Args:
-            firm_id: The firm ID
-            office_code: The office code
-
-        Returns:
-            List of Contact model instances
-
-        Raises:
-            NotImplementedError: This functionality is not yet supported by the real API
-        """
-        raise NotImplementedError("Getting office contacts is not yet supported by the real Provider Data API")
-
-    def create_office_contact(self, firm_id: int, office_code: str, contact: Contact) -> Contact:
-        """
-        Create a contact for an office.
-
-        Args:
-            firm_id: The firm ID
-            office_code: The office code
-            contact: Contact model instance to create
-
-        Returns:
-            Contact: The created Contact model instance
-
-        Raises:
-            NotImplementedError: This functionality is not yet supported by the real API
-        """
-        raise NotImplementedError("Creating office contacts is not yet supported by the real Provider Data API")
-
-    def update_contact(self, firm_id: int, office_code: str, contact: Contact) -> Contact:
-        """
-        Update an existing contact.
-
-        Args:
-            firm_id: The firm ID
-            office_code: The office code
-            contact: Contact model instance with updated data
-
-        Returns:
-            Contact: The updated Contact model instance
-
-        Raises:
-            NotImplementedError: This functionality is not yet supported by the real API
-        """
-        raise NotImplementedError("Updating contacts is not yet supported by the real Provider Data API")

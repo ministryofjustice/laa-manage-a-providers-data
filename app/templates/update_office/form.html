@@ -1,0 +1,12 @@
+{% extends 'form.html' %}
+
+{% block form %}
+  {{ form.hidden_tag() }}
+
+  <span class="govuk-caption-xl">{{ form.caption }}</span>
+  <h1 class="govuk-heading-l govuk-!-margin-bottom-1">Office: {{ form.office.firm_office_code }}</h1>
+  <p class="govuk-body govuk-!-margin-bottom-7">{{ office_address }}</p>
+  <h1 class="govuk-heading-xl">{{ form.title|replace('\n', '<br>')|safe }}</h1>
+
+  {% block update_office_form_content %}{% endblock %}
+{% endblock %}

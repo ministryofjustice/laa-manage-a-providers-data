@@ -1,59 +1,12 @@
 {%- from 'govuk_frontend_jinja/components/notification-banner/macro.html' import govukNotificationBanner -%}
-{%- from 'govuk_frontend_jinja/components/error-summary/macro.html' import govukErrorSummary %}
+
 
 {% macro renderFlashMessages() %}
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-      {# Group error messages together #}
-      {% set error_messages = [] %}
-      {% set other_messages = [] %}
-
       {% for category, message in messages %}
-        {% if category == "error" %}
-          {% set _ = error_messages.append(message) %}
-        {% else %}
-          {% set _ = other_messages.append((category, message)) %}
-        {% endif %}
-      {% endfor %}
-
-      {# Render all errors in a single summary #}
-      {% if error_messages %}
-        {{ renderErrorSummary(error_messages) }}
-      {% endif %}
-
-      {# Render other message types as notification banners #}
-      {% for category, message in other_messages %}
-        {{ govukNotificationBanner({
-          'type': category,
-          'html': message
-        }) }}
+        {{ govukNotificationBanner({'type': category, 'html': message}) }}
       {% endfor %}
     {% endif %}
   {% endwith %}
-{% endmacro %}
-
-{% macro renderErrorSummary(errorList, titleText="There is a problem") %}
-  {% if errorList %}
-    {% set formattedErrors = [] %}
-
-    {# Convert to list if it's a single item #}
-    {% set errors = [errorList] if errorList is string or (errorList is mapping) else errorList %}
-
-    {% for error in errors %}
-      {% if error is mapping %}
-        {# Already formatted error object - use as is #}
-        {% set _ = formattedErrors.append(error) %}
-      {% else %}
-        {# Convert anything else to text #}
-        {% set _ = formattedErrors.append({"text": error|string}) %}
-      {% endif %}
-    {% endfor %}
-
-    {% if formattedErrors %}
-      {{ govukErrorSummary({
-        'titleText': titleText,
-        'errorList': formattedErrors
-      }) }}
-    {% endif %}
-  {% endif %}
 {% endmacro %}

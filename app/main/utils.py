@@ -1,14 +1,10 @@
 import html
 import json
-import logging
-from datetime import date
 
-from flask import current_app, flash, session, url_for
+from flask import current_app, flash, session
 
 from app.models import BankAccount, Contact, Firm, Office
-from app.pda.mock_api import MockProviderDataApi, ProviderDataApiError
-
-logger = logging.getLogger(__name__)
+from app.pda.mock_api import MockProviderDataApi
 
 
 def get_full_info_html(data):
@@ -26,18 +22,6 @@ def get_full_info_html(data):
     </details>
     """
     return html_content
-
-
-def provider_name_html(provider: Firm | dict):
-    if isinstance(provider, Firm):
-        _firm_id = provider.firm_id
-        _firm_name = provider.firm_name
-    elif isinstance(provider, dict):
-        _firm_id = int(provider.get("firm_id") or provider.get("advocate_number") or provider.get("barrister_number"))
-        _firm_name = provider.get("firm_name") or provider.get("advocate_name") or provider.get("barrister_name")
-    else:
-        raise ValueError(f"Provider {provider} must be a Provider or dict")
-    return f"<a class='govuk-link', href={url_for('main.view_provider', firm=_firm_id)}>{_firm_name}</a>"
 
 
 def add_new_provider(firm: Firm, show_success_message: bool = True) -> Firm:
@@ -113,86 +97,6 @@ def add_new_contact(contact: Contact, firm_id: int, office_code: str, show_succe
         flash(f"<b>Contact successfully created for office {office_code}</b>", "success")
 
     return new_contact
-
-
-def change_liaison_manager(contact: Contact, firm_id: int, show_success_message: bool = True) -> Contact:
-    """Change the liaison manager for ALL offices of a firm, making the new contact primary across the firm.
-
-    Creates a new contact record for each office of the firm, making the new person the primary
-    liaison manager for every office. All existing liaison managers across all offices become non-primary.
-
-    Args:
-        contact: Contact model instance for the new liaison manager
-        firm_id: The firm ID
-        show_success_message: Whether to show a success flash message (default: True)
-
-    Returns:
-        Contact: The contact record for the head office (or first office found if no head office)
-
-    Raises:
-        RuntimeError: If Provider Data API not initialized
-        ValueError: If firm_id is not a positive integer
-        ProviderDataApiError: If firm doesn't exist or has no offices
-        NotImplementedError: If the API doesn't support contact management yet
-    """
-    pda = current_app.extensions.get("pda")
-    if not pda:
-        raise RuntimeError("Provider Data API not initialized")
-
-    if not isinstance(firm_id, int) or firm_id <= 0:
-        raise ValueError("firm_id must be a positive integer")
-
-    # Get all offices for this firm
-    firm_offices = pda.get_provider_offices(firm_id)
-    if not firm_offices:
-        raise ProviderDataApiError(f"No offices found for firm {firm_id}")
-
-    # Find head office for return value (use first office as fallback)
-    head_office = pda.get_head_office(firm_id)
-    return_office = head_office or firm_offices[0]
-
-    # Set all existing liaison managers to non-primary across all offices
-    for office in firm_offices:
-        contacts = pda.get_office_contacts(firm_id, office.firm_office_code)
-        for existing_contact in contacts:
-            if existing_contact.job_title == "Liaison manager" and existing_contact.primary == "Y":
-                # Set this contact to non-primary
-                updated_contact = existing_contact.model_copy(update={"primary": "N"})
-                try:
-                    pda.update_contact(firm_id, office.firm_office_code, updated_contact)
-                except ProviderDataApiError:
-                    error_message = (
-                        f"Failed to update {existing_contact.job_title} for office {office.firm_office_code}"
-                    )
-                    logger.error(error_message)
-                    flash(error_message, "error")
-
-    # Create new primary liaison manager contact for each office
-    contacts_by_office_id = {}
-    for office in firm_offices:
-        contact_updates = {
-            "vendor_site_id": office.firm_office_id,
-            "job_title": "Liaison manager",
-            "primary": "Y",
-            "active_from": date.today().isoformat(),
-        }
-
-        office_contact = contact.model_copy(update=contact_updates)
-        try:
-            created_contact = pda.create_office_contact(firm_id, office.firm_office_code, office_contact)
-            contacts_by_office_id[office.firm_office_id] = created_contact
-        except ProviderDataApiError:
-            error_message = f"Failed to create {office_contact.job_title} for office {office.firm_office_code}"
-            logger.error(error_message)
-            flash(error_message, "error")
-
-    # Return the contact for the head office (or first office)
-    return_contact = contacts_by_office_id[return_office.firm_office_id]
-
-    if show_success_message:
-        flash(f"<b>{return_contact.first_name} {return_contact.last_name} is the new liaison manager</b>", "success")
-
-    return return_contact
 
 
 def create_provider_from_session() -> Firm | None:
