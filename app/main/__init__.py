@@ -42,3 +42,4 @@ bp.add_url_rule(
 
 add_a_new_provider.register_views(bp)
 add_a_new_office.register_views(bp)
+modify_provider.register_views(bp)
