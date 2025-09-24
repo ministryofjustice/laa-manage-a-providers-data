@@ -141,8 +141,8 @@ def test_office_contact(page):
     expect(page.get_by_text("Show 2 additional contacts")).to_be_visible()
 
     page.get_by_text("Show 2 additional contacts").click()
-    expect(page.get_by_role("link", name="Change liaison manager  (David Smith)")).to_be_visible()
-    expect(page.get_by_role("link", name="Change liaison manager  (Alice Brown)")).to_be_visible()
+    expect(page.get_by_role("heading", name="David Smith")).to_be_visible()
+    expect(page.get_by_role("heading", name="Alice Brown")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")

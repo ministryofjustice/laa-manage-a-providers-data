@@ -224,7 +224,7 @@ class MockProviderDataApi:
         for office in offices:
             # Child offices have headOffice = parent's office ID
             # Head offices have headOffice = "N/A"
-            if office.head_office == "N/A":
+            if office.get_is_head_office():
                 return office
         return None
 
@@ -618,3 +618,40 @@ class MockProviderDataApi:
         if office:
             office.update(fields_to_update)
         return office
+
+    def update_contact(self, firm_id: int, office_code: str, contact: Contact) -> Contact:
+        """
+        Update an existing contact.
+
+        Args:
+            firm_id: The firm ID
+            office_code: The office code
+            contact: Contact model instance with updated data (must have vendor_site_id set)
+
+        Returns:
+            Contact: The updated Contact model instance
+
+        Raises:
+            ProviderDataApiError: If contact doesn't exist
+        """
+        if not isinstance(firm_id, int) or firm_id <= 0:
+            raise ValueError("firm_id must be a positive integer")
+        if not office_code or not isinstance(office_code, str):
+            raise ValueError("office_code must be a non-empty string")
+        if not contact.vendor_site_id:
+            raise ValueError("contact must have vendor_site_id set")
+
+        # Find the contact in mock data
+        contact_index = None
+        for i, existing_contact in enumerate(self._mock_data["contacts"]):
+            if existing_contact.get("vendorSiteId") == contact.vendor_site_id:
+                contact_index = i
+                break
+
+        if contact_index is None:
+            raise ProviderDataApiError(f"Contact with vendor_site_id {contact.vendor_site_id} not found")
+
+        # Update the contact data
+        self._mock_data["contacts"][contact_index] = contact.to_api_dict()
+
+        return contact

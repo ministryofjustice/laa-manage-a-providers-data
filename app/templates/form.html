@@ -23,6 +23,11 @@
           {% endblock %}
       {% endif %}
 
+      {% if form.description %}
+        {# Bottom margin is 50px to match the bottom margin of the xl heading #}
+        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-8">{{ form.description }}</p>
+      {% endif %}
+
       {% for field in form %}
         {% if field.type != 'CSRFToken' and field.type != 'HiddenField' and field.type != "SubmitField" %}
           {{ field }}
