@@ -10,6 +10,7 @@
 {%- from 'components/address.html' import addressDisplay -%}
 {% from 'macros/contact_tables.html' import contactCards %}
 {% from 'govuk_frontend_jinja/components/summary-list/macro.html' import govukSummaryList %}
+{%- from 'govuk_frontend_jinja/components/tag/macro.html' import govukTag -%}
 {%- from 'macros/flash_messages.html' import renderFlashMessages %}
 
 {% block beforeContent %}
@@ -34,7 +35,13 @@
       {{ renderFlashMessages() }}
 
       <span class="govuk-caption-xl">{{ firm.firm_name }}</span>
-      <h1 class="govuk-heading-xl">Office: {{ office.firm_office_code }}</h1>
+      <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Office: {{ office.firm_office_code }}</h1>
+
+      <div class="govuk-!-margin-bottom-7">
+        {% for tag in office_tags %}
+          {{ govukTag(tag.to_gov_params()) }}
+        {% endfor %}
+      </div>
 
       {{ addressDisplay(office) }}
 
