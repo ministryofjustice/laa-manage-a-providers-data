@@ -25,5 +25,9 @@ class Tag:
         self.text = text
         self.color = color
 
-    def to_gov_params(self):
-        return {"text": self.text, "class": self.color.value}
+    @property
+    def colour_class(self):
+        return self.color.value
+
+    def to_govuk_params(self):
+        return {"text": self.text, "classes": self.colour_class}

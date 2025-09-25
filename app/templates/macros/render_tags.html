@@ -1,0 +1,14 @@
+{%- from 'govuk_frontend_jinja/components/tag/macro.html' import govukTag -%}
+
+{% macro renderTags(tags) %}
+  <div class="govuk-!-margin-bottom-7">
+    {% for tag in tags %}
+      {% set tag_classes = tag.colour_class + " govuk-!-margin-right-1" %}
+
+      {{ govukTag({
+        "text": tag.text,
+        "classes": tag_classes,
+      }) }}
+    {% endfor %}
+  </div>
+{% endmacro %}

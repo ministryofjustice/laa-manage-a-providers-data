@@ -1,5 +1,7 @@
 from wtforms import Form
 
+from app.utils.formatting import format_date
+
 
 def has_page_heading(form: Form) -> bool:
     """
@@ -23,3 +25,4 @@ def has_page_heading(form: Form) -> bool:
 def register_template_filters(app):
     """Register all custom template filters with the Flask app."""
     app.template_filter("has_page_heading")(has_page_heading)
+    app.template_filter("format_date")(format_date)
