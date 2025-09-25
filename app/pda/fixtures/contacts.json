@@ -98,6 +98,17 @@
       "jobTitle": "Liaison manager",
       "primary": "Y",
       "activeFrom": "2023-12-20"
+    },
+    {
+      "vendorSiteId": 401,
+      "firstName": "Alan",
+      "lastName": "Davies",
+      "emailAddress": "alan.davies@gmail.com",
+      "telephoneNumber": "0116 234 5678",
+      "website": "https://www.alandavies.com",
+      "jobTitle": "Liaison manager",
+      "primary": "Y",
+      "activeFrom": "2025-09-25"
     }
   ]
 }
