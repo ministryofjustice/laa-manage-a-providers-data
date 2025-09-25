@@ -38,6 +38,7 @@ class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
         else:
             return self.form_invalid(form, **kwargs)
 
+
 class PaymentMethodFormView(BaseFormView):
     """Form view for the payment method form"""
 

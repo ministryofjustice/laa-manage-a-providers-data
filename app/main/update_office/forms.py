@@ -41,6 +41,7 @@ class UpdateVATRegistrationNumberForm(BaseForm):
         ],
     )
 
+
 class PaymentMethodForm(BaseForm):
     title = "Payment method"
     url = "provider/<firm:firm>/office/<office:office>/payment-method"
