@@ -8,6 +8,8 @@
 {%- from 'components/back_link.html' import govukBackLink -%}
 {% from 'govuk_frontend_jinja/components/summary-list/macro.html' import govukSummaryList %}
 {%- from 'macros/flash_messages.html' import renderFlashMessages %}
+{%- from 'govuk_frontend_jinja/components/tag/macro.html' import govukTag -%}
+{%- from 'govuk_frontend_jinja/components//warning-text/macro.html' import govukWarningText -%}
 
 {% block beforeContent %}
   {{ super() }}
@@ -23,7 +25,18 @@
     <span class="govuk-caption-xl">{{ firm.firm_type|capitalize }}</span>
     <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ firm.firm_name }}</h1>
     {%  if firm.inactive_date %}
-        <p><strong class="govuk-tag govuk-tag--grey">Inactive</strong></p>
+        {{  govukTag({
+            "text": "Inactive",
+            "classes": "govuk-tag--grey",
+        }) }}
+        {{ govukWarningText({
+            "text": "Provider marked as inactive on " ~ firm.inactive_date.strftime("%d/%m/%Y"),
+            "classes": "govuk-!-margin-top-2 govuk-!-margin-bottom-3"
+        }) }}
+        {{ govukWarningText({
+            "text": "Payments for all offices are hold because provider is inactive",
+            "classes": "govuk-!-margin-bottom-5"
+        }) }}
     {% endif %}
 
     {% block actionButtons %}
