@@ -35,7 +35,7 @@ class TestConfig(Config):
     WTF_CSRF_ENABLED = False
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def app(config=TestConfig):
     app = create_app(config, MockProviderDataApi)
     with app.app_context():
