@@ -18,6 +18,7 @@ def browser_context_args(browser_context_args):
 
 class TestConfig(Config):
     TESTING = True
+    PROPAGATE_EXCEPTIONS = False
     DEBUG = True
     SECRET_KEY = "TEST_KEY"
     PDA_URL = "http://mock-api.test"
