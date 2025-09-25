@@ -7,7 +7,7 @@ from app.utils import register_form_view
 bp = Blueprint("main", __name__, template_folder="templates")
 
 # Import modules after blueprint creation to avoid circular imports
-# Suppress E402 on these specific lines only.
+from app.main import modify_provider  # noqa: E402
 from app.main import routes  # noqa: E402,F401
 from app.main import add_a_new_office, add_a_new_provider, modify_provider, update_office  # noqa: E402,F401
 from app.main import errors as errors  # noqa: E402
