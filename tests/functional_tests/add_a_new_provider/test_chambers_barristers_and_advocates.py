@@ -12,7 +12,7 @@ def test_barristers_and_advocates_visible(page: Page) -> None:
     expect(page.get_by_role("cell", name="Karen Sillen")).to_be_visible()
     expect(page.get_by_role("cell", name="Sophie Lelièvre")).to_be_visible()
     expect(page.get_by_role("button", name="Add another barrister")).to_be_visible()
-    expect(page.get_by_role("cell", name="DAVIES & ASSOCIATES")).to_be_visible()
+    expect(page.get_by_role("cell", name="ALAN DAVIES")).to_be_visible()
     expect(page.get_by_role("cell", name="Finn O'Connor")).to_be_visible()
     expect(page.get_by_role("button", name="Add another advocate")).to_be_visible()
 
