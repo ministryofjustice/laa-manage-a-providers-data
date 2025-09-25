@@ -1,7 +1,11 @@
+from typing import Any
+
 from flask import Response, redirect, render_template, url_for
 
+from app.forms import BaseForm
 from app.main.utils import change_liaison_manager
-from app.models import Contact
+from app.main.views import get_main_table
+from app.models import Contact, Firm
 from app.views import FullWidthBaseFormView
 
 
@@ -35,3 +39,19 @@ class ChangeLiaisonManagerFormView(FullWidthBaseFormView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form, **kwargs)
+
+
+class ChangeProviderActiveStatusFormView(FullWidthBaseFormView):
+    def get_context_data(self, firm: Firm, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form=form, context=context, **kwargs)
+        context.update({"main_table": get_main_table(firm, head_office=None, parent_firm=None)})
+        return context
+
+    def get(self, firm: Firm, context, **kwargs):
+        status = "inactive" if firm.inactive_date else "active"
+        form = self.get_form_class()(status=status)
+        return render_template(self.template, **self.get_context_data(firm, form))
+
+    def form_valid(self, form):
+        # Todo: Send update to the API
+        return super().form_valid(form)
