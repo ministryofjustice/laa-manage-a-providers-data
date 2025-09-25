@@ -1,0 +1,7 @@
+{% extends 'form.html' %}
+{%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
+
+{% block pageContent %}
+    {{ govukTable(main_table.to_govuk_params()) }}
+    {{ super() }}
+{% endblock %}
