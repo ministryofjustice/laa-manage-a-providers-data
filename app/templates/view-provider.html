@@ -21,7 +21,10 @@
     {{ renderFlashMessages() }}
 
     <span class="govuk-caption-xl">{{ firm.firm_type|capitalize }}</span>
-    <h1 class="govuk-heading-xl">{{ firm.firm_name }}</h1>
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ firm.firm_name }}</h1>
+    {%  if firm.inactive_date %}
+        <p><strong class="govuk-tag govuk-tag--grey">Inactive</strong></p>
+    {% endif %}
 
     {% block actionButtons %}
       {# Place firm-type specific action buttons  #}
