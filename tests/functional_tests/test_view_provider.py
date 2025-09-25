@@ -13,8 +13,12 @@ def test_view_provider_page_ui_loads(page):
 
     expect(page.get_by_role("link", name="Offices")).to_be_visible()
 
+    # Tags
+    expect(page.locator("strong", has_text="Inactive")).to_be_visible()
+
     # Buttons
-    expect(page.get_by_role("button", name="Make provider inactive")).to_be_visible()
+    expect(page.get_by_role("button", name="Make provider active")).to_be_visible()
+
     # Main table
     expect(page.get_by_role("rowheader", name="Provider name")).to_be_visible()
     expect(page.get_by_role("cell", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
