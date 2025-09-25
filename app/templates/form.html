@@ -15,10 +15,12 @@
     {% block form %}
       {{ form.hidden_tag() }}
       {% if not form | has_page_heading %}
-        {% if form.caption %}
-          <span class="govuk-caption-xl">{{ form.caption }}</span>
-        {% endif %}
-        <h1 class="govuk-heading-xl">{{ form.title|replace('\n', '<br>')|safe }}</h1>
+          {% block pageHeading %}
+            {% if form.caption %}
+              <span class="govuk-caption-xl">{{ form.caption }}</span>
+            {% endif %}
+            <h1 class="govuk-heading-xl">{{ form.title|replace('\n', '<br>')|safe }}</h1>
+          {% endblock %}
       {% endif %}
 
       {% if form.description %}
