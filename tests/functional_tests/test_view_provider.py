@@ -37,7 +37,7 @@ def test_view_parent_provider(page):
     page.get_by_role("button", name="Search").click()
 
     # Click child provider
-    page.get_by_role("link", name="DAVIES & ASSOCIATES").click()
+    page.get_by_role("link", name="ALAN DAVIES").click()
 
     # Assert we can see the parent provider
     expect(page.get_by_role("rowheader", name="Chambers")).to_be_visible()
@@ -153,11 +153,11 @@ def test_view_advocate_provider_main_table(page):
     page.get_by_role("button", name="Search").click()
 
     # Click on an Advocate provider
-    page.get_by_role("link", name="DAVIES & ASSOCIATES").click()
+    page.get_by_role("link", name="ALAN DAVIES").click()
 
     # Check Advocate-specific main table fields
     expect(page.get_by_role("rowheader", name="Advocate name")).to_be_visible()
-    expect(page.get_by_role("cell", name="DAVIES & ASSOCIATES")).to_be_visible()
+    expect(page.get_by_role("cell", name="ALAN DAVIES")).to_be_visible()
 
     expect(page.get_by_role("rowheader", name="Advocate number")).to_be_visible()
     expect(page.get_by_role("cell", name="4", exact=True)).to_be_visible()
