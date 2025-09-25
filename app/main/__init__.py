@@ -9,7 +9,8 @@ bp = Blueprint("main", __name__, template_folder="templates")
 # Import modules after blueprint creation to avoid circular imports
 from app.main import middleware  # noqa: E402,F401
 from app.main import routes  # noqa: E402,F401
-from app.main import add_a_new_office, add_a_new_provider, modify_provider  # noqa: E402
+from app.main import add_a_new_office, add_a_new_provider, modify_provider, update_office  # noqa: E402
+
 
 register_form_view(form_class=ProviderListForm, view_class=ProviderList, blueprint=bp)
 
@@ -46,4 +47,5 @@ bp.add_url_rule(
 
 add_a_new_provider.register_views(bp)
 add_a_new_office.register_views(bp)
+update_office.register_views(bp)
 modify_provider.register_views(bp)

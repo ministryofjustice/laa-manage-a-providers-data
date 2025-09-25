@@ -31,10 +31,11 @@ class TestConfig(Config):
     RATELIMIT_ENABLED = False
     # Use memory storage for rate limiting in tests
     RATELIMIT_STORAGE_URI = "memory://"
+    WTF_CSRF_ENABLED = False
 
 
 @pytest.fixture(scope="session")
 def app(config=TestConfig):
     app = create_app(config, MockProviderDataApi)
-
-    return app
+    with app.app_context():
+        yield app
