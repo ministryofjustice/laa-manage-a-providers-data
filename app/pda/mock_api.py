@@ -674,17 +674,8 @@ class MockProviderDataApi:
         if firm_dict:
             firm_dict.update(fields_to_update)
 
+        # Return updated firm as a Firm instance
         return self.get_provider_firm(firm.firm_id)
-        # Get all field aliases with their model field name
-        # alias_to_field = {
-        #     field.alias: name
-        #     for name, field in firm.model_fields.items()
-        # }
-        #
-        # # Update the firm using the field name rather than the alias
-        # for key, value in fields_to_update.items():
-        #     field_name = alias_to_field[key]
-        #     setattr(firm, field_name, value)
 
     def _update_provider_firm_in_storage(self, firm: Firm):
         firm_data = firm.to_api_dict()
