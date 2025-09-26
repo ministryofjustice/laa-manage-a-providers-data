@@ -17,7 +17,8 @@
     "nonProfitOrganisation": "N",
     "smallBusinessFlag": "N",
     "womenOwnedFlag": "N",
-    "websiteUrl": null
+    "websiteUrl": null,
+    "inactiveDate": "2025-09-26"
   },
   {
     "firmNumber": "2",
