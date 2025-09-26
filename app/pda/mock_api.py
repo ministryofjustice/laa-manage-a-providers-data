@@ -677,13 +677,6 @@ class MockProviderDataApi:
         # Return updated firm as a Firm instance
         return self.get_provider_firm(firm.firm_id)
 
-    def _update_provider_firm_in_storage(self, firm: Firm):
-        firm_data = firm.to_api_dict()
-        for item in self._mock_data["firms"]:
-            if item.get("firmId") == firm.firm_id:
-                item.update(firm_data)
-                break
-
     def update_contact(self, firm_id: int, office_code: str, contact: Contact) -> Contact:
         """
         Update an existing contact.
