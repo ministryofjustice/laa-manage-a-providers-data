@@ -27,6 +27,10 @@ class ChangeLiaisonManagerForm(ChangeForm, LiaisonManagerForm):
 
 
 class ChangeProviderActiveStatusForm(ChangeForm, BaseForm):
+    def __init__(self, firm: Firm, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.firm = firm
+
     title = "Change active status"
     url = "provider/<firm:firm>/confirm-provider-status"
     template = "modify_provider/form.html"

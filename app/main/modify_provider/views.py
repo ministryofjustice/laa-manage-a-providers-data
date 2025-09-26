@@ -1,6 +1,7 @@
+import datetime
 from typing import Any
 
-from flask import Response, redirect, render_template, url_for
+from flask import Response, current_app, flash, redirect, render_template, url_for
 
 from app.forms import BaseForm
 from app.main.utils import change_liaison_manager
@@ -42,16 +43,35 @@ class ChangeLiaisonManagerFormView(FullWidthBaseFormView):
 
 
 class ChangeProviderActiveStatusFormView(FullWidthBaseFormView):
-    def get_context_data(self, firm: Firm, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+    def get_success_url(self, form):
+        return url_for("main.view_provider", firm=form.firm)
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(form=form, context=context, **kwargs)
-        context.update({"main_table": get_main_table(firm, head_office=None, parent_firm=None)})
+        context.update({"main_table": get_main_table(form.firm, head_office=None, parent_firm=None)})
         return context
 
     def get(self, firm: Firm, context, **kwargs):
         status = "inactive" if firm.inactive_date else "active"
-        form = self.get_form_class()(status=status)
-        return render_template(self.template, **self.get_context_data(firm, form))
+        form = self.get_form_class()(status=status, firm=firm)
+        return render_template(self.template, **self.get_context_data(form))
+
+    def post(self, firm, context, **kwargs):
+        form = self.get_form_class()(firm=firm)
+
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form, **kwargs)
 
     def form_valid(self, form):
-        # Todo: Send update to the API
+        status = form.data.get("status")
+        inactive_date = None
+        if status == "inactive":
+            inactive_date = datetime.date.today().strftime("%Y-%m-%d")
+        data = {Firm.model_fields["inactive_date"].alias: inactive_date}
+
+        pda = current_app.extensions["pda"]
+        pda.patch_provider_firm(form.firm.firm_id, data)
+        flash(f"{form.firm.firm_name} marked as {status}", "success")
         return super().form_valid(form)
