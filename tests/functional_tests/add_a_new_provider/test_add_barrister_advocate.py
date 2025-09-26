@@ -23,19 +23,21 @@ def test_add_barrister_form_loads_from_chambers(page: Page) -> None:
 @pytest.mark.usefixtures("live_server")
 def test_add_barrister_form_not_accessible_for_non_chambers(page: Page) -> None:
     # Navigate to the add barrister page for a legal services provider
-    page.goto(url_for("main.add_barrister_form", firm=1, _external=True))
-
+    resp = page.goto(url_for("main.add_barrister_form", firm=1, _external=True))
+    assert resp is not None
     # Should get 404 error
-    assert page.title() == "404 Not Found"
+    assert resp.status == 404
+    expect(page.get_by_role("heading", name="Page not found")).to_be_visible
 
 
 @pytest.mark.usefixtures("live_server")
 def test_add_advocate_form_not_accessible_for_non_chambers(page: Page) -> None:
     # Navigate to the add advocate page for a legal services provider
-    page.goto(url_for("main.add_barrister_form", firm=1, _external=True))
-
+    resp = page.goto(url_for("main.add_barrister_form", firm=1, _external=True))
+    assert resp is not None
     # Should get 404 error
-    assert page.title() == "404 Not Found"
+    assert resp.status == 404
+    expect(page.get_by_role("heading", name="Page not found")).to_be_visible
 
 
 @pytest.mark.usefixtures("live_server")
