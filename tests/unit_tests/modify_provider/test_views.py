@@ -31,7 +31,7 @@ class TestChangeProviderActiveStatusFormView:
         call_kwargs = mock_render_template.call_args.kwargs
         assert call_kwargs["form"].status.data == "active"
 
-    def test_post_change_active_to_inactive(self, app, client):
+    def test_post_change_inactive_to_active(self, app, client):
         """Test changing provider from inactive to active"""
         pda = app.extensions["pda"]
         firm = pda.get_all_provider_firms()[0]
@@ -47,8 +47,8 @@ class TestChangeProviderActiveStatusFormView:
 
         assert pda.get_provider_firm(firm.firm_id).inactive_date is None
 
-    def test_post_change_inactive_to_active(self, app, client):
-        """Test changing provider from inactive to active"""
+    def test_post_change_active_to_inactive(self, app, client):
+        """Test changing provider from active to inactive"""
         pda = app.extensions["pda"]
         firm = pda.get_all_provider_firms()[1]
         assert firm.inactive_date is None
