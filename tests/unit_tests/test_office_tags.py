@@ -1,7 +1,7 @@
 from datetime import date
 from unittest.mock import Mock
 
-from app.components.tag import Tag, TagColor
+from app.components.tag import Tag
 from app.main.utils import get_office_tags
 
 
@@ -14,8 +14,8 @@ class TestGetOfficeTags:
 
         assert len(tags) == 1
         assert isinstance(tags[0], Tag)
-        assert tags[0].text == "Inactive"
-        assert tags[0].color == TagColor.GREY
+        assert tags[0].to_gov_params()["text"] == "Inactive"
+        assert tags[0].to_gov_params()["classes"] == "govuk-tag--grey"
 
     def test_office_without_inactive_date_returns_empty_list(self):
         office = Mock()
