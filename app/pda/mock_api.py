@@ -376,6 +376,44 @@ class MockProviderDataApi:
             "bankDetails": [],  # Add mock bank details here if needed
         }
 
+    def update_office_payment_method(self, firm_id: int, office_code: str, payment_method: str) -> Office:
+        """
+        Update the payment method for an office.
+
+        Args:
+            firm_id: The firm ID
+            office_code: The office code
+            payment_method: The new payment method value (e.g., "Electronic" or "Cheque")
+
+        Returns:
+            Office: The updated Office model instance
+
+        Raises:
+            ProviderDataApiError: If the office doesn't exist
+            ValueError: If parameters are invalid
+        """
+        if not isinstance(firm_id, int) or firm_id <= 0:
+            raise ValueError("firm_id must be a positive integer")
+        if not office_code or not isinstance(office_code, str):
+            raise ValueError("office_code must be a non-empty string")
+        if not payment_method or not isinstance(payment_method, str):
+            raise ValueError("payment_method must be a non-empty string")
+
+        office_data = self._find_office_data(firm_id, office_code)
+        if office_data is None:
+            raise ProviderDataApiError(f"Office {office_code} not found for firm {firm_id}")
+
+        # Update payment method using API/camelCase field name
+        office_data["paymentMethod"] = payment_method
+
+        # Return updated Office model
+        try:
+            cleaned_office = _clean_data(office_data)
+            return Office(**cleaned_office)
+        except ValidationError as e:
+            self.logger.error(f"Invalid office data in mock after payment method update for office {office_code}: {e}")
+            raise ProviderDataApiError(f"Invalid office data: {e}")
+
     def create_provider_firm(self, firm: Firm) -> Firm:
         """
         Create a new provider firm in the mock data.
