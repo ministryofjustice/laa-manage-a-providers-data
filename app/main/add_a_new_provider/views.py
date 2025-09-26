@@ -219,6 +219,8 @@ class BankAccountFormView(FullWidthBaseFormView):
     success_endpoint = "main.add_liaison_manager"
 
     def form_valid(self, form):
+        # Set payment method for the main submit button flow
+        session["new_head_office"]["payment_method"] = "Electronic"
         session["new_head_office_bank_account"] = {
             "bank_account_name": form.data.get("bank_account_name"),
             "sort_code": form.data.get("sort_code"),
@@ -255,7 +257,8 @@ class BankAccountFormView(FullWidthBaseFormView):
 
         # Check if skip button was clicked (before validation)
         if request.form.get("skip_button"):
-            # Skip storing bank account data and go to next step
+            # Skip storing bank account data set payment-method to "Cheque" and go to next step
+            session["new_head_office"]["payment_method"] = "Cheque"
             return redirect(url_for(self.success_endpoint))
 
         firm = Firm(**session.get("new_provider"))

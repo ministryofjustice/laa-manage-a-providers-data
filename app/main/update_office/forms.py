@@ -1,11 +1,13 @@
 from wtforms.fields.simple import StringField
-from wtforms.validators import Optional
+from wtforms.validators import Optional, InputRequired
+from wtforms.fields.choices import RadioField
 
 from app.models import Firm, Office
 from app.validators import (
     ValidateVATRegistrationNumber,
 )
-from app.widgets import GovTextInput
+from app.widgets import GovTextInput, GovRadioInput
+from app.constants import PAYMENT_METHOD_CHOICES
 
 from ...forms import BaseForm
 
@@ -37,4 +39,30 @@ class UpdateVATRegistrationNumberForm(BaseForm):
             Optional(),
             ValidateVATRegistrationNumber(message="Enter the VAT registration number in the correct format"),
         ],
+    )
+
+
+class PaymentMethodForm(BaseForm):
+    title = "Payment method"
+    url = "provider/<firm:firm>/office/<office:office>/payment-method"
+    template = "update_office/payment-method.html"
+    submit_button_text = "Save"
+
+    def __init__(self, firm=None, office=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.firm = firm
+        self.office = office
+
+    @property
+    def caption(self):
+        if not self.firm:
+            return "Unknown office"
+        return self.firm.firm_name
+
+    payment_method = RadioField(
+        "Payment method",
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
+        validators=[InputRequired(message="Select a payment method")],
+        choices=PAYMENT_METHOD_CHOICES,
+        default="Electronic",
     )
