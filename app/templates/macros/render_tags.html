@@ -3,10 +3,12 @@
 {% macro renderTags(tags) %}
   <div class="govuk-!-margin-bottom-7">
     {% for tag in tags %}
+      {# Get the gov params from the tag object #}
+      {% set tag_params = tag.to_gov_params() %}
       {# Add additional spacing between each tag #}
-      {% set tag_classes = tag.colour_class + " govuk-!-margin-right-1" %}
+      {% set tag_classes = tag_params.class + " govuk-!-margin-right-1" %}
       {{ govukTag({
-        "text": tag.text,
+        "text": tag_params.text,
         "classes": tag_classes,
       }) }}
     {% endfor %}
