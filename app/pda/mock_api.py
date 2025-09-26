@@ -657,6 +657,26 @@ class MockProviderDataApi:
             office.update(fields_to_update)
         return office
 
+    def patch_provider_firm(self, firm_id: int, fields_to_update: dict):
+        firm = self.get_provider_firm(firm_id)
+        if firm:
+            return self._update_provider_firm(firm, fields_to_update)
+        return firm
+
+    def _update_provider_firm(self, firm: Firm, fields_to_update: dict):
+        # Get the raw firm data from storage
+        firm_dict = None
+        for item in self._mock_data["firms"]:
+            if item.get("firmId") == firm.firm_id:
+                firm_dict = item
+                break
+
+        if firm_dict:
+            firm_dict.update(fields_to_update)
+
+        # Return updated firm as a Firm instance
+        return self.get_provider_firm(firm.firm_id)
+
     def update_contact(self, firm_id: int, office_code: str, contact: Contact) -> Contact:
         """
         Update an existing contact.

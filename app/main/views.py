@@ -113,6 +113,41 @@ def get_bank_account_table(bank_account: BankAccount) -> DataTable | None:
     return table
 
 
+def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | None) -> SummaryList:
+    data_source_map = {
+        "firm": firm.to_internal_dict() if firm else {},
+        "head_office": head_office.to_internal_dict() if head_office else {},
+        "parent_firm": parent_firm.to_internal_dict() if parent_firm else {},
+    }
+    main_table = SummaryList()
+
+    # Add firm type specific fields
+    for field in MAIN_TABLE_FIELD_CONFIG.get(firm.firm_type, []):
+        data_source = data_source_map.get(field.get("data_source", "firm"), None)
+        if data_source is None:
+            raise ValueError(f"{field.get('data_source', 'firm')} is not a valid data source")
+
+        value = data_source.get(field["id"])
+
+        if not value and field.get("hide_if_null", False):
+            continue
+
+        if html_renderer := field.get("html_renderer"):
+            if not isinstance(html_renderer, Callable):
+                raise ValueError("html_renderer must be callable")
+            field["html"] = html_renderer(data_source)
+
+        main_table.add_row(
+            value=value,
+            label=field.get("label"),
+            formatter=field.get("formatter"),
+            html=field.get("html"),
+            default_value=field.get("default", "No data"),
+        )
+
+    return main_table
+
+
 class ProviderList(BaseFormView):
     """View for provider list"""
 
@@ -141,40 +176,6 @@ class ViewProvider(MethodView):
     ):
         if subpage:
             self.subpage = subpage
-
-    def get_main_table(self, firm: Firm, head_office: Office | None, parent_firm: Firm | None) -> SummaryList:
-        data_source_map = {
-            "firm": firm.to_internal_dict() if firm else {},
-            "head_office": head_office.to_internal_dict() if head_office else {},
-            "parent_firm": parent_firm.to_internal_dict() if parent_firm else {},
-        }
-        main_table = SummaryList()
-
-        # Add firm type specific fields
-        for field in MAIN_TABLE_FIELD_CONFIG.get(firm.firm_type, []):
-            data_source = data_source_map.get(field.get("data_source", "firm"), None)
-            if data_source is None:
-                raise ValueError(f"{field.get('data_source', 'firm')} is not a valid data source")
-
-            value = data_source.get(field["id"])
-
-            if not value and field.get("hide_if_null", False):
-                continue
-
-            if html_renderer := field.get("html_renderer"):
-                if not isinstance(html_renderer, Callable):
-                    raise ValueError("html_renderer must be callable")
-                field["html"] = html_renderer(data_source)
-
-            main_table.add_row(
-                value=value,
-                label=field.get("label"),
-                formatter=field.get("formatter"),
-                html=field.get("html"),
-                default_value=field.get("default", "No data"),
-            )
-
-        return main_table
 
     def get_office_tables(self, firm, head_office: Office, other_offices: list[Office]) -> dict[str, DataTable]:
         """Gets two data tables one for the main office and one for other offices."""
@@ -311,7 +312,7 @@ class ViewProvider(MethodView):
             parent_provider: Firm = pda.get_provider_firm(firm.parent_firm_id)
             context.update({"parent_provider": parent_provider})
 
-        main_table = self.get_main_table(firm, head_office, parent_provider)
+        main_table = get_main_table(firm, head_office, parent_provider)
         context.update({"main_table": main_table})
 
         if self.subpage == "offices":

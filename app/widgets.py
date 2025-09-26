@@ -290,7 +290,25 @@ class GovRadioInput(ParameterOverrideMixin, BaseGovRadioInput):
         ))
     """
 
-    pass
+    def __init__(self, choice_hints: dict = None, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.choice_hints = choice_hints or {}
+
+    def _assign_hint_text(self, items):
+        """
+        Attach hint text to item value defined
+        """
+        for item in items:
+            value = item.get("value")
+            if value in self.choice_hints:
+                item["hint"] = {"text": self.choice_hints[value]}
+
+    def map_gov_params(self, field, **kwargs):
+        params = super(GovRadioInput, self).map_gov_params(field, **kwargs)
+        # Adds hint text to choice
+        if self.choice_hints:
+            self._assign_hint_text(params["items"])
+        return params
 
 
 class GovDateInput(ParameterOverrideMixin, BaseGovDateInput):
