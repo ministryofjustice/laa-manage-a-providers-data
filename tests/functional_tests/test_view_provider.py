@@ -13,8 +13,20 @@ def test_view_provider_page_ui_loads(page):
 
     expect(page.get_by_role("link", name="Offices")).to_be_visible()
 
+    # Tags
+    expect(page.locator(".govuk-tag", has_text="Inactive")).to_be_visible()
+    expect(
+        page.locator(".govuk-warning-text__text", has_text="Provider marked as inactive on 25/09/2025")
+    ).to_be_visible()
+    expect(
+        page.locator(
+            ".govuk-warning-text__text", has_text="Payments for all offices are hold because provider is inactive"
+        )
+    ).to_be_visible()
+
     # Buttons
-    expect(page.get_by_role("button", name="Make provider inactive")).to_be_visible()
+    expect(page.get_by_role("button", name="Make provider active")).to_be_visible()
+
     # Main table
     expect(page.get_by_role("rowheader", name="Provider name")).to_be_visible()
     expect(page.get_by_role("cell", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()

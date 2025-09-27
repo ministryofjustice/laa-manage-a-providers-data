@@ -2,10 +2,17 @@
 {% from 'macros/contact_tables.html' import contactCards %}
 
 {% block actionButtons %}
-  {{ govukButton({
-    "text": "Make provider inactive",
-    "classes": "govuk-button--secondary",
-  }) }}
+  {% if firm.inactive_date %}
+      {{ govukButton({
+        "text": "Make provider active",
+        "classes": "govuk-button--secondary",
+      }) }}
+  {% else %}
+      {{ govukButton({
+        "text": "Make provider inactive",
+        "classes": "govuk-button--secondary",
+      }) }}
+  {% endif %}
 
   {{ govukButton({
     "text": "Record provider intervention",
