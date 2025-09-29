@@ -1,8 +1,9 @@
-from flask import Response, redirect, render_template, url_for
+from flask import Response, abort, redirect, render_template, request, url_for
 
-from app.main.utils import change_liaison_manager
+from app.main.modify_provider import AssignChambersForm
+from app.main.utils import assign_firm_to_a_new_chambers, change_liaison_manager
 from app.models import Contact
-from app.views import FullWidthBaseFormView
+from app.views import BaseFormView, FullWidthBaseFormView
 
 
 class ChangeLiaisonManagerFormView(FullWidthBaseFormView):
@@ -35,3 +36,48 @@ class ChangeLiaisonManagerFormView(FullWidthBaseFormView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form, **kwargs)
+
+
+class AssignChambersFormView(BaseFormView):
+    """Form view for the assign to a chambers form"""
+
+    template = "add_provider/assign-chambers.html"
+    success_endpoint = "main.create_provider"
+    form_class: AssignChambersForm
+
+    def get_success_url(self, form):
+        return url_for("main.view_provider", firm=form.firm)
+
+    def form_valid(self, form):
+        new_chambers_id = int(form.data.get("provider"))
+        assign_firm_to_a_new_chambers(form.firm, new_chambers_id)
+        return redirect(self.get_success_url(form))
+
+    @staticmethod
+    def get_valid_firm_or_abort(firm):
+        if not firm:
+            abort(400)
+
+        if firm.firm_type not in ["Barrister", "Advocate"]:
+            abort(400)
+
+    def get(self, firm, context):
+        self.get_valid_firm_or_abort(firm)
+        search_term = request.args.get("search", "").strip()
+        page = int(request.args.get("page", 1))
+        form = self.get_form_class()(firm=firm, search_term=search_term, page=page)
+
+        if search_term:
+            form.search.validate(form)
+
+        return render_template(self.get_template(), **self.get_context_data(form, context))
+
+    def post(self, firm, context) -> Response | str:
+        self.get_valid_firm_or_abort(firm)
+        search_term = request.args.get("search", "").strip()
+        page = int(request.args.get("page", 1))
+        form = self.get_form_class()(firm=firm, search_term=search_term, page=page)
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)

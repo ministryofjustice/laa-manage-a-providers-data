@@ -39,7 +39,11 @@
 
           <br>
 
-          {{ govukButton({'text': 'Continue'}) }}
+          {% set submitButtonText = form.submit_button_text or "Continue" %}
+
+          {{ govukButton({
+            'text': submitButtonText
+          }) }}
         </form>
       {% endif %}
     </div>

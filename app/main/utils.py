@@ -389,3 +389,72 @@ def get_office_tags(office: Office):
     if office.inactive_date:
         tags.append(Tag(TagType.INACTIVE))
     return tags
+
+
+def get_firm_account_number(firm: Firm | int) -> str | None:
+    """Gets the account number for a given firm or firm_id.
+
+    A firm's account number is the firm_office_code of that firm's head office.
+
+    Args:
+        firm: Either a Firm instance or a firm_id (int)
+
+    Returns:
+        The firm's account number (firm_office_code), or None if no head office exists
+
+    Raises:
+        RuntimeError: If Provider Data API is not initialized
+        ValueError: If firm is neither a Firm instance nor an int
+    """
+    pda: MockProviderDataApi = current_app.extensions.get("pda")
+    if not pda:
+        raise RuntimeError("Provider Data API not initialized")
+
+    firm_id = firm.firm_id if isinstance(firm, Firm) else firm
+
+    if not isinstance(firm_id, int):
+        raise ValueError(f"Expected Firm or firm_id (int), got {type(firm)}")
+
+    head_office = pda.get_head_office(firm_id)
+    if not head_office:
+        logger.warning(f"Firm {firm_id} does not have a head office, and therefore has no account number.")
+        return None
+
+    return head_office.firm_office_code
+
+
+def assign_firm_to_a_new_chambers(firm: Firm | int, chambers: Firm | int):
+    """Assigns an advocate or a barrister to a new chambers.
+
+    Args:
+        firm: Firm | int - Firm or firm_id of an advocate or barrister
+        chambers: Firm | int - Firm or firm_id of new chambers to assign this firm to
+
+    Returns:
+        The updated advocate or barrister
+
+    Raises:
+        RuntimeError: If Provider Data API is not initialized
+        ValueError: If firm is not an advocate or barrister
+        ValueError: If new_chambers is not a Chambers
+    """
+    pda = current_app.extensions.get("pda")
+    if not pda:
+        raise RuntimeError("Provider Data API not initialized")
+
+    # Convert int to Firm if necessary
+    if isinstance(firm, int):
+        firm = pda.get_provider_firm(firm)
+
+    if isinstance(chambers, int):
+        chambers = pda.get_provider_firm(chambers)
+
+    # Verify firm is an advocate or barrister
+    if firm.firm_type not in ["Advocate", "Barrister"]:
+        raise ValueError(f"firm must be an advocate or barrister, got firm_type: {firm.firm_type}")
+
+    # Verify chambers is actually a chambers
+    if chambers.firm_type != "Chambers":
+        raise ValueError(f"chambers must be a Chambers, got firm_type: {chambers.firm_type}")
+
+    return pda.patch_provider(firm.firm_id, {"parentFirmId": chambers.firm_id})
