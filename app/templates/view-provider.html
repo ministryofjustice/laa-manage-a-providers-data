@@ -8,7 +8,7 @@
 {%- from 'components/back_link.html' import govukBackLink -%}
 {% from 'govuk_frontend_jinja/components/summary-list/macro.html' import govukSummaryList %}
 {%- from 'macros/flash_messages.html' import renderFlashMessages %}
-{%- from 'govuk_frontend_jinja/components/tag/macro.html' import govukTag -%}
+{%- from 'macros/render_tags.html' import renderTags %}
 {%- from 'govuk_frontend_jinja/components//warning-text/macro.html' import govukWarningText -%}
 
 {% block beforeContent %}
@@ -24,13 +24,11 @@
 
     <span class="govuk-caption-xl">{{ firm.firm_type|capitalize }}</span>
     <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ firm.firm_name }}</h1>
-    {%  if firm.inactive_date %}
-        {{  govukTag({
-            "text": "Inactive",
-            "classes": "govuk-tag--grey",
-        }) }}
+    {{ renderTags(firm_tags) }}
+
+    {% if firm.inactive_date %}
         {{ govukWarningText({
-            "text": "Provider marked as inactive on " ~ firm.inactive_date.strftime("%d/%m/%Y"),
+            "text": "Provider marked as inactive on " ~ firm.inactive_date | format_date,
             "classes": "govuk-!-margin-top-2 govuk-!-margin-bottom-3"
         }) }}
         {{ govukWarningText({
@@ -38,7 +36,6 @@
             "classes": "govuk-!-margin-bottom-5"
         }) }}
     {% endif %}
-
     {% block actionButtons %}
       {# Place firm-type specific action buttons  #}
     {% endblock %}
