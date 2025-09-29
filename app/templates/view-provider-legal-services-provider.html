@@ -3,8 +3,9 @@
 
 {% block actionButtons %}
   {{ govukButton({
-    "text": "Make provider inactive",
+    "text": "Make provider active" if firm.inactive_date else "Make provider inactive",
     "classes": "govuk-button--secondary",
+    "href": "#"
   }) }}
 
   {{ govukButton({
