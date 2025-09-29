@@ -32,8 +32,8 @@ def test_view_provider_contacts_multiple_contacts_with_details(page: Page):
     # Verify the primary contact is shown directly
     expect(page.get_by_text("Sarah Johnson", exact=True)).to_be_visible()
 
-    # Check that there's a details component for additional contacts (now 2 additional)
-    expect(page.get_by_text("Show 2 additional contacts")).to_be_visible()
+    # Check that there's a details component for previous contacts
+    expect(page.get_by_text("Previous contacts")).to_be_visible()
 
     # The secondary contacts should not be visible initially
     expect(page.get_by_text("David Smith", exact=True)).not_to_be_visible()
@@ -41,8 +41,8 @@ def test_view_provider_contacts_multiple_contacts_with_details(page: Page):
     expect(page.get_by_text("david.smith@smithpartners.com")).not_to_be_visible()
     expect(page.get_by_text("alice.brown@smithpartners.com")).not_to_be_visible()
 
-    # Click the details to reveal additional contacts
-    page.get_by_text("Show 2 additional contacts").click()
+    # Click the details to reveal previous contacts
+    page.get_by_text("Previous contacts").click()
 
     # Now both secondary contacts should be visible
     expect(page.get_by_text("David Smith", exact=True)).to_be_visible()
@@ -53,7 +53,7 @@ def test_view_provider_contacts_multiple_contacts_with_details(page: Page):
     expect(page.get_by_text("0116 123 4569")).to_be_visible()
     expect(page.get_by_text("Active to")).to_be_visible()
 
-    # Check that active from dates are visible for additional contacts
+    # Check that active from dates are visible for previous contacts
     expect(page.get_by_text("10 Mar 2024")).to_have_count(
         2
     )  # David Smith's Active from date and Alice Brown's Active to date
@@ -73,7 +73,7 @@ def test_view_provider_contacts_single_contact_no_details(page: Page):
 
     # Should not show any details component
     expect(page.get_by_text("Show")).not_to_be_visible()
-    expect(page.get_by_text("additional contact")).not_to_be_visible()
+    expect(page.get_by_text("previous contacts")).not_to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -99,13 +99,13 @@ def test_view_provider_contacts_details_component_functionality(page: Page):
     expect(page.get_by_text("David Smith", exact=True)).not_to_be_visible()
 
     # Click to open
-    page.get_by_text("Show 2 additional contacts").click()
+    page.get_by_text("Previous contacts").click()
 
     # Details should now be open
     expect(page.get_by_text("David Smith", exact=True)).to_be_visible()
 
     # Click to close
-    page.get_by_text("Show 2 additional contacts").click()
+    page.get_by_text("Previous contacts").click()
 
     # Details should be closed again
     expect(page.get_by_text("David Smith", exact=True)).not_to_be_visible()
