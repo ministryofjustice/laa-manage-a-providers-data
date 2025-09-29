@@ -9,7 +9,7 @@
       "website": "https://www.smithpartners.com",
       "jobTitle": "Liaison manager",
       "primary": "Y",
-      "activeFrom": "2024-01-15"
+      "creationDate": "2025-01-15"
     },
     {
       "vendorSiteId": 101,
@@ -20,7 +20,8 @@
       "website": null,
       "jobTitle": "Liaison manager",
       "primary": "N",
-      "activeFrom": "2024-03-10"
+      "creationDate": "2024-03-10",
+      "inactiveDate": "2025-01-15"
     },
     {
       "vendorSiteId": 101,
@@ -31,7 +32,8 @@
       "website": "https://www.alicebrown.com",
       "jobTitle": "Liaison manager",
       "primary": "N",
-      "activeFrom": "2024-06-22"
+      "creationDate": "2024-01-22",
+      "inactiveDate": "2024-03-10"
     },
     {
       "vendorSiteId": 102,
@@ -42,7 +44,7 @@
       "website": "https://www.johnsonlegal.com",
       "jobTitle": "Liaison manager",
       "primary": "Y",
-      "activeFrom": "2023-11-05"
+      "creationDate": "2023-11-05"
     },
     {
       "vendorSiteId": 103,
@@ -53,7 +55,7 @@
       "website": "https://www.brownassociates.com",
       "jobTitle": "Liaison manager",
       "primary": "Y",
-      "activeFrom": "2024-02-28"
+      "creationDate": "2024-05-12"
     },
     {
       "vendorSiteId": 103,
@@ -64,7 +66,8 @@
       "website": null,
       "jobTitle": "Liaison manager",
       "primary": "N",
-      "activeFrom": "2024-05-12"
+      "creationDate": "2024-02-12",
+      "inactiveDate": "2024-15-12"
     },
     {
       "vendorSiteId": 104,
@@ -75,7 +78,7 @@
       "website": "https://www.davischambers.com",
       "jobTitle": "Liaison manager",
       "primary": "Y",
-      "activeFrom": "2023-09-18"
+      "creationDate": "2023-09-18"
     },
     {
       "vendorSiteId": 105,
@@ -86,7 +89,7 @@
       "website": null,
       "jobTitle": "Liaison manager",
       "primary": "Y",
-      "activeFrom": "2024-04-07"
+      "creationDate": "2024-04-07"
     },
     {
       "vendorSiteId": 201,
@@ -97,7 +100,7 @@
       "website": "https://www.scottishlegal.com",
       "jobTitle": "Liaison manager",
       "primary": "Y",
-      "activeFrom": "2023-12-20"
+      "creationDate": "2023-12-20"
     },
     {
       "vendorSiteId": 401,
@@ -108,7 +111,7 @@
       "website": "https://www.alandavies.com",
       "jobTitle": "Liaison manager",
       "primary": "Y",
-      "activeFrom": "2025-09-25"
+      "creationDate": "2025-09-25"
     }
   ]
 }

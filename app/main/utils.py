@@ -158,7 +158,9 @@ def change_liaison_manager(contact: Contact, firm_id: int, show_success_message:
         for existing_contact in contacts:
             if existing_contact.job_title == "Liaison manager" and existing_contact.primary == "Y":
                 # Set this contact to non-primary
-                updated_contact = existing_contact.model_copy(update={"primary": "N"})
+                updated_contact = existing_contact.model_copy(
+                    update={"primary": "N", "inactive_date": date.today().isoformat()}
+                )
                 try:
                     pda.update_contact(firm_id, office.firm_office_code, updated_contact)
                 except ProviderDataApiError:
@@ -175,7 +177,7 @@ def change_liaison_manager(contact: Contact, firm_id: int, show_success_message:
             "vendor_site_id": office.firm_office_id,
             "job_title": "Liaison manager",
             "primary": "Y",
-            "active_from": date.today().isoformat(),
+            "creation_date": date.today().isoformat(),
         }
 
         office_contact = contact.model_copy(update=contact_updates)

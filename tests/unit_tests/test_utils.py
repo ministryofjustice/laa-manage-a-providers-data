@@ -221,6 +221,7 @@ class TestChangeLiaisonManager:
             assert result.email_address == "jane.doe@example.com"
             assert result.job_title == "Liaison manager"
             assert result.primary == "Y"
+            assert result.creation_date == date.today().isoformat()
 
     def test_invalid_firm_id_raises_value_error(self, app):
         """Test that ValueError is raised for invalid firm_id."""
@@ -250,7 +251,7 @@ class TestChangeLiaisonManager:
                         "emailAddress": "john.smith@example.com",
                         "jobTitle": "Liaison manager",
                         "primary": "Y",
-                        "activeFrom": "2024-01-01",
+                        "creationDate": "2024-01-01",
                     }
                 ],
             }
@@ -264,12 +265,172 @@ class TestChangeLiaisonManager:
 
             result = change_liaison_manager(new_contact, 1)
 
+            # Verify new contact was created correctly
             assert result.vendor_site_id == 101
             assert result.first_name == "Alice"
             assert result.last_name == "Johnson"
             assert result.email_address == "alice.johnson@example.com"
             assert result.primary == "Y"
             assert result.job_title == "Liaison manager"
+            assert result.creation_date == date.today().isoformat()
+
+            # Verify old liaison manager was updated to non-primary with inactive date
+            old_contact = next(
+                (c for c in mock_api._mock_data["contacts"] if c["firstName"] == "John" and c["lastName"] == "Smith"),
+                None,
+            )
+            assert old_contact is not None
+            assert old_contact["primary"] == "N"
+            assert old_contact["inactiveDate"] == date.today().isoformat()
+
+    def test_existing_primary_liaison_managers_made_non_primary(self, app):
+        """Test that existing primary liaison managers are set to non-primary with inactive date."""
+        with app.test_request_context():
+            mock_api = app.extensions["pda"]
+            mock_api._mock_data = {
+                "firms": [{"firmId": 1, "firmName": "Test Firm"}],
+                "offices": [
+                    {"_firmId": 1, "firmOfficeCode": "HEAD01", "firmOfficeId": 101, "headOffice": "N/A"},
+                    {"_firmId": 1, "firmOfficeCode": "BRANCH01", "firmOfficeId": 102, "headOffice": "101"},
+                ],
+                "contacts": [
+                    {
+                        "vendorSiteId": 101,
+                        "firstName": "John",
+                        "lastName": "Smith",
+                        "emailAddress": "john.smith@example.com",
+                        "jobTitle": "Liaison manager",
+                        "primary": "Y",
+                        "creationDate": "2024-01-01",
+                    },
+                    {
+                        "vendorSiteId": 102,
+                        "firstName": "Jane",
+                        "lastName": "Wilson",
+                        "emailAddress": "jane.wilson@example.com",
+                        "jobTitle": "Liaison manager",
+                        "primary": "Y",
+                        "creationDate": "2024-02-01",
+                    },
+                ],
+            }
+
+            new_contact = Contact(
+                first_name="New",
+                last_name="Manager",
+                email_address="new.manager@example.com",
+            )
+
+            change_liaison_manager(new_contact, 1)
+
+            # Find all old liaison managers and verify they're now non-primary with inactive date
+            old_contacts = [
+                c
+                for c in mock_api._mock_data["contacts"]
+                if c["jobTitle"] == "Liaison manager" and c["firstName"] != "New"
+            ]
+
+            assert len(old_contacts) == 2
+            for old_contact in old_contacts:
+                assert old_contact["primary"] == "N"
+                assert old_contact["inactiveDate"] == date.today().isoformat()
+
+    def test_non_primary_liaison_managers_not_updated(self, app):
+        """Test that already non-primary liaison managers are not updated."""
+        with app.test_request_context():
+            mock_api = app.extensions["pda"]
+            mock_api._mock_data = {
+                "firms": [{"firmId": 1, "firmName": "Test Firm"}],
+                "offices": [{"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101, "headOffice": "N/A"}],
+                "contacts": [
+                    {
+                        "vendorSiteId": 101,
+                        "firstName": "Already",
+                        "lastName": "Inactive",
+                        "emailAddress": "already.inactive@example.com",
+                        "jobTitle": "Liaison manager",
+                        "primary": "N",
+                        "creationDate": "2024-01-01",
+                        "inactiveDate": "2024-06-01",
+                    }
+                ],
+            }
+
+            original_update = mock_api.update_contact
+            mock_api.update_contact = MagicMock(side_effect=original_update)
+
+            new_contact = Contact(
+                first_name="New",
+                last_name="Manager",
+                email_address="new.manager@example.com",
+            )
+
+            change_liaison_manager(new_contact, 1)
+
+            # update_contact should not have been called since existing contact was already non-primary
+            mock_api.update_contact.assert_not_called()
+
+            # Verify the already-inactive contact wasn't modified
+            old_contact = mock_api._mock_data["contacts"][0]
+            assert old_contact["inactiveDate"] == "2024-06-01"  # Original date unchanged
+
+    def test_non_liaison_manager_contacts_not_affected(self, app):
+        """Test that contacts with other job titles are not affected."""
+        with app.test_request_context():
+            mock_api = app.extensions["pda"]
+            mock_api._mock_data = {
+                "firms": [{"firmId": 1, "firmName": "Test Firm"}],
+                "offices": [{"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101, "headOffice": "N/A"}],
+                "contacts": [
+                    {
+                        "vendorSiteId": 101,
+                        "firstName": "Other",
+                        "lastName": "Contact",
+                        "emailAddress": "other.contact@example.com",
+                        "jobTitle": "Finance Manager",
+                        "primary": "Y",
+                        "creationDate": "2024-01-01",
+                    },
+                    {
+                        "vendorSiteId": 101,
+                        "firstName": "Primary",
+                        "lastName": "Liaison",
+                        "emailAddress": "primary.liaison@example.com",
+                        "jobTitle": "Liaison manager",
+                        "primary": "Y",
+                        "creationDate": "2024-01-01",
+                    },
+                ],
+            }
+
+            new_contact = Contact(
+                first_name="New",
+                last_name="Manager",
+                email_address="new.manager@example.com",
+            )
+
+            change_liaison_manager(new_contact, 1)
+
+            # Verify the Finance Manager was NOT updated
+            finance_contact = next(
+                (c for c in mock_api._mock_data["contacts"] if c["jobTitle"] == "Finance Manager"), None
+            )
+            assert finance_contact is not None
+            assert finance_contact["primary"] == "Y"
+            assert "inactiveDate" not in finance_contact
+
+            # Verify only the Liaison manager was updated
+            old_liaison = next(
+                (
+                    c
+                    for c in mock_api._mock_data["contacts"]
+                    if c["firstName"] == "Primary" and c["lastName"] == "Liaison"
+                ),
+                None,
+            )
+            assert old_liaison is not None
+            assert old_liaison["primary"] == "N"
+            assert old_liaison["inactiveDate"] == date.today().isoformat()
 
     def test_creates_contacts_for_all_offices(self, app):
         """Test that contacts are created for all offices of the firm."""
@@ -305,14 +466,15 @@ class TestChangeLiaisonManager:
                 assert contact["lastName"] == "Office"
                 assert contact["emailAddress"] == "multi.office@example.com"
                 assert contact["primary"] == "Y"
+                assert result.creation_date == date.today().isoformat()
 
             office_ids = [c["vendorSiteId"] for c in liaison_contacts]
             assert 101 in office_ids
             assert 102 in office_ids
             assert 103 in office_ids
 
-    def test_sets_active_from_date(self, app):
-        """Test that active_from is set to today's date when not provided."""
+    def test_sets_creation_date(self, app):
+        """Test that creation_date is set to today's date when not provided."""
         with app.test_request_context():
             mock_api = app.extensions["pda"]
             mock_api._mock_data = {
@@ -329,9 +491,9 @@ class TestChangeLiaisonManager:
 
             result = change_liaison_manager(new_contact, 1)
 
-            assert result.active_from is not None
+            assert result.creation_date is not None
             expected_date = date.today().isoformat()
-            assert result.active_from == expected_date
+            assert result.creation_date == expected_date
 
     @patch("app.main.utils.logger")
     def test_update_contact_error_handling(self, mock_logger, app):
@@ -349,7 +511,7 @@ class TestChangeLiaisonManager:
                         "emailAddress": "john.smith@example.com",
                         "jobTitle": "Liaison manager",
                         "primary": "Y",
-                        "activeFrom": "2024-01-01",
+                        "creationDate": "2024-01-01",
                     }
                 ],
             }
@@ -373,6 +535,13 @@ class TestChangeLiaisonManager:
                 # Should log error and flash error message
                 mock_logger.error.assert_called_once_with("Failed to update Liaison manager for office 1A001L")
                 mock_flash.assert_any_call("Failed to update Liaison manager for office 1A001L", "error")
+
+                # Verify update_contact was called with correct parameters
+                assert mock_api.update_contact.call_count == 1
+                call_args = mock_api.update_contact.call_args
+                updated_contact = call_args[0][2]  # Third argument is the contact
+                assert updated_contact.primary == "N"
+                assert updated_contact.inactive_date == date.today().isoformat()
 
     @patch("app.main.utils.logger")
     def test_create_contact_error_handling(self, mock_logger, app):
@@ -434,7 +603,7 @@ class TestChangeLiaisonManager:
                         "emailAddress": "old.manager@example.com",
                         "jobTitle": "Liaison manager",
                         "primary": "Y",
-                        "activeFrom": "2024-01-01",
+                        "creationDate": "2024-01-01",
                     }
                 ],
             }

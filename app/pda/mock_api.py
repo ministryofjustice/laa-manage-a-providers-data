@@ -639,10 +639,10 @@ class MockProviderDataApi:
 
         office_id = office_data.get("firmOfficeId")
 
-        # Set the vendor_site_id to the office ID and active_from to today in ISO format
+        # Set the vendor_site_id to the office ID and creation_date to today in ISO format
         updates = {"vendor_site_id": office_id}
-        if not contact.active_from:
-            updates["active_from"] = date.today().isoformat()
+        if not contact.creation_date:
+            updates["creation_date"] = date.today().isoformat()
 
         updated_contact = contact.model_copy(update=updates)
 

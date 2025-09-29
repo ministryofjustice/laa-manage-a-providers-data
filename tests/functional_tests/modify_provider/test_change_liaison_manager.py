@@ -146,4 +146,4 @@ def test_change_liaison_manager_replaces_existing_primary(page: Page):
     expect(page.get_by_text("newprimary@example.com")).to_be_visible()
 
     current_date = date.today().strftime("%d %b %Y")
-    expect(page.get_by_text(current_date)).to_be_visible()
+    expect(page.get_by_text(current_date)).to_have_count(2)  # Active from date on new provider & active to date on
