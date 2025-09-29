@@ -48,7 +48,7 @@ def format_date(date: str | datetime.date) -> str:
     if isinstance(date, datetime.date):
         # Format as "20 Jan 2023"
         return date.strftime("%-d %b %Y")
-    raise ValueError("")
+    raise ValueError(f"{date} is not a valid date.")
 
 
 def format_yes_no(value: Optional[str]) -> str:
