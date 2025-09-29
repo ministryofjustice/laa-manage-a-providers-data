@@ -215,7 +215,8 @@ def test_optional_fields_not_required(page: Page):
 def test_direct_access_without_session_redirects(page: Page):
     """Test that accessing contact details directly without session data gives 404."""
     # Try to access contact details page directly without going through add office flow
-    page.goto(url_for("main.add_office_contact_details", firm=1, _external=True))
-
+    resp = page.goto(url_for("main.add_office_contact_details", firm=1, _external=True))
+    assert resp is not None
+    assert resp.status == 400
     # Should get 400 error since no session data exists
-    assert page.title() == "400 Bad Request"
+    expect(page.get_by_role("heading", name="Sorry, there is a problem with the service")).to_be_visible

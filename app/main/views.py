@@ -69,7 +69,14 @@ def get_contact_tables(firm: Firm, head_office: Office = None) -> list[DataTable
 
 def get_payment_information_table(firm: Firm, office: Office) -> DataTable:
     table = SummaryList()
-    table.add_row(value=None, label="Payment method", row_action_urls={"enter": "#", "change": "#"})
+    table.add_row(
+        value=office.payment_method,
+        label="Payment method",
+        row_action_urls={
+            "enter": url_for("main.payment_method_form", firm=firm.firm_id, office=office.firm_office_code),
+            "change": url_for("main.payment_method_form", firm=firm.firm_id, office=office.firm_office_code),
+        },
+    )
     return table
 
 

@@ -1,4 +1,5 @@
 import pytest
+import re
 from flask import url_for
 from playwright.sync_api import Page, expect
 
@@ -187,3 +188,58 @@ def test_postcode_auto_capitalize(page: Page):
 
     # The field should have the auto-capitalise CSS class applied
     assert "auto-capitalise" in postcode_field.get_attribute("class")
+
+
+@pytest.mark.usefixtures("live_server")
+def test_payment_method_selection_persists(page: Page):
+    """Test successful form submission with required fields only."""
+    navigate_to_head_office_contact_details(page)
+
+    # Fill all required fields
+    page.get_by_role("textbox", name="Address line 1").fill("123 Head Office Street")
+    page.get_by_role("textbox", name="Town or city").fill("Head Office City")
+    page.get_by_role("textbox", name="Postcode").fill("HO1 2CE")
+    page.get_by_role("textbox", name="Telephone number").fill("01234567890")
+    page.get_by_role("textbox", name="Email address").fill("headoffice@testlsp.com")
+    page.get_by_role("textbox", name="DX number").fill("DX123456")
+    page.get_by_role("textbox", name="DX centre").fill("Head Office Centre")
+    page.get_by_role("button", name="Continue").click()
+
+    # Check we are on the VAT registration number page
+    expect(page.get_by_role("heading", name="Head office: VAT registration number (optional)")).to_be_visible()
+    page.get_by_role("button", name="Continue").click()
+
+    # Fill bank account form
+    expect(page.get_by_role("heading", name="Head office: Bank account details")).to_be_visible()
+    page.get_by_role("textbox", name="Account name").fill("Test Business Account")
+    page.get_by_role("textbox", name="Sort code").fill("123456")
+    page.get_by_role("textbox", name="Account number").fill("12345678")
+    page.get_by_role("button", name="Continue").click()
+
+    # Fill liaison manager form
+    expect(page.get_by_role("heading", name="Add liaison manager")).to_be_visible()
+    page.get_by_role("textbox", name="First name").fill("John")
+    page.get_by_role("textbox", name="Last name").fill("Smith")
+    page.get_by_role("textbox", name="Email address").fill("john.smith@testlsp.com")
+    page.get_by_role("textbox", name="Telephone number").fill("01234567890")
+    page.get_by_role("button", name="Continue").click()
+
+    # Should now be on the Assign Contract Manager page
+    page.get_by_role("textbox", name="Search for a contract manager").fill("Alice")
+    page.get_by_role("button", name="Search").click()
+
+    # Select the contract manager
+    page.get_by_role("radio", name="Select this row").click()
+
+    # Submit the form
+    page.get_by_role("button", name="Submit").click()
+
+    # Click on the Offices sub-navigation
+    page.get_by_role("link", name="Offices").click()
+
+    # Click on the first office link in the table
+    page.locator("a.govuk-link").filter(has_text=re.compile(r"^[A-Z0-9]+[A-Z]$")).first.click()
+    expect(page.get_by_text("Bank accounts and payment")).to_be_visible()
+    page.get_by_text("Bank accounts and payment").click()
+    expect(page.get_by_text("Payment Information")).to_be_visible()
+    expect(page.get_by_text("Electronic")).to_be_visible()
