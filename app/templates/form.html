@@ -33,12 +33,14 @@
           {{ field }}
         {% endif %}
       {% endfor %}
+        
+      {%  block FormButtons %}
+          {% set submitButtonText = form.submit_button_text or "Continue" %}
 
-      {% set submitButtonText = form.submit_button_text or "Continue" %}
-
-      {{ govukButton({
-        'text': submitButtonText
-      }) }}
+          {{ govukButton({
+            'text': submitButtonText
+          }) }}
+      {% endblock %}
 
       {# Render additional submissions buttons to the right of the default field #}
       {% for field in form %}

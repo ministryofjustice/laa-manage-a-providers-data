@@ -31,6 +31,13 @@ class ChangeProviderActiveStatusForm(ChangeForm, BaseForm):
         super().__init__(*args, **kwargs)
         self.firm = firm
 
+        choice_hints = {
+            "active": "This will not make all the offices of this provider active. Any office can be made active after you make the provider active."
+        }
+        if self.status.data == "active":
+            choice_hints = {"inactive": "This will also make all offices of this provider inactive."}
+        self.status.widget.choice_hints = choice_hints
+
     title = "Change active status"
     url = "provider/<firm:firm>/confirm-provider-status"
     template = "modify_provider/form.html"
@@ -38,7 +45,6 @@ class ChangeProviderActiveStatusForm(ChangeForm, BaseForm):
         "",
         widget=GovRadioInput(
             heading_class="govuk-fieldset__legend--m",
-            choice_hints={"inactive": "This will also make all offices of this provider inactive"},
         ),
         choices=[("active", "Active"), ("inactive", "Inactive")],
     )

@@ -14,6 +14,11 @@ class ChangeLiaisonManagerFormView(FullWidthBaseFormView):
     def get_success_url(self, firm):
         return url_for("main.view_provider", firm=firm)
 
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super(ChangeLiaisonManagerFormView, self).get_context_data(form, context, **kwargs)
+        context.update({"cancel_url": self.get_success_url(form.firm)})
+        return context
+
     def form_valid(self, form):
         # Create Contact instance from form data
         new_contact = Contact(

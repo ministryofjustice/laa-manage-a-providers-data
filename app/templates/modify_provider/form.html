@@ -1,7 +1,12 @@
 {% extends 'form.html' %}
 {%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
 
-{% block pageContent %}
-    {{ govukTable(main_table.to_govuk_params()) }}
+{% block pageHeading %}
+  {{ super() }}
+  {{ govukTable(main_table.to_govuk_params()) }}
+{% endblock %}
+
+{% block FormButtons %}
     {{ super() }}
+    <a class="mapd-cancel-btn govuk-link govuk-link--no-visited-state govuk-!-margin-top-2 govuk-!-margin-left-2" href="{{ cancel_url }}">Cancel</a>
 {% endblock %}
