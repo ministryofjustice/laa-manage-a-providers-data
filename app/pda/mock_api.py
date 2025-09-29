@@ -206,6 +206,13 @@ class MockProviderDataApi:
             self.logger.error(f"Invalid offices data in mock for firm {firm_id}: {e}")
             raise ProviderDataApiError(f"Invalid offices data: {e}")
 
+    def make_all_provider_offices_inactive(self, firm_id: int):
+        offices = self.get_provider_offices(firm_id)
+        for office in offices:
+            # When need to update the office data in memory and not the office object
+            item = self._find_office_data(firm_id, office.firm_office_code)
+            item.update({"inactive_date": date.today()})
+
     def get_head_office(self, firm_id: int) -> Office | None:
         """
         Gets the head office for a specific firm.
@@ -660,7 +667,10 @@ class MockProviderDataApi:
     def patch_provider_firm(self, firm_id: int, fields_to_update: dict):
         firm = self.get_provider_firm(firm_id)
         if firm:
-            return self._update_provider_firm(firm, fields_to_update)
+            firm = self._update_provider_firm(firm, fields_to_update)
+            if "inactiveDate" in fields_to_update and fields_to_update["inactiveDate"]:
+                self.make_all_provider_offices_inactive(firm_id)
+
         return firm
 
     def _update_provider_firm(self, firm: Firm, fields_to_update: dict):
