@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 from typing import Optional
 
 from app.constants import ADVOCATE_LEVEL_CHOICES, CONSTITUTIONAL_STATUS_CHOICES, FIRM_TYPE_CHOICES
@@ -32,19 +32,23 @@ def format_advocate_level(advocate_level: str) -> str:
     return choices_dict.get(advocate_level)
 
 
-def format_date(date_string: Optional[str]) -> str:
+def format_date(date: str | datetime.date) -> str:
     """Format ISO date string for display"""
-    if not date_string:
+    if not date:
         return ""
 
-    try:
-        # Parse ISO format date
-        date_obj = datetime.fromisoformat(date_string)
+    if isinstance(date, str):
+        try:
+            # Parse ISO format date
+            date = datetime.date.fromisoformat(date)
+        except (ValueError, TypeError):
+            # If it's not a valid ISO date, return as-is
+            return date
+
+    if isinstance(date, datetime.date):
         # Format as "20 Jan 2023"
-        return date_obj.strftime("%-d %b %Y")
-    except (ValueError, TypeError):
-        # If it's not a valid ISO date, return as-is
-        return date_string
+        return date.strftime("%-d %b %Y")
+    raise ValueError(f"{date} is not a valid date.")
 
 
 def format_yes_no(value: Optional[str]) -> str:

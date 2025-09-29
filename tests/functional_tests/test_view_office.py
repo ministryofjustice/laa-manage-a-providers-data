@@ -157,3 +157,39 @@ def test_office_no_vat_registration_number(page):
     page.get_by_role("link", name="3A001L").click()
     page.get_by_role("link", name="Bank accounts and payment").click()
     expect(page.get_by_role("link", name="Enter vat registration number")).to_be_visible()
+
+
+@pytest.mark.usefixtures("live_server")
+def test_office_inactive(page):
+    page.get_by_role("button", name="Sign in").click()
+    page.get_by_role("button", name="Search").click()
+    page.get_by_role("link", name="METROPOLITAN LAW CENTRE").click()
+    page.get_by_role("link", name="Offices").click()
+    page.get_by_role("link", name="3A001L").click()
+
+    # Tag
+    expect(page.get_by_text("Inactive", exact=True)).to_be_visible()
+
+    # Warning text
+    expect(page.get_by_text("Warning Provider marked as inactive on 25 Sep 2025")).to_be_visible()
+    expect(page.get_by_text("Warning Payments for all offices are hold because provider is inactive")).to_be_visible()
+
+    # Button
+    expect(page.get_by_role("button", name="Make active")).to_be_visible()
+
+
+@pytest.mark.usefixtures("live_server")
+def test_office_active(page):
+    navigate_to_office_page(page)
+
+    # Tag
+    expect(page.get_by_text("Inactive", exact=True)).not_to_be_visible()
+
+    # Warning text
+    expect(page.get_by_text("Warning Provider marked as inactive on 25 Sep 2025")).not_to_be_visible()
+    expect(
+        page.get_by_text("Warning Payments for all offices are hold because provider is inactive")
+    ).not_to_be_visible()
+
+    # Button
+    expect(page.get_by_role("button", name="Make inactive")).to_be_visible()

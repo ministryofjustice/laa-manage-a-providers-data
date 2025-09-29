@@ -5,6 +5,7 @@ from datetime import date
 
 from flask import current_app, flash, session, url_for
 
+from app.components.tag import Tag, TagType
 from app.models import BankAccount, Contact, Firm, Office
 from app.pda.mock_api import MockProviderDataApi, ProviderDataApiError
 
@@ -381,3 +382,10 @@ def _replicate_office_contacts(
         replicated_contacts.append(replicated_contact)
 
     return replicated_contacts
+
+
+def get_office_tags(office: Office):
+    tags: list[Tag] = []
+    if office.inactive_date:
+        tags.append(Tag(TagType.INACTIVE))
+    return tags

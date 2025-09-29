@@ -11,6 +11,7 @@
 {% from 'macros/contact_tables.html' import contactCards %}
 {% from 'govuk_frontend_jinja/components/summary-list/macro.html' import govukSummaryList %}
 {%- from 'macros/flash_messages.html' import renderFlashMessages %}
+{%- from 'macros/render_tags.html' import renderTags %}
 
 {% block beforeContent %}
   {{ super() }}
@@ -34,15 +35,28 @@
       {{ renderFlashMessages() }}
 
       <span class="govuk-caption-xl">{{ firm.firm_name }}</span>
-      <h1 class="govuk-heading-xl">Office: {{ office.firm_office_code }}</h1>
+      <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">Office: {{ office.firm_office_code }}</h1>
+
+      {{ renderTags(office_tags) }}
 
       {{ addressDisplay(office) }}
 
       <br>
 
+      {% if office.inactive_date %}
+        {{ govukWarningText({
+              "text": "Provider marked as inactive on " ~ office.inactive_date | format_date,
+              "classes": "govuk-!-margin-top-2 govuk-!-margin-bottom-3"
+          }) }}
+        {{ govukWarningText({
+            "text": "Payments for all offices are hold because provider is inactive",
+            "classes": "govuk-!-margin-bottom-5"
+        }) }}
+      {% endif %}
+
       {{ govukButton({
-        "text": "Make inactive",
-        "classes": "govuk-button--secondary"
+        "text": "Make active" if office.inactive_date else "Make inactive",
+        "classes": "govuk-button--secondary",
       }) }}
 
       {{ govukButton({
