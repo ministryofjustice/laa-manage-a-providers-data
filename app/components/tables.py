@@ -214,8 +214,8 @@ class SummaryList(DataTable):
 
     def add_row(
         self,
-        value,
         label,
+        value=None,
         formatter=None,
         html=None,
         row_action_urls: dict[RowActionTypes, str] | None = None,
@@ -233,8 +233,8 @@ class SummaryList(DataTable):
         See `TransposedDataTable.get_rows` for more information.
 
         Args:
-            value: String value to appear in a cell
             label: String presentation label, also used as ID after conversion to snake_case
+            value: Optional String value to appear in a cell
             formatter: Optional Callable, used to convert `value` into the presented string in the cell
             html: Optional Callable, used during table generation to provide the HTML for the cell
             row_action_urls: Optional dict, using `RowActionTypes` as key and a URL as value.

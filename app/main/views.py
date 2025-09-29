@@ -56,11 +56,11 @@ def get_contact_tables(firm: Firm, head_office: Office = None) -> list[DataTable
 
         contact_table = SummaryList(card=card)
 
-        contact_table.add_row(contact.job_title, "Job title")
-        contact_table.add_row(contact.telephone_number, "Telephone number")
-        contact_table.add_row(contact.email_address, "Email address")
-        contact_table.add_row(contact.website, "Website")
-        contact_table.add_row(contact.active_from, "Active from", format_date)
+        contact_table.add_row("Job title", contact.job_title)
+        contact_table.add_row("Telephone number", contact.telephone_number)
+        contact_table.add_row("Email address", contact.email_address)
+        contact_table.add_row("Website", contact.website)
+        contact_table.add_row("Active from", contact.active_from, format_date)
 
         contact_tables.append(contact_table)
 
@@ -70,8 +70,8 @@ def get_contact_tables(firm: Firm, head_office: Office = None) -> list[DataTable
 def get_payment_information_table(firm: Firm, office: Office) -> DataTable:
     table = SummaryList()
     table.add_row(
-        value=office.payment_method,
         label="Payment method",
+        value=office.payment_method,
         row_action_urls={
             "enter": url_for("main.payment_method_form", firm=firm.firm_id, office=office.firm_office_code),
             "change": url_for("main.payment_method_form", firm=firm.firm_id, office=office.firm_office_code),
@@ -84,8 +84,8 @@ def get_vat_registration_table(firm: Firm, office: Office) -> DataTable:
     table = SummaryList()
     url = url_for("main.add_office_vat_number", firm=firm, office=office)
     table.add_row(
-        value=office.vat_registration_number,
         label="VAT registration number",
+        value=office.vat_registration_number,
         row_action_urls={"enter": url, "change": url},
     )
     return table
@@ -93,10 +93,10 @@ def get_vat_registration_table(firm: Firm, office: Office) -> DataTable:
 
 def get_office_overview_table(firm: Firm, office: Office) -> DataTable:
     table = SummaryList()
-    table.add_row(firm.firm_name, "Parent provider", html=provider_name_html(firm))
-    table.add_row(office.firm_office_code, "Account number")
-    table.add_row(office.head_office, "Head office", format_head_office)
-    table.add_row(firm.firm_type, "Supplier type", format_firm_type)
+    table.add_row("Parent provider", firm.firm_name, html=provider_name_html(firm))
+    table.add_row("Account number", office.firm_office_code)
+    table.add_row("Head office", office.head_office, format_head_office)
+    table.add_row("Supplier type", firm.firm_type, format_firm_type)
     return table
 
 
@@ -106,9 +106,9 @@ def get_bank_account_table(bank_account: BankAccount) -> DataTable | None:
 
     card: Card = {"title": bank_account.bank_account_name, "action_text": "Change bank account", "action_url": "#"}
     table = SummaryList(card=card)
-    table.add_row(bank_account.bank_account_name, "Account name")
-    table.add_row(bank_account.account_number, "Account number")
-    table.add_row(bank_account.sort_code, "Sort code")
+    table.add_row("Account name", bank_account.bank_account_name)
+    table.add_row("Account number", bank_account.account_number)
+    table.add_row("Sort code", bank_account.sort_code)
     # Effective date from still to be implemented
     return table
 
@@ -167,8 +167,8 @@ class ViewProvider(MethodView):
                 field["html"] = html_renderer(data_source)
 
             main_table.add_row(
-                value=value,
                 label=field.get("label"),
+                value=value,
                 formatter=field.get("formatter"),
                 html=field.get("html"),
                 default_value=field.get("default", "No data"),
@@ -206,15 +206,11 @@ class ViewProvider(MethodView):
         """Gets information about the chambers head office"""
         table = SummaryList()
 
-        table.add_row(
-            "test",
-            "Address",
-            html=format_office_address_multi_line_html(head_office),
-        )
-        table.add_row(head_office.email_address, "Email address")
-        table.add_row(head_office.telephone_number, "Telephone number")
-        table.add_row(head_office.dx_number, "DX number")
-        table.add_row(head_office.dx_centre, "DX centre")
+        table.add_row("Address", "test", html=format_office_address_multi_line_html(head_office))
+        table.add_row("Email address", head_office.email_address)
+        table.add_row("Telephone number", head_office.telephone_number)
+        table.add_row("DX number", head_office.dx_number)
+        table.add_row("DX centre", head_office.dx_centre)
 
         return table
 
