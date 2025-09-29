@@ -174,6 +174,9 @@ def test_office_inactive(page):
     expect(page.get_by_text("Warning Provider marked as inactive on 25 Sep 2025")).to_be_visible()
     expect(page.get_by_text("Warning Payments for all offices are hold because provider is inactive")).to_be_visible()
 
+    # Button
+    expect(page.get_by_role("button", name="Make active")).to_be_visible()
+
 
 @pytest.mark.usefixtures("live_server")
 def test_office_active(page):
@@ -187,3 +190,6 @@ def test_office_active(page):
     expect(
         page.get_by_text("Warning Payments for all offices are hold because provider is inactive")
     ).not_to_be_visible()
+
+    # Button
+    expect(page.get_by_role("button", name="Make inactive")).to_be_visible()
