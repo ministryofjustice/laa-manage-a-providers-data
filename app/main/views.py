@@ -8,7 +8,7 @@ from app.components.tables import Card, DataTable, SummaryList, TableStructureIt
 from app.main.constants import MAIN_TABLE_FIELD_CONFIG
 from app.main.forms import firm_name_html, get_firm_statuses
 from app.main.utils import create_provider_from_session, get_office_tags, provider_name_html
-from app.models import BankAccount, Firm, Office
+from app.models import BankAccount, Contact, Firm, Office
 from app.utils.formatting import (
     format_date,
     format_firm_type,
@@ -21,13 +21,16 @@ from app.views import BaseFormView
 logger = logging.getLogger(__name__)
 
 
-def get_contact_tables(firm: Firm, head_office: Office = None) -> list[DataTable]:
-    if not head_office or not firm.firm_id:
+def get_sorted_contacts(firm: Firm, office: Office = None) -> List[Contact]:
+    """
+    For the specified office (part of the specified firm), get a list of contacts with
+    the contacts marked primary appearing first in the list.
+    """
+    if not firm.firm_id or not office:
         return []
 
-    # Get contacts for the head office
     pda = current_app.extensions["pda"]
-    contacts = pda.get_office_contacts(firm.firm_id, head_office.firm_office_code)
+    contacts = pda.get_office_contacts(firm.firm_id, office.firm_office_code)
 
     if not contacts:
         return []
@@ -37,6 +40,14 @@ def get_contact_tables(firm: Firm, head_office: Office = None) -> list[DataTable
     other_contacts = [c for c in contacts if c.primary != "Y"]
     sorted_contacts = primary_contacts + other_contacts
 
+    return sorted_contacts
+
+
+def get_contact_tables(firm: Firm, head_office: Office = None) -> list[DataTable]:
+    sorted_contacts = get_sorted_contacts(firm, head_office)
+    if not sorted_contacts:
+        return []
+
     contact_tables = []
 
     for contact in sorted_contacts:
@@ -45,7 +56,7 @@ def get_contact_tables(firm: Firm, head_office: Office = None) -> list[DataTable
             "title": card_title,
         }
 
-        if contact in primary_contacts:
+        if contact.primary == "Y":
             # Only the primary contact card has the action to change the Liaison Manager
             card.update(
                 {
@@ -111,6 +122,43 @@ def get_bank_account_table(bank_account: BankAccount) -> DataTable | None:
     table.add_row("Sort code", bank_account.sort_code)
     # Effective date from still to be implemented
     return table
+
+
+def get_office_contact_table(firm: Firm, office: Office) -> DataTable | None:
+    """
+    Gets a DataTable for the primary contact for the specified office.
+
+    If the office has multiple primary contacts, the
+    """
+    sorted_contacts = get_sorted_contacts(firm, office)
+    if not sorted_contacts:
+        return None
+
+    # Take the first contact, which should be either the primary contact or,
+    # if there is no primary contact, the next available contact
+    contact_to_display = sorted_contacts[0]
+
+    office_contact_table = SummaryList()
+    office_contact_table.add_row(
+        label="Address",
+        html=format_office_address_multi_line_html(office),
+        row_action_urls={"enter": "#", "change": "#"},
+    )
+    office_contact_table.add_row(
+        label="Email address", value=contact_to_display.email_address, row_action_urls={"enter": "#", "change": "#"}
+    )
+    office_contact_table.add_row(
+        label="Telephone number",
+        value=contact_to_display.telephone_number,
+        row_action_urls={"enter": "#", "change": "#"},
+    )
+    office_contact_table.add_row(
+        label="DX number", value=office.dx_number, row_action_urls={"enter": "#", "change": "#"}
+    )
+    office_contact_table.add_row(
+        label="DX centre", value=office.dx_centre, row_action_urls={"enter": "#", "change": "#"}
+    )
+    return office_contact_table
 
 
 class ProviderList(BaseFormView):
@@ -382,7 +430,13 @@ class ViewOffice(MethodView):
             )
 
         if self.subpage == "contact":
-            context.update({"contact_tables": get_contact_tables(firm, office)})
+            context.update(
+                {
+                    "contact_tables": [
+                        get_office_contact_table(firm, office),
+                    ]
+                }
+            )
 
         if self.subpage == "overview":
             context.update({"overview_table": get_office_overview_table(firm, office)})
