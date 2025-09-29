@@ -7,7 +7,7 @@ from flask.views import MethodView
 from app.components.tables import Card, DataTable, SummaryList, TableStructureItem
 from app.main.constants import MAIN_TABLE_FIELD_CONFIG
 from app.main.forms import firm_name_html, get_firm_statuses
-from app.main.utils import create_provider_from_session, provider_name_html
+from app.main.utils import create_provider_from_session, get_office_tags, provider_name_html
 from app.models import BankAccount, Firm, Office
 from app.utils.formatting import (
     format_date,
@@ -370,7 +370,7 @@ class ViewOffice(MethodView):
             self.subpage = subpage
 
     def get_context(self, firm: Firm, office: Office) -> Dict:
-        context = {"firm": firm, "office": office, "subpage": self.subpage}
+        context = {"firm": firm, "office": office, "subpage": self.subpage, "office_tags": get_office_tags(office)}
 
         if self.subpage == "bank-payment-details":
             pda = current_app.extensions["pda"]

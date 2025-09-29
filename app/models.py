@@ -96,7 +96,10 @@ class Office(BaseModel):
     local_authority: Optional[str] = Field(alias="localAuthority", default=None)
     police_station_area_name: Optional[str] = Field(alias="policeStationAreaName", default=None)
     duty_solicitor_area_name: Optional[str] = Field(alias="dutySolicitorAreaName", default=None)
+
+    # The below fields are not present in the current version of PDA
     payment_method: Optional[str] = Field(alias="paymentMethod", default=None)
+    inactive_date: date | None = Field(alias="inactiveDate", default=None)
 
     is_head_office: Optional[bool] = Field(
         default=False, exclude=True
