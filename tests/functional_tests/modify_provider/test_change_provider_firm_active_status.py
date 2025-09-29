@@ -13,4 +13,4 @@ def test_change_provider_firm_active_status(page: Page):
     page.get_by_role("button", name="Save").click()
 
     success_message_element = page.locator(".govuk-notification-banner--success .govuk-notification-banner__content")
-    assert success_message_element.text_content() == "SMITH & PARTNERS SOLICITORS marked as active"
+    assert success_message_element.text_content().strip() == "SMITH & PARTNERS SOLICITORS marked as active"
