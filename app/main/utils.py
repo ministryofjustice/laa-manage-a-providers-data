@@ -389,7 +389,7 @@ def get_firm_tags(firm: Firm):
     if firm.inactive_date:
         tags.append(Tag(TagType.INACTIVE))
     return tags
-  
+
 
 def get_office_tags(office: Office):
     tags: list[Tag] = []
@@ -467,6 +467,6 @@ def assign_firm_to_a_new_chambers(firm: Firm | int, chambers: Firm | int) -> Fir
     new_provider_dict: dict = pda.patch_provider(firm.firm_id, {"parentFirmId": chambers.firm_id})
     new_provider = Firm(**new_provider_dict)
 
-    flash(f"{new_provider.firm_name} assigned to {chambers.firm_name}", category="success")
+    flash(f"<b>{new_provider.firm_name} assigned to {chambers.firm_name}</b>", category="success")
 
     return new_provider
