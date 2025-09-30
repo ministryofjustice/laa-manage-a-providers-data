@@ -89,7 +89,7 @@
     }) }}
 
     </div>
-    <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-grid-column-{% if subpage == 'contact' %}full{% else %}two-thirds{% endif %}">
 
     {% if subpage == "overview" %}
         {% if overview_table %}
