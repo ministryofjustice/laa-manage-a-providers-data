@@ -60,7 +60,9 @@ def get_contact_tables(firm: Firm, head_office: Office = None) -> list[DataTable
         contact_table.add_row(contact.telephone_number, "Telephone number")
         contact_table.add_row(contact.email_address, "Email address")
         contact_table.add_row(contact.website, "Website")
-        contact_table.add_row(contact.active_from, "Active from", format_date)
+        contact_table.add_row(contact.creation_date, "Active from", format_date)
+        if contact.inactive_date:
+            contact_table.add_row(contact.inactive_date, "Active to", format_date)
 
         contact_tables.append(contact_table)
 
