@@ -3,12 +3,15 @@ from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired, Length
 
 from app.fields import GovUKTableRadioField
+from wtforms.fields import RadioField
+
+from app.constants import PROVIDER_ACTIVE_STATUS_CHOICES
 from app.forms import BaseForm
 from app.main.add_a_new_provider.forms import LiaisonManagerForm
 from app.main.utils import get_firm_account_number
 from app.models import Firm
 from app.validators import ValidateSearchResults
-from app.widgets import GovTextInput
+from app.widgets import GovTextInput, GovRadioInput
 
 
 class ChangeForm:
@@ -29,6 +32,30 @@ class ChangeLiaisonManagerForm(ChangeForm, LiaisonManagerForm):
         if not self.firm or not isinstance(self.firm, Firm):
             return "Unknown"
         return self.firm.firm_name
+
+      
+class ChangeProviderActiveStatusForm(ChangeForm, BaseForm):
+    def __init__(self, firm: Firm, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.firm = firm
+
+        choice_hints = {
+            "active": "This will not make all the offices of this provider active. Any office can be made active after you make the provider active."
+        }
+        if self.status.data == "active":
+            choice_hints = {"inactive": "This will also make all offices of this provider inactive."}
+        self.status.widget.choice_hints = choice_hints
+
+    title = "Change active status"
+    url = "provider/<firm:firm>/confirm-provider-status"
+    template = "modify_provider/form.html"
+    status = RadioField(
+        "",
+        widget=GovRadioInput(
+            heading_class="govuk-fieldset__legend--m",
+        ),
+        choices=PROVIDER_ACTIVE_STATUS_CHOICES,
+    )
 
 
 class AssignChambersForm(ChangeForm, BaseForm):

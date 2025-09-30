@@ -384,6 +384,13 @@ def _replicate_office_contacts(
     return replicated_contacts
 
 
+def get_firm_tags(firm: Firm):
+    tags: list[Tag] = []
+    if firm.inactive_date:
+        tags.append(Tag(TagType.INACTIVE))
+    return tags
+  
+
 def get_office_tags(office: Office):
     tags: list[Tag] = []
     if office.inactive_date:

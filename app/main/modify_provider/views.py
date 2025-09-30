@@ -1,9 +1,13 @@
-from flask import Response, abort, redirect, render_template, request, url_for
+import datetime
+from typing import Any
+from flask import Response, current_app, abort, flash, redirect, render_template, request, url_for
 
 from app.main.modify_provider import AssignChambersForm
 from app.main.utils import assign_firm_to_a_new_chambers, change_liaison_manager
-from app.models import Contact
+from app.models import Contact, Firm
 from app.views import BaseFormView, FullWidthBaseFormView
+from app.forms import BaseForm
+from app.main.views import get_main_table
 
 
 class ChangeLiaisonManagerFormView(FullWidthBaseFormView):
@@ -38,7 +42,36 @@ class ChangeLiaisonManagerFormView(FullWidthBaseFormView):
             return self.form_invalid(form, **kwargs)
 
 
-class AssignChambersFormView(BaseFormView):
+class ChangeProviderActiveStatusFormView(FullWidthBaseFormView):
+    def get_success_url(self, form):
+        return url_for("main.view_provider", firm=form.firm)
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form=form, context=context, **kwargs)
+        context.update(
+            {
+                "main_table": get_main_table(form.firm, head_office=None, parent_firm=None),
+                "cancel_url": self.get_success_url(form),
+            }
+        )
+
+        return context
+
+    def get(self, firm: Firm, context, **kwargs):
+        status = "inactive" if firm.inactive_date else "active"
+        form = self.get_form_class()(status=status, firm=firm)
+        return render_template(self.template, **self.get_context_data(form))
+
+    def post(self, firm, context, **kwargs):
+        form = self.get_form_class()(firm=firm)
+
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form, **kwargs)
+          
+         
+ class AssignChambersFormView(BaseFormView):
     """Form view for the assign to a chambers form"""
 
     template = "add_provider/assign-chambers.html"
@@ -81,3 +114,16 @@ class AssignChambersFormView(BaseFormView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
+
+    def form_valid(self, form):
+        status = form.data.get("status")
+        inactive_date = None
+        if status == "inactive":
+            inactive_date = datetime.date.today().strftime("%Y-%m-%d")
+        data = {Firm.model_fields["inactive_date"].alias: inactive_date}
+
+        pda = current_app.extensions["pda"]
+        firm = pda.patch_provider_firm(form.firm.firm_id, data)
+        if firm:
+            flash(f"{form.firm.firm_name} marked as {status}", "success")
+        return super().form_valid(form)
