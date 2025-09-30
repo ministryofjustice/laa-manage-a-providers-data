@@ -8,7 +8,7 @@ from app.components.tables import Card, DataTable, SummaryList, TableStructureIt
 from app.main.constants import MAIN_TABLE_FIELD_CONFIG
 from app.main.forms import firm_name_html, get_firm_statuses
 from app.main.utils import create_provider_from_session, get_firm_tags, get_office_tags, provider_name_html
-from app.models import BankAccount, Firm, Office
+from app.models import BankAccount, Contact, Firm, Office
 from app.utils.formatting import (
     format_date,
     format_firm_type,
