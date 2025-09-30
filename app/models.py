@@ -181,6 +181,7 @@ class Contact(BaseModel):
 
     # vendorSiteId maps to firm_office_id
     vendor_site_id: int = Field(alias="vendorSiteId", gt=0, default=None)  # This is the firm_office_id
+    contact_id: int = Field(alias="contactId", gt=0, default=None)
     first_name: str = Field(alias="firstName", min_length=1, default=None)
     last_name: str = Field(alias="lastName", min_length=1, default=None)
     email_address: str = Field(alias="emailAddress", min_length=1, default=None)

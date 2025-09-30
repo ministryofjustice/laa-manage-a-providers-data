@@ -384,7 +384,7 @@ class TestChangeLiaisonManager:
                 "contacts": [
                     {
                         "vendorSiteId": 101,
-                        "firstName": "Other",
+                        "firstName": "BLASH",
                         "lastName": "Contact",
                         "emailAddress": "other.contact@example.com",
                         "jobTitle": "Finance Manager",
@@ -393,7 +393,7 @@ class TestChangeLiaisonManager:
                     },
                     {
                         "vendorSiteId": 101,
-                        "firstName": "Primary",
+                        "firstName": "WOOOO",
                         "lastName": "Liaison",
                         "emailAddress": "primary.liaison@example.com",
                         "jobTitle": "Liaison manager",
@@ -409,8 +409,11 @@ class TestChangeLiaisonManager:
                 email_address="new.manager@example.com",
             )
 
+            print(mock_api._mock_data["contacts"])
+
             change_liaison_manager(new_contact, 1)
 
+            print(mock_api._mock_data["contacts"])
             # Verify the Finance Manager was NOT updated
             finance_contact = next(
                 (c for c in mock_api._mock_data["contacts"] if c["jobTitle"] == "Finance Manager"), None

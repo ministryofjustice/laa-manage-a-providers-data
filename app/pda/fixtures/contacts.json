@@ -1,6 +1,7 @@
 {
   "contacts": [
     {
+      "contactId": 1,
       "vendorSiteId": 101,
       "firstName": "Sarah",
       "lastName": "Johnson",
@@ -12,6 +13,7 @@
       "creationDate": "2025-01-15"
     },
     {
+      "contactId": 2,
       "vendorSiteId": 101,
       "firstName": "David",
       "lastName": "Smith",
@@ -24,6 +26,7 @@
       "inactiveDate": "2025-01-15"
     },
     {
+      "contactId": 3,
       "vendorSiteId": 101,
       "firstName": "Alice",
       "lastName": "Brown",
@@ -36,6 +39,7 @@
       "inactiveDate": "2024-03-10"
     },
     {
+      "contactId": 4,
       "vendorSiteId": 102,
       "firstName": "Michael",
       "lastName": "Thompson",
@@ -47,6 +51,7 @@
       "creationDate": "2023-11-05"
     },
     {
+      "contactId": 5,
       "vendorSiteId": 103,
       "firstName": "Emma",
       "lastName": "Brown",
@@ -58,6 +63,7 @@
       "creationDate": "2024-05-12"
     },
     {
+      "contactId": 6,
       "vendorSiteId": 103,
       "firstName": "Sophie",
       "lastName": "Williams",
@@ -70,6 +76,7 @@
       "inactiveDate": "2024-15-12"
     },
     {
+      "contactId": 7,
       "vendorSiteId": 104,
       "firstName": "James",
       "lastName": "Davis",
@@ -81,6 +88,7 @@
       "creationDate": "2023-09-18"
     },
     {
+      "contactId": 8,
       "vendorSiteId": 105,
       "firstName": "Rachel",
       "lastName": "Wilson",
@@ -92,6 +100,7 @@
       "creationDate": "2024-04-07"
     },
     {
+      "contactId": 9,
       "vendorSiteId": 201,
       "firstName": "Robert",
       "lastName": "MacLeod",
@@ -103,6 +112,7 @@
       "creationDate": "2023-12-20"
     },
     {
+      "contactId": 10,
       "vendorSiteId": 401,
       "firstName": "Alan",
       "lastName": "Davies",

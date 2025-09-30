@@ -664,7 +664,7 @@ class MockProviderDataApi:
         Args:
             firm_id: The firm ID
             office_code: The office code
-            contact: Contact model instance with updated data (must have vendor_site_id set)
+            contact: Contact model instance with updated data
 
         Returns:
             Contact: The updated Contact model instance
@@ -676,18 +676,16 @@ class MockProviderDataApi:
             raise ValueError("firm_id must be a positive integer")
         if not office_code or not isinstance(office_code, str):
             raise ValueError("office_code must be a non-empty string")
-        if not contact.vendor_site_id:
-            raise ValueError("contact must have vendor_site_id set")
 
-        # Find the contact in mock data
+        # Find the contact in mock data by contactId
         contact_index = None
         for i, existing_contact in enumerate(self._mock_data["contacts"]):
-            if existing_contact.get("vendorSiteId") == contact.vendor_site_id:
+            if existing_contact.get("contactId") == contact.contact_id:
                 contact_index = i
                 break
 
         if contact_index is None:
-            raise ProviderDataApiError(f"Contact with vendor_site_id {contact.vendor_site_id} not found")
+            raise ProviderDataApiError(f"Contact with contact_id {contact.contact_id} not found")
 
         # Update the contact data
         self._mock_data["contacts"][contact_index] = contact.to_api_dict()
