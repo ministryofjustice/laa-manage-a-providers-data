@@ -28,7 +28,7 @@
     {% endblock %}
 
     {% if main_table %}
-      {{ govukTable(main_table.to_govuk_params()) }}
+      {{ govukSummaryList(main_table.to_summary_govuk_params()) }}
     {% endif %}
 
     </div>

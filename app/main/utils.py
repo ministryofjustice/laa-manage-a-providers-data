@@ -423,7 +423,7 @@ def get_firm_account_number(firm: Firm | int) -> str | None:
     return head_office.firm_office_code
 
 
-def assign_firm_to_a_new_chambers(firm: Firm | int, chambers: Firm | int):
+def assign_firm_to_a_new_chambers(firm: Firm | int, chambers: Firm | int) -> Firm:
     """Assigns an advocate or a barrister to a new chambers.
 
     Args:
@@ -457,4 +457,9 @@ def assign_firm_to_a_new_chambers(firm: Firm | int, chambers: Firm | int):
     if chambers.firm_type != "Chambers":
         raise ValueError(f"chambers must be a Chambers, got firm_type: {chambers.firm_type}")
 
-    return pda.patch_provider(firm.firm_id, {"parentFirmId": chambers.firm_id})
+    new_provider_dict: dict = pda.patch_provider(firm.firm_id, {"parentFirmId": chambers.firm_id})
+    new_provider = Firm(**new_provider_dict)
+
+    flash(f"{new_provider.firm_name} assigned to {chambers.firm_name}", category="success")
+
+    return new_provider

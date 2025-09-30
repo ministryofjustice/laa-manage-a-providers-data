@@ -166,12 +166,16 @@ class ViewProvider(MethodView):
                     raise ValueError("html_renderer must be callable")
                 field["html"] = html_renderer(data_source)
 
+            if change_link := field.get("change_link"):
+                field["row_action_urls"] = {"change": url_for(change_link, firm=firm)}
+
             main_table.add_row(
                 value=value,
                 label=field.get("label"),
                 formatter=field.get("formatter"),
                 html=field.get("html"),
                 default_value=field.get("default", "No data"),
+                row_action_urls=field.get("row_action_urls"),
             )
 
         return main_table
