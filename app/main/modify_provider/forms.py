@@ -1,5 +1,6 @@
 from wtforms.fields import RadioField
 
+from app.constants import PROVIDER_ACTIVE_STATUS_CHOICES
 from app.forms import BaseForm
 from app.main.add_a_new_provider.forms import LiaisonManagerForm
 from app.models import Firm
@@ -46,5 +47,5 @@ class ChangeProviderActiveStatusForm(ChangeForm, BaseForm):
         widget=GovRadioInput(
             heading_class="govuk-fieldset__legend--m",
         ),
-        choices=[("active", "Active"), ("inactive", "Inactive")],
+        choices=PROVIDER_ACTIVE_STATUS_CHOICES,
     )

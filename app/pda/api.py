@@ -460,4 +460,5 @@ class ProviderDataApi:
             f"/provider-firms/{firm_id}",
             json=fields_to_update,
         )
-        return self._handle_response(response, {})
+        self._handle_response(response, {})
+        return self.get_provider_firm(firm_id)

@@ -78,6 +78,7 @@ class ChangeProviderActiveStatusFormView(FullWidthBaseFormView):
         data = {Firm.model_fields["inactive_date"].alias: inactive_date}
 
         pda = current_app.extensions["pda"]
-        pda.patch_provider_firm(form.firm.firm_id, data)
-        flash(f"{form.firm.firm_name} marked as {status}", "success")
+        firm = pda.patch_provider_firm(form.firm.firm_id, data)
+        if firm:
+            flash(f"{form.firm.firm_name} marked as {status}", "success")
         return super().form_valid(form)
