@@ -13,6 +13,13 @@ def test_view_provider_page_ui_loads(page):
 
     expect(page.get_by_role("link", name="Offices")).to_be_visible()
 
+    # Tags
+    expect(page.locator("strong.govuk-tag", has_text="Inactive")).to_be_visible()
+
+    # Warning text
+    expect(page.get_by_text("Warning Provider marked as inactive on 25 Sep 2025")).to_be_visible()
+    expect(page.get_by_text("Warning Payments for all offices are hold because provider is inactive")).to_be_visible()
+
     # Buttons
     expect(page.get_by_role("button", name="Make provider active")).to_be_visible()
     # Main table

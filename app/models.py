@@ -40,7 +40,6 @@ class Firm(BaseModel):
     women_owned_flag: YN = Field(alias="womenOwnedFlag", default=None)
     website_url: str | None = Field(alias="websiteUrl", min_length=1, default=None)
     inactive_date: date | None = Field(alias="inactiveDate", default=None)
-
     contract_manager: str | None = Field(
         alias="contractManager", default=None
     )  # This does not exist in PDA and is here for the purpose of testing
