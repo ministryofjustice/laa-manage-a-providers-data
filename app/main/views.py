@@ -7,8 +7,8 @@ from flask.views import MethodView
 from app.components.tables import Card, DataTable, SummaryList, TableStructureItem
 from app.main.constants import MAIN_TABLE_FIELD_CONFIG
 from app.main.forms import firm_name_html, get_firm_statuses
-from app.main.utils import create_provider_from_session, get_office_tags, provider_name_html
-from app.models import BankAccount, Contact, Firm, Office
+from app.main.utils import create_provider_from_session, get_firm_tags, get_office_tags, provider_name_html
+from app.models import BankAccount, Firm, Office
 from app.utils.formatting import (
     format_date,
     format_firm_type,
@@ -343,7 +343,7 @@ class ViewProvider(MethodView):
 
         head_office, parent_provider = None, None
 
-        context = {"firm": firm}
+        context = {"firm": firm, "firm_tags": get_firm_tags(firm)}
 
         if firm.firm_id:
             # Get head office for account number
