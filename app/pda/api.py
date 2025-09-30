@@ -454,3 +454,11 @@ class ProviderDataApi:
             NotImplementedError: This functionality is not yet supported by the real API
         """
         raise NotImplementedError("Updating contacts is not yet supported by the real Provider Data API")
+
+    def patch_provider(self, firm_id: int, fields_to_update: dict):
+        response = self.patch(
+            f"/provider-firms/{firm_id}",
+            json=fields_to_update,
+        )
+        self._handle_response(response, {})
+        return self.get_provider_firm(firm_id)
