@@ -1,13 +1,14 @@
 import datetime
 from typing import Any
-from flask import Response, current_app, abort, flash, redirect, render_template, request, url_for
 
+from flask import Response, abort, current_app, flash, redirect, render_template, request, url_for
+
+from app.forms import BaseForm
 from app.main.modify_provider import AssignChambersForm
 from app.main.utils import assign_firm_to_a_new_chambers, change_liaison_manager
+from app.main.views import get_main_table
 from app.models import Contact, Firm
 from app.views import BaseFormView, FullWidthBaseFormView
-from app.forms import BaseForm
-from app.main.views import get_main_table
 
 
 class ChangeLiaisonManagerFormView(FullWidthBaseFormView):
@@ -69,9 +70,22 @@ class ChangeProviderActiveStatusFormView(FullWidthBaseFormView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form, **kwargs)
-          
-         
- class AssignChambersFormView(BaseFormView):
+
+    def form_valid(self, form):
+        status = form.data.get("status")
+        inactive_date = None
+        if status == "inactive":
+            inactive_date = datetime.date.today().strftime("%Y-%m-%d")
+        data = {Firm.model_fields["inactive_date"].alias: inactive_date}
+
+        pda = current_app.extensions["pda"]
+        firm = pda.patch_provider_firm(form.firm.firm_id, data)
+        if firm:
+            flash(f"{form.firm.firm_name} marked as {status}", "success")
+        return super().form_valid(form)
+
+
+class AssignChambersFormView(BaseFormView):
     """Form view for the assign to a chambers form"""
 
     template = "add_provider/assign-chambers.html"
@@ -114,16 +128,3 @@ class ChangeProviderActiveStatusFormView(FullWidthBaseFormView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
-
-    def form_valid(self, form):
-        status = form.data.get("status")
-        inactive_date = None
-        if status == "inactive":
-            inactive_date = datetime.date.today().strftime("%Y-%m-%d")
-        data = {Firm.model_fields["inactive_date"].alias: inactive_date}
-
-        pda = current_app.extensions["pda"]
-        firm = pda.patch_provider_firm(form.firm.firm_id, data)
-        if firm:
-            flash(f"{form.firm.firm_name} marked as {status}", "success")
-        return super().form_valid(form)

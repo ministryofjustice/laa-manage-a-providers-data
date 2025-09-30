@@ -20,7 +20,5 @@ def register_views(bp: Blueprint):
         endpoint="change_provider_active_status",
     )
     register_form_view(
-        form_class=AssignChambersForm,
-        view_class=AssignChambersFormView,
-        blueprint=bp,
-        endpoint="assign_chambers",
+        form_class=AssignChambersForm, view_class=AssignChambersFormView, blueprint=bp, endpoint="assign_chambers"
+    )
