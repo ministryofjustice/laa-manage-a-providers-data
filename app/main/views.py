@@ -160,7 +160,7 @@ def get_office_contact_table(firm: Firm, office: Office) -> DataTable | None:
     )
     return office_contact_table
 
-  
+
 def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | None) -> SummaryList:
     data_source_map = {
         "firm": firm.to_internal_dict() if firm else {},
