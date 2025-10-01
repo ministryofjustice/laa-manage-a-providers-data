@@ -1,17 +1,16 @@
 from flask import current_app
+from wtforms.fields import RadioField
 from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired, Length
 
-from app.fields import GovUKTableRadioField
-from wtforms.fields import RadioField
-
 from app.constants import PROVIDER_ACTIVE_STATUS_CHOICES
+from app.fields import GovUKTableRadioField
 from app.forms import BaseForm
 from app.main.add_a_new_provider.forms import LiaisonManagerForm
 from app.main.utils import get_firm_account_number
 from app.models import Firm
 from app.validators import ValidateSearchResults
-from app.widgets import GovTextInput, GovRadioInput
+from app.widgets import GovRadioInput, GovTextInput
 
 
 class ChangeForm:
@@ -33,7 +32,7 @@ class ChangeLiaisonManagerForm(ChangeForm, LiaisonManagerForm):
             return "Unknown"
         return self.firm.firm_name
 
-      
+
 class ChangeProviderActiveStatusForm(ChangeForm, BaseForm):
     def __init__(self, firm: Firm, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -58,10 +57,11 @@ class ChangeProviderActiveStatusForm(ChangeForm, BaseForm):
     )
 
 
-class AssignChambersForm(ChangeForm, BaseForm):
+class AssignChambersForm(BaseForm):
     url = "provider/<firm:firm>/assign-chambers"
     template = "add_provider/assign-chambers.html"
     success_url = "main.providers"
+    submit_button_text = "Submit"
 
     @property
     def title(self):
@@ -85,13 +85,18 @@ class AssignChambersForm(ChangeForm, BaseForm):
         ],
         choices=[],  # This will be set when the user sends a request.
         radio_value_key="firm_id",
-        validators=[InputRequired(message="Select a chambers to assign the new provider to")],
+        validators=[],  # Will be set dynamically in __init__
     )
 
     def __init__(self, firm: Firm, search_term=None, page=1, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.firm = firm  # Advocate or barrister we are modifying
+
+        # Set dynamic validation message based on firm type
+        self.provider.validators = [
+            InputRequired(message=f"Select a chambers to assign the {self.firm.firm_type.lower()} to")
+        ]
 
         # Get firms data
         pda = current_app.extensions["pda"]
