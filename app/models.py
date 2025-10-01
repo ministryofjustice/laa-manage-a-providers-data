@@ -131,6 +131,7 @@ class BankAccount(BaseModel):
         extra="forbid",  # Don't allow extra fields
     )
 
+    bank_account_id: int = Field(alias="bankAccountId", gt=0, default=None)
     # vendorSiteId maps to firm_office_id
     vendor_site_id: int = Field(alias="vendorSiteId", gt=0, default=None)  # This is the firm_office_id
     bank_name: str = Field(alias="bankName", min_length=1, default=None)

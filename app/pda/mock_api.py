@@ -510,6 +510,42 @@ class MockProviderDataApi:
 
         return None
 
+    def _get_bank_account_raw(self, bank_account_id: str) -> dict:
+        for account in self._mock_data["bank_accounts"]:
+            if account.get("bankAccountId") == bank_account_id:
+                return account
+        return {}
+
+    def _get_provider_bank_accounts(self, firm_id: int) -> List[BankAccount]:
+        """
+        Get the bank accounts for a specific provider firm.
+        This wil be all bank accounts belonging to an office of the given provider firm.
+
+        Args:
+            firm_id: The firm ID of the given provider firm
+
+        Returns:
+            List of BankAccount model instances, or empty list if not found
+        """
+        if not isinstance(firm_id, int) or firm_id <= 0:
+            raise ValueError("firm_id must be a positive integer")
+
+        # Get all the offices belonging to the given firm.
+        offices = self.get_provider_offices(firm_id)
+        office_ids = [office.firm_office_id for office in offices]
+
+        bank_accounts = []
+        # Find the bank account belonging to offices of the given firm.
+        for account in self._mock_data["bank_accounts"]:
+            if account.get("vendorSiteId") in office_ids:
+                try:
+                    bank_accounts.append(BankAccount(**account))
+                except ValidationError as e:
+                    self.logger.error(f"Invalid bank account data in mock for office {office_ids}: {e}")
+                    raise ProviderDataApiError(f"Invalid bank account data: {e}")
+
+        return bank_accounts
+
     def create_office_bank_account(self, firm_id: int, office_code: str, bank_account: BankAccount) -> BankAccount:
         """
         Create a bank account for an office.
@@ -723,3 +759,11 @@ class MockProviderDataApi:
         self._mock_data["contacts"][contact_index] = contact.to_api_dict()
 
         return contact
+
+    def get_provider_firm_bank_details(self, firm_id: int) -> List[BankAccount]:
+        return self._get_provider_bank_accounts(firm_id)
+
+    def patch_bank_details(self, firm_id: int, bank_account_id: str, fields_to_update) -> BankAccount:
+        data = self._get_bank_account_raw(bank_account_id)
+        data.update(fields_to_update)
+        return BankAccount(**data)
