@@ -110,6 +110,11 @@ class SearchBankAccountFormView(BaseFormView):
     template = "update_office/search-bank-account.html"
     success_endpoint = "main.view_office"
 
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update({"office_address": format_office_address_one_line(form.office)})
+        return context
+
     def get_success_url(self, form: BaseForm | None = None) -> str:
         return url_for(self.success_endpoint, firm=form.firm, office=form.office)
 

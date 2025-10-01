@@ -17,9 +17,11 @@
 
       {{ renderFlashMessages() }}
 
-      <h1 class="govuk-heading-xl">{{ form.title }}</h1>
+    <span class="govuk-caption-xl">{{ form.caption }}</span>
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-1">Office: {{ form.office.firm_office_code }}</h1>
+    <p class="govuk-body govuk-!-margin-bottom-7">{{ office_address }}</p>
 
-      <p class="govuk-hint govuk-body govuk-!-margin-bottom-6">Contact <a class="govuk-link" href="mailto: mapd@justice.gov.uk">mapd@justice.gov.uk</a> if you cannot find the contract manager you want to assign.</p>
+      <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ form.title }}</h1>
 
       <form method="get" class="govuk-!-margin-bottom-6">
           <div class="govuk-form-group--search">
@@ -53,6 +55,7 @@
           <br>
 
           {{ govukButton({'text': 'Submit'}) }}
+          {{ govukButton({'text': 'Add a new bank account', "classes": "govuk-button--secondary govuk-!-margin-left-2", "href": "#"}) }}
         </form>
       {% endif %}
     </div>
