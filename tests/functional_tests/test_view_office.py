@@ -131,18 +131,23 @@ def test_office_bank_payment_details(page):
 def test_office_contact(page):
     navigate_to_office_page(page)
     page.get_by_role("link", name="Contact").click()
-    expect(page.get_by_role("heading", name="Sarah Johnson")).to_be_visible()
-    expect(page.get_by_role("term").filter(has_text="Job title")).to_be_visible()
-    expect(page.get_by_role("definition").filter(has_text="Liaison manager")).to_be_visible()
-    expect(page.get_by_role("term").filter(has_text="Telephone number")).to_be_visible()
-    expect(page.get_by_text("123 4567")).to_be_visible()
-    expect(page.get_by_role("term").filter(has_text="Email address")).to_be_visible()
-    expect(page.get_by_text("sarah.johnson@smithpartners.")).to_be_visible()
-    expect(page.get_by_text("Show 2 additional contacts")).to_be_visible()
 
-    page.get_by_text("Show 2 additional contacts").click()
-    expect(page.get_by_role("heading", name="David Smith")).to_be_visible()
-    expect(page.get_by_role("heading", name="Alice Brown")).to_be_visible()
+    expect(page.get_by_role("heading", name="Office contact details")).to_be_visible()
+
+    expect(page.get_by_text("1 Skyscraper,1 Some Road,")).to_be_visible()
+    expect(page.get_by_role("link", name="Change   address")).to_be_visible()
+
+    expect(page.get_by_text("sarah.johnson@smithpartners.")).to_be_visible()
+    expect(page.get_by_role("link", name="Change   email address")).to_be_visible()
+
+    expect(page.get_by_text("123 4567")).to_be_visible()
+    expect(page.get_by_role("link", name="Change   telephone number")).to_be_visible()
+
+    expect(page.get_by_text("DX number", exact=True)).to_be_visible()
+    expect(page.get_by_role("link", name="Enter DX number")).to_be_visible()
+
+    expect(page.get_by_text("DX centre", exact=True)).to_be_visible()
+    expect(page.get_by_role("link", name="Enter DX centre")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
