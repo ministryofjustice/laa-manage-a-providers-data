@@ -76,19 +76,9 @@ class PaymentMethodFormView(BaseFormView):
         # Pre-populate radio with currently saved value when landing on the change page
         if getattr(office, "payment_method", None):
             form.payment_method.data = office.payment_method
-        context = self.get_context_data(form, **kwargs)
 
-        address_parts = [
-            office.address_line_1,
-            office.address_line_2,
-            office.address_line_3,
-            office.address_line_4,
-            office.city,
-            office.county,
-            office.postcode,
-        ]
-        office_address = ", ".join(part for part in address_parts if part)
-        context.update({"office_address": office_address})
+        context = self.get_context_data(form, **kwargs)
+        context.update({"office_address": format_office_address_one_line(office)})
 
         return render_template(self.template, **context)
 
@@ -144,24 +134,12 @@ class OfficeActiveStatusFormView(BaseFormView):
 
         active_status = "active"
         if getattr(office, "inactive_date", None):
-            print(f"Attempting to pre-populate with inactive {office}")
-            # form.active_status.default = "inactive"
             active_status = "inactive"
 
         form = self.get_form_class()(firm=firm, office=office, active_status=active_status)
-        context = self.get_context_data(form, **kwargs)
-        address_parts = [
-            office.address_line_1,
-            office.address_line_2,
-            office.address_line_3,
-            office.address_line_4,
-            office.city,
-            office.county,
-            office.postcode,
-        ]
-        office_address = ", ".join(part for part in address_parts if part)
-        context.update({"office_address": office_address})
 
+        context = self.get_context_data(form, **kwargs)
+        context.update({"office_address": format_office_address_one_line(office)})
         context.update({"cancel_url": url_for("main.view_office", firm=firm, office=office)})
 
         return render_template(self.template, **context)
