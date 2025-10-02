@@ -1,12 +1,12 @@
+import datetime
 from typing import Any
 
-from flask import Response, abort, flash, redirect, render_template, session, url_for, current_app
-
-from app.models import Firm, Office
-from app.views import BaseFormView, FullWidthBaseFormView
+from flask import Response, abort, current_app, flash, redirect, render_template, session, url_for
 
 from app.forms import BaseForm
+from app.models import Firm, Office
 from app.utils.formatting import format_office_address_one_line
+from app.views import BaseFormView, FullWidthBaseFormView
 
 
 class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
@@ -89,6 +89,80 @@ class PaymentMethodFormView(BaseFormView):
         ]
         office_address = ", ".join(part for part in address_parts if part)
         context.update({"office_address": office_address})
+
+        return render_template(self.template, **context)
+
+    def post(self, firm: Firm, office: Office = None, *args, **kwargs) -> Response | str:
+        if not office:
+            abort(404)
+
+        form = self.get_form_class()(firm=firm, office=office)
+
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form, **kwargs)
+
+
+class OfficeActiveStatusFormView(BaseFormView):
+    """Form view for the office active status form"""
+
+    def get_success_url(self, form, firm, office=None):
+        if office:
+            return url_for("main.view_office", firm=firm, office=office)
+        return url_for("main.view_office", firm=firm)
+
+    def form_valid(self, form):
+        if not hasattr(form, "firm") or not hasattr(form, "office"):
+            abort(400)
+
+        office_active_status = form.data.get("active_status")
+        inactive_date = None
+        if office_active_status == "inactive":
+            inactive_date = datetime.date.today().strftime("%Y-%m-%d")
+        data = {Office.model_fields["inactive_date"].alias: inactive_date}
+
+        pda = current_app.extensions["pda"]
+        updated_office = pda.patch_office(
+            firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, fields_to_update=data
+        )
+
+        if not updated_office:
+            flash("Failed to update office active status", "error")
+            return self.form_invalid(form)
+
+        # When an office is set to Inactive we also need to include hold_payments = true in the session/payload
+        if inactive_date:
+            session["hold_payments"] = True
+
+        flash("Office active status updated successfully", "success")
+        return redirect(self.get_success_url(form, form.firm, form.office))
+
+    def get(self, context, firm: Firm, office: Office = None, **kwargs):
+        if not office:
+            abort(404)
+
+        active_status = "active"
+        if getattr(office, "inactive_date", None):
+            print(f"Attempting to pre-populate with inactive {office}")
+            # form.active_status.default = "inactive"
+            active_status = "inactive"
+
+        form = self.get_form_class()(firm=firm, office=office, active_status=active_status)
+        context = self.get_context_data(form, **kwargs)
+        address_parts = [
+            office.address_line_1,
+            office.address_line_2,
+            office.address_line_3,
+            office.address_line_4,
+            office.city,
+            office.county,
+            office.postcode,
+        ]
+        office_address = ", ".join(part for part in address_parts if part)
+        context.update({"office_address": office_address})
+
+        context.update({"cancel_url": url_for("main.view_office", firm=firm, office=office)})
 
         return render_template(self.template, **context)
 

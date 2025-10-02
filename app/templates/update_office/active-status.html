@@ -1,0 +1,16 @@
+{% extends 'update_office/form.html' %}
+
+{%- from 'govuk_frontend_jinja/components/button/macro.html' import govukButton -%}
+
+{% block update_office_form_content %}
+  {{ form.active_status }}
+
+  {% set submitButtonText = form.submit_button_text or "Continue" %}
+
+  <div class="govuk-button-group">
+    {{ govukButton({
+      'text': submitButtonText
+    }) }}
+    <a class="mapd-cancel-btn govuk-link govuk-link--no-visited-state govuk-!-margin-top-2 govuk-!-margin-left-2" href="{{ cancel_url }}">Cancel</a>
+  </div>
+{% endblock %}

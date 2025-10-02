@@ -57,6 +57,7 @@
       {{ govukButton({
         "text": "Make active" if office.inactive_date else "Make inactive",
         "classes": "govuk-button--secondary",
+        "href": url_for("main.office_active_status_form", firm=firm.firm_id, office=office.firm_office_code),
       }) }}
 
       {{ govukButton({

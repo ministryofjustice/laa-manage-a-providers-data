@@ -1,7 +1,7 @@
 from app.utils import register_form_view
 
-from .forms import UpdateVATRegistrationNumberForm, PaymentMethodForm
-from .views import UpdateVATRegistrationNumberFormView, PaymentMethodFormView
+from .forms import ChangeOfficeActiveStatusForm, PaymentMethodForm, UpdateVATRegistrationNumberForm
+from .views import OfficeActiveStatusFormView, PaymentMethodFormView, UpdateVATRegistrationNumberFormView
 
 
 def register_views(bp):
@@ -16,4 +16,10 @@ def register_views(bp):
         view_class=PaymentMethodFormView,
         blueprint=bp,
         endpoint="payment_method_form",
+    )
+    register_form_view(
+        form_class=ChangeOfficeActiveStatusForm,
+        view_class=OfficeActiveStatusFormView,
+        blueprint=bp,
+        endpoint="office_active_status_form",
     )

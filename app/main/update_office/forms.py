@@ -1,13 +1,13 @@
-from wtforms.fields.simple import StringField
-from wtforms.validators import Optional, InputRequired
 from wtforms.fields.choices import RadioField
+from wtforms.fields.simple import StringField
+from wtforms.validators import InputRequired, Optional
 
+from app.constants import OFFICE_ACTIVE_STATUS_CHOICES, PAYMENT_METHOD_CHOICES
 from app.models import Firm, Office
 from app.validators import (
     ValidateVATRegistrationNumber,
 )
-from app.widgets import GovTextInput, GovRadioInput
-from app.constants import PAYMENT_METHOD_CHOICES
+from app.widgets import GovRadioInput, GovTextInput
 
 from ...forms import BaseForm
 
@@ -65,4 +65,31 @@ class PaymentMethodForm(BaseForm):
         validators=[InputRequired(message="Select a payment method")],
         choices=PAYMENT_METHOD_CHOICES,
         default="Electronic",
+    )
+
+
+class ChangeOfficeActiveStatusForm(BaseForm):
+    title = "Change active status"
+    url = "provider/<firm:firm>/office/<office:office>/confirm-office-status"
+    template = "update_office/active-status.html"
+    submit_button_text = "Submit"
+
+    def __init__(self, firm=None, office=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.firm = firm
+        self.office = office
+        # self.active_status.default = "inactive" if firm.inactive_date else "active"
+
+    @property
+    def caption(self):
+        if not self.firm:
+            return "Unknown office"
+        return self.firm.firm_name
+
+    active_status = RadioField(
+        "",
+        widget=GovRadioInput(
+            heading_class="govuk-fieldset__legend--m",
+        ),
+        choices=OFFICE_ACTIVE_STATUS_CHOICES,
     )
