@@ -99,7 +99,9 @@
     {% endif %}
     
     {% if subpage == "contact" %}
-        {{ contactCards(contact_tables, title="Office contact details") }}
+        {% if contact_tables %}
+            {{ contactCards(contact_tables, title="Office contact details") }}
+        {% endif %}
     {% endif %}
 
     {% if subpage == "bank-payment-details" %}
