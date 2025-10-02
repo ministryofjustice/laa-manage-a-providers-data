@@ -143,6 +143,9 @@ class BankAccount(BaseModel):
     account_type: str = Field(alias="accountType", default=None)
     primary_flag: str = Field(alias="primaryFlag", default="N")
 
+    start_date: date = Field(alias="startDate", default=None)
+    end_date: date = Field(alias="endDate", default=None)
+
     # Bank address fields
     address_line_1: Optional[str] = Field(alias="addressLine1", default=None)
     address_line_2: Optional[str] = Field(alias="addressLine2", default=None)

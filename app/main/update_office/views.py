@@ -120,7 +120,7 @@ class SearchBankAccountFormView(BaseFormView):
 
     def form_valid(self, form: BaseForm, **kwargs) -> str:
         pda = current_app.extensions["pda"]
-        pda.assign_bank_account_to_office(form.firm.firm_id, form.office.firm_office_id, form.bank_account.data)
+        pda.assign_bank_account_to_office(form.firm.firm_id, form.office.firm_office_code, form.bank_account.data)
         return super().form_valid(form, **kwargs)
 
     def get(self, firm, office: Office, context, **kwargs):

@@ -567,13 +567,21 @@ class MockProviderDataApi:
 
         office_id = office_data.get("firmOfficeId")
 
-        # Check if office already has a bank account
-        existing_account = self.get_office_bank_account(firm_id, office_code)
-        if existing_account:
-            raise ProviderDataApiError(f"Office {office_code} already has a bank account")
+        # Deactivate all existing bank accounts currently attached to this office
+        for account in self._mock_data["bank_accounts"]:
+            if account["vendorSiteId"] == office_id:
+                account["primaryFlag"] = "N"
+                if not account.get("endDate"):
+                    account["endDate"] = date.today().isoformat()
 
         # Set the vendor_site_id to the office ID
-        updated_account = bank_account.model_copy(update={"vendor_site_id": office_id})
+        updated_account = bank_account.model_copy(
+            update={
+                "vendor_site_id": office_id,
+                "start_date": date.today().isoformat(),
+                "primary_flag": "Y",
+            }
+        )
 
         # Add to mock data
         self._mock_data["bank_accounts"].append(updated_account.to_api_dict())
@@ -755,33 +763,24 @@ class MockProviderDataApi:
 
         return contact
 
-    def assign_bank_account_to_office(self, firm_id: int, firm_office_id: int, bank_account_id: int) -> BankAccount:
+    def assign_bank_account_to_office(self, firm_id: int, office_code: str, bank_account_id: int) -> BankAccount:
         """
         Assign a bank account to a specific office. This creates a new bank account by duplicating the given bank account.
 
         Args:
             firm_id: The firm ID that the office belongs to
-            firm_office_id: The office Id to assign the bank account to
+            office_code: The office code to assign the bank account to
             bank_account_id: The bank account ID to assign the office to
 
         Returns:
             BankAccount: The bank account that was assigned to the office
         """
-        bank_account_id = int(bank_account_id)
         bank_accounts_data = self._get_firm_bank_details_raw(firm_id)
-        selected_bank_account = bank_accounts_data[bank_account_id]
-
+        selected_bank_account = bank_accounts_data[int(bank_account_id)]
+        # Copy the selected bank account
         copy_bank_account_data = selected_bank_account.copy()
-        copy_bank_account_data.update(
-            {"bankAccountId": int(time.time()), "vendorSiteId": firm_office_id, "primaryFlag": "Y"}
-        )
+        copy_bank_account_data.update({"bankAccountId": int(time.time())})
+        new_bank_account = BankAccount(**copy_bank_account_data)
 
-        # Find all bank account for this office and set primaryFlag to No
-        for bank_account_data in bank_accounts_data.values():
-            if bank_account_data["vendorSiteId"] == firm_office_id:
-                bank_account_data["primaryFlag"] = "N"
-
-        # Add the new bank account to the storage
-        self._mock_data["bank_accounts"].append(copy_bank_account_data)
-
-        return BankAccount(**copy_bank_account_data)
+        # Create the new bank account and assign it to the office
+        return self.create_office_bank_account(firm_id, office_code, new_bank_account)
