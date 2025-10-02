@@ -184,6 +184,9 @@ def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | N
             if not isinstance(html_renderer, Callable):
                 raise ValueError("html_renderer must be callable")
             field["html"] = html_renderer(data_source)
+            
+        if change_link := field.get("change_link"):
+            field["row_action_urls"] = {"change": url_for(change_link, firm=firm)}
 
         main_table.add_row(
             value=value,
@@ -191,6 +194,7 @@ def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | N
             formatter=field.get("formatter"),
             html=field.get("html"),
             default_value=field.get("default", "No data"),
+            row_action_urls=field.get("row_action_urls")
         )
 
     return main_table

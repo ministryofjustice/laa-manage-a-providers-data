@@ -1,7 +1,6 @@
 from flask import Response, abort, redirect, render_template, request, session, url_for
 
 from app.constants import PARENT_FIRM_TYPE_CHOICES
-from app.main.add_a_new_provider import AssignChambersForm
 from app.main.utils import create_advocate_from_form_data, create_barrister_from_form_data
 from app.models import Firm
 from app.views import BaseFormView, FullWidthBaseFormView
@@ -68,46 +67,6 @@ class AdvocateDetailsFormView(BaseFormView):
             }
         )
         return super().form_valid(form)
-
-
-class AssignChambersFormView(BaseFormView):
-    """Form view for the assign to a chambers form"""
-
-    template = "add_provider/assign-chambers.html"
-    success_endpoint = "main.create_provider"
-
-    next_step_mapping = {
-        "Barrister": "main.create_provider",
-        "Advocate": "main.advocate_details",
-    }
-
-    def get_success_url(self, form):
-        provider_type = session.get("new_provider", {}).get("firm_type")
-        next_page = self.next_step_mapping.get(provider_type, "main.create_provider")
-        return url_for(next_page)
-
-    def form_valid(self, form):
-        session.get("new_provider", {}).update({"parent_firm_id": form.data.get("provider")})
-        return redirect(self.get_success_url(form))
-
-    def get(self, context):
-        search_term = request.args.get("search", "").strip()
-        page = int(request.args.get("page", 1))
-        form: AssignChambersForm = self.get_form_class()(search_term=search_term, page=page)
-
-        if search_term:
-            form.search.validate(form)
-
-        return render_template(self.get_template(), **self.get_context_data(form, context))
-
-    def post(self, context) -> Response | str:
-        search_term = request.args.get("search", "").strip()
-        page = int(request.args.get("page", 1))
-        form = self.get_form_class()(search_term=search_term, page=page)
-        if form.validate_on_submit():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
 
 
 class HeadOfficeContactDetailsFormView(BaseFormView):
