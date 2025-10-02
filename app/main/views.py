@@ -116,7 +116,7 @@ def get_bank_account_table(bank_account: BankAccount) -> DataTable | None:
         return None
 
     card: Card = {"title": bank_account.bank_account_name, "action_text": "Change bank account", "action_url": "#"}
-    table = SummaryList(card=card)
+    table = SummaryList(card=card, additional_classes="bank-account-table")
     table.add_row("Account name", bank_account.bank_account_name)
     table.add_row("Account number", bank_account.account_number)
     table.add_row("Sort code", bank_account.sort_code)
