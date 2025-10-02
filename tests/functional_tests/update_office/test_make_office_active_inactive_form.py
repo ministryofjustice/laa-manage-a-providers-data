@@ -26,7 +26,7 @@ def navigate_to_office_active_status_form(page: Page):
 
 
 @pytest.mark.usefixtures("live_server")
-def test_change_office_from_active_to_inactive(page: Page):
+def test_change_office_from_active_to_inactive_to_active(page: Page):
     navigate_to_office_active_status_form(page)
     expect(page.get_by_role("button", name="Make inactive")).to_be_visible()
     page.get_by_role("button", name="Make inactive").click()
@@ -48,30 +48,14 @@ def test_change_office_from_active_to_inactive(page: Page):
     page.get_by_role("radio", name="Inactive").check()
     page.get_by_role("button", name="Submit").click()
 
-    # See the success message on the office page
+    # See the success message on the office page...
     expect(page.get_by_text("Office active status updated")).to_be_visible()
-    # With the status updated
+    # ...with the status updated
     expect(page.get_by_text("Inactive", exact=True)).to_be_visible()
     expect(page.get_by_role("button", name="Make active")).to_be_visible()
 
-
-@pytest.mark.usefixtures("live_server")
-def test_change_office_from_inactive_to_active(page: Page):
-    navigate_to_office_active_status_form(page)
-    make_inactive_button = page.get_by_role("button", name="Make inactive")
-    if make_inactive_button.is_visible():
-        page.get_by_role("button", name="Make inactive").click()
-        # After clicking the 'make inactive' button, check we have the correct screen
-        expect(page.get_by_text("SMITH & PARTNERS SOLICITORS")).to_be_visible()
-        expect(page.get_by_role("heading", name="Office: 1A001L")).to_be_visible()
-        expect(page.get_by_text("1 Skyscraper, 1 Some Road,")).to_be_visible()
-        expect(page.get_by_role("heading", name="Change active status")).to_be_visible()
-        expect(page.get_by_role("radio", name="Inactive")).not_to_be_checked()
-    else:
-        expect(page.get_by_role("button", name="Make active")).to_be_visible()
-        page.get_by_role("button", name="Make active").click()
-
     # Make the office inactive
+    page.get_by_role("button", name="Make active").click()
     page.get_by_role("radio", name="Inactive").check()
     page.get_by_role("button", name="Submit").click()
 
