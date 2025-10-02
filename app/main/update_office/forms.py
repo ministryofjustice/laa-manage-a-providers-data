@@ -3,7 +3,6 @@ from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired, Optional
 
 from app.constants import OFFICE_ACTIVE_STATUS_CHOICES, PAYMENT_METHOD_CHOICES
-from app.models import Firm, Office
 from app.validators import (
     ValidateVATRegistrationNumber,
 )
@@ -12,21 +11,24 @@ from app.widgets import GovRadioInput, GovTextInput
 from ...forms import BaseForm
 
 
-class UpdateVATRegistrationNumberForm(BaseForm):
-    title = "VAT registration number (optional)"
+class UpdateOfficeBaseForm(BaseForm):
     template = "update_office/form.html"
-    url = "/provider/<firm:firm>/office/<office:office>/add-vat-number"
-    firm: Firm
-    office: Office
 
-    def __init__(self, firm: Firm, office: Office, *args, **kwargs):
+    def __init__(self, firm=None, office=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.firm = firm
         self.office = office
 
     @property
     def caption(self):
+        if not self.firm:
+            return "Unknown office"
         return self.firm.firm_name
+
+
+class UpdateVATRegistrationNumberForm(UpdateOfficeBaseForm):
+    title = "VAT registration number (optional)"
+    url = "/provider/<firm:firm>/office/<office:office>/add-vat-number"
 
     vat_registration_number = StringField(
         "",
@@ -42,22 +44,11 @@ class UpdateVATRegistrationNumberForm(BaseForm):
     )
 
 
-class PaymentMethodForm(BaseForm):
+class PaymentMethodForm(UpdateOfficeBaseForm):
     title = "Payment method"
     url = "provider/<firm:firm>/office/<office:office>/payment-method"
     template = "update_office/payment-method.html"
     submit_button_text = "Save"
-
-    def __init__(self, firm=None, office=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.firm = firm
-        self.office = office
-
-    @property
-    def caption(self):
-        if not self.firm:
-            return "Unknown office"
-        return self.firm.firm_name
 
     payment_method = RadioField(
         "Payment method",
@@ -68,22 +59,10 @@ class PaymentMethodForm(BaseForm):
     )
 
 
-class ChangeOfficeActiveStatusForm(BaseForm):
+class ChangeOfficeActiveStatusForm(UpdateOfficeBaseForm):
     title = "Change active status"
     url = "provider/<firm:firm>/office/<office:office>/confirm-office-status"
-    template = "update_office/form.html"
     submit_button_text = "Submit"
-
-    def __init__(self, firm=None, office=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.firm = firm
-        self.office = office
-
-    @property
-    def caption(self):
-        if not self.firm:
-            return "Unknown office"
-        return self.firm.firm_name
 
     active_status = RadioField(
         "",
