@@ -71,14 +71,13 @@ class PaymentMethodForm(BaseForm):
 class ChangeOfficeActiveStatusForm(BaseForm):
     title = "Change active status"
     url = "provider/<firm:firm>/office/<office:office>/confirm-office-status"
-    template = "update_office/active-status.html"
+    template = "update_office/form.html"
     submit_button_text = "Submit"
 
     def __init__(self, firm=None, office=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.firm = firm
         self.office = office
-        # self.active_status.default = "inactive" if firm.inactive_date else "active"
 
     @property
     def caption(self):
