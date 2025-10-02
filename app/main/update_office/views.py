@@ -4,7 +4,7 @@ from flask import Response, abort, current_app, flash, redirect, render_template
 
 from app.forms import BaseForm
 from app.main.update_office.forms import NoBankAccountsError
-from app.models import BankAccount, Firm, Office
+from app.models import Firm, Office
 from app.utils.formatting import format_office_address_one_line
 from app.views import BaseFormView, FullWidthBaseFormView
 
@@ -108,7 +108,7 @@ class SearchBankAccountFormView(BaseFormView):
     """Form view for to search for bank accounts"""
 
     template = "update_office/search-bank-account.html"
-    success_endpoint = "main.view_office"
+    success_endpoint = "main.view_office_bank_payment_details"
 
     def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(form, context, **kwargs)
@@ -119,11 +119,8 @@ class SearchBankAccountFormView(BaseFormView):
         return url_for(self.success_endpoint, firm=form.firm, office=form.office)
 
     def form_valid(self, form: BaseForm, **kwargs) -> str:
-        # Assign the bank account to the current office
-        payload = {BankAccount.model_fields["vendor_site_id"].alias: form.office.firm_office_id}
-
         pda = current_app.extensions["pda"]
-        pda.patch_bank_details(form.firm.firm_id, form.bank_account.data, fields_to_update=payload)
+        pda.assign_bank_account_to_office(form.firm.firm_id, form.office.firm_office_id, form.bank_account.data)
         return super().form_valid(form, **kwargs)
 
     def get(self, firm, office: Office, context, **kwargs):

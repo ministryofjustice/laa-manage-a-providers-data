@@ -3,6 +3,7 @@ import logging
 import os
 import random
 import string
+import time
 from datetime import date
 from typing import Any, Dict, List, Optional
 from unittest.mock import Mock
@@ -501,7 +502,7 @@ class MockProviderDataApi:
 
         # Find the bank account for this office
         for account in self._mock_data["bank_accounts"]:
-            if account.get("vendorSiteId") == office_id:
+            if account.get("vendorSiteId") == office_id and account["primaryFlag"].lower() == "y":
                 try:
                     return BankAccount(**account)
                 except ValidationError as e:
@@ -510,41 +511,35 @@ class MockProviderDataApi:
 
         return None
 
-    def _get_bank_account_raw(self, bank_account_id: str) -> dict:
-        for account in self._mock_data["bank_accounts"]:
-            if account.get("bankAccountId") == bank_account_id:
-                return account
-        return {}
-
-    def _get_provider_bank_accounts(self, firm_id: int) -> List[BankAccount]:
+    def _get_firm_bank_details_raw(self, firm_id: int) -> dict:
         """
         Get the bank accounts for a specific provider firm.
-        This wil be all bank accounts belonging to an office of the given provider firm.
+        This is all bank accounts belonging to an office of the given provider firm.
 
         Args:
             firm_id: The firm ID of the given provider firm
 
         Returns:
-            List of BankAccount model instances, or empty list if not found
+            dict of bank account data, the bank account id will be used as the key
         """
+
+        # Get all the offices belonging to the given firm.
+        firm_offices = self.get_provider_offices(firm_id)
+        firm_office_ids = [office.firm_office_id for office in firm_offices]
+
+        # Find the bank account belonging to offices of the given firm.
+        bank_accounts = self._mock_data["bank_accounts"]
+        bank_accounts = {
+            account["bankAccountId"]: account for account in bank_accounts if account["vendorSiteId"] in firm_office_ids
+        }
+        return bank_accounts
+
+    def get_provider_firm_bank_details(self, firm_id: int) -> List[BankAccount]:
         if not isinstance(firm_id, int) or firm_id <= 0:
             raise ValueError("firm_id must be a positive integer")
 
-        # Get all the offices belonging to the given firm.
-        offices = self.get_provider_offices(firm_id)
-        office_ids = [office.firm_office_id for office in offices]
-
-        bank_accounts = []
-        # Find the bank account belonging to offices of the given firm.
-        for account in self._mock_data["bank_accounts"]:
-            if account.get("vendorSiteId") in office_ids:
-                try:
-                    bank_accounts.append(BankAccount(**account))
-                except ValidationError as e:
-                    self.logger.error(f"Invalid bank account data in mock for office {office_ids}: {e}")
-                    raise ProviderDataApiError(f"Invalid bank account data: {e}")
-
-        return bank_accounts
+        bank_accounts = self._get_firm_bank_details_raw(firm_id)
+        return [BankAccount(**account) for account in bank_accounts.values()]
 
     def create_office_bank_account(self, firm_id: int, office_code: str, bank_account: BankAccount) -> BankAccount:
         """
@@ -760,10 +755,33 @@ class MockProviderDataApi:
 
         return contact
 
-    def get_provider_firm_bank_details(self, firm_id: int) -> List[BankAccount]:
-        return self._get_provider_bank_accounts(firm_id)
+    def assign_bank_account_to_office(self, firm_id: int, firm_office_id: int, bank_account_id: int) -> BankAccount:
+        """
+        Assign a bank account to a specific office. This creates a new bank account by duplicating the given bank account.
 
-    def patch_bank_details(self, firm_id: int, bank_account_id: str, fields_to_update) -> BankAccount:
-        data = self._get_bank_account_raw(bank_account_id)
-        data.update(fields_to_update)
-        return BankAccount(**data)
+        Args:
+            firm_id: The firm ID that the office belongs to
+            firm_office_id: The office Id to assign the bank account to
+            bank_account_id: The bank account ID to assign the office to
+
+        Returns:
+            BankAccount: The bank account that was assigned to the office
+        """
+        bank_account_id = int(bank_account_id)
+        bank_accounts_data = self._get_firm_bank_details_raw(firm_id)
+        selected_bank_account = bank_accounts_data[bank_account_id]
+
+        copy_bank_account_data = selected_bank_account.copy()
+        copy_bank_account_data.update(
+            {"bankAccountId": int(time.time()), "vendorSiteId": firm_office_id, "primaryFlag": "Y"}
+        )
+
+        # Find all bank account for this office and set primaryFlag to No
+        for bank_account_data in bank_accounts_data.values():
+            if bank_account_data["vendorSiteId"] == firm_office_id:
+                bank_account_data["primaryFlag"] = "N"
+
+        # Add the new bank account to the storage
+        self._mock_data["bank_accounts"].append(copy_bank_account_data)
+
+        return BankAccount(**copy_bank_account_data)

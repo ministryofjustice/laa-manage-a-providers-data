@@ -463,24 +463,18 @@ class ProviderDataApi:
         self._handle_response(response, {})
         return self.get_provider_firm(firm_id)
 
-    def patch_bank_details(self, firm_id: int, bank_account_id: str, fields_to_update) -> BankAccount:
+    def assign_bank_account_to_office(self, firm_id: int, office_code: str, bank_account_id: int) -> BankAccount:
         """
-        Update bank details for a given bank.
+        Assign a bank account to a specific office.
 
         Args:
-            firm_id: The firm ID that the bank account belongs to
-            bank_account_id: The bank account ID that is being updated.
-            fields_to_update: Dict of fields to update
+            firm_id: The firm ID that the office belongs to
+            office_code: The office code
+            bank_account_id: The bank account ID to assign the office to
 
         Returns:
-            BankAccount: The updated Bank account instance
         """
-        response = self.patch(
-            f"/provider-firms/{firm_id}/bank-details/{bank_account_id}",
-            json=fields_to_update,
-        )
-        self._handle_response(response, {})
-        return self.get_bank_details(firm_id, bank_account_id)
+        raise NotImplementedError("Assigning bank account is not yet supported by the real Provider Data API")
 
     def get_bank_details(self, firm_id, bank_account_id: str) -> Optional[BankAccount]:
         response = self.get(f"/provider-firms/{firm_id}/bank-details/{bank_account_id}")
