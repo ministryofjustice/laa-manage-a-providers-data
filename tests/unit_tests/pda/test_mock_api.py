@@ -1,3 +1,4 @@
+import datetime
 from unittest.mock import Mock, patch
 
 import pytest
@@ -469,7 +470,7 @@ class TestMockProviderDataApi:
             mock_api.create_office_bank_account(1, "NONEXISTENT", bank_account)
 
     def test_create_office_bank_account_already_exists(self, mock_api):
-        """Test creating bank account when one already exists."""
+        """Test creating bank account when one already exists. It should set and end date on the old account and flag the new one as primary"""
         mock_api._mock_data = {
             "offices": [{"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101}],
             "bank_accounts": [{"vendorSiteId": 101, "bankName": "Existing Bank"}],
@@ -484,8 +485,10 @@ class TestMockProviderDataApi:
             bank_account_name="New Account",
         )
 
-        with pytest.raises(ProviderDataApiError, match="Office 1A001L already has a bank account"):
-            mock_api.create_office_bank_account(1, "1A001L", bank_account)
+        mock_api.create_office_bank_account(1, "1A001L", bank_account)
+        assert mock_api._mock_data["bank_accounts"][0]["endDate"] == datetime.date.today().isoformat()
+        assert mock_api._mock_data["bank_accounts"][0]["primaryFlag"] == "N"
+        assert mock_api._mock_data["bank_accounts"][1]["primaryFlag"] == "Y"
 
     def test_update_office_bank_account_success(self, mock_api):
         """Test updating a bank account for an office."""
