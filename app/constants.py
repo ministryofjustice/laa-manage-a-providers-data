@@ -61,4 +61,12 @@ PAYMENT_METHOD_CHOICES = [
     ("Cheque", "Cheque"),
 ]
 
-PROVIDER_ACTIVE_STATUS_CHOICES = [("active", "Active"), ("inactive", "Inactive")]
+PROVIDER_ACTIVE_STATUS_CHOICES = [
+    ("active", "Active"),
+    ("inactive", "Inactive"),
+]
+
+OFFICE_ACTIVE_STATUS_CHOICES = [
+    ("active", "Active"),
+    ("inactive", "Inactive"),
+]
