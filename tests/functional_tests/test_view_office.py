@@ -193,7 +193,9 @@ def test_office_inactive(page):
 
     # Warning text
     expect(page.get_by_text("Warning Provider marked as inactive on 25 Sep 2025")).to_be_visible()
-    expect(page.get_by_text("Warning Payments for all offices are hold because provider is inactive")).to_be_visible()
+    expect(
+        page.get_by_text("Warning Payments for all offices are on hold because provider is inactive")
+    ).to_be_visible()
 
     # Button
     expect(page.get_by_role("button", name="Make active")).to_be_visible()
@@ -209,7 +211,7 @@ def test_office_active(page):
     # Warning text
     expect(page.get_by_text("Warning Provider marked as inactive on 25 Sep 2025")).not_to_be_visible()
     expect(
-        page.get_by_text("Warning Payments for all offices are hold because provider is inactive")
+        page.get_by_text("Warning Payments for all offices are on hold because provider is inactive")
     ).not_to_be_visible()
 
     # Button
