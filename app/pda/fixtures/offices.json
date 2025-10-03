@@ -30,7 +30,8 @@
   "cjsForceName": "Leicestershire",
   "localAuthority": "City of Leicester",
   "policeStationAreaName": "Leicester",
-  "dutySolicitorAreaName": "Leicester"
+  "dutySolicitorAreaName": "Leicester",
+  "inactiveDate": "2025-09-25"
 },
   {
   "_firmId": 1,
@@ -63,7 +64,8 @@
   "cjsForceName": "Leicestershire",
   "localAuthority": "City of Leicester",
   "policeStationAreaName": "Leicester",
-  "dutySolicitorAreaName": "Leicester"
+  "dutySolicitorAreaName": "Leicester",
+  "inactiveDate": "2025-09-25"
 },
   {
   "_firmId": 2,
