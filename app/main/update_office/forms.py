@@ -7,7 +7,7 @@ from wtforms.validators import DataRequired, InputRequired, Length, Optional
 
 from app.components.tables import RadioDataTable, TableStructureItem
 from app.constants import PAYMENT_METHOD_CHOICES
-from app.forms import BaseForm
+from app.forms import BaseForm, BaseBankAccountForm
 from app.models import BankAccount, Firm, Office
 from app.validators import (
     ValidateVATRegistrationNumber,
@@ -178,3 +178,19 @@ class BankAccountSearchForm(BaseForm):
             if search_lower in search_fields:
                 matched_bank_accounts.append(bank_account)
         return matched_bank_accounts
+
+
+class BankAccountForm(BaseBankAccountForm):
+    title = "Add a bank account"
+    url = "provider/<firm:firm>/office/<office:office>/add-bank-account"
+    submit_button_text = "Submit"
+    template = "update_office/form.html"
+
+    @property
+    def caption(self):
+        return self.firm.firm_name
+
+    def __init__(self, firm: Firm, office: Office, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.firm = firm
+        self.office = office

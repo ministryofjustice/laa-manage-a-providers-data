@@ -1,7 +1,7 @@
 from app.utils import register_form_view
+from .forms import BankAccountSearchForm, PaymentMethodForm, UpdateVATRegistrationNumberForm, BankAccountForm
+from .views import PaymentMethodFormView, SearchBankAccountFormView, UpdateVATRegistrationNumberFormView, AddBankAccountFormView
 
-from .forms import BankAccountSearchForm, PaymentMethodForm, UpdateVATRegistrationNumberForm
-from .views import PaymentMethodFormView, SearchBankAccountFormView, UpdateVATRegistrationNumberFormView
 
 
 def register_views(bp):
@@ -22,4 +22,10 @@ def register_views(bp):
         view_class=SearchBankAccountFormView,
         blueprint=bp,
         endpoint="search_bank_account",
+    )
+    register_form_view(
+        form_class=BankAccountForm,
+        view_class=AddBankAccountFormView,
+        blueprint=bp,
+        endpoint="add_office_bank_account",
     )
