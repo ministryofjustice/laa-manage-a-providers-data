@@ -261,7 +261,7 @@ def test_barrister_without_office(page):
     page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
     page.get_by_role("link", name="Barristers and advocates").click()
     page.get_by_role("link", name="Sophie Lelièvre").click()
-    page.get_by_role("link", name="Bank account and payments").click()
+    page.get_by_role("link", name="Bank accounts and payment").click()
     expect(page.get_by_text("Warning Bank account")).to_be_visible()
     expect(page.get_by_role("strong")).to_contain_text(
         "Warning Bank account information not available. Contact mapd@justice.gov.uk for more information."
