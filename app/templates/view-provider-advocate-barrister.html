@@ -72,12 +72,12 @@
           <h2 class="govuk-heading-m">Bank accounts</h2>
           {% if bank_account_table %}
               {{ govukSummaryList(bank_account_table.to_summary_govuk_params()) }}
+          {% else %}
+              {{ govukButton({
+                  "text": "Add bank account",
+                  "href": "#"
+              }) }}
           {% endif %}
-
-          {{ govukButton({
-              "text": "Add bank account",
-              "href": "#"
-          }) }}
         {% else %}
           {{ govukWarningText({"text": "Bank account information not available. Contact mapd@justice.gov.uk for more information."}) }}
         {% endif %}
