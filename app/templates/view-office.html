@@ -99,7 +99,9 @@
     {% endif %}
     
     {% if subpage == "contact" %}
-        {{ contactCards(contact_tables, title="Office contact details") }}
+        {% if contact_tables %}
+            {{ contactCards(contact_tables, title="Office contact details") }}
+        {% endif %}
     {% endif %}
 
     {% if subpage == "bank-payment-details" %}
@@ -112,12 +114,12 @@
         <h2 class="govuk-heading-m">Bank accounts</h2>
         {% if bank_account_table %}
             {{ govukSummaryList(bank_account_table.to_summary_govuk_params()) }}
+        {% else %}
+            {{ govukButton({
+                "text": "Add bank account",
+                "href": "#"
+            }) }}
         {% endif %}
-
-        {{ govukButton({
-            "text": "Add bank account",
-            "href": "#"
-        }) }}
     {% endif %}
       
     </div>

@@ -435,11 +435,14 @@ class ViewOffice(MethodView):
             )
 
         if self.subpage == "contact":
+            contact_table = get_office_contact_table(firm, office)
             context.update(
                 {
                     "contact_tables": [
-                        get_office_contact_table(firm, office),
+                        contact_table,
                     ]
+                    if contact_table
+                    else None
                 }
             )
 

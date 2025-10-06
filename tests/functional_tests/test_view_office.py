@@ -124,7 +124,8 @@ def test_office_bank_payment_details(page):
     expect(page.get_by_text("12345678", exact=True)).to_be_visible()
     expect(page.get_by_text("203045")).to_be_visible()
 
-    expect(page.get_by_role("button", name="Add bank account")).to_be_visible()
+    # Do not show 'Add bank account' button if there is an account
+    expect(page.get_by_role("button", name="Add bank account")).not_to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -148,6 +149,22 @@ def test_office_contact(page):
 
     expect(page.get_by_text("DX centre", exact=True)).to_be_visible()
     expect(page.get_by_role("link", name="Enter DX centre")).to_be_visible()
+
+
+@pytest.mark.usefixtures("live_server")
+def test_office_no_contact(page):
+    page.get_by_role("button", name="Sign in").click()
+
+    # Perform a blank search to view all providers
+    page.get_by_role("button", name="Search").click()
+
+    page.get_by_role("link", name="METROPOLITAN LAW CENTRE").click()
+    page.get_by_role("link", name="Offices").click()
+    page.get_by_role("link", name="3A001L").click()
+    page.get_by_role("link", name="Contact").click()
+
+    expect(page.get_by_role("link", name="Contact")).to_be_visible()
+    expect(page.get_by_role("heading", name="Office contact details")).not_to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
