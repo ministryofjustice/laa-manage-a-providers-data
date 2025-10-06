@@ -11,6 +11,7 @@ from app.constants import (
     YES_NO_CHOICES,
 )
 from app.fields import GovUKTableRadioField
+from app.main.forms import BaseBankAccountForm, BaseForm
 from app.validators import (
     ValidateCompaniesHouseNumber,
     ValidateGovDateField,
@@ -21,7 +22,6 @@ from app.validators import (
 from app.widgets import GovDateInput, GovRadioInput, GovSubmitInput, GovTextInput
 
 from ...fields import GovDateField
-from ...forms import BaseBankAccountForm, BaseForm
 from ..add_a_new_office import OfficeContactDetailsForm
 
 

@@ -7,8 +7,8 @@ from wtforms.validators import DataRequired, InputRequired, Length, Optional
 
 from app.components.tables import RadioDataTable, TableStructureItem
 from app.constants import PAYMENT_METHOD_CHOICES
-from app.forms import BaseForm, BaseBankAccountForm
-from app.models import BankAccount, Firm, Office
+from app.main.forms import BaseBankAccountForm, BaseForm
+from app.models import Firm, Office, BankAccount
 from app.validators import (
     ValidateVATRegistrationNumber,
 )
