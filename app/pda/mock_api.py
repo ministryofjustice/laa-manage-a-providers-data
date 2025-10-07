@@ -11,10 +11,11 @@ from pydantic import ValidationError
 
 from app.constants import FirmType
 from app.models import BankAccount, Contact, Firm, Office
+from app.pda.errors import ProviderDataApiError
 
 
-class ProviderDataApiError(Exception):
-    """Base exception for Provider Data API errors."""
+class MockPDAError(ProviderDataApiError):
+    """Base exception for Mock Provider Data API errors."""
 
     pass
 
@@ -36,7 +37,7 @@ def _generate_unique_office_code(existing_codes: List[str], max_attempts: int = 
         code = f"{random.randint(1, 9)}{random.choice(string.ascii_uppercase)}{random.randint(1, 999):03d}{random.choice(string.ascii_uppercase)}"
         if code not in existing_codes:
             return code
-    raise ProviderDataApiError(f"Could not generate unique office code after {max_attempts} attempts")
+    raise MockPDAError(f"Could not generate unique office code after {max_attempts} attempts")
 
 
 def _load_mock_data() -> Dict[str, Any]:
@@ -115,7 +116,7 @@ class MockProviderDataApi:
             bool: Always True for mock implementation
         """
         if not self._initialized:
-            raise ProviderDataApiError("API client not initialized. Call init_app() first.")
+            raise MockPDAError("API client not initialized. Call init_app() first.")
         return True
 
     def get_provider_firm(self, firm_id: int) -> Firm | None:
@@ -138,7 +139,7 @@ class MockProviderDataApi:
                     return Firm(**cleaned_firm)
                 except ValidationError as e:
                     self.logger.error(f"Invalid firm data in mock for firm {firm_id}: {e}")
-                    raise ProviderDataApiError(f"Invalid firm data: {e}")
+                    raise MockPDAError(f"Invalid firm data: {e}")
         return None
 
     def get_all_provider_firms(self) -> List[Firm]:
@@ -153,7 +154,7 @@ class MockProviderDataApi:
             return [Firm(**firm_data) for firm_data in cleaned_firms]
         except ValidationError as e:
             self.logger.error(f"Invalid firms data in mock: {e}")
-            raise ProviderDataApiError(f"Invalid firms data: {e}")
+            raise MockPDAError(f"Invalid firms data: {e}")
 
     def get_provider_office(self, office_code: str) -> Office | None:
         """
@@ -175,7 +176,7 @@ class MockProviderDataApi:
                     return Office(**cleaned_office)
                 except ValidationError as e:
                     self.logger.error(f"Invalid office data in mock for office {office_code}: {e}")
-                    raise ProviderDataApiError(f"Invalid office data: {e}")
+                    raise MockPDAError(f"Invalid office data: {e}")
         return None
 
     def get_provider_offices(self, firm_id: int) -> List[Office]:
@@ -204,7 +205,7 @@ class MockProviderDataApi:
             return [Office(**office_data) for office_data in filtered_offices]
         except ValidationError as e:
             self.logger.error(f"Invalid offices data in mock for firm {firm_id}: {e}")
-            raise ProviderDataApiError(f"Invalid offices data: {e}")
+            raise MockPDAError(f"Invalid offices data: {e}")
 
     def make_all_provider_offices_inactive(self, firm_id: int):
         offices = self.get_provider_offices(firm_id)
@@ -408,7 +409,7 @@ class MockProviderDataApi:
 
         office_data = self._find_office_data(firm_id, office_code)
         if office_data is None:
-            raise ProviderDataApiError(f"Office {office_code} not found for firm {firm_id}")
+            raise MockPDAError(f"Office {office_code} not found for firm {firm_id}")
 
         # Update payment method using API/camelCase field name
         office_data["paymentMethod"] = payment_method
@@ -419,7 +420,7 @@ class MockProviderDataApi:
             return Office(**cleaned_office)
         except ValidationError as e:
             self.logger.error(f"Invalid office data in mock after payment method update for office {office_code}: {e}")
-            raise ProviderDataApiError(f"Invalid office data: {e}")
+            raise MockPDAError(f"Invalid office data: {e}")
 
     def create_provider_firm(self, firm: Firm) -> Firm:
         """
@@ -506,7 +507,7 @@ class MockProviderDataApi:
                     return BankAccount(**account)
                 except ValidationError as e:
                     self.logger.error(f"Invalid bank account data in mock for office {office_code}: {e}")
-                    raise ProviderDataApiError(f"Invalid bank account data: {e}")
+                    raise MockPDAError(f"Invalid bank account data: {e}")
 
         return None
 
@@ -532,14 +533,14 @@ class MockProviderDataApi:
 
         office_data = self._find_office_data(firm_id, office_code)
         if office_data is None:
-            raise ProviderDataApiError(f"Office {office_code} not found for firm {firm_id}")
+            raise MockPDAError(f"Office {office_code} not found for firm {firm_id}")
 
         office_id = office_data.get("firmOfficeId")
 
         # Check if office already has a bank account
         existing_account = self.get_office_bank_account(firm_id, office_code)
         if existing_account:
-            raise ProviderDataApiError(f"Office {office_code} already has a bank account")
+            raise MockPDAError(f"Office {office_code} already has a bank account")
 
         # Set the vendor_site_id to the office ID
         updated_account = bank_account.model_copy(update={"vendor_site_id": office_id})
@@ -571,7 +572,7 @@ class MockProviderDataApi:
 
         office_data = self._find_office_data(firm_id, office_code)
         if office_data is None:
-            raise ProviderDataApiError(f"Office {office_code} not found for firm {firm_id}")
+            raise MockPDAError(f"Office {office_code} not found for firm {firm_id}")
 
         office_id = office_data.get("firmOfficeId")
 
@@ -582,7 +583,7 @@ class MockProviderDataApi:
                 self._mock_data["bank_accounts"][i] = updated_account.to_api_dict()
                 return updated_account
 
-        raise ProviderDataApiError(f"Bank account not found for office {office_code}")
+        raise MockPDAError(f"Bank account not found for office {office_code}")
 
     def get_office_contacts(self, firm_id: int, office_code: str) -> List[Contact]:
         """
@@ -616,7 +617,7 @@ class MockProviderDataApi:
                     contacts.append(Contact(**contact))
                 except ValidationError as e:
                     self.logger.error(f"Invalid contact data in mock for office {office_code}: {e}")
-                    raise ProviderDataApiError(f"Invalid contact data: {e}")
+                    raise MockPDAError(f"Invalid contact data: {e}")
 
         return contacts
 
@@ -642,7 +643,7 @@ class MockProviderDataApi:
 
         office_data = self._find_office_data(firm_id, office_code)
         if office_data is None:
-            raise ProviderDataApiError(f"Office {office_code} not found for firm {firm_id}")
+            raise MockPDAError(f"Office {office_code} not found for firm {firm_id}")
 
         office_id = office_data.get("firmOfficeId")
 
@@ -717,7 +718,7 @@ class MockProviderDataApi:
                 break
 
         if contact_index is None:
-            raise ProviderDataApiError(f"Contact with vendor_site_id {contact.vendor_site_id} not found")
+            raise MockPDAError(f"Contact with vendor_site_id {contact.vendor_site_id} not found")
 
         # Update the contact data
         self._mock_data["contacts"][contact_index] = contact.to_api_dict()

@@ -1,12 +1,16 @@
 import datetime
+import logging
 from typing import Any
 
 from flask import Response, abort, current_app, flash, redirect, render_template, session, url_for
 
 from app.forms import BaseForm
 from app.models import Firm, Office
+from app.pda.errors import ProviderDataApiError
 from app.utils.formatting import format_office_address_one_line
 from app.views import BaseFormView, FullWidthBaseFormView
+
+logger = logging.getLogger(__name__)
 
 
 class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
@@ -24,7 +28,10 @@ class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
     def form_valid(self, form):
         pda = current_app.extensions["pda"]
         data = {"vatRegistrationNumber": form.data.get("vat_registration_number")}
-        pda.patch_office(form.firm.firm_id, form.office.firm_office_code, data)
+        try:
+            pda.patch_office(form.firm.firm_id, form.office.firm_office_code, data)
+        except ProviderDataApiError as e:
+            logger.error(f"Error {e.__class__.__name__} whilst updating office VAT registration number {e}")
         return super().form_valid(form)
 
     def get(self, firm, office, *args, **kwargs):
@@ -53,11 +60,15 @@ class PaymentMethodFormView(BaseFormView):
 
         # Update the office with payment method
         pda = current_app.extensions["pda"]
-        updated_office = pda.update_office_payment_method(
-            firm_id=form.firm.firm_id,
-            office_code=form.office.firm_office_code,
-            payment_method=form.data.get("payment_method"),
-        )
+        try:
+            updated_office = pda.update_office_payment_method(
+                firm_id=form.firm.firm_id,
+                office_code=form.office.firm_office_code,
+                payment_method=form.data.get("payment_method"),
+            )
+        except (ValueError, ProviderDataApiError) as e:
+            updated_office = None
+            logger.error(f"Error {e.__class__.__name__} whilst updating office payment method {e}")
         if not updated_office:
             flash("Failed to update payment method", "error")
             return self.form_invalid(form)
@@ -111,9 +122,13 @@ class OfficeActiveStatusFormView(BaseFormView):
         data = {Office.model_fields["inactive_date"].alias: inactive_date}
 
         pda = current_app.extensions["pda"]
-        updated_office = pda.patch_office(
-            firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, fields_to_update=data
-        )
+        try:
+            updated_office = pda.patch_office(
+                firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, fields_to_update=data
+            )
+        except ProviderDataApiError as e:
+            updated_office = None
+            logger.error(f"Error {e.__class__.__name__} whilst updating office active status {e}")
 
         if not updated_office:
             flash("Failed to update office active status", "error")

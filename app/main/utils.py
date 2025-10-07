@@ -7,7 +7,8 @@ from flask import current_app, flash, session, url_for
 
 from app.components.tag import Tag, TagType
 from app.models import BankAccount, Contact, Firm, Office
-from app.pda.mock_api import MockProviderDataApi, ProviderDataApiError
+from app.pda.errors import ProviderDataApiError
+from app.pda.mock_api import MockProviderDataApi
 
 logger = logging.getLogger(__name__)
 
