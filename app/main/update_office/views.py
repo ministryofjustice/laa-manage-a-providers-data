@@ -4,7 +4,7 @@ from flask import Response, abort, current_app, flash, redirect, render_template
 
 from app.forms import BaseForm
 from app.main.update_office.forms import NoBankAccountsError
-from app.models import Firm, Office, BankAccount
+from app.models import BankAccount, Firm, Office
 from app.utils.formatting import format_office_address_one_line
 from app.views import BaseFormView, FullWidthBaseFormView
 
@@ -112,7 +112,12 @@ class SearchBankAccountFormView(BaseFormView):
 
     def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(form, context, **kwargs)
-        context.update({"office_address": format_office_address_one_line(form.office)})
+        context.update(
+            {
+                "office_address": format_office_address_one_line(form.office),
+                "add_new_bank_account_url": url_for("main.add_office_bank_account", firm=form.firm, office=form.office),
+            }
+        )
         return context
 
     def get_success_url(self, form: BaseForm | None = None) -> str:
