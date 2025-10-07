@@ -28,7 +28,6 @@ def test_search_bank_account(page: Page):
 
     # Click on the payment method sub-navigation
     page.get_by_text("Bank accounts and payment").click()
-    page.locator("a.add-bank-button").scroll_into_view_if_needed()
 
     bank_account_table = page.locator(".bank-account-table")
     bank_account_table.scroll_into_view_if_needed()
@@ -43,7 +42,7 @@ def test_search_bank_account(page: Page):
     expect(bank_account_table.locator("dd:text('Johnson Legal Services Business Account')")).not_to_be_visible()
 
     # Click the add bank button to add a new account
-    page.locator("a.add-bank-button").click()
+    page.get_by_role("link", name="Change bank account").click()
 
     # We are now on the Search bank accounts page
 

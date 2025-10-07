@@ -415,12 +415,13 @@ class ViewOffice(MethodView):
             self.subpage = subpage
 
     def get_context(self, firm: Firm, office: Office) -> Dict:
+        add_bank_account_url = url_for("main.search_bank_account", firm=firm, office=office.firm_office_code)
         context = {
             "firm": firm,
             "office": office,
             "subpage": self.subpage,
             "office_tags": get_office_tags(office),
-            "add_bank_account_url": url_for("main.search_bank_account", firm=firm, office=office.firm_office_code),
+            "add_bank_account_url": add_bank_account_url,
         }
 
         if self.subpage == "bank-payment-details":
@@ -428,11 +429,13 @@ class ViewOffice(MethodView):
             bank_account: BankAccount = pda.get_office_bank_account(
                 firm_id=firm.firm_id, office_code=office.firm_office_code
             )
+            bank_account_table = get_bank_account_table(bank_account)
+            bank_account_table.card["action_url"] = add_bank_account_url
             context.update(
                 {
                     "vat_registration_table": get_vat_registration_table(firm, office),
                     "payment_information_table": get_payment_information_table(firm, office),
-                    "bank_account_table": get_bank_account_table(bank_account),
+                    "bank_account_table": bank_account_table,
                 }
             )
 
