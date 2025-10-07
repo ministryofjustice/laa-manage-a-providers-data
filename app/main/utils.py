@@ -389,6 +389,8 @@ def get_office_tags(office: Office):
     tags: list[Tag] = []
     if office.inactive_date:
         tags.append(Tag(TagType.INACTIVE))
+    if office.hold_all_payments_flag == "Y":
+        tags.append(Tag(TagType.ON_HOLD))
     return tags
 
 
@@ -396,4 +398,6 @@ def get_firm_tags(firm: Firm):
     tags: list[Tag] = []
     if firm.inactive_date:
         tags.append(Tag(TagType.INACTIVE))
+    if firm.hold_all_payments_flag == "Y":
+        tags.append(Tag(TagType.ON_HOLD))
     return tags

@@ -117,9 +117,17 @@ class OfficeActiveStatusFormView(BaseFormView):
 
         office_active_status = form.data.get("active_status")
         inactive_date = None
+        hold_payments = None
+        hold_reason = None
         if office_active_status == "inactive":
             inactive_date = datetime.date.today().strftime("%Y-%m-%d")
-        data = {Office.model_fields["inactive_date"].alias: inactive_date}
+            hold_payments = "Y"
+            hold_reason = "Office made inactive"
+        data = {
+            Office.model_fields["inactive_date"].alias: inactive_date,
+            Office.model_fields["hold_all_payments_flag"].alias: hold_payments,
+            Office.model_fields["hold_reason"].alias: hold_reason,
+        }
 
         pda = current_app.extensions["pda"]
         try:
@@ -133,10 +141,6 @@ class OfficeActiveStatusFormView(BaseFormView):
         if not updated_office:
             flash("Failed to update office active status", "error")
             return self.form_invalid(form)
-
-        # When an office is set to Inactive we also need to include hold_payments = true in the session/payload
-        if inactive_date:
-            session["hold_payments"] = True
 
         flash("Office active status updated successfully", "success")
         return redirect(self.get_success_url(form, form.firm, form.office))
