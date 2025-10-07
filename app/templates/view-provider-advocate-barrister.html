@@ -45,7 +45,7 @@
       "href": url_for("main.view_provider_contact", firm=firm),
       "active": subpage == "contact"
     }, {
-      "text": "Bank account and payments",
+      "text": "Bank accounts and payment",
       "href": url_for("main.view_provider_bank_accounts_payment", firm=firm),
       "active": subpage == "bank-accounts-payment"
     }]
@@ -72,14 +72,14 @@
           <h2 class="govuk-heading-m">Bank accounts</h2>
           {% if bank_account_table %}
               {{ govukSummaryList(bank_account_table.to_summary_govuk_params()) }}
+          {% else %}
+              {{ govukButton({
+                  "text": "Add bank account",
+                  "href": "#"
+              }) }}
           {% endif %}
-
-          {{ govukButton({
-              "text": "Add bank account",
-              "href": "#"
-          }) }}
         {% else %}
-          {{ govukWarningText({"text": "Firm has no head office so cannot show bank information"}) }}
+          {{ govukWarningText({"text": "Bank account information not available. Contact mapd@justice.gov.uk for more information."}) }}
         {% endif %}
       {% endif %}
     </div>

@@ -132,7 +132,8 @@ def test_office_bank_payment_details(page):
     expect(page.get_by_text("12345678", exact=True)).to_be_visible()
     expect(page.get_by_text("203045")).to_be_visible()
 
-    expect(page.get_by_role("button", name="Add bank account")).to_be_visible()
+    # Do not show 'Add bank account' button if there is an account
+    expect(page.get_by_role("button", name="Add bank account")).not_to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
