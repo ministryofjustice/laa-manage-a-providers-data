@@ -8,6 +8,7 @@ from wtforms.validators import DataRequired, InputRequired, Length, Optional
 from app.components.tables import RadioDataTable, TableStructureItem
 from app.constants import PAYMENT_METHOD_CHOICES
 from app.forms import BaseForm
+from app.main.add_a_new_office.forms import OfficeContactDetailsForm
 from app.models import BankAccount, Firm, Office
 from app.validators import (
     ValidateVATRegistrationNumber,
@@ -178,3 +179,7 @@ class BankAccountSearchForm(BaseForm):
             if search_lower in search_fields:
                 matched_bank_accounts.append(bank_account)
         return matched_bank_accounts
+
+
+class ChangeOfficeContactDetailsForm(OfficeContactDetailsForm):
+    url = "provider/<firm:firm>/office/<office:office>/change-office-contact-details"

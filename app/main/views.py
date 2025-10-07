@@ -142,26 +142,27 @@ def get_office_contact_table(firm: Firm, office: Office) -> DataTable | None:
     # if there is no primary contact, the next available contact
     contact_to_display = sorted_contacts[0]
 
+    row_action_urls = {
+        "enter": url_for("main.change_office_contact_details_form", firm=firm, office=office),
+        "change": url_for("main.change_office_contact_details_form", firm=firm, office=office),
+    }
+
     office_contact_table = SummaryList()
     office_contact_table.add_row(
         label="Address",
         html=format_office_address_multi_line_html(office),
-        row_action_urls={"enter": "#", "change": "#"},
+        row_action_urls=row_action_urls,
     )
     office_contact_table.add_row(
-        label="Email address", value=contact_to_display.email_address, row_action_urls={"enter": "#", "change": "#"}
+        label="Email address", value=contact_to_display.email_address, row_action_urls=row_action_urls
     )
     office_contact_table.add_row(
         label="Telephone number",
         value=contact_to_display.telephone_number,
-        row_action_urls={"enter": "#", "change": "#"},
+        row_action_urls=row_action_urls,
     )
-    office_contact_table.add_row(
-        label="DX number", value=office.dx_number, row_action_urls={"enter": "#", "change": "#"}
-    )
-    office_contact_table.add_row(
-        label="DX centre", value=office.dx_centre, row_action_urls={"enter": "#", "change": "#"}
-    )
+    office_contact_table.add_row(label="DX number", value=office.dx_number, row_action_urls=row_action_urls)
+    office_contact_table.add_row(label="DX centre", value=office.dx_centre, row_action_urls=row_action_urls)
     return office_contact_table
 
 
