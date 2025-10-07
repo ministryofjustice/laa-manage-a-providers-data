@@ -1,4 +1,4 @@
-from flask import get_flashed_messages, url_for
+from flask import url_for
 
 from app.main.update_office.forms import BankAccountSearchForm
 from app.main.update_office.views import SearchBankAccountFormView
@@ -43,6 +43,5 @@ class TestSearchBankAccountsFormView:
 
         view = SearchBankAccountFormView(form_class=BankAccountSearchForm)
         response = view.get(firm, office, context={})
-        assert response.location == url_for("main.view_office", firm=firm, office=office)
+        assert response.location == url_for("main.add_office_bank_account", firm=firm, office=office)
         assert response.status_code == 302
-        assert get_flashed_messages() == ["No bank accounts found - Do MAPD-71"]
