@@ -111,11 +111,15 @@ def get_office_overview_table(firm: Firm, office: Office) -> DataTable:
     return table
 
 
-def get_bank_account_table(bank_account: BankAccount) -> DataTable | None:
+def get_bank_account_table(bank_account: BankAccount, action_url="#") -> DataTable | None:
     if bank_account is None:
         return None
 
-    card: Card = {"title": bank_account.bank_account_name, "action_text": "Change bank account", "action_url": "#"}
+    card: Card = {
+        "title": bank_account.bank_account_name,
+        "action_text": "Change bank account",
+        "action_url": action_url,
+    }
     table = SummaryList(card=card, additional_classes="bank-account-table")
     table.add_row("Account name", bank_account.bank_account_name)
     table.add_row("Account number", bank_account.account_number)
@@ -429,13 +433,11 @@ class ViewOffice(MethodView):
             bank_account: BankAccount = pda.get_office_bank_account(
                 firm_id=firm.firm_id, office_code=office.firm_office_code
             )
-            bank_account_table = get_bank_account_table(bank_account)
-            bank_account_table.card["action_url"] = add_bank_account_url
             context.update(
                 {
                     "vat_registration_table": get_vat_registration_table(firm, office),
                     "payment_information_table": get_payment_information_table(firm, office),
-                    "bank_account_table": bank_account_table,
+                    "bank_account_table": get_bank_account_table(bank_account, action_url=add_bank_account_url),
                 }
             )
 
