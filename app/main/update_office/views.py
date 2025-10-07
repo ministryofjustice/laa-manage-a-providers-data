@@ -97,10 +97,8 @@ class PaymentMethodFormView(BaseFormView):
 class OfficeActiveStatusFormView(BaseFormView):
     """Form view for the office active status form"""
 
-    def get_success_url(self, form, firm, office=None):
-        if office:
-            return url_for("main.view_office", firm=firm, office=office)
-        return url_for("main.view_office", firm=firm)
+    def get_success_url(self, form, firm, office):
+        return url_for("main.view_office", firm=firm, office=office)
 
     def form_valid(self, form):
         if not hasattr(form, "firm") or not hasattr(form, "office"):
@@ -128,10 +126,7 @@ class OfficeActiveStatusFormView(BaseFormView):
         flash("Office active status updated successfully", "success")
         return redirect(self.get_success_url(form, form.firm, form.office))
 
-    def get(self, context, firm: Firm, office: Office = None, **kwargs):
-        if not office:
-            abort(404)
-
+    def get(self, context, firm: Firm, office: Office, **kwargs):
         active_status = "active"
         if getattr(office, "inactive_date", None):
             active_status = "inactive"
@@ -144,10 +139,7 @@ class OfficeActiveStatusFormView(BaseFormView):
 
         return render_template(self.template, **context)
 
-    def post(self, firm: Firm, office: Office = None, *args, **kwargs) -> Response | str:
-        if not office:
-            abort(404)
-
+    def post(self, firm: Firm, office: Office, *args, **kwargs) -> Response | str:
         form = self.get_form_class()(firm=firm, office=office)
 
         if form.validate_on_submit():

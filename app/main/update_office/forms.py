@@ -9,12 +9,13 @@ from app.validators import (
 from app.widgets import GovRadioInput, GovTextInput
 
 from ...forms import BaseForm
+from ...models import Firm, Office
 
 
 class UpdateOfficeBaseForm(BaseForm):
     template = "update_office/form.html"
 
-    def __init__(self, firm=None, office=None, *args, **kwargs):
+    def __init__(self, firm: Firm, office: Office, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.firm = firm
         self.office = office
