@@ -180,21 +180,23 @@ def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | N
         if not value and field.get("hide_if_null", False):
             continue
 
+        html = None
         if html_renderer := field.get("html_renderer"):
             if not isinstance(html_renderer, Callable):
                 raise ValueError("html_renderer must be callable")
-            field["html"] = html_renderer(data_source)
-            
+            html = html_renderer(data_source)
+
+        row_action_urls = None
         if change_link := field.get("change_link"):
-            field["row_action_urls"] = {"change": url_for(change_link, firm=firm)}
+            row_action_urls = {"change": url_for(change_link, firm=firm)}
 
         main_table.add_row(
-            value=value,
             label=field.get("label"),
+            value=value,
             formatter=field.get("formatter"),
-            html=field.get("html"),
+            html=html,
+            row_action_urls=row_action_urls,
             default_value=field.get("default", "No data"),
-            row_action_urls=field.get("row_action_urls")
         )
 
     return main_table
