@@ -413,7 +413,7 @@ def get_firm_account_number(firm: Firm | int) -> str | None:
         RuntimeError: If Provider Data API is not initialized
         ValueError: If firm is neither a Firm instance nor an int
     """
-    pda: MockProviderDataApi = current_app.extensions.get("pda")
+    pda = current_app.extensions.get("pda")
     if not pda:
         raise RuntimeError("Provider Data API not initialized")
 
