@@ -132,7 +132,7 @@ class SearchBankAccountFormView(BaseFormView):
         except NoBankAccountsError:
             # This firm does not have any bank accounts, so redirect the user to a form to add new bank account details
             url = url_for("main.view_office", firm=firm, office=office)
-            flash("No bank accounts found - Do MAPD-71", "error")
+            flash("No bank accounts found", "error")
             return redirect(url)
 
         if search_term:

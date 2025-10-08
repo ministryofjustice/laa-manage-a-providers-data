@@ -45,4 +45,4 @@ class TestSearchBankAccountsFormView:
         response = view.get(firm, office, context={})
         assert response.location == url_for("main.view_office", firm=firm, office=office)
         assert response.status_code == 302
-        assert get_flashed_messages() == ["No bank accounts found - Do MAPD-71"]
+        assert get_flashed_messages() == ["No bank accounts found"]
