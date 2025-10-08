@@ -158,7 +158,12 @@ class AddBankAccountFormView(BaseFormView):
 
     def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(form)
-        context.update({"office_address": format_office_address_one_line(form.office)})
+        context.update(
+            {
+                "office_address": format_office_address_one_line(form.office),
+                "grid_column_class": "govuk-grid-column-full",
+            }
+        )
         return context
 
     def form_valid(self, form):
