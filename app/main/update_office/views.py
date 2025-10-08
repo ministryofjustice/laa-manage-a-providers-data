@@ -166,7 +166,7 @@ class OfficeActiveStatusFormView(BaseFormView):
         else:
             return self.form_invalid(form, **kwargs)
 
-        
+
 class SearchBankAccountFormView(BaseFormView):
     """Form view for to search for bank accounts"""
 

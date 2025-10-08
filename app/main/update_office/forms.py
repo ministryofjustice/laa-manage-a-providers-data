@@ -5,19 +5,14 @@ from wtforms.fields.choices import RadioField
 from wtforms.fields.simple import StringField
 from wtforms.validators import DataRequired, InputRequired, Length, Optional
 
-from app.constants import OFFICE_ACTIVE_STATUS_CHOICES, PAYMENT_METHOD_CHOICES
-
 from app.components.tables import RadioDataTable, TableStructureItem
-from app.constants import PAYMENT_METHOD_CHOICES
+from app.constants import OFFICE_ACTIVE_STATUS_CHOICES, PAYMENT_METHOD_CHOICES
 from app.forms import BaseForm
 from app.models import BankAccount, Firm, Office
 from app.validators import (
     ValidateVATRegistrationNumber,
 )
 from app.widgets import GovRadioInput, GovTextInput
-
-from ...forms import BaseForm
-from ...models import Firm, Office
 
 
 class UpdateOfficeBaseForm(BaseForm):
@@ -80,8 +75,8 @@ class ChangeOfficeActiveStatusForm(UpdateOfficeBaseForm):
         ),
         choices=OFFICE_ACTIVE_STATUS_CHOICES,
     )
-    
-    
+
+
 class NoBankAccountsError(Exception):
     pass
 
