@@ -2,9 +2,10 @@ import datetime
 import logging
 from typing import Any
 
-from flask import Response, abort, current_app, flash, redirect, render_template, session, url_for
+from flask import Response, abort, current_app, flash, redirect, render_template, request, session, url_for
 
 from app.forms import BaseForm
+from app.main.update_office.forms import NoBankAccountsError
 from app.models import Firm, Office
 from app.pda.errors import ProviderDataApiError
 from app.utils.formatting import format_office_address_one_line
@@ -160,7 +161,50 @@ class OfficeActiveStatusFormView(BaseFormView):
 
     def post(self, firm: Firm, office: Office, *args, **kwargs) -> Response | str:
         form = self.get_form_class()(firm=firm, office=office)
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form, **kwargs)
 
+        
+class SearchBankAccountFormView(BaseFormView):
+    """Form view for to search for bank accounts"""
+
+    template = "update_office/search-bank-account.html"
+    success_endpoint = "main.view_office_bank_payment_details"
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update({"office_address": format_office_address_one_line(form.office)})
+        return context
+
+    def get_success_url(self, form: BaseForm | None = None) -> str:
+        return url_for(self.success_endpoint, firm=form.firm, office=form.office)
+
+    def form_valid(self, form: BaseForm, **kwargs) -> str:
+        pda = current_app.extensions["pda"]
+        pda.assign_bank_account_to_office(form.firm.firm_id, form.office.firm_office_code, form.bank_account.data)
+        return super().form_valid(form, **kwargs)
+
+    def get(self, firm, office: Office, context, **kwargs):
+        search_term = request.args.get("search", "").strip()
+        page = int(request.args.get("page", 1))
+
+        try:
+            form = self.get_form_class()(firm, office, search_term=search_term, page=page)
+        except NoBankAccountsError:
+            # This firm does not have any bank accounts, so redirect the user to a form to add new bank account details
+            url = url_for("main.view_office", firm=firm, office=office)
+            flash("No bank accounts found", "error")
+            return redirect(url)
+
+        if search_term:
+            form.search.validate(form)
+
+        return render_template(self.get_template(), **self.get_context_data(form, **kwargs))
+
+    def post(self, firm, office: Office, *args, **kwargs) -> Response | str:
+        form = self.get_form_class()(firm, office)
         if form.validate_on_submit():
             return self.form_valid(form)
         else:

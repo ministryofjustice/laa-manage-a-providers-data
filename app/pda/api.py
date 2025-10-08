@@ -6,7 +6,7 @@ from pydantic import ValidationError
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
-from app.models import Contact, Firm, Office
+from app.models import BankAccount, Contact, Firm, Office
 from app.pda.errors import ProviderDataApiError
 
 
@@ -463,3 +463,38 @@ class ProviderDataApi:
         )
         self._handle_response(response, {})
         return self.get_provider_firm(firm_id)
+
+    def assign_bank_account_to_office(self, firm_id: int, office_code: str, bank_account_id: int) -> BankAccount:
+        """
+        Assign a bank account to a specific office.
+
+        Args:
+            firm_id: The firm ID that the office belongs to
+            office_code: The office code
+            bank_account_id: The bank account ID to assign the office to
+
+        Returns:
+        """
+        raise NotImplementedError("Assigning bank account is not yet supported by the real Provider Data API")
+
+    def get_bank_details(self, firm_id, bank_account_id: str) -> Optional[BankAccount]:
+        response = self.get(f"/provider-firms/{firm_id}/bank-details/{bank_account_id}")
+        data = self._handle_response(response, {})
+        return BankAccount(**data)
+
+    def get_provider_firm_bank_details(self, firm_id: int) -> List[BankAccount]:
+        """
+        Get all bank details for a specific provider.
+
+        Args:
+            firm_id: The id of the firm to get bank details for
+
+        Returns:
+            List[BankAccount]: List of bank accounts that belong to the given firm.
+        """
+        response = self.get(f"/provider-firms/{firm_id}/bank-account-details")
+        items = self._handle_response(response, [])
+        accounts = []
+        for item in items:
+            accounts.append(BankAccount(**item))
+        return accounts
