@@ -1,6 +1,7 @@
 {
   "bank_accounts": [
     {
+      "bankAccountId": 1,
       "vendorSiteId": 101,
       "bankName": "Meridian Bank PLC",
       "bankBranchName": "Leicester City Centre",
@@ -19,6 +20,7 @@
       "zip": "E14 5HP"
     },
     {
+      "bankAccountId": 2,
       "vendorSiteId": 102,
       "bankName": "Crown Financial Services",
       "bankBranchName": "Birmingham High Street",
@@ -37,6 +39,7 @@
       "zip": "E14 5HQ"
     },
     {
+      "bankAccountId": 3,
       "vendorSiteId": 103,
       "bankName": "Sterling Trust Bank",
       "bankBranchName": "Manchester Central",
@@ -55,6 +58,7 @@
       "zip": "EC2V 7HN"
     },
     {
+      "bankAccountId": 4,
       "vendorSiteId": 104,
       "bankName": "Phoenix Commercial Bank",
       "bankBranchName": "Leeds City Branch",
@@ -73,6 +77,7 @@
       "zip": "EC2M 4AA"
     },
     {
+      "bankAccountId": 5,
       "vendorSiteId": 105,
       "bankName": "Atlantic Banking Group",
       "bankBranchName": "Liverpool Street Branch",
@@ -91,6 +96,7 @@
       "zip": "NW1 3AN"
     },
     {
+      "bankAccountId": 6,
       "vendorSiteId": 201,
       "bankName": "Highland Finance Bank",
       "bankBranchName": "Edinburgh Princes Street",
