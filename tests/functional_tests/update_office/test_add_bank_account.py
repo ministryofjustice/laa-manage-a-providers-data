@@ -45,7 +45,7 @@ def test_add_bank_account_from_office_page(page: Page):
     # Click on the payment method sub-navigation and add the bank account
     expect(page.get_by_text("Bank accounts and payment")).to_be_visible()
     page.get_by_text("Bank accounts and payment").click()
-    page.locator(".add-bank-button").click()
+    page.get_by_role("button", name="Add bank account").click()
     complete_add_bank_account_form(page)
 
 
@@ -56,10 +56,10 @@ def test_add_bank_account_from_search_bank_account_page(page: Page):
     expect(page.get_by_text("Bank accounts and payment")).to_be_visible()
     page.get_by_text("Bank accounts and payment").click()
     # The office page should not display an “Add Bank Account” button if a bank account already exists
-    expect(page.locator(".add-bank-button")).not_to_be_visible()
+    expect(page.get_by_role("button", name="Add bank account")).not_to_be_visible()
     # Clicking the Change bank account should take us to the bank account search form
     page.get_by_role("link", name="Change bank account").click()
     expect(page.get_by_role("heading", name="Search for bank account")).to_be_visible()
     # Add a new bank account using the `Add a new bank account` button
-    page.get_by_role("link", name="Add a new bank account").click()
+    page.get_by_role("button", name="Add a new bank account").click()
     complete_add_bank_account_form(page)
