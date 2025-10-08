@@ -186,12 +186,14 @@ class SummaryList(DataTable):
         data: Data | RowData | None = None,
         headings: list[str] | None = None,
         card: Card | None = None,
+        additional_classes: str = None,
     ) -> None:
         """
         Helper class for generating the head and rows required for displaying transposed GOV.UK Tables.
         """
         super().__init__(structure if structure else [], data if data else [])
         self.card = card
+        self.additional_classes = additional_classes
 
         if headings is not None:
             expected_heading_count = len(self.data) + 1
@@ -341,7 +343,7 @@ class SummaryList(DataTable):
 
         params = {
             "rows": summary_rows,
-            "classes": DEFAULT_TABLE_CLASSES,
+            "classes": DEFAULT_TABLE_CLASSES + (f" {self.additional_classes}" if self.additional_classes else ""),
         }
 
         if self.card:

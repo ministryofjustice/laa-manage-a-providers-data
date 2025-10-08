@@ -131,6 +131,7 @@ class BankAccount(BaseModel):
         extra="forbid",  # Don't allow extra fields
     )
 
+    bank_account_id: int = Field(alias="bankAccountId", gt=0, default=None)
     # vendorSiteId maps to firm_office_id
     vendor_site_id: int = Field(alias="vendorSiteId", gt=0, default=None)  # This is the firm_office_id
     bank_name: str = Field(alias="bankName", min_length=1, default=None)
@@ -141,6 +142,9 @@ class BankAccount(BaseModel):
     currency_code: str = Field(alias="currencyCode", default="GBP")
     account_type: str = Field(alias="accountType", default=None)
     primary_flag: str = Field(alias="primaryFlag", default="N")
+
+    start_date: date = Field(alias="startDate", default=None)
+    end_date: date = Field(alias="endDate", default=None)
 
     # Bank address fields
     address_line_1: Optional[str] = Field(alias="addressLine1", default=None)
