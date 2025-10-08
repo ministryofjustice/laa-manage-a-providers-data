@@ -1,7 +1,12 @@
 from app.utils import register_form_view
-from .forms import BankAccountSearchForm, PaymentMethodForm, UpdateVATRegistrationNumberForm, BankAccountForm
-from .views import PaymentMethodFormView, SearchBankAccountFormView, UpdateVATRegistrationNumberFormView, AddBankAccountFormView
 
+from .forms import BankAccountForm, BankAccountSearchForm, PaymentMethodForm, UpdateVATRegistrationNumberForm
+from .views import (
+    AddBankAccountFormView,
+    PaymentMethodFormView,
+    SearchBankAccountFormView,
+    UpdateVATRegistrationNumberFormView,
+)
 
 
 def register_views(bp):

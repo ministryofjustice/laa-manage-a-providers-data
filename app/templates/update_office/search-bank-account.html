@@ -41,9 +41,11 @@
           <div class="govuk-form-group {% if form.bank_account.errors %} govuk-form-group--error{% endif %}">
 
             {% if form.bank_account.errors %}
-                <p class="govuk-error-message">
-                  <span class="govuk-visually-hidden">Error:</span> {{ form.bank_account.errors[0] }}
-                </p>
+                {% for error in form.bank_account.errors %}
+                    <p class="govuk-error-message">
+                      <span class="govuk-visually-hidden">Error:</span> {{ error }}
+                    </p>
+                {% endfor %}
             {% endif %}
 
             {{ govukTable(form.bank_accounts_table.to_govuk_params(selected_value=form.selected_value)) }}
