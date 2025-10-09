@@ -1,7 +1,6 @@
 {% extends "form.html" %}
 
 {%- from 'govuk_frontend_jinja/components/input/macro.html' import govukInput -%}
-{%- from 'components/moj-pagination.html' import mojPagination -%}
 {%- from 'components/radio_button_table.html' import govukRadioTable %}
 {%- from "govuk_frontend_jinja/components/warning-text/macro.html" import govukWarningText %}
 {%- from 'macros/flash_messages.html' import renderFlashMessages %}
@@ -27,7 +26,7 @@
       </form>
 
       {% if form.search_term %}
-        <h2 class="govuk-heading-m">{{ form.num_results }} search {{ "result" if form.num_results == 1 else "results" }} for ‘{{ form.search_term | upper }}’</h2>
+        <h2 class="govuk-heading-m">{{ form.num_results }} search {{ "result" if form.num_results == 1 else "results" }} for ‘{{ form.search_term }}’</h2>
       {% endif %}
 
       {# Selection form using POST #}
@@ -35,11 +34,15 @@
         <form method="post">
           {{ form.hidden_tag() }}
 
-          {{ govukRadioTable(form.provider, pagination=mojPagination(currentPage=form.page, numShownPerPage=form.providers_shown_per_page, numResults=form.num_results, searchTerm=form.search_term)) }}
+          {{ govukRadioTable(form.provider) }}
 
           <br>
 
-          {{ govukButton({'text': 'Continue'}) }}
+          {% set submitButtonText = form.submit_button_text or "Continue" %}
+
+          {{ govukButton({
+            'text': submitButtonText
+          }) }}
         </form>
       {% endif %}
     </div>
