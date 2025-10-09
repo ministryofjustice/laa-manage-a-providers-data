@@ -3,7 +3,6 @@ from typing import Any
 from flask import Response, abort, current_app, flash, redirect, render_template, request, session, url_for
 
 from app.forms import BaseForm
-from app.main.add_a_new_office.views import OfficeContactDetailsFormView
 from app.main.update_office.forms import NoBankAccountsError
 from app.models import Firm, Office
 from app.utils.formatting import format_office_address_one_line
@@ -149,7 +148,23 @@ class SearchBankAccountFormView(BaseFormView):
             return self.form_invalid(form, **kwargs)
 
 
-class ChangeOfficeContactDetailsFormView(OfficeContactDetailsFormView):
+class ChangeOfficeContactDetailsFormView(BaseFormView):
+    def get_success_url(self, form) -> str:
+        return url_for("main.view_office", firm=form.firm, office=form.office)
+
     def get(self, context, firm: Firm, office: Office, **kwargs):
-        form = self.get_form_class()(firm=firm, office=office)
+        form = self.get_form_class()(firm=firm, office=office, **office.to_internal_dict())
         return render_template(self.template, **self.get_context_data(form, **kwargs))
+
+    def form_valid(self, form, **kwargs):
+        pda = current_app.extensions["pda"]
+        pda.update_office_contact_details(form.firm.firm_id, form.office.firm_office_code, form.data)
+        return super().form_valid(form, **kwargs)
+
+    def post(self, firm: Firm, office: Office, *args, **kwargs) -> Response | str:
+        form = self.get_form_class()(firm=firm, office=office)
+
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form, **kwargs)

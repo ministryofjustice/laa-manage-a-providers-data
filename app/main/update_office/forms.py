@@ -183,3 +183,11 @@ class BankAccountSearchForm(BaseForm):
 
 class ChangeOfficeContactDetailsForm(OfficeContactDetailsForm):
     url = "provider/<firm:firm>/office/<office:office>/change-office-contact-details"
+
+    def __init__(self, firm: Firm, office: Office, *args, **kwargs):
+        self.office = office
+        super(ChangeOfficeContactDetailsForm, self).__init__(firm, *args, **kwargs)
+
+    @property
+    def caption(self):
+        return self.office.office_name
