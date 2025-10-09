@@ -125,7 +125,7 @@ def get_bank_account_table(bank_account: BankAccount, action_url="#") -> DataTab
     table.add_row("Account name", bank_account.bank_account_name)
     table.add_row("Account number", bank_account.account_number)
     table.add_row("Sort code", bank_account.sort_code)
-    dt = ""
+    dt = bank_account.start_date
     if isinstance(bank_account.start_date, datetime.date):
         dt = bank_account.start_date.isoformat()
     table.add_row("Effective date from", dt)
