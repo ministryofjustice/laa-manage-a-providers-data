@@ -16,7 +16,7 @@ def navigate_to_existing_provider(page: Page, firm_id: int = 1):
     page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
 
     # Verify we're on the provider details page
-    expect(page.get_by_role("cell", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
 
 
 def navigate_to_change_liaison_manager_form(page: Page, firm_id: int = 1):
@@ -66,7 +66,7 @@ def test_change_liaison_manager_successful_submission(page: Page):
     page.get_by_role("button", name="Save").click()
 
     # Should redirect to the provider details page
-    expect(page.get_by_role("cell", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
 
     # Should show success message
     expect(page.get_by_text("Jane Doe is the new liaison manager")).to_be_visible()
@@ -103,7 +103,7 @@ def test_change_liaison_manager_form_partial_data(page: Page):
     page.get_by_role("button", name="Save").click()
 
     # Should redirect to the provider details page
-    expect(page.get_by_role("cell", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
 
     # Should show success message
     expect(page.get_by_text("John Smith is the new liaison manager")).to_be_visible()

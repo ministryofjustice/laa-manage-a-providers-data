@@ -88,6 +88,13 @@ class MockProviderDataApi:
                 return office
         return None
 
+    def _find_firm_data(self, firm_id: int) -> Optional[Dict[str, Any]]:
+        """Find firm by firm_id."""
+        for firm in self._mock_data["firms"]:
+            if firm.get("firmId") == firm_id:
+                return firm
+        return None
+
     def init_app(self, app, base_url: str = None, api_key: str = None, **kwargs) -> None:
         """
         Initialize the mock API client with Flask app configuration.
@@ -762,6 +769,13 @@ class MockProviderDataApi:
         self._mock_data["contacts"][contact_index] = contact.to_api_dict()
 
         return contact
+
+    def patch_provider(self, firm_id: int, fields_to_update: dict):
+        firm: dict = self._find_firm_data(firm_id)
+        if not firm:
+            raise ProviderDataApiError(f"Provider with firm {firm_id} not found")
+        firm.update(fields_to_update)
+        return firm
 
     def assign_bank_account_to_office(self, firm_id: int, office_code: str, bank_account_id: int) -> BankAccount:
         """
