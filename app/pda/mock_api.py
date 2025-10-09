@@ -785,5 +785,6 @@ class MockProviderDataApi:
         # Create the new bank account and assign it to the office
         return self.create_office_bank_account(firm_id, office_code, new_bank_account)
 
-    def update_office_contact_details(self, firm_id, firm_office_code, office_data):
-        pass
+    def update_office_contact_details(self, firm_id, firm_office_code, payload):
+        office_data = self._find_office_data(firm_id, firm_office_code)
+        office_data.update(payload)

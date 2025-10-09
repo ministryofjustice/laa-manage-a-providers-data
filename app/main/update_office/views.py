@@ -150,7 +150,7 @@ class SearchBankAccountFormView(BaseFormView):
 
 class ChangeOfficeContactDetailsFormView(BaseFormView):
     def get_success_url(self, form) -> str:
-        return url_for("main.view_office", firm=form.firm, office=form.office)
+        return url_for("main.view_office_contact", firm=form.firm, office=form.office)
 
     def get(self, context, firm: Firm, office: Office, **kwargs):
         form = self.get_form_class()(firm=firm, office=office, **office.to_internal_dict())
@@ -158,7 +158,14 @@ class ChangeOfficeContactDetailsFormView(BaseFormView):
 
     def form_valid(self, form, **kwargs):
         pda = current_app.extensions["pda"]
-        pda.update_office_contact_details(form.firm.firm_id, form.office.firm_office_code, form.data)
+        data = {}
+        for field_name, field_value in form.data.items():
+            model_field = Office.model_fields.get(field_name)
+            if model_field:
+                alias = model_field.alias if model_field.alias else field_name
+                data[alias] = field_value
+
+        pda.update_office_contact_details(form.firm.firm_id, form.office.firm_office_code, data)
         return super().form_valid(form, **kwargs)
 
     def post(self, firm: Firm, office: Office, *args, **kwargs) -> Response | str:
