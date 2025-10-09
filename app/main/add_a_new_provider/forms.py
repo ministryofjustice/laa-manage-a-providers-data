@@ -1,4 +1,4 @@
-from flask import current_app, session
+from flask import session
 from wtforms import RadioField, SubmitField
 from wtforms.fields.simple import StringField
 from wtforms.validators import Email, InputRequired, Length, Optional
@@ -17,6 +17,7 @@ from app.validators import (
     ValidateGovDateField,
     ValidatePastDate,
     ValidateSearchResults,
+    ValidateSortCode,
     ValidateVATRegistrationNumber,
 )
 from app.widgets import GovDateInput, GovRadioInput, GovSubmitInput, GovTextInput
@@ -113,84 +114,6 @@ class AdvocateDetailsForm(BaseForm):
             Length(max=15, message="Bar Council roll number must be 15 characters or less"),
         ],
     )
-
-
-class AssignChambersForm(BaseForm):
-    title = "Assign to a chambers"
-    url = "assign-chambers"
-    template = "add_provider/assign-chambers.html"
-    success_url = "main.providers"
-
-    search = StringField(
-        "Search for a chambers",
-        widget=GovTextInput(
-            form_group_classes="govuk-!-width-two-thirds",
-            heading_class="govuk-fieldset__legend--s",
-            classes="provider-search",
-            hint="You can search by name or account number",
-        ),
-        validators=[Length(max=100, message="Search term must be 100 characters or less"), ValidateSearchResults()],
-    )
-
-    provider = GovUKTableRadioField(
-        "",
-        structure=[
-            {"text": "Provider", "id": "firm_name"},
-            {"text": "Account number", "id": "firm_number"},
-            {"text": "Type", "id": "firm_type"},
-        ],
-        choices=[],  # This will be set when the user sends a request.
-        radio_value_key="firm_id",
-        validators=[InputRequired(message="Select a chambers to assign the new provider to")],
-    )
-
-    def __init__(self, search_term=None, page=1, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Get firms data
-        pda = current_app.extensions["pda"]
-        firms = pda.get_all_provider_firms()
-
-        # Advocates or Barristers can only have Chambers as their parent
-        firms = [firm for firm in firms if firm.firm_type == "Chambers"]
-
-        # Set search field data
-        self.search_term = search_term
-        if search_term:
-            self.search.data = search_term
-
-        # Filter providers based on search term
-        if self.search_term:
-            search_lower = self.search_term.lower()
-            firms = [
-                firm
-                for firm in firms
-                if (search_lower in firm.firm_name.lower() or search_lower in str(firm.firm_id).lower())
-            ]
-
-        self.page = page
-        self.providers_shown_per_page = 7
-        self.num_results = len(firms)
-
-        # Limit results and populate choices
-        start_id = self.providers_shown_per_page * (self.page - 1)
-        end_id = self.providers_shown_per_page * (self.page - 1) + self.providers_shown_per_page
-
-        firms = firms[start_id:end_id]
-        choices = []
-        for firm in firms:
-            choices.append(
-                (
-                    firm.firm_id,
-                    {
-                        "firm_name": firm.firm_name,
-                        "firm_number": firm.firm_number,
-                        "firm_type": firm.firm_type,
-                    },
-                )
-            )
-
-        self.provider.choices = choices
 
 
 class ChambersDetailsForm(BaseForm):

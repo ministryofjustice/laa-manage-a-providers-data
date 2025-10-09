@@ -23,17 +23,17 @@ def test_view_provider_page_ui_loads(page):
     # Buttons
     expect(page.get_by_role("button", name="Make provider active")).to_be_visible()
     # Main table
-    expect(page.get_by_role("rowheader", name="Provider name")).to_be_visible()
-    expect(page.get_by_role("cell", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.get_by_text("Provider name", exact=True).first).to_be_visible()
+    expect(page.get_by_text("SMITH & PARTNERS SOLICITORS", exact=True).first).to_be_visible()
 
-    expect(page.get_by_role("rowheader", name="Provider number")).to_be_visible()
-    expect(page.get_by_role("cell", name="1", exact=True)).to_be_visible()
+    expect(page.get_by_text("Provider number", exact=True).first).to_be_visible()
+    expect(page.get_by_text("1", exact=True).first).to_be_visible()
 
-    expect(page.get_by_role("rowheader", name="Account number")).to_be_visible()
-    expect(page.get_by_role("cell", name="1A001L")).to_be_visible()
+    expect(page.get_by_text("Account number", exact=True).first).to_be_visible()
+    expect(page.get_by_text("1A001L", exact=True).first).to_be_visible()
 
-    expect(page.get_by_role("rowheader", name="Constitutional status")).to_be_visible()
-    expect(page.get_by_role("cell", name="Partnership")).to_be_visible()
+    expect(page.get_by_text("Constitutional status", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Partnership", exact=True).first).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -47,17 +47,17 @@ def test_view_parent_provider(page):
     page.get_by_role("link", name="ALAN DAVIES").click()
 
     # Assert we can see the parent provider
-    expect(page.get_by_role("rowheader", name="Chambers")).to_be_visible()
-    expect(page.get_by_role("row", name="Chambers JOHNSON LEGAL SERVICES").get_by_role("link")).to_be_visible()
+    expect(page.get_by_text("Chambers", exact=True)).to_be_visible()
+    expect(page.get_by_role("link", name="JOHNSON LEGAL SERVICES").first).to_be_visible()
 
     # Click parent provider
-    page.get_by_role("row", name="Chambers JOHNSON LEGAL SERVICES").get_by_role("link").click()
-    expect(page.get_by_role("rowheader", name="Provider name")).to_be_visible()
-    expect(page.get_by_role("cell", name="JOHNSON LEGAL SERVICES")).to_be_visible()
-    expect(page.get_by_role("rowheader", name="Provider number")).to_be_visible()
-    expect(page.get_by_role("cell", name="2", exact=True)).to_be_visible()
-    expect(page.get_by_role("rowheader", name="Account number")).to_be_visible()
-    expect(page.get_by_role("cell", name="2R006L")).to_be_visible()
+    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").first.click()
+    expect(page.get_by_text("Provider name", exact=True).first).to_be_visible()
+    expect(page.get_by_text("JOHNSON LEGAL SERVICES", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Provider number", exact=True).first).to_be_visible()
+    expect(page.get_by_text("2", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Account number", exact=True).first).to_be_visible()
+    expect(page.get_by_text("2R006L", exact=True).first).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -108,10 +108,10 @@ def test_add_new_lsp(page):
     expect(page.get_by_role("alert", name="Success").locator("div").first).to_be_visible()
     expect(page.get_by_text("Legal services provider", exact=True)).to_be_visible()
     expect(page.get_by_role("heading", name="Test provider")).to_be_visible()
-    expect(page.get_by_role("cell", name="Test provider")).to_be_visible()
-    expect(page.get_by_role("cell", name="Charity")).to_be_visible()
-    expect(page.get_by_role("cell", name="12345678")).to_be_visible()
-    expect(page.get_by_role("cell", name="Alice Johnson")).to_be_visible()
+    expect(page.get_by_text("Test provider", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Charity", exact=True).first).to_be_visible()
+    expect(page.get_by_text("12345678", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Alice Johnson", exact=True).first).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -126,11 +126,12 @@ def test_lsp_contact(page):
     expect(page.get_by_role("heading", name="Contacts")).to_be_visible()
 
     # Summary list of liaison manager
-    expect(page.locator("dl")).to_contain_text("Job title")
-    expect(page.locator("dl")).to_contain_text("Telephone number")
-    expect(page.locator("dl")).to_contain_text("Email address")
-    expect(page.locator("dl")).to_contain_text("Website")
-    expect(page.locator("dl")).to_contain_text("Active from")
+    contact_section = page.locator(".govuk-summary-card").first
+    expect(contact_section).to_contain_text("Job title")
+    expect(contact_section).to_contain_text("Telephone number")
+    expect(contact_section).to_contain_text("Email address")
+    expect(contact_section).to_contain_text("Website")
+    expect(contact_section).to_contain_text("Active from")
     expect(page.get_by_role("link", name="Change liaison manager")).to_be_visible()
 
 
@@ -163,23 +164,23 @@ def test_view_advocate_provider_main_table(page):
     page.get_by_role("link", name="ALAN DAVIES").click()
 
     # Check Advocate-specific main table fields
-    expect(page.get_by_role("rowheader", name="Advocate name")).to_be_visible()
-    expect(page.get_by_role("cell", name="ALAN DAVIES")).to_be_visible()
+    expect(page.get_by_text("Advocate name", exact=True).first).to_be_visible()
+    expect(page.get_by_text("ALAN DAVIES", exact=True).first).to_be_visible()
 
-    expect(page.get_by_role("rowheader", name="Advocate number")).to_be_visible()
-    expect(page.get_by_role("cell", name="4", exact=True)).to_be_visible()
+    expect(page.get_by_text("Advocate number", exact=True).first).to_be_visible()
+    expect(page.get_by_text("4", exact=True).first).to_be_visible()
 
-    expect(page.get_by_role("rowheader", name="Account number")).to_be_visible()
+    expect(page.get_by_text("Account number", exact=True).first).to_be_visible()
 
     # Check that Chambers link is visible and clickable
-    expect(page.get_by_role("rowheader", name="Chambers")).to_be_visible()
-    expect(page.get_by_role("cell").locator("a[href*='/provider/2']")).to_be_visible()
+    expect(page.get_by_text("Chambers", exact=True).first).to_be_visible()
+    expect(page.get_by_role("link", name="JOHNSON LEGAL SERVICES").first).to_be_visible()
 
     # Check for Advocate level field (even if no data)
-    expect(page.get_by_role("rowheader", name="Advocate level")).to_be_visible()
+    expect(page.get_by_text("Advocate level", exact=True).first).to_be_visible()
 
     # Check for SRA roll number field
-    expect(page.get_by_role("rowheader", name="Solicitors Regulation Authority roll number")).to_be_visible()
+    expect(page.get_by_text("Solicitors Regulation Authority roll number", exact=True).first).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -197,23 +198,23 @@ def test_view_barrister_provider_main_table(page):
     page.get_by_role("link", name="Karen Sillen").click()
 
     # Check Barrister-specific main table fields
-    expect(page.get_by_role("rowheader", name="Barrister name")).to_be_visible()
-    expect(page.get_by_role("cell", name="Karen Sillen")).to_be_visible()
+    expect(page.get_by_text("Barrister name", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Karen Sillen", exact=True).first).to_be_visible()
 
-    expect(page.get_by_role("rowheader", name="Barrister number")).to_be_visible()
-    expect(page.get_by_role("cell", name="13", exact=True)).to_be_visible()
+    expect(page.get_by_text("Barrister number", exact=True).first).to_be_visible()
+    expect(page.get_by_text("13", exact=True).first).to_be_visible()
 
-    expect(page.get_by_role("rowheader", name="Account number")).to_be_visible()
+    expect(page.get_by_text("Account number", exact=True).first).to_be_visible()
 
     # Check that Chambers link is visible and clickable
-    expect(page.get_by_role("rowheader", name="Chambers")).to_be_visible()
-    expect(page.get_by_role("cell").locator("a[href*='/provider/2']")).to_be_visible()
+    expect(page.get_by_text("Chambers", exact=True).first).to_be_visible()
+    expect(page.get_by_role("link", name="JOHNSON LEGAL SERVICES").first).to_be_visible()
 
     # Check for Barrister level field
-    expect(page.get_by_role("rowheader", name="Barrister level")).to_be_visible()
+    expect(page.get_by_text("Barrister level", exact=True).first).to_be_visible()
 
     # Check for Bar Council roll number field
-    expect(page.get_by_role("rowheader", name="Bar Council roll number")).to_be_visible()
+    expect(page.get_by_text("Bar Council roll number", exact=True).first).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -227,13 +228,13 @@ def test_view_chambers_provider_main_table(page):
     page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
 
     # Check Chambers-specific main table fields (simplified compared to LSP)
-    expect(page.get_by_role("rowheader", name="Provider name")).to_be_visible()
-    expect(page.get_by_role("cell", name="JOHNSON LEGAL SERVICES")).to_be_visible()
+    expect(page.get_by_text("Provider name", exact=True).first).to_be_visible()
+    expect(page.get_by_text("JOHNSON LEGAL SERVICES", exact=True).first).to_be_visible()
 
-    expect(page.get_by_role("rowheader", name="Provider number")).to_be_visible()
-    expect(page.get_by_role("cell", name="2", exact=True)).to_be_visible()
+    expect(page.get_by_text("Provider number", exact=True).first).to_be_visible()
+    expect(page.get_by_text("2", exact=True).first).to_be_visible()
 
-    expect(page.get_by_role("rowheader", name="Account number")).to_be_visible()
+    expect(page.get_by_text("Account number", exact=True).first).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")

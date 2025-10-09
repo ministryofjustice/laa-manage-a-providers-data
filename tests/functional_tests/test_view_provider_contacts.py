@@ -79,11 +79,12 @@ def test_view_provider_contacts_summary_list_structure(page: Page):
     page.goto(url_for("main.view_provider_contact", firm=2, _external=True))
 
     # Check that required fields are present in the summary list
-    expect(page.locator("dl")).to_contain_text("Job title")
-    expect(page.locator("dl")).to_contain_text("Telephone number")
-    expect(page.locator("dl")).to_contain_text("Email address")
-    expect(page.locator("dl")).to_contain_text("Website")
-    expect(page.locator("dl")).to_contain_text("Active from")
+    contact_section = page.locator(".govuk-summary-card").first
+    expect(contact_section).to_contain_text("Job title")
+    expect(contact_section).to_contain_text("Telephone number")
+    expect(contact_section).to_contain_text("Email address")
+    expect(contact_section).to_contain_text("Website")
+    expect(contact_section).to_contain_text("Active from")
 
 
 @pytest.mark.usefixtures("live_server")
@@ -133,5 +134,5 @@ def test_view_provider_contacts_no_contacts_provider(page: Page):
     # Should not show the Contacts heading since there are no contacts
     expect(page.get_by_role("heading", name="Contacts")).not_to_be_visible()
 
-    # Should not show any summary lists for contacts
-    expect(page.locator(".govuk-summary-list")).not_to_be_visible()
+    # Should not show any summary card for contacts (main table summary list will still be visible)
+    expect(page.locator(".govuk-summary-card")).not_to_be_visible()
