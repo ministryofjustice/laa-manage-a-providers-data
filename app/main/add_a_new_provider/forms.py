@@ -10,14 +10,11 @@ from app.constants import (
     PARENT_FIRM_TYPE_CHOICES,
     YES_NO_CHOICES,
 )
-from app.fields import GovUKTableRadioField
 from app.main.forms import BaseBankAccountForm, BaseForm
 from app.validators import (
     ValidateCompaniesHouseNumber,
     ValidateGovDateField,
     ValidatePastDate,
-    ValidateSearchResults,
-    ValidateSortCode,
     ValidateVATRegistrationNumber,
 )
 from app.widgets import GovDateInput, GovRadioInput, GovSubmitInput, GovTextInput
