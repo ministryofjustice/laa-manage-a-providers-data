@@ -81,7 +81,7 @@ class NoBankAccountsError(Exception):
     pass
 
 
-class BankAccountSearchForm(BaseForm):
+class BankAccountSearchForm(UpdateOfficeBaseForm):
     title = "Search for bank account"
     url = "/provider/<firm:firm>/office/<office:office>/search-bank-account"
     template = "update_office/search-bank-account.html"
@@ -101,15 +101,9 @@ class BankAccountSearchForm(BaseForm):
         validators=[DataRequired(message="Select a bank account or search again")],
     )
 
-    @property
-    def caption(self):
-        return self.firm.firm_name
-
     def __init__(self, firm: Firm, office: Office, search_term=None, page=1, selected_value=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(firm, office, *args, **kwargs)
         self.page = page
-        self.firm = firm
-        self.office = office
 
         # Set search field data
         self.search_term = search_term
