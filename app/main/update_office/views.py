@@ -1,3 +1,4 @@
+import datetime
 from typing import Any
 
 from flask import Response, abort, current_app, flash, redirect, render_template, request, session, url_for
@@ -173,6 +174,7 @@ class AddBankAccountFormView(BaseFormView):
                 "accountNumber": form.account_number.data,
                 "bankAccountName": form.bank_account_name.data,
                 "vendorSiteId": form.office.firm_office_id,
+                "startDate": datetime.date.today(),
             }
         )
         pda = current_app.extensions["pda"]
