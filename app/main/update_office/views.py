@@ -145,7 +145,7 @@ class OfficeActiveStatusFormView(BaseFormView):
             flash("<b>Failed to update office active status</b>", "error")
             return self.form_invalid(form)
 
-        flash("<b>Office active status updated</b>", "success")
+        flash(f"<b>Office marked as {office_active_status}</b>", "success")
         return redirect(self.get_success_url(form, form.firm, form.office))
 
     def get(self, context, firm: Firm, office: Office, **kwargs):
