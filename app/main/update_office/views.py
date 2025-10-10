@@ -217,6 +217,35 @@ class SearchBankAccountFormView(BaseFormView):
             return self.form_invalid(form, **kwargs)
 
 
+class ChangeOfficeContactDetailsFormView(BaseFormView):
+    def get_success_url(self, form) -> str:
+        return url_for("main.view_office_contact", firm=form.firm, office=form.office)
+
+    def get(self, context, firm: Firm, office: Office, **kwargs):
+        form = self.get_form_class()(firm=firm, office=office, **office.to_internal_dict())
+        return render_template(self.template, **self.get_context_data(form, **kwargs))
+
+    def form_valid(self, form, **kwargs):
+        pda = current_app.extensions["pda"]
+        data = {}
+        for field_name, field_value in form.data.items():
+            model_field = Office.model_fields.get(field_name)
+            if model_field:
+                alias = model_field.alias if model_field.alias else field_name
+                data[alias] = field_value
+
+        pda.update_office_contact_details(form.firm.firm_id, form.office.firm_office_code, data)
+        return super().form_valid(form, **kwargs)
+
+    def post(self, firm: Firm, office: Office, *args, **kwargs) -> Response | str:
+        form = self.get_form_class()(firm=firm, office=office)
+
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form, **kwargs)
+
+
 class AddBankAccountFormView(BaseFormView):
     def get_success_url(self, form):
         return url_for("main.view_office_bank_payment_details", firm=form.firm, office=form.office)

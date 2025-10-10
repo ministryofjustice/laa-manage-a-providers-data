@@ -8,6 +8,7 @@ from wtforms.validators import DataRequired, InputRequired, Length, Optional
 from app.components.tables import RadioDataTable, TableStructureItem
 from app.constants import OFFICE_ACTIVE_STATUS_CHOICES, PAYMENT_METHOD_CHOICES
 from app.forms import BaseForm
+from app.main.add_a_new_office.forms import OfficeContactDetailsForm
 from app.main.forms import BaseBankAccountForm
 from app.models import BankAccount, Firm, Office
 from app.validators import (
@@ -179,6 +180,18 @@ class BankAccountSearchForm(UpdateOfficeBaseForm):
             if search_lower in search_fields:
                 matched_bank_accounts.append(bank_account)
         return matched_bank_accounts
+
+
+class ChangeOfficeContactDetailsForm(OfficeContactDetailsForm):
+    url = "provider/<firm:firm>/office/<office:office>/change-office-contact-details"
+
+    def __init__(self, firm: Firm, office: Office, *args, **kwargs):
+        self.office = office
+        super(ChangeOfficeContactDetailsForm, self).__init__(firm, *args, **kwargs)
+
+    @property
+    def caption(self):
+        return self.office.office_name
 
 
 class BankAccountForm(BaseBankAccountForm):
