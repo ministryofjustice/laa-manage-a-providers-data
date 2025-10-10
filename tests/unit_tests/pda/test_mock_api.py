@@ -5,8 +5,8 @@ import pytest
 
 from app.models import BankAccount, Contact, Firm, Office
 from app.pda.mock_api import (
+    MockPDAError,
     MockProviderDataApi,
-    ProviderDataApiError,
     _clean_data,
     _generate_unique_office_code,
     _load_fixture,
@@ -94,7 +94,7 @@ class TestDataLoadFunctions:
         ):
             existing_codes = ["1A001A"]
 
-            with pytest.raises(ProviderDataApiError):
+            with pytest.raises(MockPDAError):
                 _generate_unique_office_code(existing_codes, max_attempts=5)
 
 
@@ -466,7 +466,7 @@ class TestMockProviderDataApi:
             bank_account_name="Test Account",
         )
 
-        with pytest.raises(ProviderDataApiError, match="Office NONEXISTENT not found"):
+        with pytest.raises(MockPDAError, match="Office NONEXISTENT not found"):
             mock_api.create_office_bank_account(1, "NONEXISTENT", bank_account)
 
     def test_create_office_bank_account_already_exists(self, mock_api):
@@ -546,7 +546,7 @@ class TestMockProviderDataApi:
             bank_account_name="Test Account",
         )
 
-        with pytest.raises(ProviderDataApiError, match="Bank account not found for office 1A001L"):
+        with pytest.raises(MockPDAError, match="Bank account not found for office 1A001L"):
             mock_api.update_office_bank_account(1, "1A001L", bank_account)
 
     def test_update_office_bank_account_office_not_found(self, mock_api):
@@ -562,7 +562,7 @@ class TestMockProviderDataApi:
             bank_account_name="Test Account",
         )
 
-        with pytest.raises(ProviderDataApiError, match="Office NONEXISTENT not found"):
+        with pytest.raises(MockPDAError, match="Office NONEXISTENT not found"):
             mock_api.update_office_bank_account(1, "NONEXISTENT", bank_account)
 
     def test_get_provider_children_success(self, mock_api):
@@ -769,7 +769,7 @@ class TestMockProviderDataApi:
             primary="Y",
         )
 
-        with pytest.raises(ProviderDataApiError, match="Office NONEXISTENT not found"):
+        with pytest.raises(MockPDAError, match="Office NONEXISTENT not found"):
             mock_api.create_office_contact(1, "NONEXISTENT", contact)
 
     def test_create_office_contact_invalid_params(self, mock_api):

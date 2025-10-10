@@ -7,15 +7,16 @@ from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
 from app.models import BankAccount, Contact, Firm, Office
+from app.pda.errors import ProviderDataApiError
 
 
-class ProviderDataApiError(Exception):
+class PDAError(ProviderDataApiError):
     """Base exception for Provider Data API errors."""
 
     pass
 
 
-class ProviderDataApiConnectionError(ProviderDataApiError):
+class PDAConnectionError(PDAError):
     """Raised when unable to connect to the Provider Data API."""
 
     pass
@@ -100,14 +101,14 @@ class ProviderDataApi:
             ProviderDataApiConnectionError: If connection fails
         """
         if not self._initialized:
-            raise ProviderDataApiError("API client not initialized. Call init_app() first.")
+            raise PDAError("API client not initialized. Call init_app() first.")
 
         try:
             response = self.get("/")  # TODO: See if we can get a better status endpoint
             return response.status_code == 200
         except Exception as e:
             self.logger.error(f"Failed to connect to Provider Data API: {e}")
-            raise ProviderDataApiConnectionError(f"Connection test failed: {e}")
+            raise PDAConnectionError(f"Connection test failed: {e}")
 
     def _make_request(self, method: str, endpoint: str, **kwargs) -> requests.Response:
         """
@@ -125,7 +126,7 @@ class ProviderDataApi:
             ProviderDataApiError: If the request fails
         """
         if not self._initialized:
-            raise ProviderDataApiError("API client not initialized. Call init_app() first.")
+            raise PDAError("API client not initialized. Call init_app() first.")
 
         url = f"{self.base_url}/{endpoint.lstrip('/')}"
 
@@ -141,7 +142,7 @@ class ProviderDataApi:
 
         except requests.RequestException as e:
             self.logger.error(f"Request failed for {method} {url}: {e}")
-            raise ProviderDataApiError(f"Request failed: {e}")
+            raise PDAError(f"Request failed: {e}")
 
     def get(self, endpoint: str, params: Optional[Dict[str, Any]] = None) -> requests.Response:
         """
@@ -190,7 +191,7 @@ class ProviderDataApi:
                 return response.json()
             except ValueError as e:
                 self.logger.error(f"Failed to parse JSON response: {e}")
-                raise ProviderDataApiError(f"Invalid JSON response: {e}")
+                raise PDAError(f"Invalid JSON response: {e}")
 
         elif response.status_code in [204, 404]:
             # 204: No Content (successful but empty)
@@ -204,7 +205,7 @@ class ProviderDataApi:
             try:
                 response.raise_for_status()
             except requests.HTTPError as e:
-                raise ProviderDataApiError(f"HTTP error: {e}")
+                raise PDAError(f"HTTP error: {e}")
 
     def get_provider_firm(self, firm_id: int) -> Firm | None:
         """
@@ -230,7 +231,7 @@ class ProviderDataApi:
             return Firm(**firm)
         except ValidationError as e:
             self.logger.error(f"Invalid firm data from API for firm {firm_id}: {e}")
-            raise ProviderDataApiError(f"Invalid firm data: {e}")
+            raise PDAError(f"Invalid firm data: {e}")
 
     def get_all_provider_firms(self) -> List[Firm]:
         """
@@ -249,7 +250,7 @@ class ProviderDataApi:
             return [Firm(**firm_data) for firm_data in raw_data["firms"]]
         except ValidationError as e:
             self.logger.error(f"Invalid firms data from API: {e}")
-            raise ProviderDataApiError(f"Invalid firms data: {e}")
+            raise PDAError(f"Invalid firms data: {e}")
 
     def get_provider_office(self, office_code: str) -> Office | None:
         """
@@ -275,7 +276,7 @@ class ProviderDataApi:
             return Office(**office)
         except ValidationError as e:
             self.logger.error(f"Invalid office data from API for office {office_code}: {e}")
-            raise ProviderDataApiError(f"Invalid office data: {e}")
+            raise PDAError(f"Invalid office data: {e}")
 
     def get_provider_offices(self, firm_id: int) -> List[Office]:
         """
@@ -301,7 +302,7 @@ class ProviderDataApi:
             return [Office(**office_data) for office_data in offices_data]
         except ValidationError as e:
             self.logger.error(f"Invalid offices data from API for firm {firm_id}: {e}")
-            raise ProviderDataApiError(f"Invalid offices data: {e}")
+            raise PDAError(f"Invalid offices data: {e}")
 
     def get_head_office(self, firm_id: int) -> Office | None:
         """

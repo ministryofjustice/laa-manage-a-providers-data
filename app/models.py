@@ -100,6 +100,8 @@ class Office(BaseModel):
     # The below fields are not present in the current version of PDA
     payment_method: Optional[str] = Field(alias="paymentMethod", default=None)
     inactive_date: date | None = Field(alias="inactiveDate", default=None)
+    hold_all_payments_flag: YN | None = Field(alias="holdAllPaymentsFlag", default=None)
+    hold_reason: str | None = Field(alias="holdReason", min_length=1, default=None)
 
     is_head_office: Optional[bool] = Field(
         default=False, exclude=True
