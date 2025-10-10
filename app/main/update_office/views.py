@@ -221,6 +221,11 @@ class ChangeOfficeContactDetailsFormView(BaseFormView):
     def get_success_url(self, form) -> str:
         return url_for("main.view_office_contact", firm=form.firm, office=form.office)
 
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update({"office_address": format_office_address_one_line(form.office)})
+        return context
+
     def get(self, context, firm: Firm, office: Office, **kwargs):
         form = self.get_form_class()(firm=firm, office=office, **office.to_internal_dict())
         return render_template(self.template, **self.get_context_data(form, **kwargs))
