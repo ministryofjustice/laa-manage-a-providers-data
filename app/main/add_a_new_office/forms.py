@@ -126,7 +126,7 @@ class OfficeContactDetailsForm(BaseForm):
     )
 
     email_address = StringField(
-        "Email address (optional)",
+        "Office email address (optional)",
         widget=GovTextInput(heading_class="govuk-fieldset__legend--m", classes="govuk-!-width-full"),
         validators=[
             Optional(),
