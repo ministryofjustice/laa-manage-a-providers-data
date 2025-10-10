@@ -5,7 +5,6 @@ from .forms import (
     AddBarristerForm,
     AddProviderForm,
     AdvocateDetailsForm,
-    AssignChambersForm,
     AssignContractManagerForm,
     BankAccountForm,
     HeadOfficeContactDetailsForm,
@@ -18,7 +17,6 @@ from .views import (
     AddBarristerFormView,
     AddProviderFormView,
     AdvocateDetailsFormView,
-    AssignChambersFormView,
     AssignContractManagerFormView,
     BankAccountFormView,
     HeadOfficeContactDetailsFormView,
@@ -34,8 +32,6 @@ def register_views(bp):
     register_form_view(form_class=LspDetailsForm, view_class=LspDetailsFormView, blueprint=bp)
 
     register_form_view(form_class=AdvocateDetailsForm, view_class=AdvocateDetailsFormView, blueprint=bp)
-
-    register_form_view(form_class=AssignChambersForm, view_class=AssignChambersFormView, blueprint=bp)
 
     register_form_view(
         form_class=HeadOfficeContactDetailsForm, view_class=HeadOfficeContactDetailsFormView, blueprint=bp

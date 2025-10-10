@@ -186,12 +186,14 @@ class SummaryList(DataTable):
         data: Data | RowData | None = None,
         headings: list[str] | None = None,
         card: Card | None = None,
+        additional_classes: str = None,
     ) -> None:
         """
         Helper class for generating the head and rows required for displaying transposed GOV.UK Tables.
         """
         super().__init__(structure if structure else [], data if data else [])
         self.card = card
+        self.additional_classes = additional_classes
 
         if headings is not None:
             expected_heading_count = len(self.data) + 1
@@ -214,8 +216,8 @@ class SummaryList(DataTable):
 
     def add_row(
         self,
-        value,
         label,
+        value=None,
         formatter=None,
         html=None,
         row_action_urls: dict[RowActionTypes, str] | None = None,
@@ -233,8 +235,8 @@ class SummaryList(DataTable):
         See `TransposedDataTable.get_rows` for more information.
 
         Args:
-            value: String value to appear in a cell
             label: String presentation label, also used as ID after conversion to snake_case
+            value: Optional String value to appear in a cell
             formatter: Optional Callable, used to convert `value` into the presented string in the cell
             html: Optional Callable, used during table generation to provide the HTML for the cell
             row_action_urls: Optional dict, using `RowActionTypes` as key and a URL as value.
@@ -341,7 +343,7 @@ class SummaryList(DataTable):
 
         params = {
             "rows": summary_rows,
-            "classes": DEFAULT_TABLE_CLASSES,
+            "classes": DEFAULT_TABLE_CLASSES + (f" {self.additional_classes}" if self.additional_classes else ""),
         }
 
         if self.card:

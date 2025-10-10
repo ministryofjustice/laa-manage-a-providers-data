@@ -3,6 +3,7 @@ import logging
 import os
 import random
 import string
+import time
 from datetime import date
 from typing import Any, Dict, List, Optional
 from unittest.mock import Mock
@@ -85,6 +86,13 @@ class MockProviderDataApi:
         for office in self._mock_data["offices"]:
             if office.get("_firmId") == firm_id and office.get("firmOfficeCode") == office_code:
                 return office
+        return None
+
+    def _find_firm_data(self, firm_id: int) -> Optional[Dict[str, Any]]:
+        """Find firm by firm_id."""
+        for firm in self._mock_data["firms"]:
+            if firm.get("firmId") == firm_id:
+                return firm
         return None
 
     def init_app(self, app, base_url: str = None, api_key: str = None, **kwargs) -> None:
@@ -205,6 +213,13 @@ class MockProviderDataApi:
         except ValidationError as e:
             self.logger.error(f"Invalid offices data in mock for firm {firm_id}: {e}")
             raise ProviderDataApiError(f"Invalid offices data: {e}")
+
+    def make_all_provider_offices_inactive(self, firm_id: int):
+        offices = self.get_provider_offices(firm_id)
+        for office in offices:
+            # When need to update the office data in memory and not the office object
+            item = self._find_office_data(firm_id, office.firm_office_code)
+            item.update({"inactive_date": date.today()})
 
     def get_head_office(self, firm_id: int) -> Office | None:
         """
@@ -494,7 +509,7 @@ class MockProviderDataApi:
 
         # Find the bank account for this office
         for account in self._mock_data["bank_accounts"]:
-            if account.get("vendorSiteId") == office_id:
+            if account.get("vendorSiteId") == office_id and account["primaryFlag"].lower() == "y":
                 try:
                     return BankAccount(**account)
                 except ValidationError as e:
@@ -502,6 +517,36 @@ class MockProviderDataApi:
                     raise ProviderDataApiError(f"Invalid bank account data: {e}")
 
         return None
+
+    def _get_firm_bank_details_raw(self, firm_id: int) -> dict:
+        """
+        Get the bank accounts for a specific provider firm.
+        This is all bank accounts belonging to an office of the given provider firm.
+
+        Args:
+            firm_id: The firm ID of the given provider firm
+
+        Returns:
+            dict of bank account data, the bank account id will be used as the key
+        """
+
+        # Get all the offices belonging to the given firm.
+        firm_offices = self.get_provider_offices(firm_id)
+        firm_office_ids = [office.firm_office_id for office in firm_offices]
+
+        # Find the bank account belonging to offices of the given firm.
+        bank_accounts = self._mock_data["bank_accounts"]
+        bank_accounts = {
+            account["bankAccountId"]: account for account in bank_accounts if account["vendorSiteId"] in firm_office_ids
+        }
+        return bank_accounts
+
+    def get_provider_firm_bank_details(self, firm_id: int) -> List[BankAccount]:
+        if not isinstance(firm_id, int) or firm_id <= 0:
+            raise ValueError("firm_id must be a positive integer")
+
+        bank_accounts = self._get_firm_bank_details_raw(firm_id)
+        return [BankAccount(**account) for account in bank_accounts.values()]
 
     def create_office_bank_account(self, firm_id: int, office_code: str, bank_account: BankAccount) -> BankAccount:
         """
@@ -529,13 +574,21 @@ class MockProviderDataApi:
 
         office_id = office_data.get("firmOfficeId")
 
-        # Check if office already has a bank account
-        existing_account = self.get_office_bank_account(firm_id, office_code)
-        if existing_account:
-            raise ProviderDataApiError(f"Office {office_code} already has a bank account")
+        # Deactivate all existing bank accounts currently attached to this office
+        for account in self._mock_data["bank_accounts"]:
+            if account["vendorSiteId"] == office_id:
+                account["primaryFlag"] = "N"
+                if not account.get("endDate"):
+                    account["endDate"] = date.today().isoformat()
 
         # Set the vendor_site_id to the office ID
-        updated_account = bank_account.model_copy(update={"vendor_site_id": office_id})
+        updated_account = bank_account.model_copy(
+            update={
+                "vendor_site_id": office_id,
+                "start_date": date.today().isoformat(),
+                "primary_flag": "Y",
+            }
+        )
 
         # Add to mock data
         self._mock_data["bank_accounts"].append(updated_account.to_api_dict())
@@ -657,6 +710,29 @@ class MockProviderDataApi:
             office.update(fields_to_update)
         return office
 
+    def patch_provider_firm(self, firm_id: int, fields_to_update: dict):
+        firm = self.get_provider_firm(firm_id)
+        if firm:
+            firm = self._update_provider_firm(firm, fields_to_update)
+            if "inactiveDate" in fields_to_update and fields_to_update["inactiveDate"]:
+                self.make_all_provider_offices_inactive(firm_id)
+
+        return firm
+
+    def _update_provider_firm(self, firm: Firm, fields_to_update: dict):
+        # Get the raw firm data from storage
+        firm_dict = None
+        for item in self._mock_data["firms"]:
+            if item.get("firmId") == firm.firm_id:
+                firm_dict = item
+                break
+
+        if firm_dict:
+            firm_dict.update(fields_to_update)
+
+        # Return updated firm as a Firm instance
+        return self.get_provider_firm(firm.firm_id)
+
     def update_contact(self, firm_id: int, office_code: str, contact: Contact) -> Contact:
         """
         Update an existing contact.
@@ -693,3 +769,32 @@ class MockProviderDataApi:
         self._mock_data["contacts"][contact_index] = contact.to_api_dict()
 
         return contact
+
+    def patch_provider(self, firm_id: int, fields_to_update: dict):
+        firm: dict = self._find_firm_data(firm_id)
+        if not firm:
+            raise ProviderDataApiError(f"Provider with firm {firm_id} not found")
+        firm.update(fields_to_update)
+        return firm
+
+    def assign_bank_account_to_office(self, firm_id: int, office_code: str, bank_account_id: int) -> BankAccount:
+        """
+        Assign a bank account to a specific office. This creates a new bank account by duplicating the given bank account.
+
+        Args:
+            firm_id: The firm ID that the office belongs to
+            office_code: The office code to assign the bank account to
+            bank_account_id: The bank account ID to assign the office to
+
+        Returns:
+            BankAccount: The bank account that was assigned to the office
+        """
+        bank_accounts_data = self._get_firm_bank_details_raw(firm_id)
+        selected_bank_account = bank_accounts_data[int(bank_account_id)]
+        # Copy the selected bank account
+        copy_bank_account_data = selected_bank_account.copy()
+        copy_bank_account_data.update({"bankAccountId": int(time.time())})
+        new_bank_account = BankAccount(**copy_bank_account_data)
+
+        # Create the new bank account and assign it to the office
+        return self.create_office_bank_account(firm_id, office_code, new_bank_account)
