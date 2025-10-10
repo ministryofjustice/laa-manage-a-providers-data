@@ -1,28 +1,20 @@
 from app.utils import register_form_view
 
 from .forms import (
-    (
     BankAccountForm,
     BankAccountSearchForm,
     ChangeOfficeActiveStatusForm,
-   
     ChangeOfficeContactDetailsForm,
     PaymentMethodForm,
-   
     UpdateVATRegistrationNumberForm,
-),
 )
 from .views import (
     AddBankAccountFormView,
-    OfficeActiveStatusFormView,
-    (
     ChangeOfficeContactDetailsFormView,
+    OfficeActiveStatusFormView,
     PaymentMethodFormView,
-   
     SearchBankAccountFormView,
-   
     UpdateVATRegistrationNumberFormView,
-),
 )
 
 
