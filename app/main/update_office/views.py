@@ -33,6 +33,9 @@ class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
             pda.patch_office(form.firm.firm_id, form.office.firm_office_code, data)
         except ProviderDataApiError as e:
             logger.error(f"Error {e.__class__.__name__} whilst updating office VAT registration number {e}")
+            flash("Failed to update VAT registration number", "error")
+            return self.form_invalid(form)
+        flash("Updated VAT registration number", "success")
         return super().form_valid(form)
 
     def get(self, firm, office, *args, **kwargs):
@@ -68,9 +71,7 @@ class PaymentMethodFormView(BaseFormView):
                 payment_method=form.data.get("payment_method"),
             )
         except (ValueError, ProviderDataApiError) as e:
-            updated_office = None
             logger.error(f"Error {e.__class__.__name__} whilst updating office payment method {e}")
-        if not updated_office:
             flash("Failed to update payment method", "error")
             return self.form_invalid(form)
 
@@ -117,6 +118,12 @@ class OfficeActiveStatusFormView(BaseFormView):
             abort(400)
 
         office_active_status = form.data.get("active_status")
+        office = form.office
+        current_status = "inactive" if office.inactive_date else "active"
+        if office_active_status == current_status:
+            flash("Office active status unchanged", "message")
+            return redirect(self.get_success_url(form, form.firm, form.office))
+
         inactive_date = None
         hold_payments = None
         hold_reason = None
@@ -132,18 +139,13 @@ class OfficeActiveStatusFormView(BaseFormView):
 
         pda = current_app.extensions["pda"]
         try:
-            updated_office = pda.patch_office(
-                firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, fields_to_update=data
-            )
+            pda.patch_office(firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, fields_to_update=data)
         except ProviderDataApiError as e:
-            updated_office = None
             logger.error(f"Error {e.__class__.__name__} whilst updating office active status {e}")
-
-        if not updated_office:
             flash("Failed to update office active status", "error")
             return self.form_invalid(form)
 
-        flash("Office active status updated successfully", "success")
+        flash("Office active status updated", "success")
         return redirect(self.get_success_url(form, form.firm, form.office))
 
     def get(self, context, firm: Firm, office: Office, **kwargs):
