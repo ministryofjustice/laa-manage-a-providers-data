@@ -7,7 +7,8 @@ from flask import current_app, flash, session, url_for
 
 from app.components.tag import Tag, TagType
 from app.models import BankAccount, Contact, Firm, Office
-from app.pda.mock_api import MockProviderDataApi, ProviderDataApiError
+from app.pda.errors import ProviderDataApiError
+from app.pda.mock_api import MockProviderDataApi
 
 logger = logging.getLogger(__name__)
 
@@ -388,6 +389,8 @@ def get_firm_tags(firm: Firm):
     tags: list[Tag] = []
     if firm.inactive_date:
         tags.append(Tag(TagType.INACTIVE))
+    if firm.hold_all_payments_flag == "Y":
+        tags.append(Tag(TagType.ON_HOLD))
     return tags
 
 
@@ -395,6 +398,8 @@ def get_office_tags(office: Office):
     tags: list[Tag] = []
     if office.inactive_date:
         tags.append(Tag(TagType.INACTIVE))
+    if office.hold_all_payments_flag == "Y":
+        tags.append(Tag(TagType.ON_HOLD))
     return tags
 
 

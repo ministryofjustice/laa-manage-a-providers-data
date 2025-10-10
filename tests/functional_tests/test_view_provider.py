@@ -18,7 +18,9 @@ def test_view_provider_page_ui_loads(page):
 
     # Warning text
     expect(page.get_by_text("Warning Provider marked as inactive on 25 Sep 2025")).to_be_visible()
-    expect(page.get_by_text("Warning Payments for all offices are hold because provider is inactive")).to_be_visible()
+    expect(
+        page.get_by_text("Warning Payments for all offices are on hold because provider is inactive")
+    ).to_be_visible()
 
     # Buttons
     expect(page.get_by_role("button", name="Make provider active")).to_be_visible()
