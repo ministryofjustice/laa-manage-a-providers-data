@@ -33,9 +33,9 @@ class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
             pda.patch_office(form.firm.firm_id, form.office.firm_office_code, data)
         except ProviderDataApiError as e:
             logger.error(f"Error {e.__class__.__name__} whilst updating office VAT registration number {e}")
-            flash("Failed to update VAT registration number", "error")
+            flash("<b>Failed to update VAT registration number</b>", "error")
             return self.form_invalid(form)
-        flash("Updated VAT registration number", "success")
+        flash("<b>Updated VAT registration number</b>", "success")
         return super().form_valid(form)
 
     def get(self, firm, office, *args, **kwargs):
@@ -72,12 +72,12 @@ class PaymentMethodFormView(BaseFormView):
             )
         except (ValueError, ProviderDataApiError) as e:
             logger.error(f"Error {e.__class__.__name__} whilst updating office payment method {e}")
-            flash("Failed to update payment method", "error")
+            flash("<b>Failed to update payment method</b>", "error")
             return self.form_invalid(form)
 
         session["payment_method"] = form.data.get("payment_method")
 
-        flash("Payment method updated successfully", "success")
+        flash("<b>Payment method updated successfully</b>", "success")
         return redirect(self.get_success_url(form, form.firm, updated_office))
 
     def get(self, context, firm: Firm, office: Office = None, **kwargs):
@@ -121,7 +121,7 @@ class OfficeActiveStatusFormView(BaseFormView):
         office = form.office
         current_status = "inactive" if office.inactive_date else "active"
         if office_active_status == current_status:
-            flash("Office active status unchanged", "message")
+            flash("<b>Office active status unchanged</b>", "message")
             return redirect(self.get_success_url(form, form.firm, form.office))
 
         inactive_date = None
@@ -142,10 +142,10 @@ class OfficeActiveStatusFormView(BaseFormView):
             pda.patch_office(firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, fields_to_update=data)
         except ProviderDataApiError as e:
             logger.error(f"Error {e.__class__.__name__} whilst updating office active status {e}")
-            flash("Failed to update office active status", "error")
+            flash("<b>Failed to update office active status</b>", "error")
             return self.form_invalid(form)
 
-        flash("Office active status updated", "success")
+        flash("<b>Office active status updated</b>", "success")
         return redirect(self.get_success_url(form, form.firm, form.office))
 
     def get(self, context, firm: Firm, office: Office, **kwargs):
@@ -197,7 +197,7 @@ class SearchBankAccountFormView(BaseFormView):
         except NoBankAccountsError:
             # This firm does not have any bank accounts, so redirect the user to a form to add new bank account details
             url = url_for("main.view_office", firm=firm, office=office)
-            flash("No bank accounts found", "error")
+            flash("<b>No bank accounts found</b>", "error")
             return redirect(url)
 
         if search_term:
