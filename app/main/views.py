@@ -139,14 +139,6 @@ def get_office_contact_table(firm: Firm, office: Office) -> DataTable | None:
 
     If the office has multiple primary contacts, the
     """
-    sorted_contacts = get_sorted_contacts(firm, office)
-    if not sorted_contacts:
-        return None
-
-    # Take the first contact, which should be either the primary contact or,
-    # if there is no primary contact, the next available contact
-    contact_to_display = sorted_contacts[0]
-
     office_contact_table = SummaryList()
     office_contact_table.add_row(
         label="Address",
@@ -160,7 +152,7 @@ def get_office_contact_table(firm: Firm, office: Office) -> DataTable | None:
     )
     office_contact_table.add_row(
         label="Email address",
-        value=contact_to_display.email_address,
+        value=office.email_address,
         row_action_urls={
             "enter": url_for("main.change_office_contact_details_form", firm=firm, office=office),
             "change": url_for(
@@ -171,7 +163,7 @@ def get_office_contact_table(firm: Firm, office: Office) -> DataTable | None:
 
     office_contact_table.add_row(
         label="Telephone number",
-        value=contact_to_display.telephone_number,
+        value=office.telephone_number,
         row_action_urls={
             "enter": url_for("main.change_office_contact_details_form", firm=firm, office=office),
             "change": url_for(
