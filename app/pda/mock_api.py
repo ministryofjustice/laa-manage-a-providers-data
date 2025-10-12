@@ -220,7 +220,7 @@ class MockProviderDataApi:
         for office in offices:
             # When need to update the office data in memory and not the office object
             item = self._find_office_data(firm_id, office.firm_office_code)
-            item.update({"inactive_date": date.today()})
+            item.update({"inactiveDate": date.today()})
 
     def get_head_office(self, firm_id: int) -> Office | None:
         """

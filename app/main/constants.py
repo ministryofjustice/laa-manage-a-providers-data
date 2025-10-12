@@ -1,33 +1,10 @@
-from typing import TYPE_CHECKING
-
+from app.main.utils import get_entity_active_text, provider_name_html
 from app.utils.formatting import (
     format_advocate_level,
     format_constitutional_status,
     format_date,
     format_yes_no,
 )
-
-if TYPE_CHECKING:
-    from app.main.utils import provider_name_html
-else:
-    # Lazy import to avoid circular dependency
-    provider_name_html = None
-
-
-def get_active_status(data: dict) -> str:
-    """Returns 'Yes' if entity is active (inactive_date is None), otherwise 'No'"""
-    return "No" if data.get("inactive_date") else "Yes"
-
-
-def _get_provider_name_html_lazy():
-    """Lazy import of provider_name_html to avoid circular dependency."""
-    global provider_name_html
-    if provider_name_html is None:
-        from app.main.utils import provider_name_html as _provider_name_html
-
-        provider_name_html = _provider_name_html
-    return provider_name_html
-
 
 # Valid data sources to use in the view provider main table configuration, default is firm
 MAIN_TABLE_VALID_DATA_SOURCES = ["firm", "parent_firm", "head_office"]
@@ -37,7 +14,7 @@ STATUS_TABLE_FIELD_CONFIG = {
     "Legal Services Provider": [
         {
             "label": "Active",
-            "text_renderer": get_active_status,
+            "text_renderer": get_entity_active_text,
             "change_link": "main.change_provider_active_status",
         },
         {
@@ -47,18 +24,19 @@ STATUS_TABLE_FIELD_CONFIG = {
             "default": "No",
         },
         {"label": "Intervened", "default": "No"},
+        {"label": "Referred to debt recovery", "default": "No"},
     ],
     "Chambers": [
         {
             "label": "Active",
-            "text_renderer": get_active_status,
+            "text_renderer": get_entity_active_text,
             "change_link": "main.change_provider_active_status",
         },
     ],
     "Barrister": [
         {
             "label": "Active",
-            "text_renderer": get_active_status,
+            "text_renderer": get_entity_active_text,
             "change_link": "main.change_provider_active_status",
         },
         {
@@ -68,11 +46,12 @@ STATUS_TABLE_FIELD_CONFIG = {
             "default": "No",
         },
         {"label": "Intervened", "default": "No"},
+        {"label": "Referred to debt recovery", "default": "No"},
     ],
     "Advocate": [
         {
             "label": "Active",
-            "text_renderer": get_active_status,
+            "text_renderer": get_entity_active_text,
             "change_link": "main.change_provider_active_status",
         },
         {
@@ -82,11 +61,12 @@ STATUS_TABLE_FIELD_CONFIG = {
             "default": "No",
         },
         {"label": "Intervened", "default": "No"},
+        {"label": "Referred to debt recovery", "default": "No"},
     ],
     "Office": [
         {
             "label": "Active",
-            "text_renderer": get_active_status,
+            "text_renderer": get_entity_active_text,
             "change_link": "main.office_active_status_form",
         },
         {
@@ -96,6 +76,7 @@ STATUS_TABLE_FIELD_CONFIG = {
             "default": "No",
         },
         {"label": "Intervened", "default": "No"},
+        {"label": "Referred to debt recovery", "default": "No"},
     ],
 }
 
