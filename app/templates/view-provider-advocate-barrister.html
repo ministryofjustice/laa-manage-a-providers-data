@@ -22,21 +22,6 @@
   {% endif %}
 {% endblock %}
 
-{% block actionButtons %}
-  {{ govukButton({
-    "text": "Make inactive",
-    "classes": "govuk-button--secondary",
-  }) }}
-  {{ govukButton({
-    "text": "Hold payments",
-    "classes": "govuk-button--secondary govuk-!-margin-left-3",
-  }) }}
-  {{ govukButton({
-    "text": "Record intervention",
-    "classes": "govuk-button--secondary govuk-!-margin-left-3",
-  }) }}
-{% endblock %}
-
 {% block firmTypeSubNavigation %}
 	{{ mojSubNavigation({
     "label": "Sub navigation",

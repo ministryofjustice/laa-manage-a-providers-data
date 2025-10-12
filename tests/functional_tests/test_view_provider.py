@@ -16,14 +16,23 @@ def test_view_provider_page_ui_loads(page):
     # Tags
     expect(page.locator("strong.govuk-tag", has_text="Inactive")).to_be_visible()
 
-    # Warning text
-    expect(page.get_by_text("Warning Provider marked as inactive on 25 Sep 2025")).to_be_visible()
-    expect(
-        page.get_by_text("Warning Payments for all offices are on hold because provider is inactive")
-    ).to_be_visible()
+    # Status table - Check for status rows
+    expect(page.get_by_text("Active", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Payments on hold", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Intervened", exact=True).first).to_be_visible()
 
-    # Buttons
-    expect(page.get_by_role("button", name="Make provider active")).to_be_visible()
+    # Status table should show "No" for Active (since inactive)
+    status_table = page.locator(".govuk-summary-list").first
+    expect(status_table.get_by_text("No", exact=True).first).to_be_visible()
+
+    # Check for change link on Active row - should have actual URL, not '#'
+    expect(status_table.get_by_role("link", name="Change").first).to_have_attribute(
+        "href", "/provider/1/confirm-provider-status"
+    )
+
+    # Overview heading
+    expect(page.get_by_role("heading", name="Overview")).to_be_visible()
+
     # Main table
     expect(page.get_by_text("Provider name", exact=True).first).to_be_visible()
     expect(page.get_by_text("SMITH & PARTNERS SOLICITORS", exact=True).first).to_be_visible()
