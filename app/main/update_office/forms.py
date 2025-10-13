@@ -6,8 +6,8 @@ from wtforms.fields.simple import StringField
 from wtforms.validators import DataRequired, InputRequired, Length, Optional
 
 from app.components.tables import RadioDataTable, TableStructureItem
-from app.constants import PAYMENT_METHOD_CHOICES
-from app.main.forms import BaseBankAccountForm, BaseForm
+from app.constants import OFFICE_ACTIVE_STATUS_CHOICES, PAYMENT_METHOD_CHOICES
+from app.forms import BaseBankAccountForm, BaseForm
 from app.models import BankAccount, Firm, Office
 from app.validators import (
     ValidateVATRegistrationNumber,
@@ -15,12 +15,8 @@ from app.validators import (
 from app.widgets import GovRadioInput, GovTextInput
 
 
-class UpdateVATRegistrationNumberForm(BaseForm):
-    title = "VAT registration number (optional)"
+class UpdateOfficeBaseForm(BaseForm):
     template = "update_office/form.html"
-    url = "/provider/<firm:firm>/office/<office:office>/add-vat-number"
-    firm: Firm
-    office: Office
 
     def __init__(self, firm: Firm, office: Office, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -29,7 +25,14 @@ class UpdateVATRegistrationNumberForm(BaseForm):
 
     @property
     def caption(self):
+        if not self.firm:
+            return "Unknown office"
         return self.firm.firm_name
+
+
+class UpdateVATRegistrationNumberForm(UpdateOfficeBaseForm):
+    title = "VAT registration number (optional)"
+    url = "/provider/<firm:firm>/office/<office:office>/add-vat-number"
 
     vat_registration_number = StringField(
         "",
@@ -45,22 +48,11 @@ class UpdateVATRegistrationNumberForm(BaseForm):
     )
 
 
-class PaymentMethodForm(BaseForm):
+class PaymentMethodForm(UpdateOfficeBaseForm):
     title = "Payment method"
     url = "provider/<firm:firm>/office/<office:office>/payment-method"
     template = "update_office/payment-method.html"
     submit_button_text = "Save"
-
-    def __init__(self, firm=None, office=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.firm = firm
-        self.office = office
-
-    @property
-    def caption(self):
-        if not self.firm:
-            return "Unknown office"
-        return self.firm.firm_name
 
     payment_method = RadioField(
         "Payment method",
@@ -71,11 +63,25 @@ class PaymentMethodForm(BaseForm):
     )
 
 
+class ChangeOfficeActiveStatusForm(UpdateOfficeBaseForm):
+    title = "Change active status"
+    url = "provider/<firm:firm>/office/<office:office>/confirm-office-status"
+    submit_button_text = "Submit"
+
+    active_status = RadioField(
+        "",
+        widget=GovRadioInput(
+            heading_class="govuk-fieldset__legend--m",
+        ),
+        choices=OFFICE_ACTIVE_STATUS_CHOICES,
+    )
+
+
 class NoBankAccountsError(Exception):
     pass
 
 
-class BankAccountSearchForm(BaseForm):
+class BankAccountSearchForm(UpdateOfficeBaseForm):
     title = "Search for bank account"
     url = "/provider/<firm:firm>/office/<office:office>/search-bank-account"
     template = "update_office/search-bank-account.html"
@@ -95,15 +101,9 @@ class BankAccountSearchForm(BaseForm):
         validators=[DataRequired(message="Select a bank account or search again")],
     )
 
-    @property
-    def caption(self):
-        return self.firm.firm_name
-
     def __init__(self, firm: Firm, office: Office, search_term=None, page=1, selected_value=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(firm, office, *args, **kwargs)
         self.page = page
-        self.firm = firm
-        self.office = office
 
         # Set search field data
         self.search_term = search_term

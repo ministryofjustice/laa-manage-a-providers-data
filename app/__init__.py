@@ -70,14 +70,20 @@ def create_app(config_class=Config, pda_class=ProviderDataApi):
         "default-src": "'self'",
         "script-src": [
             "'self'",
+            "https://*.googletagmanager.com",
         ],
         "style-src": ["'self'"],
         "connect-src": [
             "'self'",
+            "https://*.google-analytics.com",
+            "https://*.analytics.google.com",
+            "https://*.googletagmanager.com",
         ],
         "img-src": [
             "'self'",
             "www.gov.uk",
+            "https://*.google-analytics.com",
+            "https://*.googletagmanager.com",
         ],
     }
 

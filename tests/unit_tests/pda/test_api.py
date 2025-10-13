@@ -4,7 +4,7 @@ import pytest
 import requests
 
 from app.models import Firm, Office
-from app.pda.api import ProviderDataApi, ProviderDataApiConnectionError, ProviderDataApiError
+from app.pda.api import PDAConnectionError, PDAError, ProviderDataApi
 
 
 class TestProviderDataApi:
@@ -51,11 +51,11 @@ class TestProviderDataApi:
     def test_test_connection_failure(self, initialized_client):
         initialized_client.session.request = Mock(side_effect=requests.RequestException("Connection failed"))
 
-        with pytest.raises(ProviderDataApiConnectionError):
+        with pytest.raises(PDAConnectionError):
             initialized_client.test_connection()
 
     def test_test_connection_not_initialized(self, api_client):
-        with pytest.raises(ProviderDataApiError, match="API client not initialized"):
+        with pytest.raises(PDAError, match="API client not initialized"):
             api_client.test_connection()
 
     def test_make_request_success(self, initialized_client):
@@ -69,7 +69,7 @@ class TestProviderDataApi:
     def test_make_request_failure(self, initialized_client):
         initialized_client.session.request = Mock(side_effect=requests.RequestException("Request failed"))
 
-        with pytest.raises(ProviderDataApiError):
+        with pytest.raises(PDAError):
             initialized_client._make_request("GET", "/test")
 
     def test_handle_response_200(self, initialized_client):
@@ -102,7 +102,7 @@ class TestProviderDataApi:
         mock_response.status_code = 500
         mock_response.raise_for_status.side_effect = requests.HTTPError("Server Error")
 
-        with pytest.raises(ProviderDataApiError):
+        with pytest.raises(PDAError):
             initialized_client._handle_response(mock_response, {})
 
     def test_get_provider_firm_success(self, initialized_client):

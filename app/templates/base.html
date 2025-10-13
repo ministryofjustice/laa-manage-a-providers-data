@@ -13,6 +13,13 @@
 {% block head %}
   <meta name="description" content="{{config['SERVICE_NAME']}}">
   <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" nonce="{{ csp_nonce() }}" />
+  <!-- Google Tag Manager - to be moved after cookie banner implementation -->
+  <script nonce="{{ csp_nonce() }}">(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-WF3Z86T4');</script>
+  <!-- End Google Tag Manager -->
 {% endblock %}
 
 {% block header %}

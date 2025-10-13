@@ -2,7 +2,7 @@ import pytest
 from playwright.sync_api import expect
 
 
-def navigate_to_office_page(page):
+def navigate_to_inactive_office_page(page):
     """Helper function to navigate to an office page via UI flow."""
     page.get_by_role("button", name="Sign in").click()
 
@@ -14,17 +14,25 @@ def navigate_to_office_page(page):
     page.get_by_role("link", name="1A001L").click()
 
 
+def navigate_to_active_office_page(page):
+    page.get_by_role("button", name="Sign in").click()
+    page.get_by_role("button", name="Search").click()
+    page.get_by_role("link", name="BIRMINGHAM LEGAL AID CENTRE").click()
+    page.get_by_role("link", name="Offices").click()
+    page.get_by_role("link", name="6A002L").click()
+
+
 @pytest.mark.usefixtures("live_server")
 def test_view_office_page_loads(page):
     """Test that the office page loads with correct information."""
-    navigate_to_office_page(page)
+    navigate_to_inactive_office_page(page)
 
     # Check page title and office code
     expect(page.get_by_role("heading", name="Office: 1A001L")).to_be_visible()
     expect(page.locator("span.govuk-caption-xl")).to_contain_text("SMITH & PARTNERS SOLICITORS")
 
     # Check office buttons are present
-    expect(page.get_by_role("button", name="Make inactive")).to_be_visible()
+    expect(page.get_by_role("button", name="Make active")).to_be_visible()
     expect(page.get_by_role("button", name="Hold payments")).to_be_visible()
     expect(page.get_by_role("button", name="Record office intervention")).to_be_visible()
 
@@ -32,7 +40,7 @@ def test_view_office_page_loads(page):
 @pytest.mark.usefixtures("live_server")
 def test_view_office_navigation_tabs(page):
     """Test that office navigation tabs are displayed."""
-    navigate_to_office_page(page)
+    navigate_to_active_office_page(page)
 
     # Check sub-navigation tabs
     expect(page.get_by_role("link", name="Overview")).to_be_visible()
@@ -43,7 +51,7 @@ def test_view_office_navigation_tabs(page):
 @pytest.mark.usefixtures("live_server")
 def test_view_office_overview_section(page):
     """Test that office overview section displays correctly."""
-    navigate_to_office_page(page)
+    navigate_to_inactive_office_page(page)
 
     # Check overview section
     expect(page.get_by_role("heading", name="Overview")).to_be_visible()
@@ -62,7 +70,7 @@ def test_view_office_overview_section(page):
 @pytest.mark.usefixtures("live_server")
 def test_view_office_parent_provider_link(page):
     """Test that parent provider link navigates correctly."""
-    navigate_to_office_page(page)
+    navigate_to_inactive_office_page(page)
 
     # Click on parent provider link in overview section
     page.get_by_role("row", name="Parent provider SMITH & PARTNERS SOLICITORS").get_by_role(
@@ -93,7 +101,7 @@ def test_office_page_navigation_from_offices_list(page):
 @pytest.mark.usefixtures("live_server")
 def test_office_breadcrumbs(page):
     """Test that office page has correct breadcrumbs and link destinations."""
-    navigate_to_office_page(page)
+    navigate_to_inactive_office_page(page)
 
     # Check breadcrumb links are visible
     expect(page.get_by_label("Breadcrumb").get_by_role("link", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
@@ -109,7 +117,7 @@ def test_office_breadcrumbs(page):
 
 @pytest.mark.usefixtures("live_server")
 def test_office_bank_payment_details(page):
-    navigate_to_office_page(page)
+    navigate_to_inactive_office_page(page)
     page.get_by_role("link", name="Bank accounts and payment").click()
 
     expect(page.get_by_role("definition").filter(has_text="Payment method")).to_be_visible()
@@ -130,7 +138,7 @@ def test_office_bank_payment_details(page):
 
 @pytest.mark.usefixtures("live_server")
 def test_office_contact(page):
-    navigate_to_office_page(page)
+    navigate_to_inactive_office_page(page)
     page.get_by_role("link", name="Contact").click()
 
     expect(page.get_by_role("heading", name="Office contact details")).to_be_visible()
@@ -183,18 +191,16 @@ def test_office_no_vat_registration_number(page):
 
 @pytest.mark.usefixtures("live_server")
 def test_office_inactive(page):
-    page.get_by_role("button", name="Sign in").click()
-    page.get_by_role("button", name="Search").click()
-    page.get_by_role("link", name="METROPOLITAN LAW CENTRE").click()
-    page.get_by_role("link", name="Offices").click()
-    page.get_by_role("link", name="3A001L").click()
+    navigate_to_inactive_office_page(page)
 
     # Tag
     expect(page.get_by_text("Inactive", exact=True)).to_be_visible()
 
     # Warning text
-    expect(page.get_by_text("Warning Provider marked as inactive on 25 Sep 2025")).to_be_visible()
-    expect(page.get_by_text("Warning Payments for all offices are hold because provider is inactive")).to_be_visible()
+    expect(page.get_by_text("Warning Office marked as inactive on 25 Sep 2025")).to_be_visible()
+    expect(
+        page.get_by_text("Warning Payments for all offices are on hold because provider is inactive")
+    ).to_be_visible()
 
     # Button
     expect(page.get_by_role("button", name="Make active")).to_be_visible()
@@ -202,7 +208,7 @@ def test_office_inactive(page):
 
 @pytest.mark.usefixtures("live_server")
 def test_office_active(page):
-    navigate_to_office_page(page)
+    navigate_to_active_office_page(page)
 
     # Tag
     expect(page.get_by_text("Inactive", exact=True)).not_to_be_visible()
@@ -210,7 +216,7 @@ def test_office_active(page):
     # Warning text
     expect(page.get_by_text("Warning Provider marked as inactive on 25 Sep 2025")).not_to_be_visible()
     expect(
-        page.get_by_text("Warning Payments for all offices are hold because provider is inactive")
+        page.get_by_text("Warning Payments for all offices are on hold because provider is inactive")
     ).not_to_be_visible()
 
     # Button

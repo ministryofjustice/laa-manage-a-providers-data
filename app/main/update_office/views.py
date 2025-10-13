@@ -1,4 +1,5 @@
 import datetime
+import logging
 from typing import Any
 
 from flask import Response, abort, current_app, flash, redirect, render_template, request, session, url_for
@@ -6,8 +7,11 @@ from flask import Response, abort, current_app, flash, redirect, render_template
 from app.forms import BaseForm
 from app.main.update_office.forms import NoBankAccountsError
 from app.models import BankAccount, Firm, Office
+from app.pda.errors import ProviderDataApiError
 from app.utils.formatting import format_office_address_one_line
 from app.views import BaseFormView, FullWidthBaseFormView
+
+logger = logging.getLogger(__name__)
 
 
 class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
@@ -25,7 +29,13 @@ class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
     def form_valid(self, form):
         pda = current_app.extensions["pda"]
         data = {"vatRegistrationNumber": form.data.get("vat_registration_number")}
-        pda.patch_office(form.firm.firm_id, form.office.firm_office_code, data)
+        try:
+            pda.patch_office(form.firm.firm_id, form.office.firm_office_code, data)
+        except ProviderDataApiError as e:
+            logger.error(f"Error {e.__class__.__name__} whilst updating office VAT registration number {e}")
+            flash("<b>Failed to update VAT registration number</b>", "error")
+            return self.form_invalid(form)
+        flash("<b>Updated VAT registration number</b>", "success")
         return super().form_valid(form)
 
     def get(self, firm, office, *args, **kwargs):
@@ -54,18 +64,20 @@ class PaymentMethodFormView(BaseFormView):
 
         # Update the office with payment method
         pda = current_app.extensions["pda"]
-        updated_office = pda.update_office_payment_method(
-            firm_id=form.firm.firm_id,
-            office_code=form.office.firm_office_code,
-            payment_method=form.data.get("payment_method"),
-        )
-        if not updated_office:
-            flash("Failed to update payment method", "error")
+        try:
+            updated_office = pda.update_office_payment_method(
+                firm_id=form.firm.firm_id,
+                office_code=form.office.firm_office_code,
+                payment_method=form.data.get("payment_method"),
+            )
+        except (ValueError, ProviderDataApiError) as e:
+            logger.error(f"Error {e.__class__.__name__} whilst updating office payment method {e}")
+            flash("<b>Failed to update payment method</b>", "error")
             return self.form_invalid(form)
 
         session["payment_method"] = form.data.get("payment_method")
 
-        flash("Payment method updated successfully", "success")
+        flash("<b>Payment method updated successfully</b>", "success")
         return redirect(self.get_success_url(form, form.firm, updated_office))
 
     def get(self, context, firm: Firm, office: Office = None, **kwargs):
@@ -77,19 +89,9 @@ class PaymentMethodFormView(BaseFormView):
         # Pre-populate radio with currently saved value when landing on the change page
         if getattr(office, "payment_method", None):
             form.payment_method.data = office.payment_method
-        context = self.get_context_data(form, **kwargs)
 
-        address_parts = [
-            office.address_line_1,
-            office.address_line_2,
-            office.address_line_3,
-            office.address_line_4,
-            office.city,
-            office.county,
-            office.postcode,
-        ]
-        office_address = ", ".join(part for part in address_parts if part)
-        context.update({"office_address": office_address})
+        context = self.get_context_data(form, **kwargs)
+        context.update({"office_address": format_office_address_one_line(office)})
 
         return render_template(self.template, **context)
 
@@ -99,6 +101,68 @@ class PaymentMethodFormView(BaseFormView):
 
         form = self.get_form_class()(firm=firm, office=office)
 
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form, **kwargs)
+
+
+class OfficeActiveStatusFormView(BaseFormView):
+    """Form view for the office active status form"""
+
+    def get_success_url(self, form, firm, office):
+        return url_for("main.view_office", firm=firm, office=office)
+
+    def form_valid(self, form):
+        if not hasattr(form, "firm") or not hasattr(form, "office"):
+            abort(400)
+
+        office_active_status = form.data.get("active_status")
+        office = form.office
+        current_status = "inactive" if office.inactive_date else "active"
+        if office_active_status == current_status:
+            flash("<b>Office active status unchanged</b>", "message")
+            return redirect(self.get_success_url(form, form.firm, form.office))
+
+        inactive_date = None
+        hold_payments = None
+        hold_reason = None
+        if office_active_status == "inactive":
+            inactive_date = datetime.date.today().strftime("%Y-%m-%d")
+            hold_payments = "Y"
+            hold_reason = "Office made inactive"
+        data = {
+            Office.model_fields["inactive_date"].alias: inactive_date,
+            Office.model_fields["hold_all_payments_flag"].alias: hold_payments,
+            Office.model_fields["hold_reason"].alias: hold_reason,
+        }
+
+        pda = current_app.extensions["pda"]
+        try:
+            pda.patch_office(firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, fields_to_update=data)
+        except ProviderDataApiError as e:
+            logger.error(f"Error {e.__class__.__name__} whilst updating office active status {e}")
+            flash("<b>Failed to update office active status</b>", "error")
+            return self.form_invalid(form)
+
+        flash(f"<b>Office marked as {office_active_status}</b>", "success")
+        return redirect(self.get_success_url(form, form.firm, form.office))
+
+    def get(self, context, firm: Firm, office: Office, **kwargs):
+        active_status = "active"
+        if getattr(office, "inactive_date", None):
+            active_status = "inactive"
+
+        form = self.get_form_class()(firm=firm, office=office, active_status=active_status)
+
+        context = self.get_context_data(form, **kwargs)
+        context.update({"office_address": format_office_address_one_line(office)})
+        context.update({"cancel_url": url_for("main.view_office", firm=firm, office=office)})
+
+        return render_template(self.template, **context)
+
+    def post(self, firm: Firm, office: Office, *args, **kwargs) -> Response | str:
+        form = self.get_form_class()(firm=firm, office=office)
         if form.validate_on_submit():
             return self.form_valid(form)
         else:

@@ -8,7 +8,7 @@ from wtforms import StringField
 
 from app.main.utils import change_liaison_manager
 from app.models import Contact
-from app.pda.mock_api import MockProviderDataApi, ProviderDataApiError
+from app.pda.mock_api import MockPDAError, MockProviderDataApi
 from app.utils import register_form_view
 from app.views import BaseFormView
 
@@ -355,7 +355,7 @@ class TestChangeLiaisonManager:
             }
 
             # Mock the update_contact method to raise an error
-            mock_api.update_contact = MagicMock(side_effect=ProviderDataApiError("Update failed"))
+            mock_api.update_contact = MagicMock(side_effect=MockPDAError("Update failed"))
 
             new_contact = Contact(
                 first_name="Jane",
@@ -393,7 +393,7 @@ class TestChangeLiaisonManager:
 
             def side_effect(firm_id, office_code, contact):
                 if office_code == "1A002L":
-                    raise ProviderDataApiError("Create failed")
+                    raise MockPDAError("Create failed")
                 return original_create(firm_id, office_code, contact)
 
             mock_api.create_office_contact = MagicMock(side_effect=side_effect)
@@ -440,13 +440,13 @@ class TestChangeLiaisonManager:
             }
 
             # Mock both operations to fail
-            mock_api.update_contact = MagicMock(side_effect=ProviderDataApiError("Update failed"))
+            mock_api.update_contact = MagicMock(side_effect=MockPDAError("Update failed"))
 
             original_create = mock_api.create_office_contact
 
             def create_side_effect(firm_id, office_code, contact):
                 if office_code == "1A002L":
-                    raise ProviderDataApiError("Create failed")
+                    raise MockPDAError("Create failed")
                 return original_create(firm_id, office_code, contact)
 
             mock_api.create_office_contact = MagicMock(side_effect=create_side_effect)
