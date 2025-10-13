@@ -38,7 +38,7 @@ def complete_add_bank_account_form(page: Page):
     expect(bank_account_table.locator("dd:text('123456')")).to_be_visible()
     expect(bank_account_table.locator("dd:text('08102025')")).to_be_visible()
     expect(bank_account_table.locator("dd:text('Functional Test Account')")).to_be_visible()
-    expect(bank_account_table.locator(f"dd:text('{datetime.date.today().isoformat()}')")).to_be_visible()
+    expect(bank_account_table.locator(f"dd:text('{datetime.date.today().strftime('%d %b %Y')}')")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
