@@ -19,7 +19,7 @@ def navigate_to_office_contact_details(page: Page):
     page.get_by_role("link", name="Offices").click()
 
     # Click "Add an office" button
-    page.get_by_role("button", name="Add an office").click()
+    page.get_by_role("button", name="Add another office").click()
 
     # Fill the add office form
     page.get_by_role("textbox", name="Office name").fill("Test Office")
