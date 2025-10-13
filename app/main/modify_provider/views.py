@@ -1,14 +1,17 @@
 import datetime
+import logging
 from typing import Any
 
 from flask import Response, abort, current_app, flash, redirect, render_template, request, url_for
 
 from app.forms import BaseForm
-from app.main.modify_provider import AssignChambersForm
-from app.main.utils import assign_firm_to_a_new_chambers, change_liaison_manager
+from app.main.modify_provider import AssignChambersForm, ReassignHeadOfficeForm
+from app.main.utils import assign_firm_to_a_new_chambers, change_liaison_manager, reassign_head_office
 from app.main.views import get_main_table
 from app.models import Contact, Firm
 from app.views import BaseFormView, FullWidthBaseFormView
+
+logger = logging.getLogger(__name__)
 
 
 class ChangeLiaisonManagerFormView(FullWidthBaseFormView):
@@ -128,3 +131,48 @@ class AssignChambersFormView(BaseFormView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
+
+
+class ReassignHeadOfficeFormView(BaseFormView):
+    form_class = ReassignHeadOfficeForm
+
+    def get_success_url(self, form: BaseForm | None = None) -> str:
+        return url_for("main.view_provider_offices", firm=form.firm)
+
+    def get(self, firm, context=None, **kwargs):
+        if not firm:
+            abort(400)
+        form = self.get_form_class()(firm=firm)
+        # Pre-select the current head office
+        if hasattr(form, "current_head_office"):
+            form.office.data = form.current_head_office.firm_office_code
+        context = self.get_context_data(form, context=context)
+        context.update({"cancel_url": self.get_success_url(form)})
+        return render_template(self.get_template(), **context)
+
+    def form_valid(self, form):
+        new_head_office_code = form.data.get("office")
+        current_head_office = form.current_head_office
+
+        if new_head_office_code == current_head_office.firm_office_code:
+            flash(f"No change made because {new_head_office_code} is already the head office")
+            return redirect(self.get_success_url(form))
+
+        try:
+            reassign_head_office(form.firm, new_head_office_code)
+            flash(f"<b>{form.firm.firm_name} head office reassigned to {new_head_office_code}</b>", category="success")
+        except (ValueError, RuntimeError) as e:
+            logger.error(f"{e.__class__.__name__} whilst reassigning head office: {e}")
+            flash(
+                f"Unable to reassign head office for {form.firm.firm_name} to {new_head_office_code}", category="error"
+            )
+
+        return redirect(self.get_success_url(form))
+
+    def post(self, firm, context) -> Response | str:
+        if not firm:
+            abort(400)
+        form = self.get_form_class()(firm=firm)
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        return self.form_invalid(form)

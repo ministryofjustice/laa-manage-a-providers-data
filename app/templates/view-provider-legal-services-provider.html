@@ -35,6 +35,14 @@
         {% if "head" in office_tables %}
           <h3 class="govuk-heading-m">Head office</h3>
           {{ govukTable(office_tables.head.to_govuk_params()) }}
+
+          {% if "other" in office_tables %}
+            {{ govukButton({
+              "text": "Reassign head office",
+               "href": url_for("main.reassign_head_office", firm=firm),
+               "classes": "govuk-button--secondary"
+            }) }}
+          {% endif %}
         {% endif %}
 
         {% if "other" in office_tables %}
