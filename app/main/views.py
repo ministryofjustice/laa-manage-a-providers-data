@@ -184,7 +184,7 @@ def get_office_contact_table(firm: Firm, office: Office) -> DataTable | None:
         label="DX centre",
         value=office.dx_centre,
         row_action_urls={
-            "enter": url_for("main.change_office_contact_details_form", firm=firm, office=office, _anchor="dx_number"),
+            "enter": url_for("main.change_office_contact_details_form", firm=firm, office=office, _anchor="dx_centre"),
             "change": url_for("main.change_office_contact_details_form", firm=firm, office=office, _anchor="dx_centre"),
         },
     )
