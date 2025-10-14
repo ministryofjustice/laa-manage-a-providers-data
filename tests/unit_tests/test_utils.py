@@ -483,7 +483,9 @@ class TestReassignHeadOffice:
             mock_pda.init_app(app)
             app.extensions["pda"] = mock_pda
             mock_pda._mock_data = {
-                "firms": [{"firmId": 1, "firmName": "Test Firm"}],
+                "firms": [
+                    {"firmId": 1, "firmName": "Test Firm"},
+                ],
                 "offices": [
                     {"_firmId": 1, "firmOfficeCode": "HEAD01", "firmOfficeId": 101, "headOffice": "N/A"},
                     {"_firmId": 1, "firmOfficeCode": "BRANCH01", "firmOfficeId": 102, "headOffice": "HEAD01"},
@@ -502,3 +504,8 @@ class TestReassignHeadOffice:
             mock_api = app.extensions["pda"]
             old_head_office = mock_api.get_provider_office("HEAD01")
             assert old_head_office.head_office == "BRANCH01"
+
+    def test_existing_head_office(self, app):
+        with app.test_request_context():
+            with pytest.raises(ValueError, match="HEAD01 is already the head office"):
+                reassign_head_office(firm=1, new_head_office="HEAD01")
