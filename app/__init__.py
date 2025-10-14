@@ -8,6 +8,7 @@ from flask_wtf.csrf import CSRFProtect
 from govuk_frontend_wtf.main import WTFormsHelpers
 from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
 from sentry_sdk.integrations.flask import FlaskIntegration
+import os
 
 from app.auth import authentication as auth
 from app.config import Config
@@ -33,6 +34,9 @@ if Config.SENTRY_DSN:
         # This can either be dev, uat, staging, or production.
         # It is set by MAPD_ENVIRONMENT in the helm charts.
         environment=Config.ENVIRONMENT,
+        # This is set by the host name in the helm charts.
+        # Added to make it easier to identify which deployment in UAT is triggering alerts.
+        server_name=os.environ.get("HOSTNAME"),
     )
 
 
