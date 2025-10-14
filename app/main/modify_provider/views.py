@@ -9,6 +9,7 @@ from app.main.modify_provider import AssignChambersForm, ReassignHeadOfficeForm
 from app.main.utils import assign_firm_to_a_new_chambers, change_liaison_manager, reassign_head_office
 from app.main.views import get_main_table
 from app.models import Contact, Firm
+from app.pda.errors import ProviderDataApiError
 from app.views import BaseFormView, FullWidthBaseFormView
 
 logger = logging.getLogger(__name__)
@@ -161,7 +162,7 @@ class ReassignHeadOfficeFormView(BaseFormView):
         try:
             reassign_head_office(form.firm, new_head_office_code)
             flash(f"<b>{form.firm.firm_name} head office reassigned to {new_head_office_code}</b>", category="success")
-        except (ValueError, RuntimeError) as e:
+        except (ValueError, RuntimeError, ProviderDataApiError) as e:
             logger.error(f"{e.__class__.__name__} whilst reassigning head office: {e}")
             flash(
                 f"Unable to reassign head office for {form.firm.firm_name} to {new_head_office_code}", category="error"
