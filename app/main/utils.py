@@ -477,7 +477,7 @@ def assign_firm_to_a_new_chambers(firm: Firm | int, chambers: Firm | int) -> Fir
     return new_provider
 
 
-def reassign_head_office(firm: Firm, new_head_office: Office | str) -> Firm:
+def reassign_head_office(firm: Firm | int, new_head_office: Office | str) -> Office:
     """
     Updates the specified office to be the new head office, and updates all other provider offices
     to reference the new head office.
@@ -530,4 +530,4 @@ def reassign_head_office(firm: Firm, new_head_office: Office | str) -> Firm:
             logger.error(f"{e.__class__.__name__} whilst updating office {office.firm_office_code}: {e}")
             flash(f"Failed to update office {office.firm_office_code}", category="error")
 
-    return firm
+    return pda.get_head_office(firm.firm_id)

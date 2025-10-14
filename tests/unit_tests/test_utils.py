@@ -6,7 +6,7 @@ from flask import Blueprint
 from flask_wtf import FlaskForm
 from wtforms import StringField
 
-from app.main.utils import change_liaison_manager
+from app.main.utils import change_liaison_manager, reassign_head_office
 from app.models import Contact
 from app.pda.mock_api import MockPDAError, MockProviderDataApi
 from app.utils import register_form_view
@@ -472,3 +472,33 @@ class TestChangeLiaisonManager:
                 # Should flash both error messages
                 mock_flash.assert_any_call("Failed to update Liaison manager for office 1A001L", "error")
                 mock_flash.assert_any_call("Failed to create Liaison manager for office 1A002L", "error")
+
+
+class TestReassignHeadOffice:
+    @pytest.fixture(autouse=True)
+    def setup_mock_api(self, app):
+        """Ensure each test starts with a clean MockProviderDataApi."""
+        with app.app_context():
+            mock_pda = MockProviderDataApi()
+            mock_pda.init_app(app)
+            app.extensions["pda"] = mock_pda
+            mock_pda._mock_data = {
+                "firms": [{"firmId": 1, "firmName": "Test Firm"}],
+                "offices": [
+                    {"_firmId": 1, "firmOfficeCode": "HEAD01", "firmOfficeId": 101, "headOffice": "N/A"},
+                    {"_firmId": 1, "firmOfficeCode": "BRANCH01", "firmOfficeId": 102, "headOffice": "HEAD01"},
+                    {"_firmId": 1, "firmOfficeCode": "BRANCH02", "firmOfficeId": 103, "headOffice": "HEAD01"},
+                ],
+                "contacts": [],
+            }
+
+    def test_successful_change_with_mock_api(self, app):
+        with app.test_request_context():
+            new_head = reassign_head_office(firm=1, new_head_office="BRANCH01")
+
+            assert new_head.head_office == "N/A"
+            assert new_head.firm_office_code == "BRANCH01"
+
+            mock_api = app.extensions["pda"]
+            old_head_office = mock_api.get_provider_office("HEAD01")
+            assert old_head_office.head_office == "BRANCH01"
