@@ -239,7 +239,15 @@ class ChangeOfficeContactDetailsFormView(BaseFormView):
                 alias = model_field.alias if model_field.alias else field_name
                 data[alias] = field_value
 
-        pda.update_office_contact_details(form.firm.firm_id, form.office.firm_office_code, data)
+        try:
+            pda.update_office_contact_details(form.firm.firm_id, form.office.firm_office_code, data)
+        except ProviderDataApiError as e:
+            logger.error(f"Error {e.__class__.__name__} whilst updating office contact details {e}")
+            form.form_errors = getattr(form, "form_errors", [])
+            form.form_errors.append("We couldn’t update the office contact details. Try again later.")
+            return self.form_invalid(form)
+
+        flash("Office contact details successfully updated", category="success")
         return super().form_valid(form, **kwargs)
 
     def post(self, firm: Firm, office: Office, *args, **kwargs) -> Response | str:
