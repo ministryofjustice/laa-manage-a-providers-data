@@ -26,19 +26,11 @@
     <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ firm.firm_name }}</h1>
     {{ renderTags(firm_tags) }}
 
-    {% if firm.inactive_date %}
-        {{ govukWarningText({
-            "text": "Provider marked as inactive on " ~ firm.inactive_date | format_date,
-            "classes": "govuk-!-margin-top-2 govuk-!-margin-bottom-3"
-        }) }}
-        {{ govukWarningText({
-            "text": "Payments for all offices are on hold because provider is inactive",
-            "classes": "govuk-!-margin-bottom-5"
-        }) }}
+    {% if status_table %}
+      {{ govukSummaryList(status_table.to_summary_govuk_params()) }}
     {% endif %}
-    {% block actionButtons %}
-      {# Place firm-type specific action buttons  #}
-    {% endblock %}
+
+    <h2 class="govuk-heading-m">Overview</h2>
 
     {% if main_table %}
       {{ govukSummaryList(main_table.to_summary_govuk_params()) }}

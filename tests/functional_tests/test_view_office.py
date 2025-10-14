@@ -31,10 +31,10 @@ def test_view_office_page_loads(page):
     expect(page.get_by_role("heading", name="Office: 1A001L")).to_be_visible()
     expect(page.locator("span.govuk-caption-xl")).to_contain_text("SMITH & PARTNERS SOLICITORS")
 
-    # Check office buttons are present
-    expect(page.get_by_role("button", name="Make active")).to_be_visible()
-    expect(page.get_by_role("button", name="Hold payments")).to_be_visible()
-    expect(page.get_by_role("button", name="Record office intervention")).to_be_visible()
+    # Check status table is present
+    expect(page.get_by_text("Active", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Payments on hold", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Intervened", exact=True).first).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -196,28 +196,25 @@ def test_office_inactive(page):
     # Tag
     expect(page.get_by_text("Inactive", exact=True)).to_be_visible()
 
-    # Warning text
-    expect(page.get_by_text("Warning Office marked as inactive on 25 Sep 2025")).to_be_visible()
-    expect(
-        page.get_by_text("Warning Payments for all offices are on hold because provider is inactive")
-    ).to_be_visible()
+    # Status table should show "No" for Active (since inactive)
+    status_table = page.locator(".govuk-summary-list").first
+    expect(status_table.get_by_text("Active", exact=True)).to_be_visible()
+    expect(status_table.get_by_text("No", exact=True).first).to_be_visible()
 
-    # Button
-    expect(page.get_by_role("button", name="Make active")).to_be_visible()
+    # Check for change link on Active row
+    expect(status_table.get_by_role("link", name="Change").first).to_have_attribute(
+        "href", "/provider/1/office/1A001L/confirm-office-status"
+    )
 
 
 @pytest.mark.usefixtures("live_server")
 def test_office_active(page):
     navigate_to_active_office_page(page)
 
-    # Tag
+    # Tag - should not show inactive tag
     expect(page.get_by_text("Inactive", exact=True)).not_to_be_visible()
 
-    # Warning text
-    expect(page.get_by_text("Warning Provider marked as inactive on 25 Sep 2025")).not_to_be_visible()
-    expect(
-        page.get_by_text("Warning Payments for all offices are on hold because provider is inactive")
-    ).not_to_be_visible()
-
-    # Button
-    expect(page.get_by_role("button", name="Make inactive")).to_be_visible()
+    # Status table should be visible with Active row
+    expect(page.get_by_text("Active", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Payments on hold", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Intervened", exact=True).first).to_be_visible()

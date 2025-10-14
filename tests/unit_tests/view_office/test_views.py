@@ -1,6 +1,6 @@
 from flask import url_for
 
-from app.main.views import get_vat_registration_table
+from app.main.table_builders import get_vat_registration_table
 from app.models import Firm, Office
 
 

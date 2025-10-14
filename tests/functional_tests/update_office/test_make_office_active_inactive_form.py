@@ -28,8 +28,7 @@ def navigate_to_office_active_status_form(page: Page):
 def test_change_office_from_active_to_inactive_to_active(page: Page):
     navigate_to_office_active_status_form(page)
     # Active -> Inactive
-    expect(page.get_by_role("button", name="Make inactive")).to_be_visible()
-    page.get_by_role("button", name="Make inactive").click()
+    page.get_by_role("link", name="Change active").click()
 
     # After clicking the 'make inactive' button, check we have the correct screen
     expect(page.get_by_text("BIRMINGHAM LEGAL AID CENTRE")).to_be_visible()
@@ -47,21 +46,16 @@ def test_change_office_from_active_to_inactive_to_active(page: Page):
 
     # ...see the success message on the office page...
     expect(page.get_by_text("Office marked as inactive", exact=True)).to_be_visible()
-    # ...with the status updated
-    expect(page.get_by_text("Inactive", exact=True)).to_be_visible()
-    expect(page.get_by_role("button", name="Make active")).to_be_visible()
 
     # Inactive -> Active
     # Make the office active...
-    page.get_by_role("button", name="Make active").click()
+    page.get_by_role("link", name="Change active").click()
     expect(page.get_by_role("radio", name="Active", exact=True)).not_to_be_checked()
     page.get_by_role("radio", name="Active", exact=True).check()
     page.get_by_role("button", name="Submit").click()
 
     # ...see the success message on the office page...
     expect(page.get_by_text("Office marked as active", exact=True)).to_be_visible()
-    # ...with the status updated
-    expect(page.get_by_role("button", name="Make inactive")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -70,9 +64,9 @@ def test_change_office_active_status_cancel(page: Page):
     expect(page.get_by_role("heading", name="Office: 6A002L")).to_be_visible()
 
     # Start with an active office
-    expect(page.get_by_role("button", name="Make inactive")).to_be_visible()
+    expect(page.get_by_text("Inactive")).not_to_be_visible()
     # Start the process to change the status...
-    page.get_by_role("button", name="Make inactive").click()
+    page.get_by_role("link", name="Change active").click()
     expect(page.get_by_role("heading", name="Change active status")).to_be_visible()
     expect(page.get_by_role("link", name="Cancel")).to_be_visible()
     expect(page.get_by_role("button", name="Submit")).to_be_visible()
@@ -82,7 +76,7 @@ def test_change_office_active_status_cancel(page: Page):
     # ...but cancel the action...
     page.get_by_role("link", name="Cancel").click()
     # ...and see the status has not changed
-    expect(page.get_by_role("button", name="Make inactive")).to_be_visible()
+    expect(page.get_by_text("Inactive")).not_to_be_visible()
     # ...on the same office...
     expect(page.get_by_role("heading", name="Office: 6A002L")).to_be_visible()
     # ...and without a success message
@@ -95,16 +89,16 @@ def test_change_office_active_status_nochange(page: Page):
 
     # Start with an active office
     expect(page.get_by_role("heading", name="Office: 6A002L")).to_be_visible()
-    expect(page.get_by_role("button", name="Make inactive")).to_be_visible()
+    expect(page.get_by_text("Inactive")).not_to_be_visible()
 
     # Start the process to change the status...
-    page.get_by_role("button", name="Make inactive").click()
+    page.get_by_role("link", name="Change active").click()
     # ...check we have the expected status...
     expect(page.get_by_role("radio", name="Active", exact=True)).to_be_checked()
     # ...and submit with unchanged value...
     page.get_by_role("button", name="Submit").click()
     # ...and see the status has not changed
-    expect(page.get_by_role("button", name="Make inactive")).to_be_visible()
+    expect(page.get_by_text("Inactive")).not_to_be_visible()
     # ...on the same office...
     expect(page.get_by_role("heading", name="Office: 6A002L")).to_be_visible()
     # ...and with a message letting us know there have been no changes
