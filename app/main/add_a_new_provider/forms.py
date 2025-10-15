@@ -10,18 +10,16 @@ from app.constants import (
     PARENT_FIRM_TYPE_CHOICES,
     YES_NO_CHOICES,
 )
+from app.main.forms import BaseBankAccountForm, BaseForm
 from app.validators import (
-    ValidateAccountNumber,
     ValidateCompaniesHouseNumber,
     ValidateGovDateField,
     ValidatePastDate,
-    ValidateSortCode,
     ValidateVATRegistrationNumber,
 )
 from app.widgets import GovDateInput, GovRadioInput, GovSubmitInput, GovTextInput
 
 from ...fields import GovDateField
-from ...forms import BaseForm
 from ..add_a_new_office import OfficeContactDetailsForm
 
 
@@ -191,7 +189,7 @@ class VATRegistrationForm(BaseForm):
     )
 
 
-class BankAccountForm(BaseForm):
+class BankAccountForm(BaseBankAccountForm):
     title = "Head office: \nBank account details"
     url = "add-bank-account"
 
@@ -200,44 +198,6 @@ class BankAccountForm(BaseForm):
         # Get provider name from session if available
         new_provider_name = session.get("new_provider", {}).get("firm_name", "Unknown")
         return new_provider_name
-
-    bank_account_name = StringField(
-        "Account name",
-        widget=GovTextInput(
-            heading_class="govuk-fieldset__legend--m",
-            classes="govuk-!-width-one-quarter",
-        ),
-        validators=[
-            InputRequired(message="Enter the account name"),
-            Length(max=100, message="Account name must be 100 characters or less"),
-        ],
-    )
-
-    sort_code = StringField(
-        "Sort code",
-        widget=GovTextInput(
-            heading_class="govuk-fieldset__legend--m",
-            classes="govuk-input--width-10",
-            hint="Must be 6 digits long",
-        ),
-        validators=[
-            InputRequired(message="Enter a sort code"),
-            ValidateSortCode(),
-        ],
-    )
-
-    account_number = StringField(
-        "Account number",
-        widget=GovTextInput(
-            heading_class="govuk-fieldset__legend--m",
-            classes="govuk-!-width-one-quarter",
-            hint="Must be between 6 and 8 digits long",
-        ),
-        validators=[
-            InputRequired(message="Enter an account number"),
-            ValidateAccountNumber(),
-        ],
-    )
 
     skip_button = SubmitField(
         "Cheque payment: Skip this step", widget=GovSubmitInput(classes="govuk-button--secondary govuk-!-margin-left-2")

@@ -1,3 +1,4 @@
+import datetime
 import logging
 from typing import Callable, Dict, List, Literal, NoReturn
 
@@ -124,6 +125,10 @@ def get_bank_account_table(bank_account: BankAccount, action_url="#") -> DataTab
     table.add_row("Account name", bank_account.bank_account_name)
     table.add_row("Account number", bank_account.account_number)
     table.add_row("Sort code", bank_account.sort_code)
+    dt = bank_account.start_date
+    if isinstance(bank_account.start_date, datetime.date):
+        dt = bank_account.start_date.strftime("%d %b %Y")
+    table.add_row("Effective date from", dt)
     # Effective date from still to be implemented
     return table
 

@@ -58,7 +58,7 @@ def test_view_parent_provider(page):
     expect(page.get_by_text("JOHNSON LEGAL SERVICES", exact=True).first).to_be_visible()
     expect(page.get_by_text("Provider number", exact=True).first).to_be_visible()
     expect(page.get_by_text("2", exact=True).first).to_be_visible()
-    expect(page.get_by_text("Account number", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Chambers number", exact=True).first).to_be_visible()
     expect(page.get_by_text("2R006L", exact=True).first).to_be_visible()
 
 
@@ -236,7 +236,7 @@ def test_view_chambers_provider_main_table(page):
     expect(page.get_by_text("Provider number", exact=True).first).to_be_visible()
     expect(page.get_by_text("2", exact=True).first).to_be_visible()
 
-    expect(page.get_by_text("Account number", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Chambers number", exact=True).first).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
