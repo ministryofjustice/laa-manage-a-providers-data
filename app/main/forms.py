@@ -1,12 +1,12 @@
 from flask import current_app, url_for
 from wtforms.fields.simple import StringField
-from wtforms.validators import Length
+from wtforms.validators import InputRequired, Length
 
 from app.components.tables import DataTable, TableStructureItem
 from app.forms import BaseForm
 from app.models import Firm
 from app.utils.formatting import format_sentence_case
-from app.validators import ValidateSearchResults
+from app.validators import ValidateAccountNumber, ValidateSearchResults, ValidateSortCode
 from app.widgets import GovTextInput
 
 
@@ -74,3 +74,43 @@ class ProviderListForm(BaseForm):
 
         if len(firms) > 0:
             self.table = DataTable(structure=columns, data=[firm.to_internal_dict() for firm in firms[start_id:end_id]])
+
+
+class BaseBankAccountForm(BaseForm):
+    bank_account_name = StringField(
+        "Account name",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-!-width-one-quarter",
+        ),
+        validators=[
+            InputRequired(message="Enter the account name"),
+            Length(max=100, message="Account name must be 100 characters or less"),
+        ],
+    )
+
+    sort_code = StringField(
+        "Sort code",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-input--width-10",
+            hint="Must be 6 digits long",
+        ),
+        validators=[
+            InputRequired(message="Enter a sort code"),
+            ValidateSortCode(),
+        ],
+    )
+
+    account_number = StringField(
+        "Account number",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m",
+            classes="govuk-!-width-one-quarter",
+            hint="Must be between 6 and 8 digits long",
+        ),
+        validators=[
+            InputRequired(message="Enter an account number"),
+            ValidateAccountNumber(),
+        ],
+    )

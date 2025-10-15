@@ -498,3 +498,17 @@ class ProviderDataApi:
         for item in items:
             accounts.append(BankAccount(**item))
         return accounts
+
+    def add_bank_account_to_office(self, firm_id: int, office_code: str, bank_account: BankAccount) -> BankAccount:
+        """
+        Add a bank account to a specific office.
+
+        Args:
+            firm_id: Firm Id of the firm that the office belongs to
+            office_code: The office code to add the bank account to
+            bank_account: The bank account to add
+
+        Returns:
+            BankAccount: The bank account added to the given office
+        """
+        raise NotImplementedError("Adding bank account to an office is not yet supported by the real Provider Data API")
