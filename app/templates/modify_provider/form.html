@@ -2,6 +2,11 @@
 {%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
 
 {% block pageHeading %}
-  {{ super() }}
-  {{ govukTable(main_table.to_govuk_params()) }}
+    {% if caption %}
+        <span class="govuk-caption-xl govuk-!-margin-bottom-7">{{ caption }}</span>
+    {% endif %}
+    {{ super() }}
+    {%  if main_table %}
+        {{ govukTable(main_table.to_govuk_params()) }}
+    {% endif %}
 {% endblock %}

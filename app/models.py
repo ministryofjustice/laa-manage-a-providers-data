@@ -52,6 +52,22 @@ class Firm(BaseModel):
         """Export as snake_case dictionary for internal use."""
         return self.model_dump(by_alias=False, exclude_none=True)
 
+    @property
+    def is_advocate(self) -> bool:
+        return self.firm_type.lower() == "advocate"
+
+    @property
+    def is_barrister(self) -> bool:
+        return self.firm_type.lower() == "barrister"
+
+    @property
+    def is_chambers(self) -> bool:
+        return self.firm_type.lower() == "chambers"
+
+    @property
+    def is_legal_service_provider(self):
+        return self.firm_type.lower() == "legal services provider"
+
 
 class Office(BaseModel):
     """Office model
