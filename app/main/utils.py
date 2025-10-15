@@ -475,3 +475,59 @@ def assign_firm_to_a_new_chambers(firm: Firm | int, chambers: Firm | int) -> Fir
     flash(f"<b>{new_provider.firm_name} assigned to {chambers.firm_name}</b>", category="success")
 
     return new_provider
+
+
+def reassign_head_office(firm: Firm | int, new_head_office: Office | str) -> Office:
+    """
+    Updates the specified office to be the new head office, and updates all other provider offices
+    to reference the new head office.
+
+    Raises:
+        ProviderDataApiError: If there is an issue within the PDA
+        RuntimeError: If the PDA is not available
+        ValueError: If the provider is a Chambers, or the new head office is already the head office
+    """
+    pda = current_app.extensions.get("pda")
+    if not pda:
+        raise RuntimeError("Provider Data API not initialized")
+
+    # Prepare firm and office
+    if isinstance(firm, int):
+        firm = pda.get_provider_firm(firm)
+
+    if isinstance(new_head_office, str):
+        new_head_office = pda.get_provider_office(new_head_office)
+
+    # Validation
+    if firm.firm_type == "Chambers":
+        raise ValueError("Cannot assign a head office to a Chambers")
+
+    if new_head_office.head_office == "N/A":
+        raise ValueError(f"{new_head_office.firm_office_code} is already the head office")
+
+    # Prepare the fields to be changed...
+    # ...the head office does not point to any other office...
+    make_head_office_data = {
+        Office.model_fields["head_office"].alias: "N/A",
+    }
+    # ...and other offices point to the head office.
+    reassign_head_office_data = {
+        Office.model_fields["head_office"].alias: new_head_office.firm_office_code,
+    }
+
+    # Iterate through all of the provider's offices, updating them as head or sub offices
+    offices = pda.get_provider_offices(firm.firm_id)
+    for office in offices:
+        if office.firm_office_code == new_head_office.firm_office_code:
+            fields_to_update = make_head_office_data
+        else:
+            fields_to_update = reassign_head_office_data
+        try:
+            pda.patch_office(
+                firm_id=firm.firm_id, office_code=office.firm_office_code, fields_to_update=fields_to_update
+            )
+        except ProviderDataApiError as e:
+            logger.error(f"{e.__class__.__name__} whilst updating office {office.firm_office_code}: {e}")
+            flash(f"Failed to update office {office.firm_office_code}", category="error")
+
+    return pda.get_head_office(firm.firm_id)
