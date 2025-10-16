@@ -8,7 +8,7 @@ from app.forms import BaseForm
 from app.main.modify_provider import AssignChambersForm, ReassignHeadOfficeForm
 from app.main.utils import assign_firm_to_a_new_chambers, change_liaison_manager, reassign_head_office
 from app.main.views import get_main_table
-from app.models import Contact, Firm
+from app.models import Contact, Firm, Office
 from app.pda.errors import ProviderDataApiError
 from app.views import BaseFormView, FullWidthBaseFormView
 
@@ -53,12 +53,29 @@ class ChangeProviderActiveStatusFormView(FullWidthBaseFormView):
 
     def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(form=form, context=context, **kwargs)
-        context.update(
-            {
-                "main_table": get_main_table(form.firm, head_office=None, parent_firm=None),
-                "cancel_url": self.get_success_url(form),
-            }
-        )
+        context.update({"cancel_url": self.get_success_url(form)})
+
+        pda = current_app.extensions["pda"]
+        if form.firm.firm_id:
+            # Get head office for account number
+            head_office: Office = pda.get_head_office(form.firm.firm_id)
+            context.update({"head_office": head_office})
+
+        if form.firm.parent_firm_id:
+            # Get parent provider
+            parent_provider: Firm = pda.get_provider_firm(form.firm.parent_firm_id)
+            context.update({"parent_provider": parent_provider})
+
+        if form.firm.is_legal_services_provider or form.firm.is_chambers:
+            context.update(
+                {
+                    "main_table": get_main_table(
+                        form.firm, head_office=context.get("head_office"), parent_firm=context.get("parent_provider")
+                    ),
+                }
+            )
+        else:
+            context.update({"caption": form.firm.firm_name})
 
         return context
 

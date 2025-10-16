@@ -39,11 +39,14 @@ class ChangeProviderActiveStatusForm(ChangeForm, BaseForm):
         super().__init__(*args, **kwargs)
         self.firm = firm
 
-        choice_hints = {
-            "active": "This will not make all the offices of this provider active. Any office can be made active after you make the provider active."
-        }
-        if self.status.data == "active":
-            choice_hints = {"inactive": "This will also make all offices of this provider inactive."}
+        choice_hints = {}
+        if firm.is_legal_services_provider:
+            choice_hints = {
+                "active": "This will not make all the offices of this provider active. Any office can be made active after you make the provider active."
+            }
+            if self.status.data == "active":
+                choice_hints = {"inactive": "This will also make all offices of this provider inactive."}
+
         self.status.widget.choice_hints = choice_hints
 
     title = "Change active status"
