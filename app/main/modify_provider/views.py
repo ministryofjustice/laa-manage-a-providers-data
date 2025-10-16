@@ -66,7 +66,7 @@ class ChangeProviderActiveStatusFormView(FullWidthBaseFormView):
             parent_provider: Firm = pda.get_provider_firm(form.firm.parent_firm_id)
             context.update({"parent_provider": parent_provider})
 
-        if form.firm.is_legal_service_provider or form.firm.is_chambers:
+        if form.firm.is_legal_services_provider or form.firm.is_chambers:
             context.update(
                 {
                     "main_table": get_main_table(

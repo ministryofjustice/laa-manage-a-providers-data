@@ -65,7 +65,7 @@ class Firm(BaseModel):
         return self.firm_type.lower() == "chambers"
 
     @property
-    def is_legal_service_provider(self):
+    def is_legal_services_provider(self) -> bool:
         return self.firm_type.lower() == "legal services provider"
 
 
