@@ -371,7 +371,7 @@ class ViewProvider(MethodView):
             parent_provider: Firm = pda.get_provider_firm(firm.parent_firm_id)
             context.update({"parent_provider": parent_provider})
 
-        if firm.firm_type.lower() == "advocate" and parent_provider:
+        if firm.is_advocate and parent_provider:
             chambers_head_office = pda.get_head_office(parent_provider.firm_id)
             context.update(
                 {
