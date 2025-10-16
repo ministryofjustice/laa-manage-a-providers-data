@@ -40,7 +40,7 @@ class ChangeProviderActiveStatusForm(ChangeForm, BaseForm):
         self.firm = firm
 
         choice_hints = {}
-        if firm.is_legal_service_provider or firm.is_chambers:
+        if firm.is_legal_service_provider:
             choice_hints = {
                 "active": "This will not make all the offices of this provider active. Any office can be made active after you make the provider active."
             }
