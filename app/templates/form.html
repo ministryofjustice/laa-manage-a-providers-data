@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block pageContent %}
-  <form method="post" novalidate>
+  <form method="post" class="{{'govuk-form-group--error' if form.form_errors else ''}}" novalidate>
     {% block form %}
       {{ form.hidden_tag() }}
       {% if not form | has_page_heading %}

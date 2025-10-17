@@ -499,6 +499,9 @@ class ProviderDataApi:
             accounts.append(BankAccount(**item))
         return accounts
 
+    def update_office_contact_details(self, firm_id, firm_office_code, payload):
+        raise NotImplementedError("Update contact details has not been implemented yet")
+
     def add_bank_account_to_office(self, firm_id: int, office_code: str, bank_account: BankAccount) -> BankAccount:
         """
         Add a bank account to a specific office.
