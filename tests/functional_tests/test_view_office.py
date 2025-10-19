@@ -206,6 +206,12 @@ def test_office_inactive(page):
         "href", "/provider/1/office/1A001L/confirm-office-status"
     )
 
+    # For inactive offices, "False balance" should be visible
+    expect(page.get_by_text("False balance", exact=True).first).to_be_visible()
+
+    # For inactive offices, "Referred to debt recovery" should not be visible
+    expect(page.get_by_text("Referred to debt recovery", exact=True)).not_to_be_visible()
+
 
 @pytest.mark.usefixtures("live_server")
 def test_office_active(page):
@@ -218,3 +224,9 @@ def test_office_active(page):
     expect(page.get_by_text("Active", exact=True).first).to_be_visible()
     expect(page.get_by_text("Payments on hold", exact=True).first).to_be_visible()
     expect(page.get_by_text("Intervened", exact=True).first).to_be_visible()
+
+    # For active offices, "Referred to debt recovery" should be visible
+    expect(page.get_by_text("Referred to debt recovery", exact=True).first).to_be_visible()
+
+    # For active offices, "False balance" should not be visible
+    expect(page.get_by_text("False balance", exact=True)).not_to_be_visible()

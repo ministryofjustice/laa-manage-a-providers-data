@@ -25,6 +25,12 @@ def _add_table_row_from_config(table: SummaryList, field: dict, data_source: dic
         data_source: Data dict to extract values from
         row_action_urls: Optional row action URLs dict
     """
+    # Skip row if show_if callable returns False
+    if field.get("show_if", None):
+        show_if_callable: Callable = field.get("show_if")
+        if not show_if_callable(data_source):
+            return
+
     # Get value using text_renderer if provided, otherwise extract by id
     value = None
     if text_renderer := field.get("text_renderer"):
@@ -33,6 +39,10 @@ def _add_table_row_from_config(table: SummaryList, field: dict, data_source: dic
         value = text_renderer(data_source)
     elif field_id := field.get("id"):
         value = data_source.get(field_id)
+
+    # Skip row if hide_if_null is set and value is empty
+    if not value and field.get("hide_if_null", False):
+        return
 
     # Get HTML if html_renderer is provided
     html_content = None
@@ -117,8 +127,10 @@ def get_status_table(entity: Firm | Office, firm: Firm | None = None, office: Of
 
     status_table = SummaryList()
 
+    _all_fields = STATUS_TABLE_FIELD_CONFIG.get(entity_type, [])
+
     # Add entity type specific status fields
-    for field in STATUS_TABLE_FIELD_CONFIG.get(entity_type, []):
+    for field in _all_fields:
         change_url = _get_change_url(field, entity)
 
         row_action_urls = {"change": change_url}

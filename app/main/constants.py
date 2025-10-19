@@ -76,7 +76,16 @@ STATUS_TABLE_FIELD_CONFIG = {
             "default": "No",
         },
         {"label": "Intervened", "default": "No"},
-        {"label": "Referred to debt recovery", "default": "No"},
+        {
+            "label": "Referred to debt recovery",
+            "default": "No",
+            "show_if": lambda office: office.get("inactive_date") is None,
+        },  # Show if inactive
+        {
+            "label": "False balance",
+            "default": "No",
+            "show_if": lambda office: office.get("inactive_date"),
+        },  # Show if active
     ],
 }
 
