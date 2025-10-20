@@ -392,6 +392,16 @@ class ViewProvider(MethodView):
             parent_provider: Firm = pda.get_provider_firm(firm.parent_firm_id)
             context.update({"parent_provider": parent_provider})
 
+        if firm.is_advocate and parent_provider:
+            chambers_head_office = pda.get_head_office(parent_provider.firm_id)
+            context.update(
+                {
+                    "chambers_contact_details_table": self.get_chambers_contact_details_table(
+                        parent_provider, chambers_head_office
+                    )
+                }
+            )
+
         main_table = get_main_table(firm, head_office, parent_provider)
         context.update({"main_table": main_table})
 
@@ -477,13 +487,14 @@ class ViewOffice(MethodView):
             contact_table = get_office_contact_table(firm, office)
             context.update(
                 {
-                    "contact_tables": [
+                    "office_contact_details": [
                         contact_table,
                     ]
                     if contact_table
                     else None
                 }
             )
+            context.update({"contact_tables": get_contact_tables(firm, office)})
 
         if self.subpage == "overview":
             context.update({"overview_table": get_office_overview_table(firm, office)})
