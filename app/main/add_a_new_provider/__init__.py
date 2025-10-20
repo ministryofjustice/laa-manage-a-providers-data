@@ -2,7 +2,9 @@ from app.utils import register_form_view
 
 from .forms import (
     AddAdvocateForm,
-    AddBarristerForm,
+    AddBarristerCheckForm,
+    AddBarristerDetailsForm,
+    AddBarristerLiaisonManagerForm,
     AddProviderForm,
     AdvocateDetailsForm,
     AssignContractManagerForm,
@@ -14,7 +16,9 @@ from .forms import (
 )
 from .views import (
     AddAdvocateFormView,
-    AddBarristerFormView,
+    AddBarristerCheckFormView,
+    AddBarristerDetailsFormView,
+    AddBarristerLiaisonManagerFormView,
     AddProviderFormView,
     AdvocateDetailsFormView,
     AssignContractManagerFormView,
@@ -46,9 +50,23 @@ def register_views(bp):
     register_form_view(form_class=AssignContractManagerForm, view_class=AssignContractManagerFormView, blueprint=bp)
 
     register_form_view(
-        form_class=AddBarristerForm, view_class=AddBarristerFormView, blueprint=bp, endpoint="add_barrister_form"
+        form_class=AddBarristerDetailsForm,
+        view_class=AddBarristerDetailsFormView,
+        blueprint=bp,
+        endpoint="add_barrister_details_form",
     )
-
+    register_form_view(
+        form_class=AddBarristerCheckForm,
+        view_class=AddBarristerCheckFormView,
+        blueprint=bp,
+        endpoint="add_barrister_check_form",
+    )
+    register_form_view(
+        form_class=AddBarristerLiaisonManagerForm,
+        view_class=AddBarristerLiaisonManagerFormView,
+        blueprint=bp,
+        endpoint="add_barrister_liaison_manager_form",
+    )
     register_form_view(
         form_class=AddAdvocateForm, view_class=AddAdvocateFormView, blueprint=bp, endpoint="add_advocate_form"
     )

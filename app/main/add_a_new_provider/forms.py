@@ -364,10 +364,10 @@ class AssignContractManagerForm(BaseForm):
         self.selected_value = selected_value
 
 
-class AddBarristerForm(BaseForm):
+class AddBarristerDetailsForm(BaseForm):
     title = "Barrister details"
     url = "provider/<firm:firm>/add-barrister"
-    submit_button_text = "Submit"
+    submit_button_text = "Continue"
 
     def __init__(self, firm=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -403,6 +403,37 @@ class AddBarristerForm(BaseForm):
             Length(max=15, message="Bar Council roll number must be 15 characters or less"),
         ],
     )
+
+
+class AddBarristerCheckForm(BaseForm):
+    title = "Barrister details"
+    url = "provider/<firm:firm>/barrister-liaison-manager-check"
+    template = "add_provider/barrister-check-form.html"
+    same_liaison_manager_as_chambers = RadioField(
+        label="Do you want to use the same liaison manager as the chamber?",
+        choices=YES_NO_CHOICES,
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
+    )
+
+    @property
+    def caption(self):
+        return self.firm.firm_name
+
+    def __init__(self, firm=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.firm = firm
+
+
+class AddBarristerLiaisonManagerForm(LiaisonManagerForm):
+    url = "provider/<firm:firm>/add-barrister-liaison-manager"
+
+    @property
+    def caption(self):
+        return session["new_barrister"]["barrister_name"]
+
+    def __init__(self, firm=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.firm = firm
 
 
 class AddAdvocateForm(BaseForm):

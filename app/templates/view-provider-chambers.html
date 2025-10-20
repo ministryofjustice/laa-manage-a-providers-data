@@ -41,13 +41,13 @@
             {{ govukTable(barristers_table.to_govuk_params()) }}
             {{ govukButton({
                 "text": "Add another barrister",
-                "href": url_for("main.add_barrister_form", firm=firm)
+                "href": url_for("main.add_barrister_details_form", firm=firm)
             }) }}
         {% else %}
             <h3 class="govuk-heading-m">No barristers assigned to this chambers</h3>
             {{ govukButton({
                 "text": "Add a barrister",
-                "href": url_for("main.add_barrister_form", firm=firm)
+                "href": url_for("main.add_barrister_details_form", firm=firm)
             }) }}
         {% endif %}
 
