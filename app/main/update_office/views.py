@@ -243,7 +243,7 @@ class ChangeOfficeContactDetailsFormView(BaseFormView):
             pda.update_office_contact_details(form.firm.firm_id, form.office.firm_office_code, data)
         except ProviderDataApiError as e:
             logger.error(
-                f"Error {e.__class__.__name__} whilst updating office contact details for firm id:{form.firm.firm_id}, office id {form.office.firm_office_code} {e}"
+                f"Error {e.__class__.__name__} whilst updating office contact details for Firm id: {form.firm.firm_id}, Office code: {form.office.firm_office_code} {e}"
             )
             form.form_errors = getattr(form, "form_errors", [])
             form.form_errors.append("We couldn’t update the office contact details. Try again later.")
