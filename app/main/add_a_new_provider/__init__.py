@@ -1,7 +1,9 @@
 from app.utils import register_form_view
 
 from .forms import (
-    AddAdvocateForm,
+    AddAdvocateCheckForm,
+    AddAdvocateDetailsForm,
+    AddAdvocateLiaisonManagerForm,
     AddBarristerCheckForm,
     AddBarristerDetailsForm,
     AddBarristerLiaisonManagerForm,
@@ -15,10 +17,10 @@ from .forms import (
     VATRegistrationForm,
 )
 from .views import (
-    AddAdvocateFormView,
-    AddBarristerCheckFormView,
+    AddAdvocateBarristersCheckFormView,
+    AddAdvocateBarristersLiaisonManagerFormView,
+    AddAdvocateDetailsFormView,
     AddBarristerDetailsFormView,
-    AddBarristerLiaisonManagerFormView,
     AddProviderFormView,
     AdvocateDetailsFormView,
     AssignContractManagerFormView,
@@ -57,16 +59,35 @@ def register_views(bp):
     )
     register_form_view(
         form_class=AddBarristerCheckForm,
-        view_class=AddBarristerCheckFormView,
+        view_class=AddAdvocateBarristersCheckFormView,
         blueprint=bp,
         endpoint="add_barrister_check_form",
+        model_type="barrister",
     )
     register_form_view(
         form_class=AddBarristerLiaisonManagerForm,
-        view_class=AddBarristerLiaisonManagerFormView,
+        view_class=AddAdvocateBarristersLiaisonManagerFormView,
         blueprint=bp,
         endpoint="add_barrister_liaison_manager_form",
+        model_type="barrister",
     )
     register_form_view(
-        form_class=AddAdvocateForm, view_class=AddAdvocateFormView, blueprint=bp, endpoint="add_advocate_form"
+        form_class=AddAdvocateDetailsForm,
+        view_class=AddAdvocateDetailsFormView,
+        blueprint=bp,
+        endpoint="add_advocate_details_form",
+    )
+    register_form_view(
+        form_class=AddAdvocateCheckForm,
+        view_class=AddAdvocateBarristersCheckFormView,
+        blueprint=bp,
+        endpoint="add_advocate_check_form",
+        model_type="advocate",
+    )
+    register_form_view(
+        form_class=AddAdvocateLiaisonManagerForm,
+        view_class=AddAdvocateBarristersLiaisonManagerFormView,
+        blueprint=bp,
+        endpoint="add_advocate_liaison_manager_form",
+        model_type="advocate",
     )

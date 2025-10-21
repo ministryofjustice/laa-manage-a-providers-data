@@ -436,7 +436,7 @@ class AddBarristerLiaisonManagerForm(LiaisonManagerForm):
         self.firm = firm
 
 
-class AddAdvocateForm(BaseForm):
+class AddAdvocateDetailsForm(BaseForm):
     title = "Advocate details"
     url = "provider/<firm:firm>/add-advocate"
     submit_button_text = "Submit"
@@ -475,3 +475,34 @@ class AddAdvocateForm(BaseForm):
             Length(max=15, message="Solicitors Regulation Authority roll number must be 15 characters or less"),
         ],
     )
+
+
+class AddAdvocateCheckForm(BaseForm):
+    title = "Advocate details"
+    url = "provider/<firm:firm>/advocate-liaison-manager-check"
+    template = "add_provider/barrister-check-form.html"
+    same_liaison_manager_as_chambers = RadioField(
+        label="Do you want to use the same liaison manager as the chamber?",
+        choices=YES_NO_CHOICES,
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
+    )
+
+    @property
+    def caption(self):
+        return self.firm.firm_name
+
+    def __init__(self, firm=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.firm = firm
+
+
+class AddAdvocateLiaisonManagerForm(LiaisonManagerForm):
+    url = "provider/<firm:firm>/add-advocate-liaison-manager"
+
+    @property
+    def caption(self):
+        return session["new_advocate"]["advocate_name"]
+
+    def __init__(self, firm=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.firm = firm

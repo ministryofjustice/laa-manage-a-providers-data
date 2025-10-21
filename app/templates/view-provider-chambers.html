@@ -56,13 +56,13 @@
             {{ govukTable(advocates_table.to_govuk_params()) }}
             {{ govukButton({
                 "text": "Add another advocate",
-                "href": url_for("main.add_advocate_form", firm=firm)
+                "href": url_for("main.add_advocate_details_form", firm=firm)
             }) }}
         {% else %}
             <h3 class="govuk-heading-m">No advocates assigned to this chambers</h3>
             {{ govukButton({
                 "text": "Add an advocate",
-                "href": url_for("main.add_advocate_form", firm=firm)
+                "href": url_for("main.add_advocate_details_form", firm=firm)
             }) }}
         {% endif %}
       {% endif %}
