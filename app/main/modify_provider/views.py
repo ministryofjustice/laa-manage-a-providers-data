@@ -49,17 +49,10 @@ class ChangeProviderActiveStatusFormView(FullWidthBaseFormView):
 
     def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(form=form, context=context, **kwargs)
-        # @Ben trying to change an advocate or barrister was failing with TypeError: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
-        # so I am setting parent_firm to None for these entities
-        parent_firm = None
-        if getattr(form.firm, "parent_firm_id", None):
-            pda = current_app.extensions.get("pda")
-            if pda:
-                parent_firm = pda.get_provider_firm(form.firm.parent_firm_id)
 
         context.update(
             {
-                "main_table": get_main_table(form.firm, head_office=None, parent_firm=parent_firm),
+                "main_table": get_main_table(form.firm, head_office=None, parent_firm=None),
                 "cancel_url": self.get_success_url(form),
             }
         )
