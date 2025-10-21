@@ -36,8 +36,10 @@ def test_change_liaison_manager_form_loads_correctly(page: Page):
     # Check that firm name appears in caption
     expect(page.get_by_text("SMITH & PARTNERS SOLICITORS")).to_be_visible()
 
-    # Check description text
-    expect(page.get_by_text("This will make the current liaison manager inactive")).to_be_visible()
+    # Check description text includes the current liaison manager's name
+    expect(page.get_by_text("This change will:")).to_be_visible()
+    expect(page.get_by_text("assign the new liaison manager to all offices")).to_be_visible()
+    expect(page.get_by_text("make Sarah Johnson inactive")).to_be_visible()
 
     # Check form fields are present
     expect(page.get_by_label("First name")).to_be_visible()

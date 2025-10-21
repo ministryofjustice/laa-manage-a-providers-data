@@ -16,6 +16,14 @@ logger = logging.getLogger(__name__)
 
 
 class ChangeLiaisonManagerFormView(FullWidthBaseFormView):
+    templates = {
+        "Legal Services Provider": "modify_provider/change-liaison-manager-legal-services-provider.html",
+        "Chambers": "modify_provider/change-liaison-manager-chambers.html",
+        "Advocate": "modify_provider/change-liaison-manager-advocate.html",
+        "Barrister": "modify_provider/change-liaison-manager-barrister.html",
+        "Office": "modify_provider/change-liaison-manager-office.html",
+    }
+
     def get_success_url(self, firm):
         return url_for("main.view_provider", firm=firm)
 
@@ -36,7 +44,23 @@ class ChangeLiaisonManagerFormView(FullWidthBaseFormView):
 
     def get(self, firm, context, **kwargs):
         form = self.get_form_class()(firm=firm)
-        return render_template(self.template, **self.get_context_data(form, **kwargs))
+        context = self.get_context_data(form, **kwargs)
+
+        # Get the current liaison manager from the head office so we can display a more specific message
+        pda = current_app.extensions["pda"]
+        try:
+            head_office = pda.get_head_office(firm_id=firm.firm_id)
+            for contact in pda.get_office_contacts(firm_id=firm.firm_id, office_code=head_office.firm_office_code):
+                if contact.job_title == "Liaison manager" and contact.primary == "Y":
+                    context.update({"current_liaison_manager_name": f"{contact.first_name} {contact.last_name}"})
+                    break
+        except ProviderDataApiError as e:
+            logger.error(f"Error {e.__class__.__name__} whilst getting liaison manager for {firm.firm_id} {e}")
+            context.update({"current_liaison_manager_name": "the current liaison manager"})
+
+        # Different levels of description for the different firm types
+        template = self.templates.get(firm.firm_type, self.template)
+        return render_template(template, **context)
 
     def post(self, firm, *args, **kwargs) -> Response | str:
         form = self.get_form_class()(firm=firm)
