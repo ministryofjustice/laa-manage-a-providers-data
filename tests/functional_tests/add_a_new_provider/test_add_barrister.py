@@ -58,6 +58,19 @@ def test_add_barrister_validation_errors(page: Page) -> None:
     expect(page.locator("#main-content")).to_contain_text("Enter the Bar Council roll number")
 
 
+@pytest.mark.usefixtures("live_server")
+def test_barrister_form_displays_chambers_name_as_caption(page: Page) -> None:
+    # Navigate to chambers and add barrister form
+    page.get_by_role("button", name="Sign in").click()
+    page.get_by_role("button", name="Search").click()
+    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
+    page.get_by_role("link", name="Barristers and advocates").click()
+    page.get_by_role("button", name="Add another barrister").click()
+
+    # Check that the chambers name appears as a caption in the form
+    expect(page.locator(".govuk-caption-xl")).to_contain_text("JOHNSON LEGAL SERVICES")
+
+
 def _test_add_barrister_steps(page: Page) -> None:
     # Navigate to chambers and add barrister form
     page.get_by_role("button", name="Sign in").click()

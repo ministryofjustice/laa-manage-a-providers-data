@@ -439,7 +439,7 @@ class AddBarristerLiaisonManagerForm(LiaisonManagerForm):
 class AddAdvocateDetailsForm(BaseForm):
     title = "Advocate details"
     url = "provider/<firm:firm>/add-advocate"
-    submit_button_text = "Submit"
+    submit_button_text = "Continue"
 
     def __init__(self, firm=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
