@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 from flask import session, url_for
 
-from app.main.add_a_new_provider.forms import AddBarristerCheckForm, AddBarristerLiaisonManagerForm
+from app.main.add_a_new_provider.forms import AddAdvocateBarristerCheckForm, AddAdvocateBarristerLiaisonManagerForm
 from app.main.add_a_new_provider.views import (
     AddAdvocateBarristersCheckFormView,
     AddAdvocateBarristersLiaisonManagerFormView,
@@ -16,7 +16,7 @@ class TestAddAdvocateBarristerCheckForm:
     def test_dispatch_request_no_barrister_details(self, app):
         """Should redirect to barrister add form if no barrister details are provided."""
         firm = Firm(firmName="Test firm", firmId=1)
-        view = AddAdvocateBarristersCheckFormView(model_type="barrister", form_class=AddBarristerCheckForm(firm))
+        view = AddAdvocateBarristersCheckFormView(model_type="barrister", form_class=AddAdvocateBarristerCheckForm)
         with app.test_request_context("/"):
             response = view.dispatch_request(firm=firm)
             assert response.location == url_for("main.add_barrister_details_form", firm=1)
@@ -24,7 +24,7 @@ class TestAddAdvocateBarristerCheckForm:
     def test_dispatch_request_barrister_details(self, app):
         """Should show the check form when barrister details are provided."""
         firm = Firm(firmName="Test firm", firmId=1)
-        view = AddAdvocateBarristersCheckFormView(model_type="barrister", form_class=AddBarristerCheckForm(firm))
+        view = AddAdvocateBarristersCheckFormView(model_type="barrister", form_class=AddAdvocateBarristerCheckForm)
         session["new_barrister"] = {"barrister_name": "New Barrister"}
         with patch.object(BaseFormView, "dispatch_request") as mock_parent_dispatch_request:
             view.dispatch_request(firm=firm)
@@ -35,7 +35,7 @@ class TestAddAdvocateBarristerCheckForm:
     def test_create_model_barrister(self, mock_create_barrister_from_form_data, app):
         """Test the create_model method can create a barrister from the session"""
         firm = Firm(firmName="Test firm", firmId=1)
-        view = AddAdvocateBarristersCheckFormView(model_type="barrister", form_class=AddBarristerCheckForm(firm))
+        view = AddAdvocateBarristersCheckFormView(model_type="barrister", form_class=AddAdvocateBarristerCheckForm)
         data = dict(
             barrister_name="Test Barrister",
             barrister_level="Junior",
@@ -51,7 +51,7 @@ class TestAddAdvocateBarristerCheckForm:
     def test_create_model_advocate(self, mock_create_advocate_from_form_data, app):
         """Test the create_model method can create a advocate from the session"""
         firm = Firm(firmName="Test firm", firmId=1)
-        view = AddAdvocateBarristersCheckFormView(model_type="advocate", form_class=AddBarristerCheckForm)
+        view = AddAdvocateBarristersCheckFormView(model_type="advocate", form_class=AddAdvocateBarristerCheckForm)
         data = dict(
             advocate_name="Test Advocate",
             advocate_level="Junior",
@@ -69,8 +69,9 @@ class TestAddAdvocateBarristersLiaisonManagerFormView:
     def test_form_valid(self, mock_change_liaison_manager, app):
         """Test creating a new liaison manager for new barrister form."""
         firm = Firm(firmName="Test firm", firmId=1)
-        form = AddBarristerLiaisonManagerForm(
+        form = AddAdvocateBarristerLiaisonManagerForm(
             firm=firm,
+            model_type="barrister",
             first_name="Unit",
             last_name="Tester",
             email_address="unit.tester@justice.gov.uk",
@@ -88,7 +89,7 @@ class TestAddAdvocateBarristersLiaisonManagerFormView:
             primary="Y",
         )
         view = AddAdvocateBarristersLiaisonManagerFormView(
-            model_type="barrister", form_class=AddBarristerLiaisonManagerForm
+            model_type="barrister", form_class=AddAdvocateBarristersLiaisonManagerFormView
         )
         with patch.object(view, "create_model") as mock_create_model:
             mock_create_model.return_value = Firm(firmId=999)
