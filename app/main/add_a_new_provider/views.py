@@ -450,11 +450,11 @@ class AddAdvocateBarristersCheckFormView(BaseFormView):
         return super().dispatch_request(**kwargs)
 
     def get(self, context, firm, **kwargs):
-        form = self.get_form_class()(firm=firm)
+        form = self.get_form_class()(firm=firm, model_type=self.model_type)
         return render_template(self.get_template(), **self.get_context_data(form, **kwargs))
 
     def post(self, context, firm, **kwargs) -> Response | str:
-        form = self.get_form_class()(firm=firm)
+        form = self.get_form_class()(firm=firm, model_type=self.model_type)
 
         if form.validate_on_submit():
             return self.form_valid(form, firm)

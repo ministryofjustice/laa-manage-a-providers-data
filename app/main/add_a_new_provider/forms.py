@@ -405,9 +405,7 @@ class AddBarristerDetailsForm(BaseForm):
     )
 
 
-class AddBarristerCheckForm(BaseForm):
-    title = "Barrister details"
-    url = "provider/<firm:firm>/barrister-liaison-manager-check"
+class AddAdvocateBarristerCheckForm(BaseForm):
     template = "add_provider/barrister-check-form.html"
     same_liaison_manager_as_chambers = RadioField(
         label="Do you want to use the same liaison manager as the chamber?",
@@ -416,24 +414,52 @@ class AddBarristerCheckForm(BaseForm):
     )
 
     @property
-    def caption(self):
-        return self.firm.firm_name
+    def title(self):
+        if self.model_type.lower() == "barrister":
+            return "Barrister details"
+        else:
+            return "Advocate details"
 
-    def __init__(self, firm=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.firm = firm
-
-
-class AddBarristerLiaisonManagerForm(LiaisonManagerForm):
-    url = "provider/<firm:firm>/add-barrister-liaison-manager"
+    @classmethod
+    def url(cls, model_type):
+        if model_type.lower() == "barrister":
+            return "provider/<firm:firm>/barrister-liaison-manager-check"
+        else:
+            return "provider/<firm:firm>/advocate-liaison-manager-check"
 
     @property
     def caption(self):
-        return session["new_barrister"]["barrister_name"]
+        if self.model_type.lower() == "barrister":
+            return session["new_barrister"]["barrister_name"]
+        else:
+            return session["new_advocate"]["advocate_name"]
+        return self.firm.firm_name
 
-    def __init__(self, firm=None, *args, **kwargs):
+    def __init__(self, firm, model_type: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.firm = firm
+        self.model_type = model_type
+
+
+class AddAdvocateBarristerLiaisonManagerForm(LiaisonManagerForm):
+    @classmethod
+    def url(cls, model_type):
+        if model_type.lower() == "barrister":
+            return "provider/<firm:firm>/add-barrister-liaison-manager"
+        else:
+            return "provider/<firm:firm>/add-advocate-liaison-manager"
+
+    @property
+    def caption(self):
+        if self.model_type.lower() == "barrister":
+            return session["new_barrister"]["barrister_name"]
+        else:
+            return session["new_advocate"]["advocate_name"]
+
+    def __init__(self, firm, model_type, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.firm = firm
+        self.model_type = model_type
 
 
 class AddAdvocateDetailsForm(BaseForm):
@@ -475,34 +501,3 @@ class AddAdvocateDetailsForm(BaseForm):
             Length(max=15, message="Solicitors Regulation Authority roll number must be 15 characters or less"),
         ],
     )
-
-
-class AddAdvocateCheckForm(BaseForm):
-    title = "Advocate details"
-    url = "provider/<firm:firm>/advocate-liaison-manager-check"
-    template = "add_provider/barrister-check-form.html"
-    same_liaison_manager_as_chambers = RadioField(
-        label="Do you want to use the same liaison manager as the chamber?",
-        choices=YES_NO_CHOICES,
-        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
-    )
-
-    @property
-    def caption(self):
-        return self.firm.firm_name
-
-    def __init__(self, firm=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.firm = firm
-
-
-class AddAdvocateLiaisonManagerForm(LiaisonManagerForm):
-    url = "provider/<firm:firm>/add-advocate-liaison-manager"
-
-    @property
-    def caption(self):
-        return session["new_advocate"]["advocate_name"]
-
-    def __init__(self, firm=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.firm = firm

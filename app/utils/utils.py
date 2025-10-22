@@ -39,8 +39,11 @@ def register_form_view(
         view_func = auth.login_required(view_func)
 
     # Register the view with the blueprint
+    url = form_class.url
+    if callable(url):
+        url = url(**kwargs)
     blueprint.add_url_rule(
-        f"/{form_class.url}",
+        f"/{url}",
         view_func=view_func,
         methods=["GET", "POST"],
     )
