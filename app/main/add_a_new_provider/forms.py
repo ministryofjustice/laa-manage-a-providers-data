@@ -408,9 +408,10 @@ class AddBarristerDetailsForm(BaseForm):
 class AddAdvocateBarristerCheckForm(BaseForm):
     template = "add_provider/barrister-check-form.html"
     same_liaison_manager_as_chambers = RadioField(
-        label="Do you want to use the same liaison manager as the chamber?",
+        label="Do you want to use the same liaison manager as the chambers",
         choices=YES_NO_CHOICES,
         widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
+        validators=[InputRequired(message="Select yes if you want to use the same liaison manager as the chambers")],
     )
 
     @property
