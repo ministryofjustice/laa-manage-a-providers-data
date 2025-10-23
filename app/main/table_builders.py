@@ -1,3 +1,4 @@
+import datetime
 from collections.abc import Callable
 from typing import List
 
@@ -243,6 +244,10 @@ def get_bank_account_table(bank_account: BankAccount, action_url="#") -> DataTab
     table.add_row("Account name", bank_account.bank_account_name)
     table.add_row("Account number", bank_account.account_number)
     table.add_row("Sort code", bank_account.sort_code)
+    dt = bank_account.start_date
+    if isinstance(bank_account.start_date, datetime.date):
+        dt = bank_account.start_date.strftime("%d %b %Y")
+    table.add_row("Effective date from", dt)
     # Effective date from still to be implemented
     return table
 
@@ -253,32 +258,53 @@ def get_office_contact_table(firm: Firm, office: Office) -> DataTable | None:
 
     If the office has multiple primary contacts, the
     """
-    sorted_contacts = get_sorted_contacts(firm, office)
-    if not sorted_contacts:
-        return None
-
-    # Take the first contact, which should be either the primary contact or,
-    # if there is no primary contact, the next available contact
-    contact_to_display = sorted_contacts[0]
-
     office_contact_table = SummaryList()
     office_contact_table.add_row(
         label="Address",
         html=format_office_address_multi_line_html(office),
-        row_action_urls={"enter": "#", "change": "#"},
+        row_action_urls={
+            "enter": url_for("main.change_office_contact_details_form", firm=firm, office=office),
+            "change": url_for(
+                "main.change_office_contact_details_form", firm=firm, office=office, _anchor="address_line_1"
+            ),
+        },
     )
     office_contact_table.add_row(
-        label="Email address", value=contact_to_display.email_address, row_action_urls={"enter": "#", "change": "#"}
+        label="Email address",
+        value=office.email_address,
+        row_action_urls={
+            "enter": url_for("main.change_office_contact_details_form", firm=firm, office=office),
+            "change": url_for(
+                "main.change_office_contact_details_form", firm=firm, office=office, _anchor="email_address"
+            ),
+        },
     )
+
     office_contact_table.add_row(
         label="Telephone number",
-        value=contact_to_display.telephone_number,
-        row_action_urls={"enter": "#", "change": "#"},
+        value=office.telephone_number,
+        row_action_urls={
+            "enter": url_for("main.change_office_contact_details_form", firm=firm, office=office),
+            "change": url_for(
+                "main.change_office_contact_details_form", firm=firm, office=office, _anchor="telephone_number"
+            ),
+        },
+    )
+
+    office_contact_table.add_row(
+        label="DX number",
+        value=office.dx_number,
+        row_action_urls={
+            "enter": url_for("main.change_office_contact_details_form", firm=firm, office=office, _anchor="dx_number"),
+            "change": url_for("main.change_office_contact_details_form", firm=firm, office=office, _anchor="dx_number"),
+        },
     )
     office_contact_table.add_row(
-        label="DX number", value=office.dx_number, row_action_urls={"enter": "#", "change": "#"}
-    )
-    office_contact_table.add_row(
-        label="DX centre", value=office.dx_centre, row_action_urls={"enter": "#", "change": "#"}
+        label="DX centre",
+        value=office.dx_centre,
+        row_action_urls={
+            "enter": url_for("main.change_office_contact_details_form", firm=firm, office=office, _anchor="dx_centre"),
+            "change": url_for("main.change_office_contact_details_form", firm=firm, office=office, _anchor="dx_centre"),
+        },
     )
     return office_contact_table
