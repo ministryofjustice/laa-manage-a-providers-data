@@ -25,10 +25,10 @@ def _add_table_row_from_config(table: SummaryList, field: dict, data_source: dic
         data_source: Data dict to extract values from
         row_action_urls: Optional row action URLs dict
     """
-    # Skip row if show_if callable returns False
-    if field.get("show_if", None):
-        show_if_callable: Callable = field.get("show_if")
-        if not show_if_callable(data_source):
+    # Skip row if visible callable returns False
+    if field.get("visible", None):
+        visible_callable: Callable = field.get("visible")
+        if not visible_callable(data_source):
             return
 
     # Get value using text_renderer if provided, otherwise extract by id
