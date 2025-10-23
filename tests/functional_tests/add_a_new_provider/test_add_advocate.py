@@ -119,7 +119,7 @@ def _test_add_advocate_steps(page: Page) -> None:
     expect(page.get_by_text("0131 222 3344")).to_be_visible()
     expect(page.get_by_text("robert.macleod@scottishlegal.com")).to_be_visible()
     expect(
-        page.locator("legend", has_text="Do you want to use the same liaison manager as the chamber?")
+        page.locator("legend", has_text="Do you want to use the same liaison manager as the chambers?")
     ).to_be_visible()
 
 
