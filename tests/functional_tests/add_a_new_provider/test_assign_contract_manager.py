@@ -147,7 +147,11 @@ def test_assign_contract_manager_form_validation_no_selection(page: Page):
     page.get_by_role("button", name="Submit").click()
 
     # Should show validation error
-    expect(page.get_by_text("Error: Select a contract manager or search again")).to_be_visible()
+    expect(
+        page.get_by_text(
+            "Error: Select a contract manager, search again or skip this step if you do not know the contract manager"
+        )
+    ).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
