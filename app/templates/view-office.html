@@ -77,8 +77,11 @@
     {% endif %}
     
     {% if subpage == "contact" %}
+        {% if office_contact_details %}
+            {{ contactCards(office_contact_details, title="Office contact details") }}
+        {% endif %}
         {% if contact_tables %}
-            {{ contactCards(contact_tables, title="Office contact details") }}
+            {{ contactCards(contact_tables, title="Contact") }}
         {% endif %}
     {% endif %}
 

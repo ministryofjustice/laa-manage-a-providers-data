@@ -61,13 +61,22 @@ def test_view_parent_provider(page):
     expect(page.get_by_text("Chambers", exact=True)).to_be_visible()
     expect(page.get_by_role("link", name="JOHNSON LEGAL SERVICES").first).to_be_visible()
 
+    # Assert we can see the Provider contact details
+    expect(page.get_by_role("heading", name="Chambers contact details")).to_be_visible()
+    expect(page.locator("td").filter(has_text="1 Skyscraper,")).to_be_visible()
+    expect(page.locator("td").filter(has_text="1 Some Road,")).to_be_visible()
+    expect(page.locator("td").filter(has_text="Leicester,")).to_be_visible()
+    expect(page.locator("td").filter(has_text="LE1 1AA")).to_be_visible()
+    expect(page.get_by_text("office1@provider2.uk")).to_be_visible()
+    expect(page.get_by_text("555201")).to_be_visible()
+
     # Click parent provider
     page.get_by_role("link", name="JOHNSON LEGAL SERVICES").first.click()
     expect(page.get_by_text("Provider name", exact=True).first).to_be_visible()
     expect(page.get_by_text("JOHNSON LEGAL SERVICES", exact=True).first).to_be_visible()
     expect(page.get_by_text("Provider number", exact=True).first).to_be_visible()
     expect(page.get_by_text("2", exact=True).first).to_be_visible()
-    expect(page.get_by_text("Account number", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Chambers number", exact=True).first).to_be_visible()
     expect(page.get_by_text("2R006L", exact=True).first).to_be_visible()
 
 
@@ -245,7 +254,7 @@ def test_view_chambers_provider_main_table(page):
     expect(page.get_by_text("Provider number", exact=True).first).to_be_visible()
     expect(page.get_by_text("2", exact=True).first).to_be_visible()
 
-    expect(page.get_by_text("Account number", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Chambers number", exact=True).first).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")

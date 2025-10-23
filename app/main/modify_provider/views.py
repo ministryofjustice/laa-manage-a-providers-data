@@ -1,14 +1,18 @@
 import datetime
+import logging
 from typing import Any
 
 from flask import Response, abort, current_app, flash, redirect, render_template, request, url_for
 
 from app.forms import BaseForm
-from app.main.modify_provider import AssignChambersForm
-from app.main.utils import assign_firm_to_a_new_chambers, change_liaison_manager
+from app.main.modify_provider import AssignChambersForm, ReassignHeadOfficeForm
+from app.main.utils import assign_firm_to_a_new_chambers, change_liaison_manager, reassign_head_office
 from app.main.views import get_main_table
-from app.models import Contact, Firm
+from app.models import Contact, Firm, Office
+from app.pda.errors import ProviderDataApiError
 from app.views import BaseFormView, FullWidthBaseFormView
+
+logger = logging.getLogger(__name__)
 
 
 class ChangeLiaisonManagerFormView(FullWidthBaseFormView):
@@ -49,19 +53,29 @@ class ChangeProviderActiveStatusFormView(FullWidthBaseFormView):
 
     def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(form=form, context=context, **kwargs)
+        context.update({"cancel_url": self.get_success_url(form)})
 
-        parent_firm = None
-        if getattr(form.firm, "parent_firm_id", None):
-            pda = current_app.extensions.get("pda")
-            if pda:
-                parent_firm = pda.get_provider_firm(form.firm.parent_firm_id)
+        pda = current_app.extensions["pda"]
+        if form.firm.firm_id:
+            # Get head office for account number
+            head_office: Office = pda.get_head_office(form.firm.firm_id)
+            context.update({"head_office": head_office})
 
-        context.update(
-            {
-                "main_table": get_main_table(form.firm, head_office=None, parent_firm=parent_firm),
-                "cancel_url": self.get_success_url(form),
-            }
-        )
+        if form.firm.parent_firm_id:
+            # Get parent provider
+            parent_provider: Firm = pda.get_provider_firm(form.firm.parent_firm_id)
+            context.update({"parent_provider": parent_provider})
+
+        if form.firm.is_legal_services_provider or form.firm.is_chambers:
+            context.update(
+                {
+                    "main_table": get_main_table(
+                        form.firm, head_office=context.get("head_office"), parent_firm=context.get("parent_provider")
+                    ),
+                }
+            )
+        else:
+            context.update({"caption": form.firm.firm_name})
 
         return context
 
@@ -135,3 +149,48 @@ class AssignChambersFormView(BaseFormView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
+
+
+class ReassignHeadOfficeFormView(BaseFormView):
+    form_class = ReassignHeadOfficeForm
+
+    def get_success_url(self, form: BaseForm | None = None) -> str:
+        return url_for("main.view_provider_offices", firm=form.firm)
+
+    def get(self, firm, context=None, **kwargs):
+        if not firm:
+            abort(400)
+        form = self.get_form_class()(firm=firm)
+        # Pre-select the current head office
+        if hasattr(form, "current_head_office"):
+            form.office.data = form.current_head_office.firm_office_code
+        context = self.get_context_data(form, context=context)
+        context.update({"cancel_url": self.get_success_url(form)})
+        return render_template(self.get_template(), **context)
+
+    def form_valid(self, form):
+        new_head_office_code = form.data.get("office")
+        current_head_office = form.current_head_office
+
+        if new_head_office_code == current_head_office.firm_office_code:
+            flash(f"No change made because {new_head_office_code} is already the head office")
+            return redirect(self.get_success_url(form))
+
+        try:
+            reassign_head_office(form.firm, new_head_office_code)
+            flash(f"<b>{form.firm.firm_name} head office reassigned to {new_head_office_code}</b>", category="success")
+        except (ValueError, RuntimeError, ProviderDataApiError) as e:
+            logger.error(f"{e.__class__.__name__} whilst reassigning head office: {e}")
+            flash(
+                f"Unable to reassign head office for {form.firm.firm_name} to {new_head_office_code}", category="error"
+            )
+
+        return redirect(self.get_success_url(form))
+
+    def post(self, firm, context) -> Response | str:
+        if not firm:
+            abort(400)
+        form = self.get_form_class()(firm=firm)
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        return self.form_invalid(form)

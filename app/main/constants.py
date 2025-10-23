@@ -119,7 +119,7 @@ MAIN_TABLE_FIELD_CONFIG = {
     "Chambers": [
         {"label": "Provider name", "id": "firm_name"},
         {"label": "Provider number", "id": "firm_number"},
-        {"label": "Account number", "id": "firm_office_code", "data_source": "head_office"},
+        {"label": "Chambers number", "id": "firm_office_code", "data_source": "head_office"},
         {"label": "Parent provider name", "id": "firm_name", "data_source": "parent_firm", "hide_if_null": True},
         {
             "label": "Parent provider number",

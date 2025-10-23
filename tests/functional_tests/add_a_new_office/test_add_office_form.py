@@ -19,7 +19,7 @@ def navigate_to_add_office_form(page: Page):
     page.get_by_role("link", name="Offices").click()
 
     # Click "Add an office" button
-    page.get_by_role("button", name="Add an office").click()
+    page.get_by_role("button", name="Add another office").click()
 
     # Verify we're on the add office page
     expect(page.get_by_role("heading", name="Add a new office")).to_be_visible()

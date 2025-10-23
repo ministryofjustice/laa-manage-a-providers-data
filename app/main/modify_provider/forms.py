@@ -8,7 +8,8 @@ from app.fields import GovUKTableRadioField
 from app.forms import BaseForm
 from app.main.add_a_new_provider.forms import LiaisonManagerForm
 from app.main.utils import get_firm_account_number
-from app.models import Firm
+from app.models import Firm, Office
+from app.utils.formatting import format_office_address_one_line
 from app.validators import ValidateSearchResults
 from app.widgets import GovRadioInput, GovTextInput
 
@@ -38,11 +39,14 @@ class ChangeProviderActiveStatusForm(ChangeForm, BaseForm):
         super().__init__(*args, **kwargs)
         self.firm = firm
 
-        choice_hints = {
-            "active": "This will not make all the offices of this provider active. Any office can be made active after you make the provider active."
-        }
-        if self.status.data == "active":
-            choice_hints = {"inactive": "This will also make all offices of this provider inactive."}
+        choice_hints = {}
+        if firm.is_legal_services_provider:
+            choice_hints = {
+                "active": "This will not make all the offices of this provider active. Any office can be made active after you make the provider active."
+            }
+            if self.status.data == "active":
+                choice_hints = {"inactive": "This will also make all offices of this provider inactive."}
+
         self.status.widget.choice_hints = choice_hints
 
     title = "Change active status"
@@ -142,3 +146,50 @@ class AssignChambersForm(BaseForm):
             )
 
         self.provider.choices = choices
+
+
+class ReassignHeadOfficeForm(BaseForm):
+    url = "provider/<firm:firm>/reassign-head-office"
+    title = "Reassign head office"
+    template = "modify_provider/reassign_head_office.html"
+    success_url = "main.view_provider_offices"
+    submit_button_text = "Submit"
+
+    office = GovUKTableRadioField(
+        "",
+        structure=[
+            {"text": "Account number", "id": "account_number"},
+            {"text": "Address", "id": "address_single_line"},
+        ],  # Display as a table with columns for Account number and Address
+        radio_value_key="firm_office_code",
+        choices=[],  # Set dynamically to providers offices
+        validators=[],  # Set dynamically to add provider name
+    )
+    firm: Firm
+    current_head_office: Office
+
+    def __init__(self, firm: Firm, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.firm = firm
+        self.office.validators = [InputRequired(message=f"Select a new head office for {self.firm.firm_name}")]
+
+        pda = current_app.extensions["pda"]
+        firm_offices = pda.get_provider_offices(firm_id=self.firm.firm_id)
+        # Preload the current (without change) head office so the view can determine any changes
+        head_office = pda.get_head_office(firm_id=self.firm.firm_id)
+        self.current_head_office = head_office
+
+        # Populate the choice of offices for the firm
+        choices = []
+        for office in firm_offices:
+            choices.append(
+                (
+                    office.firm_office_code,
+                    {
+                        "account_number": office.firm_office_code,
+                        "address_single_line": format_office_address_one_line(office),
+                    },
+                )
+            )
+
+        self.office.choices = choices
