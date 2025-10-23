@@ -104,7 +104,7 @@ def get_status_table(entity: Firm | Office, firm: Firm | None = None, office: Of
 
     def _get_change_url(field: dict, entity: Firm | Office) -> str:
         change_link = field.get("change_link")
-        # Temporary logic to always show a change link even when not all change pages have been built
+        # TODO: Temporary logic to always show a change link even when not all change pages have been built, remove this when all modification pages have been built
         if not change_link:
             return "#"
         # Generate the change URL based on entity type
