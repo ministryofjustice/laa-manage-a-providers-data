@@ -1,6 +1,5 @@
-from app.main.utils import get_entity_active_text, provider_name_html
+from app.main.utils import contract_manager_hide_default, get_entity_active_text, provider_name_html
 from app.utils.formatting import (
-    contract_manager_hide_default
     format_advocate_level,
     format_constitutional_status,
     format_date,

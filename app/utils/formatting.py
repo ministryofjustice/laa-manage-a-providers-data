@@ -4,7 +4,6 @@ from typing import Optional
 from app.constants import (
     ADVOCATE_LEVEL_CHOICES,
     CONSTITUTIONAL_STATUS_CHOICES,
-    DEFAULT_CONTRACT_MANAGER_NAME,
     FIRM_TYPE_CHOICES,
 )
 from app.models import Office
@@ -175,7 +174,3 @@ def format_uncapitalized(s: str) -> str:
     starts_with_acronym = len(s) > 1 and s[1].isupper()
     continuation_cased = s if starts_with_acronym else s.replace(s[0], s[0].lower(), 1)
     return continuation_cased
-
-
-def contract_manager_hide_default(value):
-    return None if value == DEFAULT_CONTRACT_MANAGER_NAME else value
