@@ -161,8 +161,8 @@ def test_office_contact(page):
     # View more detailed liaison manager info
     expect(page.get_by_role("heading", name="Contact", exact=True)).to_be_visible()
     expect(page.get_by_role("heading", name="Sarah Johnson")).to_be_visible()
-    expect(page.get_by_text("Show 2 additional contacts")).to_be_visible()
-    page.get_by_text("Show 2 additional contacts").click()
+    expect(page.get_by_text("Previous contacts")).to_be_visible()
+    page.get_by_text("Previous contacts").click()
     expect(page.get_by_role("heading", name="David Smith")).to_be_visible()
     expect(page.get_by_role("heading", name="Alice Brown")).to_be_visible()
 

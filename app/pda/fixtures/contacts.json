@@ -1,6 +1,7 @@
 {
   "contacts": [
     {
+      "contactId": 1,
       "vendorSiteId": 101,
       "firstName": "Sarah",
       "lastName": "Johnson",
@@ -9,9 +10,10 @@
       "website": "https://www.smithpartners.com",
       "jobTitle": "Liaison manager",
       "primary": "Y",
-      "activeFrom": "2024-01-15"
+      "creationDate": "2024-01-15"
     },
     {
+      "contactId": 2,
       "vendorSiteId": 101,
       "firstName": "David",
       "lastName": "Smith",
@@ -20,9 +22,11 @@
       "website": null,
       "jobTitle": "Liaison manager",
       "primary": "N",
-      "activeFrom": "2024-03-10"
+      "creationDate": "2024-03-10",
+      "inactiveDate": "2024-06-20"
     },
     {
+      "contactId": 3,
       "vendorSiteId": 101,
       "firstName": "Alice",
       "lastName": "Brown",
@@ -31,9 +35,11 @@
       "website": "https://www.alicebrown.com",
       "jobTitle": "Liaison manager",
       "primary": "N",
-      "activeFrom": "2024-06-22"
+      "creationDate": "2024-06-22",
+      "inactiveDate": "2024-12-01"
     },
     {
+      "contactId": 4,
       "vendorSiteId": 102,
       "firstName": "Michael",
       "lastName": "Thompson",
@@ -42,9 +48,10 @@
       "website": "https://www.johnsonlegal.com",
       "jobTitle": "Liaison manager",
       "primary": "Y",
-      "activeFrom": "2023-11-05"
+      "creationDate": "2023-11-05"
     },
     {
+      "contactId": 5,
       "vendorSiteId": 103,
       "firstName": "Emma",
       "lastName": "Brown",
@@ -53,9 +60,10 @@
       "website": "https://www.brownassociates.com",
       "jobTitle": "Liaison manager",
       "primary": "Y",
-      "activeFrom": "2024-02-28"
+      "creationDate": "2024-02-28"
     },
     {
+      "contactId": 6,
       "vendorSiteId": 103,
       "firstName": "Sophie",
       "lastName": "Williams",
@@ -64,9 +72,11 @@
       "website": null,
       "jobTitle": "Liaison manager",
       "primary": "N",
-      "activeFrom": "2024-05-12"
+      "creationDate": "2024-05-12",
+      "inactiveDate": "2025-01-15"
     },
     {
+      "contactId": 7,
       "vendorSiteId": 104,
       "firstName": "James",
       "lastName": "Davis",
@@ -75,9 +85,10 @@
       "website": "https://www.davischambers.com",
       "jobTitle": "Liaison manager",
       "primary": "Y",
-      "activeFrom": "2023-09-18"
+      "creationDate": "2023-09-18"
     },
     {
+      "contactId": 8,
       "vendorSiteId": 105,
       "firstName": "Rachel",
       "lastName": "Wilson",
@@ -86,9 +97,10 @@
       "website": null,
       "jobTitle": "Liaison manager",
       "primary": "Y",
-      "activeFrom": "2024-04-07"
+      "creationDate": "2024-04-07"
     },
     {
+      "contactId": 9,
       "vendorSiteId": 201,
       "firstName": "Robert",
       "lastName": "MacLeod",
@@ -97,9 +109,10 @@
       "website": "https://www.scottishlegal.com",
       "jobTitle": "Liaison manager",
       "primary": "Y",
-      "activeFrom": "2023-12-20"
+      "creationDate": "2023-12-20"
     },
     {
+      "contactId": 10,
       "vendorSiteId": 401,
       "firstName": "Alan",
       "lastName": "Davies",
@@ -108,7 +121,7 @@
       "website": "https://www.alandavies.com",
       "jobTitle": "Liaison manager",
       "primary": "Y",
-      "activeFrom": "2025-09-25"
+      "creationDate": "2025-09-25"
     }
   ]
 }

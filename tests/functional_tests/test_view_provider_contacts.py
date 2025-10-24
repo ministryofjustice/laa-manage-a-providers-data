@@ -33,7 +33,7 @@ def test_view_provider_contacts_multiple_contacts_with_details(page: Page):
     expect(page.get_by_text("Sarah Johnson", exact=True)).to_be_visible()
 
     # Check that there's a details component for additional contacts (now 2 additional)
-    expect(page.get_by_text("Show 2 additional contacts")).to_be_visible()
+    expect(page.get_by_text("Previous contacts")).to_be_visible()
 
     # The secondary contacts should not be visible initially
     expect(page.get_by_text("David Smith", exact=True)).not_to_be_visible()
@@ -42,7 +42,7 @@ def test_view_provider_contacts_multiple_contacts_with_details(page: Page):
     expect(page.get_by_text("alice.brown@smithpartners.com")).not_to_be_visible()
 
     # Click the details to reveal additional contacts
-    page.get_by_text("Show 2 additional contacts").click()
+    page.get_by_text("Previous contacts").click()
 
     # Now both secondary contacts should be visible
     expect(page.get_by_text("David Smith", exact=True)).to_be_visible()
@@ -53,8 +53,13 @@ def test_view_provider_contacts_multiple_contacts_with_details(page: Page):
     expect(page.get_by_text("0116 123 4569")).to_be_visible()
 
     # Check that active from dates are visible for additional contacts
-    expect(page.get_by_text("10 Mar 2024")).to_be_visible()  # David Smith's date
-    expect(page.get_by_text("22 Jun 2024")).to_be_visible()  # Alice Brown's date
+    expect(page.get_by_text("10 Mar 2024")).to_be_visible()  # David Smith's creation date
+    expect(page.get_by_text("22 Jun 2024")).to_be_visible()  # Alice Brown's creation date
+
+    # Check that inactive dates are visible for inactive contacts
+    expect(page.get_by_text("Active to")).to_have_count(2)  # Both David and Alice have inactive dates
+    expect(page.get_by_text("20 Jun 2024")).to_be_visible()  # David Smith's inactive date
+    expect(page.get_by_text("1 Dec 2024")).to_be_visible()  # Alice Brown's inactive date
 
 
 @pytest.mark.usefixtures("live_server")
@@ -97,13 +102,13 @@ def test_view_provider_contacts_details_component_functionality(page: Page):
     expect(page.get_by_text("David Smith", exact=True)).not_to_be_visible()
 
     # Click to open
-    page.get_by_text("Show 2 additional contacts").click()
+    page.get_by_text("Previous contacts").click()
 
     # Details should now be open
     expect(page.get_by_text("David Smith", exact=True)).to_be_visible()
 
     # Click to close
-    page.get_by_text("Show 2 additional contacts").click()
+    page.get_by_text("Previous contacts").click()
 
     # Details should be closed again
     expect(page.get_by_text("David Smith", exact=True)).not_to_be_visible()

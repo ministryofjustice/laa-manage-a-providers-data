@@ -693,10 +693,14 @@ class MockProviderDataApi:
 
         office_id = office_data.get("firmOfficeId")
 
-        # Set the vendor_site_id to the office ID and active_from to today in ISO format
-        updates = {"vendor_site_id": office_id}
-        if not contact.active_from:
-            updates["active_from"] = date.today().isoformat()
+        # Generate a new contact ID
+        existing_ids = [contact_data.get("contactId", 0) for contact_data in self._mock_data["contacts"]]
+        new_contact_id = max(existing_ids, default=0) + 1
+
+        # Set the vendor_site_id to the office ID and creation_date to today in ISO format
+        updates = {"vendor_site_id": office_id, "contact_id": new_contact_id}
+        if not contact.creation_date:
+            updates["creation_date"] = date.today().isoformat()
 
         updated_contact = contact.model_copy(update=updates)
 
@@ -741,7 +745,7 @@ class MockProviderDataApi:
         Args:
             firm_id: The firm ID
             office_code: The office code
-            contact: Contact model instance with updated data (must have vendor_site_id set)
+            contact: Contact model instance with updated data (must have contact_id set)
 
         Returns:
             Contact: The updated Contact model instance
@@ -753,18 +757,18 @@ class MockProviderDataApi:
             raise ValueError("firm_id must be a positive integer")
         if not office_code or not isinstance(office_code, str):
             raise ValueError("office_code must be a non-empty string")
-        if not contact.vendor_site_id:
-            raise ValueError("contact must have vendor_site_id set")
+        if not contact.contact_id:
+            raise ValueError("contact must have contact_id set")
 
-        # Find the contact in mock data
+        # Find the contact in mock data by contact_id
         contact_index = None
         for i, existing_contact in enumerate(self._mock_data["contacts"]):
-            if existing_contact.get("vendorSiteId") == contact.vendor_site_id:
+            if existing_contact.get("contactId") == contact.contact_id:
                 contact_index = i
                 break
 
         if contact_index is None:
-            raise MockPDAError(f"Contact with vendor_site_id {contact.vendor_site_id} not found")
+            raise MockPDAError(f"Contact with contact_id {contact.contact_id} not found")
 
         # Update the contact data
         self._mock_data["contacts"][contact_index] = contact.to_api_dict()
