@@ -9,6 +9,7 @@ from app.components.tag import Tag, TagType
 from app.models import BankAccount, Contact, Firm, Office
 from app.pda.errors import ProviderDataApiError
 from app.pda.mock_api import MockProviderDataApi
+from app.utils.formatting import format_date
 
 logger = logging.getLogger(__name__)
 
@@ -475,6 +476,16 @@ def assign_firm_to_a_new_chambers(firm: Firm | int, chambers: Firm | int) -> Fir
     flash(f"<b>{new_provider.firm_name} assigned to {chambers.firm_name}</b>", category="success")
 
     return new_provider
+
+
+def get_entity_active_text(entity: dict) -> str:
+    """Gets the display text for if the entity is active or not.
+    If entity is active returns "Yes"
+    If entity is inactive returns "Made inactive on [DD/MM/YYYY]"
+    """
+    if inactive_date := entity.get("inactive_date"):
+        return f"Made inactive on {format_date(inactive_date)}"
+    return "Yes"
 
 
 def reassign_head_office(firm: Firm | int, new_head_office: Office | str) -> Office:
