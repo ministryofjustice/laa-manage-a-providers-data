@@ -65,6 +65,9 @@ class OfficeContactDetailsFormView(BaseFormView):
             }
         )
 
+        # the new office must be set to Electronic payment method so we do it here before the offcie is created
+        session["new_office"]["payment_method"] = "Electronic"
+
         # Create the office
         office = Office(**session.get("new_office"))
         new_office = add_new_office(office, firm_id=form.firm.firm_id)
