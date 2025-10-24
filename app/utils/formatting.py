@@ -1,7 +1,11 @@
 import datetime
 from typing import Optional
 
-from app.constants import ADVOCATE_LEVEL_CHOICES, CONSTITUTIONAL_STATUS_CHOICES, FIRM_TYPE_CHOICES
+from app.constants import (
+    ADVOCATE_LEVEL_CHOICES,
+    CONSTITUTIONAL_STATUS_CHOICES,
+    FIRM_TYPE_CHOICES,
+)
 from app.models import Office
 
 

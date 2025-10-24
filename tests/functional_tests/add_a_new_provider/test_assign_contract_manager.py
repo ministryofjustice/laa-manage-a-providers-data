@@ -147,7 +147,27 @@ def test_assign_contract_manager_form_validation_no_selection(page: Page):
     page.get_by_role("button", name="Submit").click()
 
     # Should show validation error
-    expect(page.get_by_text("Error: Select a contract manager or search again")).to_be_visible()
+    expect(
+        page.get_by_text(
+            "Error: Select a contract manager, search again or skip this step if you do not know the contract manager"
+        )
+    ).to_be_visible()
+
+
+@pytest.mark.usefixtures("live_server")
+def test_assign_contract_manager_form_skip(page: Page):
+    """Test form validation when no contract manager is selected."""
+    navigate_to_assign_contract_manager_via_lsp(page)
+
+    # Search for a contract manager
+    page.get_by_role("textbox", name="Search for a contract manager").fill("Alice")
+    page.get_by_role("button", name="Search").click()
+
+    # Submit without selecting a radio button
+    page.get_by_role("button", name="Unknown: Skip this step").click()
+
+    # Mr.Default should not be shown as such via the UI and should appear as if there is no contract manager associated with the firm.
+    expect(page.get_by_role("link", name="Enter contract manager")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")

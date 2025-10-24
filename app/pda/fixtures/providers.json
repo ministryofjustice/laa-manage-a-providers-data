@@ -18,7 +18,8 @@
     "smallBusinessFlag": "N",
     "womenOwnedFlag": "N",
     "websiteUrl": null,
-    "inactiveDate": "2025-09-25"
+    "inactiveDate": "2025-09-25",
+    "contractManager": "Mr.Default"
   },
   {
     "firmNumber": "2",

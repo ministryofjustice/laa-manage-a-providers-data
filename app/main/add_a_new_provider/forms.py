@@ -297,15 +297,19 @@ class AssignContractManagerForm(BaseForm):
         widget=GovTextInput(
             form_group_classes="govuk-!-width-two-thirds",
             heading_class="govuk-fieldset__legend--s",
-            hint="You can search by name or employee ID",
         ),
         validators=[Length(max=100, message="Search term must be 100 characters or less")],
     )
 
     contract_manager = StringField(
         "Contract manager",
-        validators=[InputRequired(message="Select a contract manager or search again")],
+        validators=[
+            InputRequired(
+                message="Select a contract manager, search again or skip this step if you do not know the contract manager"
+            )
+        ],
     )
+    skip = SubmitField("Unknown: Skip this step", widget=GovSubmitInput(classes="govuk-button--secondary"))
 
     def __init__(self, search_term=None, page=1, selected_value=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
