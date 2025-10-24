@@ -244,13 +244,14 @@ class TestChangeLiaisonManager:
                 "offices": [{"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101, "headOffice": "N/A"}],
                 "contacts": [
                     {
+                        "contactId": 1,
                         "vendorSiteId": 101,
                         "firstName": "John",
                         "lastName": "Smith",
                         "emailAddress": "john.smith@example.com",
                         "jobTitle": "Liaison manager",
                         "primary": "Y",
-                        "activeFrom": "2024-01-01",
+                        "creationDate": "2024-01-01",
                     }
                 ],
             }
@@ -312,7 +313,7 @@ class TestChangeLiaisonManager:
             assert 103 in office_ids
 
     def test_sets_active_from_date(self, app):
-        """Test that active_from is set to today's date when not provided."""
+        """Test that creation_date is set to today's date when not provided."""
         with app.test_request_context():
             mock_api = app.extensions["pda"]
             mock_api._mock_data = {
@@ -329,9 +330,9 @@ class TestChangeLiaisonManager:
 
             result = change_liaison_manager(new_contact, 1)
 
-            assert result.active_from is not None
+            assert result.creation_date is not None
             expected_date = date.today().isoformat()
-            assert result.active_from == expected_date
+            assert result.creation_date == expected_date
 
     @patch("app.main.utils.logger")
     def test_update_contact_error_handling(self, mock_logger, app):
@@ -343,13 +344,14 @@ class TestChangeLiaisonManager:
                 "offices": [{"_firmId": 1, "firmOfficeCode": "1A001L", "firmOfficeId": 101, "headOffice": "N/A"}],
                 "contacts": [
                     {
+                        "contactId": 1,
                         "vendorSiteId": 101,
                         "firstName": "John",
                         "lastName": "Smith",
                         "emailAddress": "john.smith@example.com",
                         "jobTitle": "Liaison manager",
                         "primary": "Y",
-                        "activeFrom": "2024-01-01",
+                        "creationDate": "2024-01-01",
                     }
                 ],
             }
@@ -428,13 +430,14 @@ class TestChangeLiaisonManager:
                 ],
                 "contacts": [
                     {
+                        "contactId": 1,
                         "vendorSiteId": 101,
                         "firstName": "Old",
                         "lastName": "Manager",
                         "emailAddress": "old.manager@example.com",
                         "jobTitle": "Liaison manager",
                         "primary": "Y",
-                        "activeFrom": "2024-01-01",
+                        "creationDate": "2024-01-01",
                     }
                 ],
             }
