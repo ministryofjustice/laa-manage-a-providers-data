@@ -1,7 +1,7 @@
 {
   "contacts": [
     {
--       "contactId": 1,
+      "contactId": 1,
       "vendorSiteId": 101,
       "firstName": "Sarah",
       "lastName": "Johnson",
