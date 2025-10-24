@@ -1,0 +1,10 @@
+{# This is the base form page that should be used or extended for all question pages. #}
+{% extends 'form.html' %}
+
+{% block formDescription %}
+    <p class="govuk-body govuk-!-font-weight-bold">This change will:</p>
+        <ul class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-8">
+            <li>assign the new liaison manager to barristers or advocates that the current liaison manager {{ current_liaison_manager_name }} is assigned to</li>
+            <li>make {{ current_liaison_manager_name|default("the current liaison manager") }} inactive</li>
+        </ul>
+{% endblock %}
