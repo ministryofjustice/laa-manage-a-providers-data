@@ -1,14 +1,6 @@
 {% extends 'view-provider.html' %}
 {% from 'macros/contact_tables.html' import contactCards %}
 
-{% block actionButtons %}
-  {{ govukButton({
-    "text": "Make chambers active" if firm.inactive_date else "Make chambers inactive",
-    "classes": "govuk-button--secondary",
-    "href": url_for("main.change_provider_active_status", firm=firm)
-  }) }}
-{% endblock %}
-
 {% block firmTypeSubNavigation %}
 	{{ mojSubNavigation({
     "label": "Sub navigation",
