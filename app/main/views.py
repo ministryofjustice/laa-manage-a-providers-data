@@ -207,6 +207,11 @@ def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | N
 
         value = data_source.get(field["id"])
 
+        if value_preprocessor := field.get("value_preprocessor"):
+            if not isinstance(value_preprocessor, Callable):
+                raise ValueError("value_preprocessor must be callable")
+            value = value_preprocessor(value)
+
         if not value and field.get("hide_if_null", False):
             continue
 
@@ -218,7 +223,8 @@ def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | N
 
         row_action_urls = None
         if change_link := field.get("change_link"):
-            row_action_urls = {"change": url_for(change_link, firm=firm)}
+            key = "change" if value else "enter"
+            row_action_urls = {key: url_for(change_link, firm=firm)}
 
         main_table.add_row(
             label=field.get("label"),
