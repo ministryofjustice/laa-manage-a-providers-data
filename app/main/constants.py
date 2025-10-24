@@ -1,8 +1,93 @@
-from app.main.utils import provider_name_html
-from app.utils.formatting import format_advocate_level, format_constitutional_status, format_date
+from app.main.utils import get_entity_active_text, provider_name_html
+from app.utils.formatting import (
+    format_advocate_level,
+    format_constitutional_status,
+    format_date,
+    format_yes_no,
+)
 
 # Valid data sources to use in the view provider main table configuration, default is firm
 MAIN_TABLE_VALID_DATA_SOURCES = ["firm", "parent_firm", "head_office"]
+
+# Status table configuration for different entity types
+STATUS_TABLE_FIELD_CONFIG = {
+    "Legal Services Provider": [
+        {
+            "label": "Active",
+            "text_renderer": get_entity_active_text,
+            "change_link": "main.change_provider_active_status",
+        },
+        {
+            "label": "Payments on hold",
+            "id": "hold_all_payments_flag",
+            "formatter": format_yes_no,
+            "default": "No",
+        },
+        {"label": "Intervened", "default": "No"},
+        {"label": "Referred to debt recovery", "default": "No"},
+    ],
+    "Chambers": [
+        {
+            "label": "Active",
+            "text_renderer": get_entity_active_text,
+            "change_link": "main.change_provider_active_status",
+        },
+    ],
+    "Barrister": [
+        {
+            "label": "Active",
+            "text_renderer": get_entity_active_text,
+            "change_link": "main.change_provider_active_status",
+        },
+        {
+            "label": "Payments on hold",
+            "id": "hold_all_payments_flag",
+            "formatter": format_yes_no,
+            "default": "No",
+        },
+        {"label": "Intervened", "default": "No"},
+        {"label": "Referred to debt recovery", "default": "No"},
+    ],
+    "Advocate": [
+        {
+            "label": "Active",
+            "text_renderer": get_entity_active_text,
+            "change_link": "main.change_provider_active_status",
+        },
+        {
+            "label": "Payments on hold",
+            "id": "hold_all_payments_flag",
+            "formatter": format_yes_no,
+            "default": "No",
+        },
+        {"label": "Intervened", "default": "No"},
+        {"label": "Referred to debt recovery", "default": "No"},
+    ],
+    "Office": [
+        {
+            "label": "Active",
+            "text_renderer": get_entity_active_text,
+            "change_link": "main.office_active_status_form",
+        },
+        {
+            "label": "Payments on hold",
+            "id": "hold_all_payments_flag",
+            "formatter": format_yes_no,
+            "default": "No",
+        },
+        {"label": "Intervened", "default": "No"},
+        {
+            "label": "Referred to debt recovery",
+            "default": "No",
+            "visible": lambda office: office.get("inactive_date") is None,
+        },  # Show if inactive
+        {
+            "label": "False balance",
+            "default": "No",
+            "visible": lambda office: office.get("inactive_date"),
+        },  # Show if active
+    ],
+}
 
 # View provider ,ain table configuration for each firm type
 MAIN_TABLE_FIELD_CONFIG = {
