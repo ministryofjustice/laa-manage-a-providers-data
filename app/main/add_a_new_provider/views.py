@@ -447,6 +447,11 @@ class AddAdvocateBarristersCheckFormView(BaseFormView):
         key = "new_barrister" if self.model_type == "barrister" else "new_advocate"
         if not session.get(key):
             return redirect(url_for(f"main.add_{self.model_type}_details_form", firm=kwargs["firm"]))
+
+        firm = kwargs.get("firm")
+        if (not firm) or (firm.firm_type != "Chambers") or (firm.firm_id != session[key]["parent_firm_id"]):
+            abort(404)
+
         return super().dispatch_request(**kwargs)
 
     def get(self, context, firm, **kwargs):
