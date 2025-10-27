@@ -15,7 +15,7 @@ from app.models import Firm
 class TestAddAdvocateBarristerCheckForm:
     def test_dispatch_request_no_barrister_details(self, app):
         """Should redirect to barrister add form if no barrister details are provided."""
-        firm = Firm(firmName="Test firm", firmId=1)
+        firm = Firm(firmName="Test firm", firmId=1, firmType="Chambers")
         view = AddAdvocateBarristersCheckFormView(model_type="barrister", form_class=AddAdvocateBarristerCheckForm)
         with app.test_request_context("/"):
             response = view.dispatch_request(firm=firm)
@@ -23,9 +23,9 @@ class TestAddAdvocateBarristerCheckForm:
 
     def test_dispatch_request_barrister_details(self, app):
         """Should show the check form when barrister details are provided."""
-        firm = Firm(firmName="Test firm", firmId=1)
+        firm = Firm(firmName="Test firm", firmId=1, firmType="Chambers")
         view = AddAdvocateBarristersCheckFormView(model_type="barrister", form_class=AddAdvocateBarristerCheckForm)
-        session["new_barrister"] = {"barrister_name": "New Barrister"}
+        session["new_barrister"] = {"barrister_name": "New Barrister", "parent_firm_id": firm.firm_id}
         with patch.object(BaseFormView, "dispatch_request") as mock_parent_dispatch_request:
             view.dispatch_request(firm=firm)
             del session["new_barrister"]
@@ -34,7 +34,7 @@ class TestAddAdvocateBarristerCheckForm:
     @patch("app.main.add_a_new_provider.views.create_barrister_from_form_data")
     def test_create_model_barrister(self, mock_create_barrister_from_form_data, app):
         """Test the create_model method can create a barrister from the session"""
-        firm = Firm(firmName="Test firm", firmId=1)
+        firm = Firm(firmName="Test firm", firmId=1, firmType="Chambers")
         view = AddAdvocateBarristersCheckFormView(model_type="barrister", form_class=AddAdvocateBarristerCheckForm)
         data = dict(
             barrister_name="Test Barrister",
@@ -50,7 +50,7 @@ class TestAddAdvocateBarristerCheckForm:
     @patch("app.main.add_a_new_provider.views.create_advocate_from_form_data")
     def test_create_model_advocate(self, mock_create_advocate_from_form_data, app):
         """Test the create_model method can create a advocate from the session"""
-        firm = Firm(firmName="Test firm", firmId=1)
+        firm = Firm(firmName="Test firm", firmId=1, firmType="Chambers")
         view = AddAdvocateBarristersCheckFormView(model_type="advocate", form_class=AddAdvocateBarristerCheckForm)
         data = dict(
             advocate_name="Test Advocate",
@@ -68,7 +68,7 @@ class TestAddAdvocateBarristersLiaisonManagerFormView:
     @patch("app.main.add_a_new_provider.views.change_liaison_manager")
     def test_form_valid(self, mock_change_liaison_manager, app):
         """Test creating a new liaison manager for new barrister form."""
-        firm = Firm(firmName="Test firm", firmId=1)
+        firm = Firm(firmName="Test firm", firmId=1, firmType="Chambers")
         form = AddAdvocateBarristerLiaisonManagerForm(
             firm=firm,
             model_type="barrister",

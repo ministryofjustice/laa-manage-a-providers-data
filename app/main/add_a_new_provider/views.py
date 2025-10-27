@@ -448,8 +448,8 @@ class AddAdvocateBarristersCheckFormView(BaseFormView):
         if not session.get(key):
             return redirect(url_for(f"main.add_{self.model_type}_details_form", firm=kwargs["firm"]))
 
-        firm = kwargs.get("firm")
-        if (not firm) or (firm.firm_type != "Chambers") or (firm.firm_id != session[key]["parent_firm_id"]):
+        firm: Firm = kwargs.get("firm")
+        if (not firm) or (not firm.is_chambers) or (firm.firm_id != session[key]["parent_firm_id"]):
             abort(404)
 
         return super().dispatch_request(**kwargs)
