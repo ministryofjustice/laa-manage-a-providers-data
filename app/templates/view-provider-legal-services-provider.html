@@ -37,12 +37,12 @@
           {{ govukTable(office_tables.other.to_govuk_params()) }}
           {{ govukButton({
             "text": "Add another office",
-            "href": url_for("main.add_office", firm=firm)
+            "href": url_for("main.add_office_contact_details", firm=firm)
           }) }}
         {% else %}
           {{ govukButton({
             "text": "Add an office",
-            "href": url_for("main.add_office", firm=firm)
+            "href": url_for("main.add_office_contact_details", firm=firm)
           }) }}
         {% endif %}
       {% endif %}
