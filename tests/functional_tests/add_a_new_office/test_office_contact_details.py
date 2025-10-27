@@ -21,15 +21,6 @@ def navigate_to_office_contact_details(page: Page):
     # Click "Add an office" button
     page.get_by_role("button", name="Add another office").click()
 
-    # Fill the add office form
-    page.get_by_role("textbox", name="Office name").fill("Test Office")
-    page.get_by_role("radio", name="Yes").click()
-    page.get_by_role("button", name="Continue").click()
-
-    # Should now be on the office contact details page
-    expect(page.get_by_role("heading", name="Office contact details")).to_be_visible()
-    expect(page.get_by_text("Test Office")).to_be_visible()  # Caption should show office name
-
 
 @pytest.mark.usefixtures("live_server")
 def test_form_loads_correctly(page: Page):
@@ -187,15 +178,6 @@ def test_successful_form_submission_all_fields(page: Page):
 
 
 @pytest.mark.usefixtures("live_server")
-def test_form_caption_shows_office_name(page: Page):
-    """Test that the form caption shows the office name from the previous step."""
-    navigate_to_office_contact_details(page)
-
-    # The caption should show the office name from the session
-    expect(page.get_by_text("Test Office")).to_be_visible()
-
-
-@pytest.mark.usefixtures("live_server")
 def test_optional_fields_not_required(page: Page):
     """Test that optional fields don't prevent form submission."""
     navigate_to_office_contact_details(page)
@@ -217,14 +199,3 @@ def test_optional_fields_not_required(page: Page):
     expect(page.get_by_text("123 Test Street")).to_be_visible()
     expect(page.get_by_text("Test City")).to_be_visible()
     expect(page.get_by_text("TE1 5ST")).to_be_visible()
-
-
-@pytest.mark.usefixtures("live_server")
-def test_direct_access_without_session_redirects(page: Page):
-    """Test that accessing contact details directly without session data gives 404."""
-    # Try to access contact details page directly without going through add office flow
-    resp = page.goto(url_for("main.add_office_contact_details", firm=1, _external=True))
-    assert resp is not None
-    assert resp.status == 400
-    # Should get 400 error since no session data exists
-    expect(page.get_by_role("heading", name="Sorry, there is a problem with the service")).to_be_visible

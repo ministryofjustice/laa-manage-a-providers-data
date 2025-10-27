@@ -65,7 +65,7 @@ class BaseFormView(MethodView):
             return self.form_invalid(form, **kwargs)
 
     def get_api(self) -> ProviderDataApi:
-        return current_app.extensions["api"]
+        return current_app.extensions["pda"]
 
 
 class FullWidthBaseFormView(BaseFormView):
