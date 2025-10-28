@@ -486,7 +486,8 @@ class TestMockProviderDataApi:
         )
 
         mock_api.create_office_bank_account(1, "1A001L", bank_account)
-        assert mock_api._mock_data["bank_accounts"][0]["endDate"] == datetime.date.today().isoformat()
+        assert isinstance(mock_api._mock_data["bank_accounts"][0]["endDate"], datetime.date)
+        assert mock_api._mock_data["bank_accounts"][0]["endDate"] == datetime.date.today()
         assert mock_api._mock_data["bank_accounts"][0]["primaryFlag"] == "N"
         assert mock_api._mock_data["bank_accounts"][1]["primaryFlag"] == "Y"
 
