@@ -65,15 +65,15 @@ def test_valid_form_submission_payment_method_electronic(page: Page):
     page.get_by_role("radio", name="Electronic").click()
     page.get_by_role("button", name="Save").click()
 
-    # Should redirect to the office view page
-    # is this correct? or should I be passing an office_id instead of the office code?
-    expect(page).to_have_url(url_for("main.view_office", firm=1, office="1A001L", _external=True))
+    # Redirect to the bank-payment-details subpage
+    expect(page).to_have_url(
+        url_for("main.view_office_bank_payment_details", firm=1, office="1A001L", _external=True)
+    )
 
     # Verify success message is shown
     expect(page.get_by_text("Payment method updated successfully")).to_be_visible()
 
-    # Return to bank-payment-details and Verify the payment method is displayed correctly
-    page.get_by_text("Bank accounts and payment").click()
+    # Verify the payment method is displayed correctly on bank-payment-details
     expect(page.get_by_text("Payment method").locator("xpath=following-sibling::*[1]")).to_have_text("Electronic")
     expect(page.get_by_text("Electronic", exact=True)).to_be_visible()
 
@@ -94,15 +94,15 @@ def test_valid_form_submission_payment_method_cheque(page: Page):
     page.get_by_role("radio", name="Cheque").click()
     page.get_by_role("button", name="Save").click()
 
-    # Should redirect to the office view page
-    # is this correct? or should I be passing an office_id instead of the office code?
-    expect(page).to_have_url(url_for("main.view_office", firm=1, office="1A001L", _external=True))
+    # Redirect to the bank-payment-details subpage
+    expect(page).to_have_url(
+        url_for("main.view_office_bank_payment_details", firm=1, office="1A001L", _external=True)
+    )
 
     # Verify success message is shown
     expect(page.get_by_text("Payment method updated successfully")).to_be_visible()
 
-    # Return to bank-payment-details and Verify the payment method is displayed correctly
-    page.get_by_text("Bank accounts and payment").click()
+    # Verify the payment method is displayed correctly on bank-payment-details
     expect(page.get_by_text("Payment method").locator("xpath=following-sibling::*[1]")).to_have_text("Cheque")
 
     # Now click Change and ensure Cheque is preselected
