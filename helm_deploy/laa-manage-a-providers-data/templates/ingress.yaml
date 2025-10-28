@@ -28,6 +28,13 @@ metadata:
     nginx.ingress.kubernetes.io/modsecurity-snippet: |
       SecRuleEngine On
       SecDefaultAction "phase:2,pass,log,tag:github_team=laa-get-access"
+      SecRuleUpdateTargetById 920273 "!ARGS:search"
+      SecRuleUpdateTargetById 920273 "!ARGS_NAMES:search"
+      SecRuleUpdateTargetById 920273 "!REQUEST_URI"
+
+      SecRuleUpdateTargetById 920240 "!ARGS:search"
+      SecRuleUpdateTargetById 920240 "!ARGS_NAMES:search"
+      SecRuleUpdateTargetById 920240 "!REQUEST_URI"
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   tls:
