@@ -34,6 +34,14 @@ class ChangeLiaisonManagerForm(ChangeForm, LiaisonManagerForm):
         return self.firm.firm_name
 
 
+class ChangeOfficeLiaisonManagerForm(ChangeLiaisonManagerForm):
+    url = "provider/<firm:firm>/office/<office:office>/add-liaison-manager"
+
+    def __init__(self, firm: Firm, office: Office | None = None, *args, **kwargs):
+        super().__init__(firm, *args, **kwargs)
+        self.office = office
+
+
 class ChangeProviderActiveStatusForm(ChangeForm, BaseForm):
     def __init__(self, firm: Firm, *args, **kwargs):
         super().__init__(*args, **kwargs)

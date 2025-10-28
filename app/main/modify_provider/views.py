@@ -21,7 +21,7 @@ class ChangeLiaisonManagerFormView(FullWidthBaseFormView):
         "Chambers": "modify_provider/change-liaison-manager-chambers.html",
         "Advocate": "modify_provider/change-liaison-manager-advocate.html",
         "Barrister": "modify_provider/change-liaison-manager-barrister.html",
-        "Office": "modify_provider/change-liaison-manager-office.html",
+        "Office": "modify_provider/change-liaison-manager-legal-services-provider-office.html",
     }
 
     def get_success_url(self, firm):
@@ -37,8 +37,13 @@ class ChangeLiaisonManagerFormView(FullWidthBaseFormView):
             website=form.data.get("website"),
         )
 
-        # Change the liaison manager (defaults to head office if no office_code specified)
-        change_liaison_manager(new_contact, form.firm.firm_id)
+        # Are we changing the Liaison Manager for the firm or the office?
+        if hasattr(form, "office"):
+            # Change for the specific office
+            change_liaison_manager(new_contact, form.firm.firm_id, office=form.office)
+        else:
+            # If changing at the provider, change all
+            change_liaison_manager(new_contact, form.firm.firm_id)
 
         return redirect(self.get_success_url(form.firm))
 
@@ -60,10 +65,13 @@ class ChangeLiaisonManagerFormView(FullWidthBaseFormView):
 
         # Different levels of description for the different firm types
         template = self.templates.get(firm.firm_type, self.template)
+        if hasattr(form, "office"):
+            template = self.templates.get("Office", self.template)
+
         return render_template(template, **context)
 
     def post(self, firm, *args, **kwargs) -> Response | str:
-        form = self.get_form_class()(firm=firm)
+        form = self.get_form_class()(firm=firm, *args, **kwargs)
 
         if form.validate_on_submit():
             return self.form_valid(form)

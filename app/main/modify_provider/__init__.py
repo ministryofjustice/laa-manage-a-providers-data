@@ -2,7 +2,13 @@ from flask import Blueprint
 
 from app.utils import register_form_view
 
-from .forms import AssignChambersForm, ChangeLiaisonManagerForm, ChangeProviderActiveStatusForm, ReassignHeadOfficeForm
+from .forms import (
+    AssignChambersForm,
+    ChangeLiaisonManagerForm,
+    ChangeOfficeLiaisonManagerForm,
+    ChangeProviderActiveStatusForm,
+    ReassignHeadOfficeForm,
+)
 from .views import (
     AssignChambersFormView,
     ChangeLiaisonManagerFormView,
@@ -17,6 +23,12 @@ def register_views(bp: Blueprint):
         view_class=ChangeLiaisonManagerFormView,
         blueprint=bp,
         endpoint="add_new_liaison_manager",
+    )
+    register_form_view(
+        form_class=ChangeOfficeLiaisonManagerForm,
+        view_class=ChangeLiaisonManagerFormView,
+        blueprint=bp,
+        endpoint="add_new_office_liaison_manager",
     )
     register_form_view(
         form_class=ChangeProviderActiveStatusForm,
