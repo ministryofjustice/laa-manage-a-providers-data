@@ -168,6 +168,7 @@ class TestCreateProviderFromSession:
                 "postcode": "TE1 5ST",
                 "telephone_number": "01234567890",
                 "email_address": "test@example.com",
+                "payment_method": "Electronic",
             }
 
             result = create_provider_from_session()
@@ -184,6 +185,7 @@ class TestCreateProviderFromSession:
             assert office.address_line_1 == "123 Test Street"
             assert office.city == "Test City"
             assert office.postcode == "TE1 5ST"
+            assert office.payment_method == "Electronic"
 
             # Verify sessions were cleaned up
             assert "new_provider" not in session
@@ -204,6 +206,7 @@ class TestCreateProviderFromSession:
                 "postcode": "FC2 1BA",
                 "telephone_number": "09876543210",
                 "email_address": "finance@example.com",
+                "payment_method": "Electronic",
             }
             session["new_head_office_bank_account"] = {
                 "bank_account_name": "Test Business Account",
@@ -223,6 +226,7 @@ class TestCreateProviderFromSession:
             assert len(offices) == 1
             office = offices[0]
             assert office.address_line_1 == "456 Banking Street"
+            assert office.payment_method == "Electronic"
 
             # Verify bank account was created
             bank_account = pda.get_office_bank_account(result.firm_id, office.firm_office_code)

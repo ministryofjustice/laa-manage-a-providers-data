@@ -107,6 +107,7 @@ class TestReplicateOfficeForChildFirm:
         assert office_dict["postcode"] == "TE1 2ST"
         assert office_dict["telephone_number"] == "01234567890"
         assert office_dict["head_office"] == "N/A"
+        assert office_dict["payment_method"] == "Electronic"
 
         assert result == mock_new_office
 
@@ -124,6 +125,7 @@ class TestReplicateOfficeForChildFirm:
         office_dict = office_arg.to_internal_dict()
 
         assert office_dict.get("head_office") is None
+        assert office_dict["payment_method"] == "Electronic"
 
 
 class TestCreateHeadOfficeFromParent:
