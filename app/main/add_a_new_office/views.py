@@ -12,11 +12,11 @@ class OfficeContactDetailsFormView(BaseFormView):
         return url_for("main.view_office", firm=firm, office=new_office)
 
     def form_valid(self, form):
-        head_office = self.get_api().get_head_office(form.firm.firm_id)
+        head_office: Office = self.get_api().get_head_office(form.firm.firm_id)
         # Add contact details to the existing office dict
         office_details = {
             "office_name": form.firm.firm_name,
-            "is_head_office": not head_office,
+            "head_office": str(head_office.firm_office_id) if head_office else "N/A",
             "address_line_1": form.data.get("address_line_1"),
             "address_line_2": form.data.get("address_line_2"),
             "address_line_3": form.data.get("address_line_3"),
