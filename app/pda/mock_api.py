@@ -580,13 +580,13 @@ class MockProviderDataApi:
             if account["vendorSiteId"] == office_id:
                 account["primaryFlag"] = "N"
                 if not account.get("endDate"):
-                    account["endDate"] = date.today().isoformat()
+                    account["endDate"] = date.today()
 
         # Set the vendor_site_id to the office ID
         updated_account = bank_account.model_copy(
             update={
                 "vendor_site_id": office_id,
-                "start_date": date.today().isoformat(),
+                "start_date": date.today(),
                 "primary_flag": "Y",
             }
         )
