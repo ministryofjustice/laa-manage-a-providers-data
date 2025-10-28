@@ -1,6 +1,6 @@
 from flask import Response, abort, redirect, render_template, request, session, url_for
 
-from app.constants import PARENT_FIRM_TYPE_CHOICES
+from app.constants import DEFAULT_CONTRACT_MANAGER_NAME, PARENT_FIRM_TYPE_CHOICES
 from app.main.utils import create_advocate_from_form_data, create_barrister_from_form_data
 from app.models import Firm
 from app.views import BaseFormView, FullWidthBaseFormView
@@ -298,6 +298,10 @@ class AssignContractManagerFormView(BaseFormView):
         session.get("new_provider").update({"contract_manager": form.data.get("contract_manager")})
         return super().form_valid(form)
 
+    def skip_form(self, form):
+        session.get("new_provider").update({"contract_manager": DEFAULT_CONTRACT_MANAGER_NAME})
+        return super().form_valid(form)
+
     @staticmethod
     def get_valid_firm_or_abort():
         if not session.get("new_provider"):
@@ -333,7 +337,9 @@ class AssignContractManagerFormView(BaseFormView):
         page = int(request.args.get("page", 1))
         form = self.get_form_class()(search_term=search_term, page=page)
 
-        if form.validate_on_submit():
+        if form.skip.data:
+            return self.skip_form(form)
+        elif form.validate_on_submit():
             return self.form_valid(form)
         else:
             return self.form_invalid(form, **kwargs)
