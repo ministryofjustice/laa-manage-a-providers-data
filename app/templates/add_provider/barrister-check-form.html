@@ -1,0 +1,9 @@
+{% extends 'form.html' %}
+{% from 'macros/contact_tables.html' import contactCards %}
+{% block pageHeading %}
+{% endblock %}
+{% block pageContent %}
+    <h1 class="govuk-heading-xl">{{ form.title }}</h1>
+    {{ contactCards(contact_tables, title="") }}
+    {{ super() }}
+{% endblock %}

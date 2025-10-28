@@ -174,7 +174,7 @@ def get_sorted_contacts(firm: Firm, office: Office = None) -> List[Contact]:
     return sorted_contacts
 
 
-def get_contact_tables(firm: Firm, head_office: Office = None) -> list[DataTable]:
+def get_contact_tables(firm: Firm, head_office: Office = None, include_change_link=True) -> list[DataTable]:
     sorted_contacts = get_sorted_contacts(firm, head_office)
     if not sorted_contacts:
         return []
@@ -187,7 +187,7 @@ def get_contact_tables(firm: Firm, head_office: Office = None) -> list[DataTable
             "title": card_title,
         }
 
-        if contact.primary == "Y":
+        if contact.primary == "Y" and include_change_link:
             # Only the primary contact card has the action to change the Liaison Manager
             card.update(
                 {
