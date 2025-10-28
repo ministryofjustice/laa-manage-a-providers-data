@@ -55,8 +55,8 @@ class PaymentMethodFormView(BaseFormView):
 
     def get_success_url(self, form, firm, office=None):
         if office:
-            return url_for("main.view_office", firm=firm, office=office)
-        return url_for("main.view_office", firm=firm)
+            return url_for("main.view_office_bank_payment_details", firm=firm, office=office)
+        return url_for("main.view_office_bank_payment_details", firm=firm, office=form.office)
 
     def form_valid(self, form):
         if not hasattr(form, "firm") or not hasattr(form, "office"):
