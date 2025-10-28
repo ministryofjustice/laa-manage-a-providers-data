@@ -41,6 +41,11 @@ def _add_table_row_from_config(table: SummaryList, field: dict, data_source: dic
     elif field_id := field.get("id"):
         value = data_source.get(field_id)
 
+    if value_preprocessor := field.get("value_preprocessor"):
+        if not isinstance(value_preprocessor, Callable):
+            raise ValueError("value_preprocessor must be callable")
+        value = value_preprocessor(value)
+
     # Skip row if hide_if_null is set and value is empty
     if not value and field.get("hide_if_null", False):
         return
@@ -83,10 +88,16 @@ def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | N
         if not value and field.get("hide_if_null", False):
             continue
 
+        if value_preprocessor := field.get("value_preprocessor"):
+            if not isinstance(value_preprocessor, Callable):
+                raise ValueError("value_preprocessor must be callable")
+            value = value_preprocessor(value)
+
         # Build row action URLs if change_link is present
         row_action_urls = None
         if change_link := field.get("change_link"):
-            row_action_urls = {"change": url_for(change_link, firm=firm)}
+            key = "change" if value else "enter"
+            row_action_urls = {key: url_for(change_link, firm=firm)}
 
         _add_table_row_from_config(main_table, field, data_source, row_action_urls)
 

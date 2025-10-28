@@ -70,3 +70,5 @@ OFFICE_ACTIVE_STATUS_CHOICES = [
     ("active", "Active"),
     ("inactive", "Inactive"),
 ]
+
+DEFAULT_CONTRACT_MANAGER_NAME = "Mr.Default"
