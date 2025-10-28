@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
-    success_endpoint = "main.view_office_bank_payment_details"
     template = "update_office/form.html"
 
     def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
@@ -24,7 +23,9 @@ class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
         return context
 
     def get_success_url(self, form: BaseForm | None = None) -> str:
-        return url_for(self.success_endpoint, firm=form.firm, office=form.office)
+        if form.firm.is_advocate or form.firm.is_barrister:
+            return url_for("main.view_provider_bank_accounts_payment", firm=form.firm)
+        return url_for("main.view_office_bank_payment_details", firm=form.firm, office=form.office)
 
     def form_valid(self, form):
         pda = current_app.extensions["pda"]
@@ -38,12 +39,24 @@ class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
         flash("<b>Updated VAT registration number</b>", "success")
         return super().form_valid(form)
 
-    def get(self, firm, office, *args, **kwargs):
-        form = self.get_form_class()(firm=firm, office=office, vat_registration_number=office.vat_registration_number)
+    def get_form_instance(self, **kwargs) -> BaseForm:
+        firm: Firm = kwargs["firm"]
+        if firm.is_advocate or firm.is_barrister:
+            office = self.get_api().get_head_office(firm.firm_id)
+        else:
+            office = kwargs.get("office")
+
+        if not office:
+            raise ValueError("Error updating VAT without providing an office")
+
+        return self.get_form_class()(firm=firm, office=office, vat_registration_number=office.vat_registration_number)
+
+    def get(self, firm, office=None, *args, **kwargs):
+        form = self.get_form_instance(firm=firm, office=office)
         return render_template(self.template, **self.get_context_data(form, **kwargs))
 
-    def post(self, firm, office, *args, **kwargs) -> Response | str:
-        form = self.get_form_class()(firm=firm, office=office)
+    def post(self, firm, office=None, *args, **kwargs) -> Response | str:
+        form = self.get_form_instance(firm=firm, office=office)
         if form.validate_on_submit():
             return self.form_valid(form)
         else:

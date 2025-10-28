@@ -34,7 +34,10 @@ class UpdateOfficeBaseForm(BaseForm):
 
 class UpdateVATRegistrationNumberForm(UpdateOfficeBaseForm):
     title = "VAT registration number (optional)"
-    url = "/provider/<firm:firm>/office/<office:office>/add-vat-number"
+    url = [
+        "/provider/<firm:firm>/office/<office:office>/change-vat-registration",
+        "/provider/<firm:firm>/change-vat-registration",
+    ]
 
     vat_registration_number = StringField(
         "",
@@ -48,6 +51,10 @@ class UpdateVATRegistrationNumberForm(UpdateOfficeBaseForm):
             ValidateVATRegistrationNumber(message="Enter the VAT registration number in the correct format"),
         ],
     )
+
+
+class UpdateVATRegistrationNumberAdvocateBarristerForm(UpdateVATRegistrationNumberForm):
+    url = "/provider/<firm:firm>/change-vat-registration"
 
 
 class PaymentMethodForm(UpdateOfficeBaseForm):
