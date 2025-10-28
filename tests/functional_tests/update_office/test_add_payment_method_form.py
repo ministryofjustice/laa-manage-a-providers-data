@@ -66,9 +66,7 @@ def test_valid_form_submission_payment_method_electronic(page: Page):
     page.get_by_role("button", name="Save").click()
 
     # Redirect to the bank-payment-details subpage
-    expect(page).to_have_url(
-        url_for("main.view_office_bank_payment_details", firm=1, office="1A001L", _external=True)
-    )
+    expect(page).to_have_url(url_for("main.view_office_bank_payment_details", firm=1, office="1A001L", _external=True))
 
     # Verify success message is shown
     expect(page.get_by_text("Payment method updated successfully")).to_be_visible()
@@ -95,9 +93,7 @@ def test_valid_form_submission_payment_method_cheque(page: Page):
     page.get_by_role("button", name="Save").click()
 
     # Redirect to the bank-payment-details subpage
-    expect(page).to_have_url(
-        url_for("main.view_office_bank_payment_details", firm=1, office="1A001L", _external=True)
-    )
+    expect(page).to_have_url(url_for("main.view_office_bank_payment_details", firm=1, office="1A001L", _external=True))
 
     # Verify success message is shown
     expect(page.get_by_text("Payment method updated successfully")).to_be_visible()
