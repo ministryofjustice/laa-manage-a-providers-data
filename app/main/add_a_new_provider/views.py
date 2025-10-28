@@ -98,6 +98,7 @@ class HeadOfficeContactDetailsFormView(BaseFormView):
             "email_address": form.data.get("email_address"),
             "dx_number": form.data.get("dx_number"),
             "dx_centre": form.data.get("dx_centre"),
+            "payment_method": "Electronic",
         }
 
         return super().form_valid(form)

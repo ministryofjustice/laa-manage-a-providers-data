@@ -322,6 +322,9 @@ def replicate_office_for_child_firm(source_office: Office, new_firm_id: int, as_
     else:
         office_data["is_head_office"] = False
 
+    # Ensure payment method defaults to Electronic for newly created offices for child firms
+    office_data["payment_method"] = "Electronic"
+
     # Create new office
     new_office = Office(**office_data)
     return add_new_office(new_office, firm_id=new_firm_id, show_success_message=False)
