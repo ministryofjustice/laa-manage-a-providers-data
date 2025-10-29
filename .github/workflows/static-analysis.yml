@@ -22,7 +22,7 @@ jobs:
     - name: Run pip-compile pre-commit
       id: pip_compile
       run: |
-        python -m pip install --upgrade pip
+        python -m pip install --upgrade pip==25.2
         pip install pre-commit
         ls requirements/source/* | xargs pre-commit run pip-compile --files
 
