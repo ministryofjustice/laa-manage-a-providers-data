@@ -47,7 +47,8 @@ class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
             office = kwargs.get("office")
 
         if not office:
-            raise ValueError("Error updating VAT without providing an office")
+            flash("No office found", "error")
+            abort(404, "No office found")
 
         return self.get_form_class()(firm=firm, office=office, vat_registration_number=office.vat_registration_number)
 
