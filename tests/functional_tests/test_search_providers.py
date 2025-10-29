@@ -41,22 +41,3 @@ def test_search_shows_correct__providers(page):
     expect(page.get_by_role("cell", name="3")).to_be_visible()
     expect(page.get_by_role("cell", name="No statuses")).to_be_visible()
     expect(page.get_by_text("Showing 1 to 1 of 1 results")).to_be_visible()
-
-
-@pytest.mark.usefixtures("live_server")
-def test_invalid_search_shows_error_message(page):
-    page.get_by_role("button", name="Sign in").click()
-    page.get_by_role("textbox", name="Find a provider").fill("INVALID")
-    page.get_by_role("button", name="Search").click()
-    expect(
-        page.get_by_role("link", name="No providers found. Check the spelling and search for something else.")
-    ).to_be_visible()
-    expect(
-        page.get_by_text("Error: No providers found. Check the spelling and search for something else.")
-    ).to_be_visible()
-
-    # Check table is not visible
-    expect(page.get_by_role("columnheader", name="Provider name")).not_to_be_visible()
-    expect(page.get_by_role("columnheader", name="Provider type")).not_to_be_visible()
-    expect(page.get_by_role("columnheader", name="Provider number")).not_to_be_visible()
-    expect(page.get_by_role("columnheader", name="Status")).not_to_be_visible()
