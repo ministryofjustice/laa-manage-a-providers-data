@@ -28,10 +28,8 @@ class OfficeContactDetailsFormView(BaseFormView):
             "email_address": form.data.get("email_address"),
             "dx_number": form.data.get("dx_number"),
             "dx_centre": form.data.get("dx_centre"),
+            "payment_method": "Electronic",  # The new office must be set to Electronic payment method so we do it here before the offcie is created
         }
-
-        # the new office must be set to Electronic payment method so we do it here before the offcie is created
-        session["new_office"]["payment_method"] = "Electronic"
 
         # Create the office
         office = Office(**office_details)
