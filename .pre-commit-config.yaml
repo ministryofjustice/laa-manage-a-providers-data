@@ -2,7 +2,7 @@ default_language_version:
     python: python3.13
 repos:
   - repo: https://github.com/jazzband/pip-tools
-    rev: v7.5.0
+    rev: v7.5.1
     hooks:
       - id: pip-compile
         name: pip-compile requirements-development.in
