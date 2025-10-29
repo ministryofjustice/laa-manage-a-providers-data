@@ -24,7 +24,9 @@ class ChangeLiaisonManagerFormView(FullWidthBaseFormView):
         "Office": "modify_provider/change-liaison-manager-legal-services-provider-office.html",
     }
 
-    def get_success_url(self, firm):
+    def get_success_url(self, firm, office: Office | None = None):
+        if office:
+            return url_for("main.view_office", firm=firm, office=office)
         return url_for("main.view_provider", firm=firm)
 
     def form_valid(self, form):
@@ -37,15 +39,14 @@ class ChangeLiaisonManagerFormView(FullWidthBaseFormView):
             website=form.data.get("website"),
         )
 
-        # Are we changing the Liaison Manager for the firm or the office?
+        # If the office is not specified, we change liaison manager at the firm level...
+        office = None
         if hasattr(form, "office"):
-            # Change for the specific office
-            change_liaison_manager(new_contact, form.firm.firm_id, office=form.office)
-        else:
-            # If changing at the provider, change all
-            change_liaison_manager(new_contact, form.firm.firm_id)
+            # ...but if we have a specific office, only change the office liaison manager.
+            office = form.office
+        change_liaison_manager(new_contact, form.firm.firm_id, office=office)
 
-        return redirect(self.get_success_url(form.firm))
+        return redirect(self.get_success_url(form.firm, office=office))
 
     def get(self, firm, context, **kwargs):
         form = self.get_form_class()(firm=firm)
