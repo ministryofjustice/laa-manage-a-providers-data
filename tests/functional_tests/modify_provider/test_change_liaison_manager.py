@@ -151,3 +151,40 @@ def test_change_liaison_manager_replaces_existing_primary(page: Page):
     # Current date should appear twice: Active from for new contact and Active to for old contact
     current_date = date.today().strftime("%-d %b %Y")
     expect(page.get_by_text(current_date)).to_have_count(2)
+
+
+@pytest.mark.usefixtures("live_server")
+def test_change_liaison_manager_only_on_office(page: Page):
+    """Test that changing liaison manager for an office changes only the office."""
+    navigate_to_existing_provider(page)
+
+    # Navigate to a sub-office
+    page.get_by_role("link", name="Offices").click()
+    page.get_by_role("link", name="1A002L").click()
+    page.get_by_role("link", name="Contact").click()
+    expect(page.locator("#main-content")).to_contain_text("Michael Thompson Change liaison manager (Michael Thompson)")
+
+    # Change the liaison manager...
+    page.get_by_role("link", name="Change liaison manager   (").click()
+    # ...for this specific office.
+    expect(page.get_by_text("This will only apply to this")).to_be_visible()
+
+    page.get_by_role("textbox", name="First name").click()
+    page.get_by_role("textbox", name="First name").fill("Alice")
+    page.get_by_role("textbox", name="Last name").click()
+    page.get_by_role("textbox", name="Last name").fill("Acrington")
+    page.get_by_role("textbox", name="Email address").click()
+    page.get_by_role("textbox", name="Email address").fill("alice@office2.example.com")
+    page.get_by_role("textbox", name="Telephone number").click()
+    page.get_by_role("textbox", name="Telephone number").fill("01234 567 891")
+    page.get_by_role("button", name="Save").click()
+
+    # Successfully added the new liaison manager...
+    expect(page.get_by_label("Success").locator("div").filter(has_text="Alice Acrington is the new")).to_be_visible()
+    # ...and that the new liaison manager is listed...
+    page.get_by_role("link", name="Contact").click()
+    expect(page.get_by_text("Alice Acrington Change")).to_be_visible()
+    # ...and that at the provider level...
+    page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
+    # ...the liaison manager has not changed.
+    expect(page.get_by_text("Sarah Johnson Change liaison")).to_be_visible()
