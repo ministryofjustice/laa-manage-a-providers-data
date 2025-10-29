@@ -201,6 +201,7 @@ class Contact(BaseModel):
         extra="forbid",  # Don't allow extra fields
     )
 
+    contact_id: Optional[int] = Field(alias="contactId", default=None)
     # vendorSiteId maps to firm_office_id
     vendor_site_id: int = Field(alias="vendorSiteId", gt=0, default=None)  # This is the firm_office_id
     first_name: str = Field(alias="firstName", min_length=1, default=None)
@@ -211,6 +212,8 @@ class Contact(BaseModel):
     job_title: Optional[str] = Field(alias="jobTitle", default=None)
     primary: str = Field(default="N")
     active_from: Optional[str] = Field(alias="activeFrom", default=None)
+    creation_date: Optional[date] = Field(alias="creationDate", default=None)
+    inactive_date: Optional[date] = Field(alias="inactiveDate", default=None)
 
     def to_api_dict(self) -> dict:
         """Export as camelCase dictionary for API calls."""

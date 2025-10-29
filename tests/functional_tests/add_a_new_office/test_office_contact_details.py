@@ -3,32 +3,43 @@ from flask import url_for
 from playwright.sync_api import Page, expect
 
 
-def navigate_to_office_contact_details(page: Page):
+def table_to_dict(page: Page, table_selector: str) -> dict:
+    """Convert a two-column table (<th> + <td>) into a Python dict."""
+    table_dict = {}
+    rows = page.locator(f"{table_selector} tr")
+
+    for i in range(rows.count()):
+        row = rows.nth(i)
+        header = row.locator("th").inner_text().strip()
+        cell = row.locator("td").inner_text().strip()
+        table_dict[header] = cell
+
+    return table_dict
+
+
+def navigate_to_office_contact_details(page: Page, provider_name="SMITH & PARTNERS SOLICITORS", has_office=True):
     """Helper function to navigate to the Office Contact Details form via UI flow."""
     # Navigate to the providers list
     page.goto(url_for("main.providers", _external=True))
 
     # Search for "Smith" to find "SMITH & PARTNERS SOLICITORS"
-    page.get_by_role("textbox", name="Find a provider").fill("smith")
+    page.get_by_role("textbox", name="Find a provider").fill(provider_name)
     page.get_by_role("button", name="Search").click()
 
     # Click on the first provider
-    page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
+    page.get_by_role("link", name=provider_name).click()
 
     # Click on the Offices sub-navigation
     page.get_by_role("link", name="Offices").click()
 
-    # Click "Add an office" button
-    page.get_by_role("button", name="Add another office").click()
-
-    # Fill the add office form
-    page.get_by_role("textbox", name="Office name").fill("Test Office")
-    page.get_by_role("radio", name="Yes").click()
-    page.get_by_role("button", name="Continue").click()
-
-    # Should now be on the office contact details page
-    expect(page.get_by_role("heading", name="Office contact details")).to_be_visible()
-    expect(page.get_by_text("Test Office")).to_be_visible()  # Caption should show office name
+    if has_office:
+        # Click "Add another office" button
+        page.get_by_role("button", name="Add another office").click()
+        expect(page.get_by_role("button", name="Add an office")).not_to_be_visible()
+    else:
+        # Click "Add an office" button
+        page.get_by_role("button", name="Add an office").click()
+        expect(page.get_by_role("button", name="Add another office")).not_to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -187,15 +198,6 @@ def test_successful_form_submission_all_fields(page: Page):
 
 
 @pytest.mark.usefixtures("live_server")
-def test_form_caption_shows_office_name(page: Page):
-    """Test that the form caption shows the office name from the previous step."""
-    navigate_to_office_contact_details(page)
-
-    # The caption should show the office name from the session
-    expect(page.get_by_text("Test Office")).to_be_visible()
-
-
-@pytest.mark.usefixtures("live_server")
 def test_optional_fields_not_required(page: Page):
     """Test that optional fields don't prevent form submission."""
     navigate_to_office_contact_details(page)
@@ -218,13 +220,27 @@ def test_optional_fields_not_required(page: Page):
     expect(page.get_by_text("Test City")).to_be_visible()
     expect(page.get_by_text("TE1 5ST")).to_be_visible()
 
+    # Make sure the new office is NOT marked as the head office because this provider has a head office.
+    overview_table = table_to_dict(page, "h2:has-text('Overview') + table")
+    assert overview_table["Head office"] == "No"
+
 
 @pytest.mark.usefixtures("live_server")
-def test_direct_access_without_session_redirects(page: Page):
-    """Test that accessing contact details directly without session data gives 404."""
-    # Try to access contact details page directly without going through add office flow
-    resp = page.goto(url_for("main.add_office_contact_details", firm=1, _external=True))
-    assert resp is not None
-    assert resp.status == 400
-    # Should get 400 error since no session data exists
-    expect(page.get_by_role("heading", name="Sorry, there is a problem with the service")).to_be_visible
+def test_add_head_office(page: Page):
+    """If the firm has no offices then office new being added becomes the head office"""
+    navigate_to_office_contact_details(page, provider_name="LIVERPOOL LEGAL CENTRE", has_office=False)
+
+    # Fill required fields, leave optional fields empty
+    page.get_by_role("textbox", name="Address line 1").fill("123 Test Street")
+    page.get_by_role("textbox", name="Town or city").fill("Test City")
+    page.get_by_role("textbox", name="Postcode").fill("TE1 5ST")
+    page.get_by_role("textbox", name="Telephone number").fill("01234567890")
+    page.get_by_role("textbox", name="Email address").fill("test@office.com")
+    page.get_by_role("textbox", name="DX number").fill("DX123456")
+    page.get_by_role("textbox", name="DX centre").fill("Test Centre")
+    # Leave optional fields empty: address_line_2-4, county
+    page.get_by_role("button", name="Submit").click()
+
+    # Make sure the new office is marked as the head office because this provider did not have head office.
+    overview_table = table_to_dict(page, "h2:has-text('Overview') + table")
+    assert overview_table["Head office"] == "Yes"

@@ -1,9 +1,10 @@
 from typing import Any
 
-from flask import Response, redirect, render_template, url_for
+from flask import Response, current_app, redirect, render_template, url_for
 from flask.views import MethodView
 
 from app.forms import BaseForm
+from app.pda.api import ProviderDataApi
 
 
 class BaseFormView(MethodView):
@@ -62,6 +63,9 @@ class BaseFormView(MethodView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form, **kwargs)
+
+    def get_api(self) -> ProviderDataApi:
+        return current_app.extensions["pda"]
 
 
 class FullWidthBaseFormView(BaseFormView):
