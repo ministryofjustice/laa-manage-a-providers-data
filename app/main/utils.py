@@ -119,8 +119,11 @@ def add_new_contact(contact: Contact, firm_id: int, office_code: str, show_succe
     return new_contact
 
 
-def change_liaison_manager(contact: Contact, firm_id: int, show_success_message: bool = True) -> Contact:
-    """Change the liaison manager for ALL offices of a firm, making the new contact primary across the firm.
+def change_liaison_manager(
+    contact: Contact, firm_id: int, show_success_message: bool = True, office: Office | None = None
+) -> Contact:
+    """Change the liaison manager, changing it for ALL offices of a firm if no individual office is specified, or just
+     the specified office, making the new contact primary.
 
     Creates a new contact record for each office of the firm, making the new person the primary
     liaison manager for every office. All existing liaison managers across all offices become non-primary.
@@ -146,13 +149,20 @@ def change_liaison_manager(contact: Contact, firm_id: int, show_success_message:
     if not isinstance(firm_id, int) or firm_id <= 0:
         raise ValueError("firm_id must be a positive integer")
 
-    # Get all offices for this firm
-    firm_offices = pda.get_provider_offices(firm_id)
+    if office:
+        firm_offices = [
+            office,
+        ]
+        head_office = office
+    else:
+        # Get all offices for this firm
+        firm_offices = pda.get_provider_offices(firm_id)
+        head_office = pda.get_head_office(firm_id)
+
     if not firm_offices:
         raise ProviderDataApiError(f"No offices found for firm {firm_id}")
 
-    # Find head office for return value (use first office as fallback)
-    head_office = pda.get_head_office(firm_id)
+    # Use head office for return value (or first office as fallback)
     return_office = head_office or firm_offices[0]
 
     # Set all existing liaison managers to non-primary across all offices
