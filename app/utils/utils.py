@@ -42,8 +42,10 @@ def register_form_view(
     url = form_class.url
     if callable(url):
         url = url(**kwargs)
-    blueprint.add_url_rule(
-        f"/{url}",
-        view_func=view_func,
-        methods=["GET", "POST"],
-    )
+    urls = url if isinstance(url, list) else [url]
+    for url in urls:
+        blueprint.add_url_rule(
+            f"/{url}",
+            view_func=view_func,
+            methods=["GET", "POST"],
+        )
