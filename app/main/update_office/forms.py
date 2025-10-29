@@ -53,10 +53,6 @@ class UpdateVATRegistrationNumberForm(UpdateOfficeBaseForm):
     )
 
 
-class UpdateVATRegistrationNumberAdvocateBarristerForm(UpdateVATRegistrationNumberForm):
-    url = "/provider/<firm:firm>/change-vat-registration"
-
-
 class PaymentMethodForm(UpdateOfficeBaseForm):
     title = "Payment method"
     url = "provider/<firm:firm>/office/<office:office>/payment-method"
