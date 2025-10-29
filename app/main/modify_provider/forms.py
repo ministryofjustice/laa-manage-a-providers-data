@@ -10,7 +10,6 @@ from app.main.add_a_new_provider.forms import LiaisonManagerForm
 from app.main.utils import get_firm_account_number
 from app.models import Firm, Office
 from app.utils.formatting import format_office_address_one_line
-from app.validators import ValidateSearchResults
 from app.widgets import GovRadioInput, GovTextInput
 
 
@@ -86,7 +85,7 @@ class AssignChambersForm(BaseForm):
             heading_class="govuk-fieldset__legend--s",
             hint="You can search by name or account number",
         ),
-        validators=[Length(max=100, message="Search term must be 100 characters or less"), ValidateSearchResults()],
+        validators=[Length(max=100, message="Search term must be 100 characters or less")],
     )
 
     provider = GovUKTableRadioField(
