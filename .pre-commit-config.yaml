@@ -12,6 +12,8 @@ repos:
         name: pip-compile requirements-production.in
         files: requirements-(base|production).in
         args: [ "--strip-extras", "--no-header", requirements/source/requirements-production.in, "--output-file", requirements/generated/requirements-production.txt, "--no-annotate"]
+        additional_dependencies:
+          - "pip<25.3"         # pin pip version
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.27.2
     hooks:
