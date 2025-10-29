@@ -233,7 +233,10 @@ def get_payment_information_table(firm: Firm, office: Office) -> DataTable:
 
 def get_vat_registration_table(firm: Firm, office: Office) -> DataTable:
     table = SummaryList()
-    url = url_for("main.add_office_vat_number", firm=firm, office=office)
+    if firm.is_advocate or firm.is_barrister:
+        url = url_for("main.add_office_vat_number", firm=firm)
+    else:
+        url = url_for("main.add_office_vat_number", firm=firm, office=office)
     table.add_row(
         label="VAT registration number",
         value=office.vat_registration_number,
