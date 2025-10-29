@@ -6,7 +6,7 @@ from app.components.tables import DataTable, TableStructureItem
 from app.forms import BaseForm
 from app.models import Firm
 from app.utils.formatting import format_sentence_case
-from app.validators import ValidateAccountNumber, ValidateSearchResults, ValidateSortCode
+from app.validators import ValidateAccountNumber, ValidateSortCode
 from app.widgets import GovTextInput
 
 
@@ -37,7 +37,7 @@ class ProviderListForm(BaseForm):
             heading_class="govuk-fieldset__legend--s",
             hint="You can search by name, provider number or account number",
         ),
-        validators=[Length(max=100, message="Search term must be 100 characters or less"), ValidateSearchResults()],
+        validators=[Length(max=100, message="Search term must be 100 characters or less")],
     )
 
     def __init__(self, *args, **kwargs):
