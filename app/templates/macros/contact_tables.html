@@ -16,7 +16,7 @@
             {% endset %}
             
             {{ govukDetails({
-                "summaryText": "Show " ~ (contact_tables|length - 1) ~ " additional contact" ~ ("s" if contact_tables|length > 2 else ""),
+                "summaryText": "Previous contacts",
                 "html": additional_contacts_html
             }) }}
         {% endif %}

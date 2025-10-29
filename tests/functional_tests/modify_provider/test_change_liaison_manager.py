@@ -148,5 +148,6 @@ def test_change_liaison_manager_replaces_existing_primary(page: Page):
     expect(page.get_by_text("newprimary@example.com")).to_be_visible()
 
     # Note the format does not zero pad the day of the month
+    # Current date should appear twice: Active from for new contact and Active to for old contact
     current_date = date.today().strftime("%-d %b %Y")
-    expect(page.get_by_text(current_date)).to_be_visible()
+    expect(page.get_by_text(current_date)).to_have_count(2)
