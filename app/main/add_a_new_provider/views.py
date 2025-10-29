@@ -1,8 +1,11 @@
-from flask import Response, abort, redirect, render_template, request, session, url_for
+from typing import Any
 
-from app.constants import PARENT_FIRM_TYPE_CHOICES
-from app.main.utils import create_advocate_from_form_data, create_barrister_from_form_data
-from app.models import Firm
+from flask import Response, abort, current_app, redirect, render_template, request, session, url_for
+
+from app.constants import DEFAULT_CONTRACT_MANAGER_NAME, PARENT_FIRM_TYPE_CHOICES
+from app.forms import BaseForm
+from app.main.utils import change_liaison_manager, create_advocate_from_form_data, create_barrister_from_form_data
+from app.models import Contact, Firm
 from app.views import BaseFormView, FullWidthBaseFormView
 
 
@@ -95,6 +98,7 @@ class HeadOfficeContactDetailsFormView(BaseFormView):
             "email_address": form.data.get("email_address"),
             "dx_number": form.data.get("dx_number"),
             "dx_centre": form.data.get("dx_centre"),
+            "payment_method": "Electronic",
         }
 
         return super().form_valid(form)
@@ -298,6 +302,10 @@ class AssignContractManagerFormView(BaseFormView):
         session.get("new_provider").update({"contract_manager": form.data.get("contract_manager")})
         return super().form_valid(form)
 
+    def skip_form(self, form):
+        session.get("new_provider").update({"contract_manager": DEFAULT_CONTRACT_MANAGER_NAME})
+        return super().form_valid(form)
+
     @staticmethod
     def get_valid_firm_or_abort():
         if not session.get("new_provider"):
@@ -333,24 +341,26 @@ class AssignContractManagerFormView(BaseFormView):
         page = int(request.args.get("page", 1))
         form = self.get_form_class()(search_term=search_term, page=page)
 
-        if form.validate_on_submit():
+        if form.skip.data:
+            return self.skip_form(form)
+        elif form.validate_on_submit():
             return self.form_valid(form)
         else:
             return self.form_invalid(form, **kwargs)
 
 
-class AddBarristerFormView(BaseFormView):
+class AddBarristerDetailsFormView(BaseFormView):
     """Form view for the add barrister form"""
 
     def get_success_url(self, form, firm):
-        return url_for("main.view_provider_barristers_and_advocates", firm=firm)
+        return url_for("main.add_barrister_check_form", firm=firm)
 
     def get_chambers_or_abort(self, firm):
         if not firm or firm.firm_type != "Chambers":
             abort(404)
 
     def form_valid(self, form, firm):
-        create_barrister_from_form_data(
+        session["new_barrister"] = dict(
             barrister_name=form.data.get("barrister_name"),
             barrister_level=form.data.get("barrister_level"),
             bar_council_roll_number=form.data.get("bar_council_roll_number"),
@@ -373,18 +383,18 @@ class AddBarristerFormView(BaseFormView):
             return self.form_invalid(form, **kwargs)
 
 
-class AddAdvocateFormView(BaseFormView):
+class AddAdvocateDetailsFormView(BaseFormView):
     """Form view for the add advocate form"""
 
     def get_success_url(self, form, firm):
-        return url_for("main.view_provider_barristers_and_advocates", firm=firm)
+        return url_for("main.add_advocate_check_form", firm=firm)
 
     def get_chambers_or_abort(self, firm):
         if not firm or firm.firm_type != "Chambers":
             abort(404)
 
     def form_valid(self, form, firm):
-        create_advocate_from_form_data(
+        session["new_advocate"] = dict(
             advocate_name=form.data.get("advocate_name"),
             advocate_level=form.data.get("advocate_level"),
             sra_roll_number=form.data.get("sra_roll_number"),
@@ -405,3 +415,80 @@ class AddAdvocateFormView(BaseFormView):
             return self.form_valid(form, firm)
         else:
             return self.form_invalid(form, **kwargs)
+
+
+class AddAdvocateBarristersCheckFormView(BaseFormView):
+    def __init__(self, model_type: str, *args, **kwargs):
+        self.model_type = model_type.lower()
+        super().__init__(*args, **kwargs)
+
+    def get_context_data(self, form: BaseForm, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, **kwargs)
+        from app.main.views import get_contact_tables
+
+        pda = current_app.extensions["pda"]
+        head_office = pda.get_head_office(form.firm.firm_id)
+        context["contact_tables"] = get_contact_tables(
+            firm=form.firm, head_office=head_office, include_change_link=False
+        )
+
+        return context
+
+    def create_model(self):
+        if self.model_type == "barrister":
+            firm = create_barrister_from_form_data(**session["new_barrister"])
+            del session["new_barrister"]
+        else:
+            firm = create_advocate_from_form_data(**session["new_advocate"])
+            del session["new_advocate"]
+        return firm
+
+    def form_valid(self, form: BaseForm, firm: Firm):
+        if form.same_liaison_manager_as_chambers.data.lower() == "yes":
+            new_firm = self.create_model()
+            return redirect(url_for("main.view_provider", firm=new_firm))
+
+        return redirect(url_for(f"main.add_{self.model_type}_liaison_manager_form", firm=firm))
+
+    def dispatch_request(self, **kwargs):
+        key = "new_barrister" if self.model_type == "barrister" else "new_advocate"
+        if not session.get(key):
+            return redirect(url_for(f"main.add_{self.model_type}_details_form", firm=kwargs["firm"]))
+
+        firm: Firm = kwargs.get("firm")
+        if (not firm) or (not firm.is_chambers) or (firm.firm_id != session[key]["parent_firm_id"]):
+            abort(404)
+
+        return super().dispatch_request(**kwargs)
+
+    def get(self, context, firm, **kwargs):
+        form = self.get_form_class()(firm=firm, model_type=self.model_type)
+        return render_template(self.get_template(), **self.get_context_data(form, **kwargs))
+
+    def post(self, context, firm, **kwargs) -> Response | str:
+        form = self.get_form_class()(firm=firm, model_type=self.model_type)
+
+        if form.validate_on_submit():
+            return self.form_valid(form, firm)
+        else:
+            return self.form_invalid(form, **kwargs)
+
+
+class AddAdvocateBarristersLiaisonManagerFormView(AddAdvocateBarristersCheckFormView):
+    def get_success_url(self, firm):
+        return url_for("main.view_provider", firm=firm)
+
+    def form_valid(self, form, firm):
+        new_firm = self.create_model()
+
+        liaison_manager = Contact(
+            firstName=form.data.get("first_name"),
+            lastName=form.data.get("last_name"),
+            emailAddress=form.data.get("email_address"),
+            telephoneNumber=form.data.get("telephone_number"),
+            website=form.data.get("website"),
+            jobTitle="Liaison manager",  # All contacts are liaison managers in MAPD
+            primary="Y",  # We are adding a new head office so this will be the primary contact
+        )
+        change_liaison_manager(contact=liaison_manager, firm_id=new_firm.firm_id)
+        return redirect(self.get_success_url(new_firm))

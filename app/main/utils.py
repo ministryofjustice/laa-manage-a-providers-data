@@ -6,6 +6,7 @@ from datetime import date
 from flask import current_app, flash, session, url_for
 
 from app.components.tag import Tag, TagType
+from app.constants import DEFAULT_CONTRACT_MANAGER_NAME
 from app.models import BankAccount, Contact, Firm, Office
 from app.pda.errors import ProviderDataApiError
 from app.pda.mock_api import MockProviderDataApi
@@ -323,6 +324,9 @@ def replicate_office_for_child_firm(source_office: Office, new_firm_id: int, as_
     else:
         office_data["is_head_office"] = False
 
+    # Ensure payment method defaults to Electronic for newly created offices for child firms
+    office_data["payment_method"] = "Electronic"
+
     # Create new office
     new_office = Office(**office_data)
     return add_new_office(new_office, firm_id=new_firm_id, show_success_message=False)
@@ -544,3 +548,7 @@ def reassign_head_office(firm: Firm | int, new_head_office: Office | str) -> Off
             flash(f"Failed to update office {office.firm_office_code}", category="error")
 
     return pda.get_head_office(firm.firm_id)
+
+
+def contract_manager_hide_default(value):
+    return None if value == DEFAULT_CONTRACT_MANAGER_NAME else value

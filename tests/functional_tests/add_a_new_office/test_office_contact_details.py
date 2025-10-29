@@ -148,6 +148,10 @@ def test_successful_form_submission_minimal(page: Page):
     expect(page.get_by_text("Test City")).to_be_visible()
     expect(page.get_by_text("TE1 5ST")).to_be_visible()
 
+    # Verify payment method defaults to Electronic
+    page.get_by_role("link", name="Bank accounts and payment").click()
+    expect(page.get_by_text("Payment method").locator("xpath=following-sibling::*[1]")).to_have_text("Electronic")
+
 
 @pytest.mark.usefixtures("live_server")
 def test_successful_form_submission_all_fields(page: Page):
@@ -176,6 +180,10 @@ def test_successful_form_submission_all_fields(page: Page):
     expect(page.get_by_text("Business Park")).to_be_visible()
     expect(page.get_by_text("Test City")).to_be_visible()
     expect(page.get_by_text("TE1 5ST")).to_be_visible()
+
+    # Verify payment method defaults to Electronic
+    page.get_by_role("link", name="Bank accounts and payment").click()
+    expect(page.get_by_text("Payment method").locator("xpath=following-sibling::*[1]")).to_have_text("Electronic")
 
 
 @pytest.mark.usefixtures("live_server")

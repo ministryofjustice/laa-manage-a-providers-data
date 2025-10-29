@@ -297,15 +297,19 @@ class AssignContractManagerForm(BaseForm):
         widget=GovTextInput(
             form_group_classes="govuk-!-width-two-thirds",
             heading_class="govuk-fieldset__legend--s",
-            hint="You can search by name or employee ID",
         ),
         validators=[Length(max=100, message="Search term must be 100 characters or less")],
     )
 
     contract_manager = StringField(
         "Contract manager",
-        validators=[InputRequired(message="Select a contract manager or search again")],
+        validators=[
+            InputRequired(
+                message="Select a contract manager, search again or skip this step if you do not know the contract manager"
+            )
+        ],
     )
+    skip = SubmitField("Unknown: Skip this step", widget=GovSubmitInput(classes="govuk-button--secondary"))
 
     def __init__(self, search_term=None, page=1, selected_value=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -364,10 +368,10 @@ class AssignContractManagerForm(BaseForm):
         self.selected_value = selected_value
 
 
-class AddBarristerForm(BaseForm):
+class AddBarristerDetailsForm(BaseForm):
     title = "Barrister details"
     url = "provider/<firm:firm>/add-barrister"
-    submit_button_text = "Submit"
+    submit_button_text = "Continue"
 
     def __init__(self, firm=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -405,10 +409,68 @@ class AddBarristerForm(BaseForm):
     )
 
 
-class AddAdvocateForm(BaseForm):
+class AddAdvocateBarristerCheckForm(BaseForm):
+    template = "add_provider/barrister-check-form.html"
+    same_liaison_manager_as_chambers = RadioField(
+        label="Do you want to use the same liaison manager as the chambers?",
+        choices=YES_NO_CHOICES,
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
+        validators=[InputRequired(message="Select yes if you want to use the same liaison manager as the chambers")],
+    )
+
+    @property
+    def title(self):
+        if self.model_type.lower() == "barrister":
+            return "Barrister details"
+        else:
+            return "Advocate details"
+
+    @classmethod
+    def url(cls, model_type):
+        if model_type.lower() == "barrister":
+            return "provider/<firm:firm>/barrister-liaison-manager-check"
+        else:
+            return "provider/<firm:firm>/advocate-liaison-manager-check"
+
+    @property
+    def caption(self):
+        if self.model_type.lower() == "barrister":
+            return session["new_barrister"]["barrister_name"]
+        else:
+            return session["new_advocate"]["advocate_name"]
+        return self.firm.firm_name
+
+    def __init__(self, firm, model_type: str, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.firm = firm
+        self.model_type = model_type
+
+
+class AddAdvocateBarristerLiaisonManagerForm(LiaisonManagerForm):
+    @classmethod
+    def url(cls, model_type):
+        if model_type.lower() == "barrister":
+            return "provider/<firm:firm>/add-barrister-liaison-manager"
+        else:
+            return "provider/<firm:firm>/add-advocate-liaison-manager"
+
+    @property
+    def caption(self):
+        if self.model_type.lower() == "barrister":
+            return session["new_barrister"]["barrister_name"]
+        else:
+            return session["new_advocate"]["advocate_name"]
+
+    def __init__(self, firm, model_type, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.firm = firm
+        self.model_type = model_type
+
+
+class AddAdvocateDetailsForm(BaseForm):
     title = "Advocate details"
     url = "provider/<firm:firm>/add-advocate"
-    submit_button_text = "Submit"
+    submit_button_text = "Continue"
 
     def __init__(self, firm=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
