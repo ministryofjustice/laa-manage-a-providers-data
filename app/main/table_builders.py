@@ -173,7 +173,7 @@ def get_sorted_contacts(firm: Firm, office: Office = None) -> List[Contact]:
 
     return sorted_contacts
 
-
+  
 def get_bank_account_tables(bank_accounts: List[BankAccount], action_url="#") -> List[DataTable]:
     bank_accounts.sort(key=lambda acc: (acc.primary_flag.lower() != "y", acc.start_date))
     bank_accounts_table = []
@@ -204,7 +204,10 @@ def get_bank_account_tables(bank_accounts: List[BankAccount], action_url="#") ->
     return bank_accounts_table
 
 
-def get_contact_tables(firm: Firm, head_office: Office = None, include_change_link=True) -> list[DataTable]:
+  
+def get_contact_tables(
+    firm: Firm, head_office: Office = None, include_change_link=True, changing_office: bool = False
+) -> list[DataTable]:
     sorted_contacts = get_sorted_contacts(firm, head_office)
     if not sorted_contacts:
         return []
@@ -218,11 +221,15 @@ def get_contact_tables(firm: Firm, head_office: Office = None, include_change_li
         }
 
         if contact.primary == "Y" and include_change_link:
+            if changing_office:
+                action_url = url_for("main.add_new_office_liaison_manager", firm=firm, office=head_office)
+            else:
+                action_url = url_for("main.add_new_liaison_manager", firm=firm)
             # Only the primary contact card has the action to change the Liaison Manager
             card.update(
                 {
                     "action_text": "Change liaison manager",
-                    "action_url": url_for("main.add_new_liaison_manager", firm=firm),
+                    "action_url": action_url,
                 }
             )
 

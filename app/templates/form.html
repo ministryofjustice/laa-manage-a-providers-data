@@ -24,8 +24,10 @@
       {% endif %}
 
       {% if form.description %}
-        {# Bottom margin is 50px to match the bottom margin of the xl heading #}
-        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-8">{{ form.description }}</p>
+        {% block formDescription %}
+          {# Bottom margin is 50px to match the bottom margin of the xl heading #}
+          <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-8">{{ form.description }}</p>
+        {% endblock %}
       {% endif %}
 
       {% for field in form %}

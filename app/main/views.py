@@ -222,8 +222,6 @@ class ViewProvider(MethodView):
                 context.update({"contact_details_table": self.get_chambers_contact_details_table(firm, head_office)})
 
             context.update({"contact_tables": get_contact_tables(firm, head_office)})
-            if firm.firm_type == "Chambers" and head_office:
-                context.update({"contact_details_table": self.get_chambers_contact_details_table(firm, head_office)})
 
         if self.subpage == "barristers-advocates":
             context.update({"barristers_table": self.get_barristers_table(firm)})
@@ -299,7 +297,7 @@ class ViewOffice(MethodView):
                     else None
                 }
             )
-            context.update({"contact_tables": get_contact_tables(firm, office)})
+            context.update({"contact_tables": get_contact_tables(firm, office, changing_office=True)})
 
         if self.subpage == "overview":
             context.update({"overview_table": get_office_overview_table(firm, office)})
