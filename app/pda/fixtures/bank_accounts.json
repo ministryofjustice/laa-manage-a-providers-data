@@ -21,6 +21,27 @@
       "startDate": "2025-10-10"
     },
     {
+      "bankAccountId": 901,
+      "vendorSiteId": 101,
+      "bankName": "Second Bank Partners",
+      "bankBranchName": "Manchester City Centre",
+      "sortCode": "102030",
+      "accountNumber": "10203040",
+      "bankAccountName": "Second Bank Account",
+      "currencyCode": "GBP",
+      "accountType": "Current Account",
+      "primaryFlag": "N",
+      "addressLine1": "2 Second Place",
+      "addressLine2": "Canary Wharf",
+      "addressLine3": null,
+      "city": "London",
+      "county": "Greater London",
+      "country": "GB",
+      "zip": "W22 2HP",
+      "startDate": "2025-09-10",
+      "endDate": "2025-09-10"
+    },
+    {
       "bankAccountId": 2,
       "vendorSiteId": 102,
       "bankName": "Crown Financial Services",

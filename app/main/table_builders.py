@@ -173,9 +173,19 @@ def get_sorted_contacts(firm: Firm, office: Office = None) -> List[Contact]:
 
     return sorted_contacts
 
-  
-def get_bank_account_tables(bank_accounts: List[BankAccount], action_url="#") -> List[DataTable]:
-    bank_accounts.sort(key=lambda acc: (acc.primary_flag.lower() != "y", acc.start_date))
+
+def get_sorted_office_bank_accounts(firm: Firm, office: Office = None) -> List[BankAccount]:
+    pda = current_app.extensions["pda"]
+    bank_accounts = pda.get_office_bank_accounts(firm_id=firm.firm_id, office_code=office.firm_office_code)
+    primary_bank_accounts = [bank_account for bank_account in bank_accounts if bank_account.primary_flag.lower() == "y"]
+    other_bank_accounts = [bank_account for bank_account in bank_accounts if bank_account.primary_flag.lower() == "n"]
+    primary_bank_accounts.sort(key=lambda bank_account: bank_account.start_date)
+    other_bank_accounts.sort(key=lambda bank_account: bank_account.end_date, reverse=True)
+    return primary_bank_accounts + other_bank_accounts
+
+
+def get_bank_account_tables(firm: Firm, office: Office, action_url="#") -> List[DataTable]:
+    bank_accounts = get_sorted_office_bank_accounts(firm, office)
     bank_accounts_table = []
     for bank_account in bank_accounts:
         card: Card = {

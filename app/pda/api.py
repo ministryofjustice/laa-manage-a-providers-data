@@ -397,9 +397,10 @@ class ProviderDataApi:
             raise ValueError("office_code must be a non-empty string")
 
         response = self.get(f"/provider-firms/{firm_id}/provider-offices/{office_code}/bank-account-details")
+        data = self._handle_response(response, [])
         bank_accounts = []
         if response:
-            for bank_account in response:
+            for bank_account in data:
                 bank_accounts.append(BankAccount(**bank_account))
         return bank_accounts
 

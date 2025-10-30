@@ -229,14 +229,11 @@ class ViewProvider(MethodView):
 
         if self.subpage == "bank-accounts-payment":
             if head_office:
-                bank_accounts = pda.get_office_bank_accounts(
-                    firm_id=firm.firm_id, office_code=head_office.firm_office_code
-                )
                 context.update(
                     {
                         "vat_registration_table": get_vat_registration_table(firm, head_office),
                         "payment_information_table": get_payment_information_table(firm, head_office),
-                        "bank_account_table": get_bank_account_tables(bank_accounts),
+                        "bank_account_table": get_bank_account_tables(firm=firm, office=head_office),
                     }
                 )
 
@@ -276,13 +273,13 @@ class ViewOffice(MethodView):
         context.update({"status_table": status_table})
 
         if self.subpage == "bank-payment-details":
-            pda = current_app.extensions["pda"]
-            bank_accounts = pda.get_office_bank_accounts(firm_id=firm.firm_id, office_code=office.firm_office_code)
             context.update(
                 {
                     "vat_registration_table": get_vat_registration_table(firm, office),
                     "payment_information_table": get_payment_information_table(firm, office),
-                    "bank_account_table": get_bank_account_tables(bank_accounts, action_url=add_bank_account_url),
+                    "bank_account_table": get_bank_account_tables(
+                        firm=firm, office=office, action_url=add_bank_account_url
+                    ),
                 }
             )
 

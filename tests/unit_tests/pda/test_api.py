@@ -188,11 +188,12 @@ class TestProviderDataApi:
 
     def test_get_office_bank_details(self, initialized_client):
         initialized_client.get = Mock(return_value=Mock(status_code=200))
-        initialized_client._handle_response = Mock(return_value={"accountNumber": "12345678"})
+        initialized_client._handle_response = Mock(return_value=[{"accountNumber": "12345678"}])
 
-        result = initialized_client.get_office_bank_details(123, "1A234B")
+        banks_accounts = initialized_client.get_office_bank_accounts(123, "1A234B")
 
         initialized_client.get.assert_called_once_with(
             "/provider-firms/123/provider-offices/1A234B/bank-account-details"
         )
-        assert result == {"accountNumber": "12345678"}
+        assert len(banks_accounts) == 1
+        assert banks_accounts[0].account_number == "12345678"
