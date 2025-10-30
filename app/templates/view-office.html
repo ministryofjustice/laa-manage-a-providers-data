@@ -94,7 +94,7 @@
 
         <h2 class="govuk-heading-m">Bank accounts</h2>
         {% if bank_account_table %}
-            {{ govukSummaryList(bank_account_table.to_summary_govuk_params()) }}
+            {{ contactCards(bank_account_table, title=None, previous_label="Previous bank accounts") }}
         {% else %}
             {{ govukButton({
                 "text": "Add bank account",

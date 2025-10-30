@@ -1,9 +1,11 @@
 {% from 'govuk_frontend_jinja/components/summary-list/macro.html' import govukSummaryList %}
 {% from 'govuk_frontend_jinja/components/details/macro.html' import govukDetails %}
 
-{% macro contactCards(contact_tables, title='Contacts') %}
+{% macro contactCards(contact_tables, title='Contacts', previous_label='Previous contacts') %}
     {% if contact_tables %}
-        <h3 class="govuk-heading-m">{{ title }}</h3>
+        {% if title %}
+            <h3 class="govuk-heading-m">{{ title }}</h3>
+        {% endif %}
         {# First contact shown directly #}
         {{ govukSummaryList(contact_tables[0].to_summary_govuk_params()) }}
         
@@ -16,7 +18,7 @@
             {% endset %}
             
             {{ govukDetails({
-                "summaryText": "Previous contacts",
+                "summaryText": previous_label,
                 "html": additional_contacts_html
             }) }}
         {% endif %}

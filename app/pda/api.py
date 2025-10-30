@@ -380,7 +380,7 @@ class ProviderDataApi:
         response = self.get(f"/provider-firms/{firm_id}/provider-offices/{office_code}/schedules")
         return self._handle_response(response, {})
 
-    def get_office_bank_details(self, firm_id: int, office_code: str) -> Optional[Dict[str, Any]]:
+    def get_office_bank_accounts(self, firm_id: int, office_code: str) -> List[BankAccount]:
         """
         Get bank details for a specific office.
 
@@ -389,7 +389,7 @@ class ProviderDataApi:
             office_code: The office code
 
         Returns:
-            Dict containing bank details
+            List of BankAccount model instances
         """
         if not isinstance(firm_id, int) or firm_id <= 0:
             raise ValueError("firm_id must be a positive integer")
@@ -397,7 +397,11 @@ class ProviderDataApi:
             raise ValueError("office_code must be a non-empty string")
 
         response = self.get(f"/provider-firms/{firm_id}/provider-offices/{office_code}/bank-account-details")
-        return self._handle_response(response, {})
+        bank_accounts = []
+        if response:
+            for bank_account in response:
+                bank_accounts.append(BankAccount(**bank_account))
+        return bank_accounts
 
     def patch_office(self, firm_id: int, office_code: str, fields_to_update: dict):
         response = self.patch(

@@ -7,7 +7,7 @@ from flask.views import MethodView
 from app.components.tables import DataTable, SummaryList, TableStructureItem
 from app.main.forms import firm_name_html, get_firm_statuses
 from app.main.table_builders import (
-    get_bank_account_table,
+    get_bank_account_tables,
     get_contact_tables,
     get_main_table,
     get_office_contact_table,
@@ -21,7 +21,7 @@ from app.main.utils import (
     get_firm_tags,
     get_office_tags,
 )
-from app.models import BankAccount, Firm, Office
+from app.models import Firm, Office
 from app.utils.formatting import (
     format_office_address_multi_line_html,
     format_office_address_one_line,
@@ -231,14 +231,14 @@ class ViewProvider(MethodView):
 
         if self.subpage == "bank-accounts-payment":
             if head_office:
-                bank_account: BankAccount = pda.get_office_bank_account(
+                bank_accounts = pda.get_office_bank_accounts(
                     firm_id=firm.firm_id, office_code=head_office.firm_office_code
                 )
                 context.update(
                     {
                         "vat_registration_table": get_vat_registration_table(firm, head_office),
                         "payment_information_table": get_payment_information_table(firm, head_office),
-                        "bank_account_table": get_bank_account_table(bank_account),
+                        "bank_account_table": get_bank_account_tables(bank_accounts),
                     }
                 )
 
@@ -279,14 +279,12 @@ class ViewOffice(MethodView):
 
         if self.subpage == "bank-payment-details":
             pda = current_app.extensions["pda"]
-            bank_account: BankAccount = pda.get_office_bank_account(
-                firm_id=firm.firm_id, office_code=office.firm_office_code
-            )
+            bank_accounts = pda.get_office_bank_accounts(firm_id=firm.firm_id, office_code=office.firm_office_code)
             context.update(
                 {
                     "vat_registration_table": get_vat_registration_table(firm, office),
                     "payment_information_table": get_payment_information_table(firm, office),
-                    "bank_account_table": get_bank_account_table(bank_account, action_url=add_bank_account_url),
+                    "bank_account_table": get_bank_account_tables(bank_accounts, action_url=add_bank_account_url),
                 }
             )
 
