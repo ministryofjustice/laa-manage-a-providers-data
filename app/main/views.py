@@ -233,7 +233,7 @@ class ViewProvider(MethodView):
                     {
                         "vat_registration_table": get_vat_registration_table(firm, head_office),
                         "payment_information_table": get_payment_information_table(firm, head_office),
-                        "bank_account_table": get_bank_account_tables(firm=firm, office=head_office),
+                        "bank_account_tables": get_bank_account_tables(firm=firm, office=head_office),
                     }
                 )
 
@@ -277,7 +277,7 @@ class ViewOffice(MethodView):
                 {
                     "vat_registration_table": get_vat_registration_table(firm, office),
                     "payment_information_table": get_payment_information_table(firm, office),
-                    "bank_account_table": get_bank_account_tables(
+                    "bank_account_tables": get_bank_account_tables(
                         firm=firm, office=office, action_url=add_bank_account_url
                     ),
                 }

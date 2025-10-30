@@ -201,7 +201,10 @@ def get_bank_account_tables(firm: Firm, office: Office, action_url="#") -> List[
                 }
             )
 
-        bank_account_table = SummaryList(card=card, additional_classes="bank-account-table")
+        bank_account_table = SummaryList(
+            card=card,
+            additional_classes=f"bank-account-table bank-account-table-primary-flag-{bank_account.primary_flag.lower()}",
+        )
         bank_account_table.add_row("Account name", bank_account.bank_account_name)
         bank_account_table.add_row("Account number", bank_account.account_number)
         bank_account_table.add_row("Sort code", bank_account.sort_code)
@@ -214,7 +217,6 @@ def get_bank_account_tables(firm: Firm, office: Office, action_url="#") -> List[
     return bank_accounts_table
 
 
-  
 def get_contact_tables(
     firm: Firm, head_office: Office = None, include_change_link=True, changing_office: bool = False
 ) -> list[DataTable]:
@@ -228,6 +230,7 @@ def get_contact_tables(
         card_title = f"{contact.first_name} {contact.last_name}"
         card: Card = {
             "title": card_title,
+            "classes": f"liaison-manager-card liaison-manager-card-primary-{contact.primary.lower()}",
         }
 
         if contact.primary == "Y" and include_change_link:
