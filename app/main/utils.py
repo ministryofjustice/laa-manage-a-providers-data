@@ -265,7 +265,7 @@ def create_barrister_from_form_data(
         "firm_name": barrister_name,
         "firm_type": "Barrister",
         "solicitor_advocate": "No",
-        "advocate_level": barrister_level,
+        "advocate_level": barrister_level if barrister_level not in ("None", "N/A") else None,
         "bar_council_roll": bar_council_roll_number,
         "parent_firm_id": parent_firm_id,
     }
@@ -287,7 +287,7 @@ def create_advocate_from_form_data(
         "firm_name": advocate_name,
         "firm_type": "Advocate",
         "solicitor_advocate": "Yes",
-        "advocate_level": advocate_level,
+        "advocate_level": advocate_level if advocate_level not in ("None", "N/A") else None,
         "bar_council_roll": sra_roll_number,
         "parent_firm_id": parent_firm_id,
     }

@@ -12,12 +12,16 @@ def test_add_barrister_form_loads_from_chambers(page: Page) -> None:
     page.get_by_role("link", name="Barristers and advocates").click()
     page.get_by_role("button", name="Add another barrister").click()
 
-    # Check form loads correctly
+    # Check form loads correctly...
     expect(page.get_by_role("heading", name="Barrister details")).to_be_visible()
     expect(page.get_by_text("Barrister name")).to_be_visible()
     expect(page.get_by_text("Barrister level")).to_be_visible()
     expect(page.get_by_text("Bar Council roll number")).to_be_visible()
     expect(page.get_by_role("button", name="Continue")).to_be_visible()
+    # ...with the expected levels.
+    expect(page.get_by_role("radio", name="Junior")).to_be_visible()
+    expect(page.get_by_role("radio", name="King's Counsel (KC,")).to_be_visible()
+    expect(page.get_by_role("radio", name="None of the above")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")

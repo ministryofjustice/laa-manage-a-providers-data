@@ -12,11 +12,15 @@ def test_add_advocate_form_loads_from_chambers(page: Page) -> None:
     page.get_by_role("link", name="Barristers and advocates").click()
     page.get_by_role("button", name="Add another advocate").click()
 
-    # Check form loads correctly
+    # Check form loads correctly...
     expect(page.get_by_role("heading", name="Advocate details")).to_be_visible()
     expect(page.get_by_text("Advocate name")).to_be_visible()
     expect(page.get_by_text("Advocate level")).to_be_visible()
     expect(page.get_by_text("Solicitors Regulation Authority roll number")).to_be_visible()
+    # ...with the expected levels.
+    expect(page.get_by_role("radio", name="Junior")).to_be_visible()
+    expect(page.get_by_role("radio", name="King's Counsel (KC,")).to_be_visible()
+    expect(page.get_by_role("radio", name="None of the above")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")

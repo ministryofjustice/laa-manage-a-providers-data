@@ -17,7 +17,7 @@ from app.validators import (
     ValidatePastDate,
     ValidateVATRegistrationNumber,
 )
-from app.widgets import GovDateInput, GovRadioInput, GovSubmitInput, GovTextInput
+from app.widgets import GovDateInput, GovRadioInput, GovRadioInputWithDivider, GovSubmitInput, GovTextInput
 
 from ...fields import GovDateField
 from ..add_a_new_office import OfficeContactDetailsForm
@@ -394,7 +394,7 @@ class AddBarristerDetailsForm(BaseForm):
 
     barrister_level = RadioField(
         "Barrister level",
-        widget=GovRadioInput(heading_class="govuk-fieldset__legend--s"),
+        widget=GovRadioInputWithDivider(heading_class="govuk-fieldset__legend--s"),
         choices=ADVOCATE_LEVEL_CHOICES,
         validators=[InputRequired(message="Select the barrister level")],
     )
@@ -493,7 +493,7 @@ class AddAdvocateDetailsForm(BaseForm):
 
     advocate_level = RadioField(
         "Advocate level",
-        widget=GovRadioInput(heading_class="govuk-fieldset__legend--s"),
+        widget=GovRadioInputWithDivider(heading_class="govuk-fieldset__legend--s"),
         choices=ADVOCATE_LEVEL_CHOICES,
         validators=[InputRequired(message="Select the advocate level")],
     )
