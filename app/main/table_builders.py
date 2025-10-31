@@ -190,6 +190,7 @@ def get_bank_account_tables(firm: Firm, office: Office, action_url="#") -> List[
     for bank_account in bank_accounts:
         card: Card = {
             "title": bank_account.bank_account_name,
+            "classes": f"bank-account-table bank-account-table-primary-flag-{bank_account.primary_flag.lower()}",
         }
 
         if bank_account.primary_flag.lower() == "y":
@@ -203,7 +204,6 @@ def get_bank_account_tables(firm: Firm, office: Office, action_url="#") -> List[
 
         bank_account_table = SummaryList(
             card=card,
-            additional_classes=f"bank-account-table bank-account-table-primary-flag-{bank_account.primary_flag.lower()}",
         )
         bank_account_table.add_row("Account name", bank_account.bank_account_name)
         bank_account_table.add_row("Account number", bank_account.account_number)
