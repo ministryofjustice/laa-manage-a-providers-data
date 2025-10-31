@@ -17,4 +17,4 @@ multi_line_output = 3
 line_length = 120
 
 [tool.pytest.ini_options]
-live_server_scope = "module"
+live_server_scope = "function"

@@ -285,6 +285,7 @@ class TestTransposedDataTable:
 
         expected_card = {
             "title": {"text": "Contact Details"},
+            "classes": None,
             "actions": {
                 "items": [
                     {

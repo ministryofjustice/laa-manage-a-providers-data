@@ -47,6 +47,7 @@ class Card(TypedDict, total=False):
     action_text: str | None
     action_url: str | None
     action_visually_hidden_text: str | None
+    classes: str | None
 
 
 class Cell(TypedDict, total=False):
@@ -351,6 +352,7 @@ class SummaryList(DataTable):
             if self.card.get("action_text"):
                 card.update(
                     {
+                        "classes": self.card.get("classes"),
                         "actions": {
                             "items": [
                                 {
@@ -359,7 +361,7 @@ class SummaryList(DataTable):
                                     "visuallyHiddenText": self.card.get("action_visually_hidden_text"),
                                 }
                             ]
-                        }
+                        },
                     }
                 )
             params["card"] = card

@@ -392,13 +392,13 @@ class TestMockProviderDataApi:
             ],
         }
 
-        result = mock_api.get_office_bank_account(1, "1A001L")
+        result = mock_api.get_office_bank_accounts(1, "1A001L")
 
-        assert result is not None
-        assert result.vendor_site_id == 101
-        assert result.bank_name == "Test Bank"
-        assert result.sort_code == "123456"
-        assert result.account_number == "12345678"
+        assert len(result) == 1
+        assert result[0].vendor_site_id == 101
+        assert result[0].bank_name == "Test Bank"
+        assert result[0].sort_code == "123456"
+        assert result[0].account_number == "12345678"
 
     def test_get_office_bank_account_not_found(self, mock_api):
         """Test getting a bank account when none exists."""
@@ -407,25 +407,25 @@ class TestMockProviderDataApi:
             "bank_accounts": [],
         }
 
-        result = mock_api.get_office_bank_account(1, "1A001L")
+        result = mock_api.get_office_bank_accounts(1, "1A001L")
 
-        assert result is None
+        assert result == []
 
     def test_get_office_bank_account_office_not_found(self, mock_api):
         """Test getting a bank account when office doesn't exist."""
         mock_api._mock_data = {"offices": [], "bank_accounts": []}
 
-        result = mock_api.get_office_bank_account(1, "NONEXISTENT")
+        result = mock_api.get_office_bank_accounts(1, "NONEXISTENT")
 
-        assert result is None
+        assert result == []
 
     def test_get_office_bank_account_invalid_params(self, mock_api):
         """Test validation of parameters."""
         with pytest.raises(ValueError, match="firm_id must be a positive integer"):
-            mock_api.get_office_bank_account(0, "1A001L")
+            mock_api.get_office_bank_accounts(0, "1A001L")
 
         with pytest.raises(ValueError, match="office_code must be a non-empty string"):
-            mock_api.get_office_bank_account(1, "")
+            mock_api.get_office_bank_accounts(1, "")
 
     def test_create_office_bank_account_success(self, mock_api):
         """Test creating a bank account for an office."""
