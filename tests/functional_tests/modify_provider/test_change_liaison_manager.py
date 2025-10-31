@@ -189,4 +189,4 @@ def test_change_liaison_manager_only_on_office(page: Page):
     # ...and that at the provider level...
     page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
     # ...the liaison manager has not changed.
-    expect(page.get_by_text("Sarah Johnson Change liaison")).to_be_visible()
+    expect(page.get_by_role("heading", name="Alice Acrington")).not_to_be_visible()

@@ -5,7 +5,7 @@ FirmType = Literal["Advocate", "Barrister", "Chambers", "Legal Services Provider
 ConstitutionalStatus = Literal[
     "Charity", "Government Funded Organisation", "LLP", "Limited Company", "Partnership", "Sole Practitioner", "N/A"
 ]
-AdvocateLevel = Literal["Pupil", "Junior", "KC"]
+AdvocateLevel = Literal["Junior", "KC"]
 YesNo = Literal["Yes", "No"]
 YN = Literal["Y", "N"]
 YNOrNA = Literal["Y", "N", "N/A"]
@@ -34,12 +34,12 @@ CONSTITUTIONAL_STATUS_CHOICES = [
     ("Government Funded Organisation", "Government Funded Organisation"),
 ]
 
+
 ADVOCATE_LEVEL_CHOICES = [
-    ("Pupil", "Pupil"),
     ("Junior", "Junior"),
     ("KC", "King's Counsel (KC, previously QC)"),
+    (None, "None of the above"),
 ]
-
 YES_NO_CHOICES = [
     ("Yes", "Yes"),
     ("No", "No"),

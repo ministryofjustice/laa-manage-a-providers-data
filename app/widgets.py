@@ -311,6 +311,47 @@ class GovRadioInput(ParameterOverrideMixin, BaseGovRadioInput):
         return params
 
 
+class GovRadioInputWithDivider(GovRadioInput):
+    """
+    Adds a divider BEFORE a specified value, defaulting to before the last value.
+
+    Example usage:
+        RadioField(
+            "Do you have the condition?",
+            widget=GovRadioInputWithDivider(divider_before="skip", divider_text="or"),
+            choices=(("yes", "Yes"), ("no", "No"), ("skip", "Prefer not to say"))
+        )
+    """
+
+    def __init__(
+        self, choice_hints: dict = None, divider_text: str = "or", divider_before: str | None = None, **kwargs: Any
+    ) -> None:
+        super().__init__(choice_hints=choice_hints, **kwargs)
+        self.divider_text = divider_text
+        self.divider_before = divider_before
+
+    def map_gov_params(self, field, **kwargs):
+        params = super(GovRadioInputWithDivider, self).map_gov_params(field, **kwargs)
+
+        # If we do not have any iterable items, return unmodified
+        if "items" not in params:
+            return params
+
+        # Default to divider just above last entry...
+        divider_index = len(params["items"]) - 1
+        # ...but if a value is specified...
+        if self.divider_before is not None:
+            # ...insert at the point the specified value occupies.
+            for index, item in enumerate(params["items"]):
+                if item["value"] == self.divider_before:
+                    divider_index = index
+                    break
+
+        # Add the divider at the chosen point
+        params["items"].insert(divider_index, {"divider": self.divider_text})
+        return params
+
+
 class GovDateInput(ParameterOverrideMixin, BaseGovDateInput):
     """
     Date input widget with parameter override support.
