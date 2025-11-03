@@ -209,10 +209,16 @@ def get_bank_account_tables(firm: Firm, office: Office, action_url="#") -> List[
         bank_account_table.add_row("Account number", bank_account.account_number)
         bank_account_table.add_row("Sort code", bank_account.sort_code)
         dt = bank_account.start_date
-        if isinstance(bank_account.start_date, datetime.date):
-            dt = bank_account.start_date.strftime("%d %b %Y")
+        if isinstance(dt, datetime.date):
+            dt = dt.strftime("%d %b %Y")
         bank_account_table.add_row("Effective date from", dt)
-        # Effective date from still to be implemented
+
+        dt = bank_account.end_date
+        if isinstance(dt, datetime.date):
+            dt = dt.strftime("%d %b %Y")
+        if dt:
+            bank_account_table.add_row("Effective date to", dt)
+
         bank_accounts_table.append(bank_account_table)
     return bank_accounts_table
 
