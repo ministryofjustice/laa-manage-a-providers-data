@@ -1,4 +1,4 @@
-from app.main.utils import contract_manager_hide_default, get_entity_active_text, provider_name_html
+from app.main.utils import get_entity_active_text, provider_name_html
 from app.utils.formatting import (
     format_advocate_level,
     format_constitutional_status,
@@ -24,7 +24,6 @@ STATUS_TABLE_FIELD_CONFIG = {
             "default": "No",
         },
         {"label": "Intervened", "default": "No"},
-        {"label": "Referred to debt recovery", "default": "No"},
     ],
     "Chambers": [
         {
@@ -89,7 +88,7 @@ STATUS_TABLE_FIELD_CONFIG = {
     ],
 }
 
-# View provider ,ain table configuration for each firm type
+# View provider main table configuration for each firm type
 MAIN_TABLE_FIELD_CONFIG = {
     "Legal Services Provider": [
         {"label": "Provider name", "id": "firm_name"},
@@ -114,12 +113,6 @@ MAIN_TABLE_FIELD_CONFIG = {
             "default": "Not provided",
         },
         {"label": "Companies House number", "id": "company_house_number", "default": "Not provided"},
-        {
-            "label": "Contract manager",
-            "id": "contract_manager",
-            "change_link": "main.index",
-            "value_preprocessor": contract_manager_hide_default,
-        },
     ],
     "Chambers": [
         {"label": "Provider name", "id": "firm_name"},
