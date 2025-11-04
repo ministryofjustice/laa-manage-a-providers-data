@@ -5,6 +5,7 @@ from typing import List
 from flask import current_app, url_for
 
 from app.components.tables import Card, DataTable, SummaryList
+from app.constants import DISPLAY_DATE_FORMAT
 from app.main.constants import MAIN_TABLE_FIELD_CONFIG, STATUS_TABLE_FIELD_CONFIG
 from app.main.utils import provider_name_html
 from app.models import BankAccount, Contact, Firm, Office
@@ -174,6 +175,55 @@ def get_sorted_contacts(firm: Firm, office: Office = None) -> List[Contact]:
     return sorted_contacts
 
 
+def get_sorted_office_bank_accounts(firm: Firm, office: Office = None) -> List[BankAccount]:
+    pda = current_app.extensions["pda"]
+    bank_accounts = pda.get_office_bank_accounts(firm_id=firm.firm_id, office_code=office.firm_office_code)
+    primary_bank_accounts = [bank_account for bank_account in bank_accounts if bank_account.primary_flag.lower() == "y"]
+    other_bank_accounts = [bank_account for bank_account in bank_accounts if bank_account.primary_flag.lower() == "n"]
+    primary_bank_accounts.sort(key=lambda bank_account: bank_account.start_date)
+    other_bank_accounts.sort(key=lambda bank_account: bank_account.end_date, reverse=True)
+    return primary_bank_accounts + other_bank_accounts
+
+
+def get_bank_account_tables(firm: Firm, office: Office, action_url="#") -> List[DataTable]:
+    bank_accounts = get_sorted_office_bank_accounts(firm, office)
+    bank_accounts_table = []
+    for bank_account in bank_accounts:
+        card: Card = {
+            "title": bank_account.bank_account_name,
+            "classes": f"bank-account-table bank-account-table-primary-flag-{bank_account.primary_flag.lower()}",
+        }
+
+        if bank_account.primary_flag.lower() == "y":
+            # Only the primary bank account has the action to change the bank account link
+            card.update(
+                {
+                    "action_text": "Change bank account",
+                    "action_url": action_url,
+                }
+            )
+
+        bank_account_table = SummaryList(
+            card=card,
+        )
+        bank_account_table.add_row("Account name", bank_account.bank_account_name)
+        bank_account_table.add_row("Account number", bank_account.account_number)
+        bank_account_table.add_row("Sort code", bank_account.sort_code)
+        dt = bank_account.start_date
+        if isinstance(dt, datetime.date):
+            dt = dt.strftime(DISPLAY_DATE_FORMAT)
+        bank_account_table.add_row("Effective date from", dt)
+
+        dt = bank_account.end_date
+        if isinstance(dt, datetime.date):
+            dt = dt.strftime(DISPLAY_DATE_FORMAT)
+        if dt:
+            bank_account_table.add_row("Effective date to", dt)
+
+        bank_accounts_table.append(bank_account_table)
+    return bank_accounts_table
+
+
 def get_contact_tables(
     firm: Firm, head_office: Office = None, include_change_link=True, changing_office: bool = False
 ) -> list[DataTable]:
@@ -187,6 +237,7 @@ def get_contact_tables(
         card_title = f"{contact.first_name} {contact.last_name}"
         card: Card = {
             "title": card_title,
+            "classes": f"liaison-manager-card liaison-manager-card-primary-{contact.primary.lower()}",
         }
 
         if contact.primary == "Y" and include_change_link:
@@ -251,27 +302,6 @@ def get_office_overview_table(firm: Firm, office: Office) -> DataTable:
     table.add_row("Account number", office.firm_office_code)
     table.add_row("Head office", office.head_office, format_head_office)
     table.add_row("Supplier type", firm.firm_type, format_firm_type)
-    return table
-
-
-def get_bank_account_table(bank_account: BankAccount, action_url="#") -> DataTable | None:
-    if bank_account is None:
-        return None
-
-    card: Card = {
-        "title": bank_account.bank_account_name,
-        "action_text": "Change bank account",
-        "action_url": action_url,
-    }
-    table = SummaryList(card=card, additional_classes="bank-account-table")
-    table.add_row("Account name", bank_account.bank_account_name)
-    table.add_row("Account number", bank_account.account_number)
-    table.add_row("Sort code", bank_account.sort_code)
-    dt = bank_account.start_date
-    if isinstance(bank_account.start_date, datetime.date):
-        dt = bank_account.start_date.strftime("%d %b %Y")
-    table.add_row("Effective date from", dt)
-    # Effective date from still to be implemented
     return table
 
 

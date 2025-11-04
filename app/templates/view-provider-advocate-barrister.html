@@ -61,8 +61,8 @@
           {{ govukSummaryList(vat_registration_table.to_summary_govuk_params()) }}
 
           <h2 class="govuk-heading-m">Bank accounts</h2>
-          {% if bank_account_table %}
-              {{ govukSummaryList(bank_account_table.to_summary_govuk_params()) }}
+          {% if bank_account_tables %}
+              {{ contactCards(bank_account_tables, title=None, previous_label="Previous bank accounts") }}
           {% else %}
               {{ govukButton({
                   "text": "Add bank account",

@@ -21,14 +21,14 @@ class TestSearchBankAccountForm:
     def test_form_no_search(self, app):
         """Should show all bank accounts belonging to the firm if no search term is provided."""
 
-        assert len(self.bank_accounts) == 2
+        assert len(self.bank_accounts) == 3
         form = BankAccountSearchForm(firm=self.firm, office=self.office)
-        assert len(form.bank_accounts_table.data) == 2
+        assert len(form.bank_accounts_table.data) == 3
 
     def test_form_search(self, app):
         """Search for a given sort code."""
 
-        assert len(self.bank_accounts) == 2
+        assert len(self.bank_accounts) == 3
         form = BankAccountSearchForm(firm=self.firm, office=self.office, search_term="203045")
         assert len(form.bank_accounts_table.data) == 1
         assert form.bank_accounts_table.data[0]["account_number"] == "12345678"
@@ -36,11 +36,11 @@ class TestSearchBankAccountForm:
     def test_form_pagination(self, app):
         """Test pagination"""
 
-        assert len(self.bank_accounts) == 2
+        assert len(self.bank_accounts) == 3
 
         BankAccount.ITEMS_PER_PAGE = 1
         form = BankAccountSearchForm(firm=self.firm, office=self.office)
-        assert form.num_results == 2
+        assert form.num_results == 3
         assert form.page == 1
         assert len(form.bank_accounts_table.data[1])
 

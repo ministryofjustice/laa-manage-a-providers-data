@@ -162,7 +162,9 @@ def test_change_liaison_manager_only_on_office(page: Page):
     page.get_by_role("link", name="Offices").click()
     page.get_by_role("link", name="1A002L").click()
     page.get_by_role("link", name="Contact").click()
-    expect(page.get_by_role("heading", name="Alice Acrington")).not_to_be_visible()
+    expect(page.locator(".liaison-manager-card-primary-y .govuk-summary-card__title")).to_contain_text(
+        "Michael Thompson"
+    )
 
     # Change the liaison manager...
     page.get_by_role("link", name="Change liaison manager   (").click()

@@ -484,7 +484,7 @@ class MockProviderDataApi:
 
         return updated_office
 
-    def get_office_bank_account(self, firm_id: int, office_code: str) -> BankAccount | None:
+    def get_office_bank_accounts(self, firm_id: int, office_code: str) -> List[BankAccount]:
         """
         Get the bank account for a specific office (each office has only one bank account).
 
@@ -493,8 +493,9 @@ class MockProviderDataApi:
             office_code: The office code
 
         Returns:
-            BankAccount model instance, or None if not found
+            List[BankAccount]: The bank accounts for a specific office
         """
+        bank_accounts = []
         if not isinstance(firm_id, int) or firm_id <= 0:
             raise ValueError("firm_id must be a positive integer")
         if not office_code or not isinstance(office_code, str):
@@ -502,22 +503,22 @@ class MockProviderDataApi:
 
         office_data = self._find_office_data(firm_id, office_code)
         if office_data is None:
-            return None
+            return bank_accounts
 
         office_id = office_data.get("firmOfficeId")
         if not office_id:
-            return None
+            return bank_accounts
 
         # Find the bank account for this office
         for account in self._mock_data["bank_accounts"]:
-            if account.get("vendorSiteId") == office_id and account["primaryFlag"].lower() == "y":
+            if account.get("vendorSiteId") == office_id:
                 try:
-                    return BankAccount(**account)
+                    bank_accounts.append(BankAccount(**account))
                 except ValidationError as e:
                     self.logger.error(f"Invalid bank account data in mock for office {office_code}: {e}")
                     raise MockPDAError(f"Invalid bank account data: {e}")
 
-        return None
+        return bank_accounts
 
     def _get_firm_bank_details_raw(self, firm_id: int) -> dict:
         """

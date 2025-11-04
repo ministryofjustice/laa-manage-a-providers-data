@@ -29,7 +29,7 @@ def test_search_bank_account(page: Page):
     # Click on the payment method sub-navigation
     page.get_by_text("Bank accounts and payment").click()
 
-    bank_account_table = page.locator(".bank-account-table")
+    bank_account_table = page.locator(".bank-account-table-primary-flag-y")
     bank_account_table.scroll_into_view_if_needed()
     # Confirm bank account is displayed
     expect(bank_account_table.locator("dd:text('203045')")).to_be_visible()
@@ -61,7 +61,7 @@ def test_search_bank_account(page: Page):
     page.get_by_role("button", name="Submit").click()
 
     # We are now back viewing the office
-    bank_account_table = page.locator(".bank-account-table")
+    bank_account_table = page.locator(".bank-account-table-primary-flag-y")
     bank_account_table.scroll_into_view_if_needed()
 
     # Confirm the new bank is displayed

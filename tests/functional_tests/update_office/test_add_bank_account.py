@@ -33,7 +33,7 @@ def complete_add_bank_account_form(page: Page):
     page.get_by_role("button", name="Submit").click()
 
     # Check new bank account is on the office overview page
-    bank_account_table = page.locator(".bank-account-table")
+    bank_account_table = page.locator(".bank-account-table-primary-flag-y")
     bank_account_table.scroll_into_view_if_needed()
     expect(bank_account_table.locator("dd:text('123456')")).to_be_visible()
     expect(bank_account_table.locator("dd:text('08102025')")).to_be_visible()

@@ -229,8 +229,9 @@ class TestCreateProviderFromSession:
             assert office.payment_method == "Electronic"
 
             # Verify bank account was created
-            bank_account = pda.get_office_bank_account(result.firm_id, office.firm_office_code)
-            assert bank_account is not None
+            bank_accounts = pda.get_office_bank_accounts(result.firm_id, office.firm_office_code)
+            assert len(bank_accounts) == 1
+            bank_account = bank_accounts[0]
             assert bank_account.bank_account_name == "Test Business Account"
             assert bank_account.sort_code == "123456"
             assert bank_account.account_number == "87654321"
@@ -278,8 +279,9 @@ class TestCreateProviderFromSession:
             assert office.address_line_1 == "789 Partial Street"
 
             # Verify bank account was created with required fields only
-            bank_account = pda.get_office_bank_account(result.firm_id, office.firm_office_code)
-            assert bank_account is not None
+            bank_accounts = pda.get_office_bank_accounts(result.firm_id, office.firm_office_code)
+            assert len(bank_accounts) == 1
+            bank_account = bank_accounts[0]
             assert bank_account.bank_account_name == "Partial Account"
             assert bank_account.sort_code == "123456"
             assert bank_account.account_number == "87654321"
@@ -319,5 +321,5 @@ class TestCreateProviderFromSession:
             assert office.address_line_1 == "789 Skip Street"
 
             # Verify no bank account was created (since skip was used)
-            bank_account = pda.get_office_bank_account(result.firm_id, office.firm_office_code)
-            assert bank_account is None
+            bank_accounts = pda.get_office_bank_accounts(result.firm_id, office.firm_office_code)
+            assert bank_accounts == []
