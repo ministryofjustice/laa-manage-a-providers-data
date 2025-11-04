@@ -5,6 +5,7 @@ from typing import List
 from flask import current_app, url_for
 
 from app.components.tables import Card, DataTable, SummaryList
+from app.constants import DISPLAY_DATE_FORMAT
 from app.main.constants import MAIN_TABLE_FIELD_CONFIG, STATUS_TABLE_FIELD_CONFIG
 from app.main.utils import provider_name_html
 from app.models import BankAccount, Contact, Firm, Office
@@ -210,12 +211,12 @@ def get_bank_account_tables(firm: Firm, office: Office, action_url="#") -> List[
         bank_account_table.add_row("Sort code", bank_account.sort_code)
         dt = bank_account.start_date
         if isinstance(dt, datetime.date):
-            dt = dt.strftime("%d %b %Y")
+            dt = dt.strftime(DISPLAY_DATE_FORMAT)
         bank_account_table.add_row("Effective date from", dt)
 
         dt = bank_account.end_date
         if isinstance(dt, datetime.date):
-            dt = dt.strftime("%d %b %Y")
+            dt = dt.strftime(DISPLAY_DATE_FORMAT)
         if dt:
             bank_account_table.add_row("Effective date to", dt)
 
