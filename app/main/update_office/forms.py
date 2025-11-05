@@ -125,7 +125,10 @@ class ChangeOfficeContactDetailsForm(OfficeContactDetailsForm):
 
 class BankAccountForm(BaseBankAccountForm):
     title = "Add a bank account"
-    url = "provider/<firm:firm>/office/<office:office>/add-bank-account"
+    url = [
+        "provider/<firm:firm>/office/<office:office>/add-bank-account",
+        "provider/<firm:firm>/add-bank-account",
+    ]
     submit_button_text = "Submit"
     template = "update_office/form.html"
 

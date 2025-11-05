@@ -331,3 +331,22 @@ class ViewOffice(MethodView):
         context = self.get_context(firm, office)
 
         return render_template(self.template, **context)
+
+
+class AdvocateBarristerOfficeMixin:
+    def get_success_url(self, form) -> str:
+        if form.firm.is_advocate or form.firm.is_barrister:
+            return url_for(self.provider_success_url, firm=form.firm)
+
+        return url_for(self.office_success_url, firm=form.firm, office=form.office)
+
+    def dispatch_request(self, *args, **kwargs):
+        firm: Firm = kwargs.get("firm")
+        office: Office | None = kwargs.get("office")
+
+        if not firm.is_advocate and not firm.is_barrister and not office:
+            abort(404)
+
+        kwargs["office"] = office if office else self.get_api().get_head_office(firm.firm_id)
+
+        return super().dispatch_request(*args, **kwargs)
