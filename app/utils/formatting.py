@@ -17,7 +17,9 @@ def normalize_for_search(value: str | None) -> str:
     """
     if not value:
         return ""
-    return re.sub(r"%", "", str(value))
+    lowered = str(value).lower()
+    return re.sub(r"[^a-z0-9]", "", lowered)
+    # return re.sub(r"%", "", str(value), lowered) # this breaks searches like johnson%legal
 
 
 def format_firm_type(firm_type: str) -> str:
