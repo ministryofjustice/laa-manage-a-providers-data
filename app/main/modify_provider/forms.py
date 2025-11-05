@@ -5,8 +5,8 @@ from wtforms.validators import InputRequired, Length
 
 from app.constants import PROVIDER_ACTIVE_STATUS_CHOICES
 from app.fields import GovUKTableRadioField
+from app.forms import BaseForm
 from app.main.add_a_new_provider.forms import LiaisonManagerForm
-from app.main.forms import BaseBankAccountSearchForm, BaseForm
 from app.main.utils import get_firm_account_number
 from app.models import Firm, Office
 from app.utils.formatting import format_office_address_one_line, normalize_for_search
@@ -203,21 +203,3 @@ class ReassignHeadOfficeForm(BaseForm):
             )
 
         self.office.choices = choices
-
-
-class AdvocateBarristerBankSearchForm(BaseBankAccountSearchForm):
-    title = "Search for bank account"
-    url = "/provider/<firm:firm>/search-bank-account"
-    template = "update_office/search-bank-account.html"
-    submit_button_text = "Continue"
-
-    @property
-    def caption(self):
-        return self.firm.firm_name
-
-    def __init__(self, firm: Firm, *args, **kwargs):
-        if not firm.is_advocate or not firm.is_barrister:
-            raise ValueError(f"Trying to use AdvocateBarristerBankSearchForm for {firm.firm_type}")
-
-        self.firm = firm
-        super().__init__(*args, **kwargs)
