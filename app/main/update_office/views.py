@@ -211,7 +211,12 @@ class SearchBankAccountFormView(AdvocateBarristerOfficeMixin, BaseFormView):
         return super().form_valid(form, **kwargs)
 
     def get(self, firm, office: Office, context, **kwargs):
-        search_term = request.args.get("search", "").strip()
+        # Display all bank accounts by default
+        default_search_term = ""
+        if firm.is_advocate or firm.is_barrister:
+            # Display no results by default for advocates and barristers
+            default_search_term = None
+        search_term = request.args.get("search", default_search_term)
         page = int(request.args.get("page", 1))
 
         try:

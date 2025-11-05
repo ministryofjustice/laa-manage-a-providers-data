@@ -143,7 +143,7 @@ class SearchableTableForm(BaseForm):
         validators=[],
     )
 
-    def __init__(self, *args, search_term=None, page=1, selected_value=None, **kwargs):
+    def __init__(self, *args, search_term="", page=1, selected_value=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.search.label.text = self.SEARCH_FIELD_LABEL
         self.search.widget.hint_text = self.SEARCH_FIELD_HINT
@@ -157,6 +157,9 @@ class SearchableTableForm(BaseForm):
             self.search.data = search_term
 
         # Filter bank accounts based on search term
+        if search_term is None:
+            return
+
         data = self.get_searchable_data()
         data = self.filter_searchable_data(data, search_term)
         self.num_results = len(data)

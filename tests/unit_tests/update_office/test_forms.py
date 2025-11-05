@@ -63,6 +63,10 @@ class TestSearchBankAccountForm:
         with pytest.raises(NoBankAccountsError):
             BankAccountSearchForm(firm=firm, office=office)
 
+    def test_no_bank_accounts_no_default_search(self, app):
+        form = BankAccountSearchForm(firm=self.firm, office=self.office, search_term=None)
+        assert not hasattr(form, "bank_accounts_table")
+
     def test_no_bank_accounts_advocate(self, app):
         firm = Firm(
             firmName="Test Firm Name",
@@ -70,7 +74,7 @@ class TestSearchBankAccountForm:
             firmType="Advocate",
         )
         office = Office(officeName="Test Office Name", firmOfficeId=2001, firmOfficeCode="T2001")
-        form = BankAccountSearchForm(firm=firm, office=office)
+        form = BankAccountSearchForm(firm=firm, office=office, search_term="")
         assert len(form.bank_accounts_table.data) == len(self.all_bank_accounts)
 
     def test_no_bank_accounts_barrister(self, app):
@@ -80,5 +84,5 @@ class TestSearchBankAccountForm:
             firmType="Barrister",
         )
         office = Office(officeName="Test Office Name", firmOfficeId=2001, firmOfficeCode="T2001")
-        form = BankAccountSearchForm(firm=firm, office=office)
+        form = BankAccountSearchForm(firm=firm, office=office, search_term="")
         assert len(form.bank_accounts_table.data) == len(self.all_bank_accounts)
