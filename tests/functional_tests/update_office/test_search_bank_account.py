@@ -93,6 +93,7 @@ def _test_search_bank_account_advocate_barrister(
     page.get_by_text("Bank accounts and payment").click()
     expected_return_page_url = page.url
 
+    # If we are given account details then assert those are displayed on the page
     if current_account_number:
         # Add bank account button should not be there
         expect(page.get_by_role("button", name="Add bank account")).not_to_be_visible()
@@ -111,6 +112,14 @@ def _test_search_bank_account_advocate_barrister(
         page.get_by_role("button", name="Add bank account").click()
 
     # We are now on the Search bank accounts page
+
+    # There should be no results by default for advocate and barristers
+    expect(page.locator("th:has-text('Sort code')")).not_to_be_visible()
+    expect(page.locator("th:has-text('Account number')")).not_to_be_visible()
+    expect(page.locator("th:has-text('Account name')")).not_to_be_visible()
+
+    # Clicking the search button should display all bank accounts
+    page.get_by_role("button", name="Search").click()
 
     # Check accounts belonging to other firms are displayed
     # Smith & Partners Solicitors Client Account
