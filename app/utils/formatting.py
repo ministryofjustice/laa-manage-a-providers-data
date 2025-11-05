@@ -13,7 +13,8 @@ from app.models import Office
 # TODO: Remove this function and replace with a proper wildcard search option
 def normalize_for_search(value: str | None) -> str:
     """Normalize a string for fuzzy substring matching by:
-    - Remove the '%' character
+    - Lowercasing
+    - Removing all non-alphanumeric characters
     """
     if not value:
         return ""
