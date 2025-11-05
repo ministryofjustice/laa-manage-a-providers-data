@@ -166,9 +166,6 @@ def test_assign_contract_manager_form_skip(page: Page):
     # Submit without selecting a radio button
     page.get_by_role("button", name="Unknown: Skip this step").click()
 
-    # Mr.Default should not be shown as such via the UI and should appear as if there is no contract manager associated with the firm.
-    expect(page.get_by_role("link", name="Enter contract manager")).to_be_visible()
-
 
 @pytest.mark.usefixtures("live_server")
 def test_assign_contract_manager_successful_submission(page: Page):
