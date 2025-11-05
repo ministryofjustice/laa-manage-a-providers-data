@@ -3,13 +3,12 @@ from typing import List
 from flask import current_app
 from wtforms.fields.choices import RadioField
 from wtforms.fields.simple import StringField
-from wtforms.validators import DataRequired, InputRequired, Length, Optional
+from wtforms.validators import InputRequired, Optional
 
-from app.components.tables import RadioDataTable, TableStructureItem
 from app.constants import OFFICE_ACTIVE_STATUS_CHOICES, PAYMENT_METHOD_CHOICES
 from app.forms import BaseForm
 from app.main.add_a_new_office.forms import OfficeContactDetailsForm
-from app.main.forms import BaseBankAccountForm
+from app.main.forms import BaseBankAccountForm, BaseBankAccountSearchForm
 from app.models import BankAccount, Firm, Office
 from app.validators import (
     ValidateVATRegistrationNumber,
@@ -82,66 +81,16 @@ class ChangeOfficeActiveStatusForm(UpdateOfficeBaseForm):
     )
 
 
-class NoBankAccountsError(Exception):
-    pass
-
-
-class BankAccountSearchForm(UpdateOfficeBaseForm):
+class BankAccountSearchForm(BaseBankAccountSearchForm, UpdateOfficeBaseForm):
     title = "Search for bank account"
-    url = "/provider/<firm:firm>/office/<office:office>/search-bank-account"
+    url = [
+        "/provider/<firm:firm>/office/<office:office>/search-bank-account",
+        "/provider/<firm:firm>/search-bank-account",
+    ]
     template = "update_office/search-bank-account.html"
     submit_button_text = "Continue"
-    ITEMS_PER_PAGE = 10
 
-    search = StringField(
-        "Search for a bank account",
-        widget=GovTextInput(
-            form_group_classes="govuk-!-width-two-thirds",
-            heading_class="govuk-fieldset__legend--s",
-            hint="You can search by sort code or account number",
-        ),
-        validators=[Length(max=8, message="Search term must be 8 characters or less")],
-    )
-    bank_account = StringField(
-        validators=[DataRequired(message="Select a bank account or search again")],
-    )
-
-    def __init__(self, firm: Firm, office: Office, search_term=None, page=1, selected_value=None, *args, **kwargs):
-        super().__init__(firm, office, *args, **kwargs)
-        self.page = page
-
-        # Set search field data
-        self.search_term = search_term
-        if search_term:
-            self.search.data = search_term
-
-        # Filter bank accounts based on search term
-        bank_accounts = self.get_matched_bank_accounts(firm.firm_id, search_term)
-        self.num_results = len(bank_accounts)
-
-        # Limit results and populate choices
-        start_id = self.ITEMS_PER_PAGE * (page - 1)
-        end_id = self.ITEMS_PER_PAGE * (page - 1) + self.ITEMS_PER_PAGE
-
-        bank_accounts = bank_accounts[start_id:end_id]
-
-        # Create RadioDataTable for contract managers
-        table_structure: list[TableStructureItem] = [
-            {"text": "Sort code", "id": "sort_code"},
-            {"text": "Account number", "id": "account_number"},
-            {"text": "Account name", "id": "bank_account_name"},
-        ]
-        self.bank_accounts_table = RadioDataTable(
-            structure=table_structure,
-            data=[bank_account.to_internal_dict() for bank_account in bank_accounts],
-            radio_field_name="bank_account",
-            radio_value_key="bank_account_id",
-        )
-
-        # Store selected value for table rendering
-        self.selected_value = selected_value
-
-    def get_bank_accounts(self, firm_id: int) -> List[BankAccount]:
+    def get_bank_accounts(self, *args, **kwargs) -> List[BankAccount]:
         """
         Get list of bank accounts belonging to the given firm id
 
@@ -155,34 +104,10 @@ class BankAccountSearchForm(UpdateOfficeBaseForm):
             NoBankAccountsError: When the given firm does not have any bank accounts
         """
         pda = current_app.extensions["pda"]
-        bank_accounts = pda.get_provider_firm_bank_details(firm_id)
-        if not bank_accounts:
-            raise NoBankAccountsError("No bank accounts found")
-        return bank_accounts
+        if self.firm.is_advocate or self.firm.is_barrister:
+            return pda.get_all_bank_accounts()
 
-    def get_matched_bank_accounts(self, firm_id: int, search_term: str) -> List[BankAccount]:
-        """
-        Get bank accounts matching the search term that belong to a given firm
-
-        Args:
-        firm_id: The firm ID of the firm to limit the search to
-        search_term: A bank account sort code or account number to search for
-
-        Returns:
-            List[BankAccount]: List of bank accounts that belong to the given that match the search term
-        """
-        bank_accounts = self.get_bank_accounts(firm_id)
-        if not search_term:
-            # Return all bank accounts when no search term is provided.
-            return bank_accounts
-
-        matched_bank_accounts = []
-        search_lower = search_term.lower()
-        for bank_account in bank_accounts:
-            search_fields = [bank_account.account_number, bank_account.sort_code]
-            if search_lower in search_fields:
-                matched_bank_accounts.append(bank_account)
-        return matched_bank_accounts
+        return pda.get_provider_firm_bank_details(self.firm.firm_id)
 
 
 class ChangeOfficeContactDetailsForm(OfficeContactDetailsForm):
