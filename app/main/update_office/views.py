@@ -6,6 +6,7 @@ from flask import Response, abort, current_app, flash, redirect, render_template
 
 from app.forms import BaseForm
 from app.main.forms import NoBankAccountsError
+from app.main.utils import firm_office_url_for
 from app.main.views import AdvocateBarristerOfficeMixin
 from app.models import BankAccount, Firm, Office
 from app.pda.errors import ProviderDataApiError
@@ -15,18 +16,15 @@ from app.views import BaseFormView, FullWidthBaseFormView
 logger = logging.getLogger(__name__)
 
 
-class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
+class UpdateVATRegistrationNumberFormView(AdvocateBarristerOfficeMixin, FullWidthBaseFormView):
     template = "update_office/form.html"
+    provider_success_url = "main.view_provider_bank_accounts_payment"
+    office_success_url = "main.view_office_bank_payment_details"
 
     def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(form, context, **kwargs)
         context.update({"office_address": format_office_address_one_line(form.office)})
         return context
-
-    def get_success_url(self, form: BaseForm | None = None) -> str:
-        if form.firm.is_advocate or form.firm.is_barrister:
-            return url_for("main.view_provider_bank_accounts_payment", firm=form.firm)
-        return url_for("main.view_office_bank_payment_details", firm=form.firm, office=form.office)
 
     def form_valid(self, form):
         pda = current_app.extensions["pda"]
@@ -40,25 +38,12 @@ class UpdateVATRegistrationNumberFormView(FullWidthBaseFormView):
         flash("<b>Updated VAT registration number</b>", "success")
         return super().form_valid(form)
 
-    def get_form_instance(self, **kwargs) -> BaseForm:
-        firm: Firm = kwargs["firm"]
-        if firm.is_advocate or firm.is_barrister:
-            office = self.get_api().get_head_office(firm.firm_id)
-        else:
-            office = kwargs.get("office")
-
-        if not office:
-            flash("No office found", "error")
-            abort(404, "No office found")
-
-        return self.get_form_class()(firm=firm, office=office, vat_registration_number=office.vat_registration_number)
-
-    def get(self, firm, office=None, *args, **kwargs):
-        form = self.get_form_instance(firm=firm, office=office)
+    def get(self, firm, office, *args, **kwargs):
+        form = self.get_form_class()(firm=firm, office=office, vat_registration_number=office.vat_registration_number)
         return render_template(self.template, **self.get_context_data(form, **kwargs))
 
-    def post(self, firm, office=None, *args, **kwargs) -> Response | str:
-        form = self.get_form_instance(firm=firm, office=office)
+    def post(self, firm, office, *args, **kwargs) -> Response | str:
+        form = self.get_form_class()(firm=firm, office=office)
         if form.validate_on_submit():
             return self.form_valid(form)
         else:
@@ -193,10 +178,9 @@ class SearchBankAccountFormView(AdvocateBarristerOfficeMixin, BaseFormView):
 
     def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(form, context, **kwargs)
-        if form.firm.is_advocate or form.firm.is_barrister:
-            add_new_bank_account_url = url_for("main.add_office_bank_account", firm=form.firm)
-        else:
-            add_new_bank_account_url = url_for("main.add_office_bank_account", firm=form.firm, office=form.office)
+        add_new_bank_account_url = firm_office_url_for(
+            "main.add_office_bank_account", firm=form.firm, office=form.office
+        )
         context.update(
             {
                 "office_address": format_office_address_one_line(form.office),

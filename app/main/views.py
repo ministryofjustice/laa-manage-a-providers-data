@@ -16,11 +16,7 @@ from app.main.table_builders import (
     get_status_table,
     get_vat_registration_table,
 )
-from app.main.utils import (
-    create_provider_from_session,
-    get_firm_tags,
-    get_office_tags,
-)
+from app.main.utils import create_provider_from_session, firm_office_url_for, get_firm_tags, get_office_tags
 from app.models import Firm, Office
 from app.utils.formatting import (
     format_office_address_multi_line_html,
@@ -229,10 +225,7 @@ class ViewProvider(MethodView):
 
         if self.subpage == "bank-accounts-payment":
             if head_office:
-                if firm.is_advocate or firm.is_barrister:
-                    add_bank_account_url = url_for("main.search_bank_account", firm=firm)
-                else:
-                    add_bank_account_url = url_for("main.search_bank_account", firm=firm, office=head_office)
+                add_bank_account_url = firm_office_url_for("main.search_bank_account", firm=firm, office=head_office)
                 context.update(
                     {
                         "vat_registration_table": get_vat_registration_table(firm, head_office),
