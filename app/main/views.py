@@ -240,6 +240,7 @@ class ViewProvider(MethodView):
                         "bank_account_tables": get_bank_account_tables(
                             firm=firm, office=head_office, action_url=add_bank_account_url
                         ),
+                        "add_new_bank_account_url": add_bank_account_url,
                     }
                 )
 
