@@ -229,11 +229,17 @@ class ViewProvider(MethodView):
 
         if self.subpage == "bank-accounts-payment":
             if head_office:
+                if firm.is_advocate or firm.is_barrister:
+                    add_bank_account_url = url_for("main.search_bank_account", firm=firm)
+                else:
+                    add_bank_account_url = url_for("main.search_bank_account", firm=firm, office=head_office)
                 context.update(
                     {
                         "vat_registration_table": get_vat_registration_table(firm, head_office),
                         "payment_information_table": get_payment_information_table(firm, head_office),
-                        "bank_account_tables": get_bank_account_tables(firm=firm, office=head_office),
+                        "bank_account_tables": get_bank_account_tables(
+                            firm=firm, office=head_office, action_url=add_bank_account_url
+                        ),
                     }
                 )
 
