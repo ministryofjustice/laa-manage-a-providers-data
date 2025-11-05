@@ -227,7 +227,3 @@ class ReassignHeadOfficeFormView(BaseFormView):
         if form.validate_on_submit():
             return self.form_valid(form)
         return self.form_invalid(form)
-
-
-class AdvocateBarristerBankSearchFormView(BaseFormView):
-    pass
