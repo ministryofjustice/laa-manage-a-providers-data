@@ -59,13 +59,14 @@ class TestUpdateVATRegistrationNumberFormView:
 
 
 class TestSearchBankAccountsFormView:
-    def test_get_returns_redirect(self, app, client):
+    def test_get_returns_redirect_lsp(self, app, client):
         pda = app.extensions["pda"]
         firm = pda.create_provider_firm(
             Firm(
                 **{
                     "firmId": 12345,
                     "firmName": "Test firm name",
+                    "firmType": "Legal Services Provider",
                 }
             )
         )
@@ -77,3 +78,19 @@ class TestSearchBankAccountsFormView:
         response = view.get(firm, office, context={})
         assert response.location == url_for("main.add_office_bank_account", firm=firm, office=office)
         assert response.status_code == 302
+
+    def test_get_returns_redirect_advocate(self, app, client):
+        pda = app.extensions["pda"]
+        firm = pda.create_provider_firm(
+            Firm(
+                **{
+                    "firmId": 12345,
+                    "firmName": "Test firm name",
+                    "firmType": "Advocate",
+                }
+            )
+        )
+        office = pda.create_provider_office(Office(**{}), firm_id=firm.firm_id)
+        view = SearchBankAccountFormView(form_class=BankAccountSearchForm)
+        response = view.get(firm, office, context={})
+        assert isinstance(response, str)

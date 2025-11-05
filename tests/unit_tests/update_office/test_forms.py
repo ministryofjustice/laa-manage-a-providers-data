@@ -1,7 +1,8 @@
 import pytest
 
+from app.main.forms import NoBankAccountsError
 from app.main.update_office.forms import BankAccountSearchForm
-from app.models import BankAccount
+from app.models import BankAccount, Firm, Office
 
 
 @pytest.fixture
@@ -10,10 +11,13 @@ def setup_fixture(request, app):
     firm = pda.get_all_provider_firms()[0]
     office = pda.get_provider_offices(firm.firm_id)[0]
     bank_accounts = pda.get_provider_firm_bank_details(firm.firm_id)
+    all_bank_accounts = pda.get_all_bank_accounts()
 
+    # Add properties to class being decorated
     request.cls.firm = firm
     request.cls.office = office
     request.cls.bank_accounts = bank_accounts
+    request.cls.all_bank_accounts = all_bank_accounts
 
 
 @pytest.mark.usefixtures("setup_fixture")
@@ -48,3 +52,33 @@ class TestSearchBankAccountForm:
         form = BankAccountSearchForm(firm=self.firm, office=self.office, search_term="DOES NOT EXIST")
         assert form.num_results == 0
         assert len(form.bank_accounts_table.data) == 0
+
+    def test_no_bank_accounts_lsp(self, app):
+        firm = Firm(
+            firmName="Test Firm Name",
+            firmId=1001,
+            firmType="Legal Services Provider",
+        )
+        office = Office(officeName="Test Office Name", firmOfficeId=2001, firmOfficeCode="T2001")
+        with pytest.raises(NoBankAccountsError):
+            BankAccountSearchForm(firm=firm, office=office)
+
+    def test_no_bank_accounts_advocate(self, app):
+        firm = Firm(
+            firmName="Test Firm Name",
+            firmId=1001,
+            firmType="Advocate",
+        )
+        office = Office(officeName="Test Office Name", firmOfficeId=2001, firmOfficeCode="T2001")
+        form = BankAccountSearchForm(firm=firm, office=office)
+        assert len(form.bank_accounts_table.data) == len(self.all_bank_accounts)
+
+    def test_no_bank_accounts_barrister(self, app):
+        firm = Firm(
+            firmName="Test Firm Name",
+            firmId=1001,
+            firmType="Barrister",
+        )
+        office = Office(officeName="Test Office Name", firmOfficeId=2001, firmOfficeCode="T2001")
+        form = BankAccountSearchForm(firm=firm, office=office)
+        assert len(form.bank_accounts_table.data) == len(self.all_bank_accounts)
