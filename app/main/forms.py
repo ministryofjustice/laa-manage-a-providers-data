@@ -49,15 +49,21 @@ class ProviderListForm(BaseForm):
 
         self.search_term = self.data.get("search", None)
 
-        # Filter providers based on search term
-        if self.search_term != "":
-            search_lower = normalize_for_search(self.search_term)
+        # On initial page load we show no results
+        if self.search_term is None:
+            firms = []
+        # If an empty search is submitted we show all providers
+        elif self.search_term == "":
+            pass
+        else:
+            # Here we need to clean up the search terms to remove % and make sure it doesnt break responses
+            search_lower = normalize_for_search(self.search_term).lower()
             firms = [
                 firm
                 for firm in firms
                 if (
-                    search_lower in normalize_for_search(firm.firm_name)
-                    or search_lower in normalize_for_search(str(firm.firm_id))
+                    search_lower in normalize_for_search(firm.firm_name).lower()
+                    or search_lower in normalize_for_search(str(firm.firm_id)).lower()
                 )
             ]
 
