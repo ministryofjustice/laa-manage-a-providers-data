@@ -11,6 +11,7 @@ from app.constants import (
     YES_NO_CHOICES,
 )
 from app.main.forms import BaseBankAccountForm, BaseForm
+from app.utils.formatting import normalize_for_search
 from app.validators import (
     ValidateCompaniesHouseNumber,
     ValidateGovDateField,
@@ -338,9 +339,9 @@ class AssignContractManagerForm(BaseForm):
         # Filter contract managers based on search term
         filtered_managers = self.contract_managers
         if self.search_term:
-            search_lower = self.search_term.lower()
+            search_lower = normalize_for_search(self.search_term)
             filtered_managers = [
-                manager for manager in self.contract_managers if (search_lower in manager["name"].lower())
+                manager for manager in self.contract_managers if search_lower in normalize_for_search(manager["name"])
             ]
 
         self.page = page

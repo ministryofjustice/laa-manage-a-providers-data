@@ -1,4 +1,5 @@
 import datetime
+import re
 from typing import Optional
 
 from app.constants import (
@@ -7,6 +8,19 @@ from app.constants import (
     FIRM_TYPE_CHOICES,
 )
 from app.models import Office
+
+
+def normalize_for_search(value: str | None) -> str:
+    """Normalize a string for fuzzy substring matching by:
+    - Lowercasing
+    - Removing all non-alphanumeric characters
+
+    Returns empty string for falsy inputs.
+    """
+    if not value:
+        return ""
+    lowered = str(value).lower()
+    return re.sub(r"[^a-z0-9]", "", lowered)
 
 
 def format_firm_type(firm_type: str) -> str:

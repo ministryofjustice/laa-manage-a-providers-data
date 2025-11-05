@@ -5,7 +5,7 @@ from wtforms.validators import InputRequired, Length
 from app.components.tables import DataTable, TableStructureItem
 from app.forms import BaseForm
 from app.models import Firm
-from app.utils.formatting import format_sentence_case
+from app.utils.formatting import format_sentence_case, normalize_for_search
 from app.validators import ValidateAccountNumber, ValidateSortCode
 from app.widgets import GovTextInput
 
@@ -51,11 +51,14 @@ class ProviderListForm(BaseForm):
 
         # Filter providers based on search term
         if self.search_term != "":
-            search_lower = str(self.search_term).lower()
+            search_lower = normalize_for_search(self.search_term)
             firms = [
                 firm
                 for firm in firms
-                if (search_lower in firm.firm_name.lower() or search_lower in str(firm.firm_id).lower())
+                if (
+                    search_lower in normalize_for_search(firm.firm_name)
+                    or search_lower in normalize_for_search(str(firm.firm_id))
+                )
             ]
 
         self.page = self.data.get("page", 1)
