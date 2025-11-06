@@ -36,8 +36,8 @@
         <h2 class="govuk-heading-m">{{ form.num_results }} search {{ "result" if form.num_results == 1 else "results" }} for '{{ form.search_term }}'</h2>
       {% endif %}
 
-      {% if form.search_term is not none  and form.num_results > 0 %}
         <form method="post">
+        {% if form.search_term is not none  and form.num_results > 0 %}
           {{ form.hidden_tag() }}
 
           <div class="govuk-form-group {% if form.bank_account.errors %} govuk-form-group--error{% endif %}">
@@ -58,10 +58,11 @@
 
           <br>
 
-          {{ govukButton({'text': 'Submit'}) }}
-          {{ govukButton({'text': 'Add a new bank account', "classes": "govuk-button--secondary govuk-!-margin-left-2", "href": add_new_bank_account_url}) }}
+          {{ govukButton({'text': 'Submit', 'classes': 'govuk-!-margin-right-2'}) }}
+        {% endif %}
+          {{ govukButton({'text': 'Add a new bank account', "classes": "govuk-button--secondary", "href": add_new_bank_account_url}) }}
         </form>
-      {% endif %}
+
     </div>
   </div>
 
