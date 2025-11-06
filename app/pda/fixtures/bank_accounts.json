@@ -39,6 +39,27 @@
       "country": "GB",
       "zip": "W22 2HP",
       "startDate": "2025-09-10",
+      "endDate": "2025-10-08"
+    },
+    {
+      "bankAccountId": 902,
+      "vendorSiteId": 101,
+      "bankName": "Third Bank Partners",
+      "bankBranchName": "Manchester City Centre",
+      "sortCode": "102030",
+      "accountNumber": "90807060",
+      "bankAccountName": "Third Bank Account",
+      "currencyCode": "GBP",
+      "accountType": "Current Account",
+      "primaryFlag": "N",
+      "addressLine1": "3 Second Place",
+      "addressLine2": "Canary Wharf",
+      "addressLine3": null,
+      "city": "London",
+      "county": "Greater London",
+      "country": "GB",
+      "zip": "W33 3HP",
+      "startDate": "2025-10-08",
       "endDate": "2025-10-10"
     },
     {

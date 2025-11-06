@@ -801,7 +801,13 @@ class MockProviderDataApi:
         )[0]
         # Copy the selected bank account
         copy_bank_account_data = selected_bank_account.copy()
-        copy_bank_account_data.update({"bankAccountId": int(time.time())})
+        copy_bank_account_data.update(
+            {
+                "bankAccountId": int(time.time()),
+                "startDate": date.today(),
+                "endDate": None,
+            }
+        )
         new_bank_account = BankAccount(**copy_bank_account_data)
 
         # Create the new bank account and assign it to the office
