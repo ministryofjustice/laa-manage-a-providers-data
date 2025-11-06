@@ -66,17 +66,4 @@
 
 {% block bodyEnd %}
   <script src="{{ url_for('static', filename='scripts.js') }}" nonce="{{ csp_nonce() }}"></script>
-  <script nonce="{{ csp_nonce() }}">
-    document.addEventListener('DOMContentLoaded', function () {
-      const sanitize = function (form) {
-        const input = form.querySelector('input[name="search"]');
-        if (input && typeof input.value === 'string' && input.value.indexOf('%') !== -1) {
-          input.value = input.value.replace(/%/g, '');
-        }
-      };
-      document.querySelectorAll('form').forEach(function (form) {
-        form.addEventListener('submit', function () { sanitize(form); });
-      });
-    });
-  </script>
 {% endblock %}
