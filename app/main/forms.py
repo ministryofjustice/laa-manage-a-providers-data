@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from typing import Any, List
 
 from flask import current_app, url_for
@@ -235,10 +236,27 @@ class BaseBankAccountSearchForm(SearchableTableForm):
         pda = current_app.extensions["pda"]
         return pda.get_all_bank_accounts()
 
+    @classmethod
+    def sort_bank_accounts(
+        cls,
+        bank_accounts: List[BankAccount],
+    ) -> list[BankAccount]:
+        """Sort bank accounts based on the start date"""
+
+        # Sink bank accounts with no start date to the bottom
+        no_start_date_default = (datetime.today() - timedelta(weeks=5200)).date()
+        return sorted(
+            bank_accounts,
+            key=lambda account: account.start_date if account.start_date else no_start_date_default,
+            reverse=True,
+        )
+
     def get_searchable_data(self, *args, **kwargs) -> List[dict[str, Any]]:
         bank_accounts = self.get_bank_accounts(*args, **kwargs)
+
         if not bank_accounts:
             raise NoBankAccountsError("No bank accounts found")
+        bank_accounts = self.sort_bank_accounts(bank_accounts)
         return [bank_account.to_internal_dict() for bank_account in bank_accounts]
 
     def filter_searchable_data(self, bank_accounts: List[dict[str, Any]], search_term: str) -> List[dict[str, Any]]:

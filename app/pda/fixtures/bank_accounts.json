@@ -58,7 +58,8 @@
       "city": "London",
       "county": "Greater London",
       "country": "GB",
-      "zip": "E14 5HQ"
+      "zip": "E14 5HQ",
+      "startDate": "2020-08-10"
     },
     {
       "bankAccountId": 3,

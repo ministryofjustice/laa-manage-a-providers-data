@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 
 from app.main.forms import NoBankAccountsError
@@ -52,6 +54,46 @@ class TestSearchBankAccountForm:
         form = BankAccountSearchForm(firm=self.firm, office=self.office, search_term="DOES NOT EXIST")
         assert form.num_results == 0
         assert len(form.bank_accounts_table.data) == 0
+
+    def test_form_bank_accounts_order(self, app):
+        """Bank accounts with the latest start date should be at the top"""
+        bank_accounts = [
+            # Last
+            BankAccount(
+                bankAccountId=1001, bankAccountName="Test Bank Account 1", accountNumber="10000001", sortCode="203010"
+            ),
+            # First
+            BankAccount(
+                bankAccountId=1002,
+                bankAccountName="Test Bank Account 2",
+                accountNumber="10000002",
+                sortCode="203010",
+                startDate=datetime.date(2026, 1, 1),
+            ),
+            # Second
+            BankAccount(
+                bankAccountId=1003,
+                bankAccountName="Test Bank Account 3",
+                accountNumber="10000003",
+                sortCode="203010",
+                startDate=datetime.date(2025, 10, 1),
+            ),
+            # Third
+            BankAccount(
+                bankAccountId=1004,
+                bankAccountName="Test Bank Account 4",
+                accountNumber="10000004",
+                sortCode="203010",
+                startDate=datetime.date(2024, 10, 1),
+            ),
+        ]
+        expected_sorted_bank_accounts = [
+            bank_accounts[1],
+            bank_accounts[2],
+            bank_accounts[3],
+            bank_accounts[0],
+        ]
+        assert expected_sorted_bank_accounts == BankAccountSearchForm.sort_bank_accounts(bank_accounts)
 
     def test_no_bank_accounts_lsp(self, app):
         firm = Firm(
