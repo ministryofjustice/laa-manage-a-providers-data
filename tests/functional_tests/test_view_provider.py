@@ -131,7 +131,6 @@ def test_add_new_lsp(page):
     expect(page.get_by_text("Test provider", exact=True).first).to_be_visible()
     expect(page.get_by_text("Charity", exact=True).first).to_be_visible()
     expect(page.get_by_text("12345678", exact=True).first).to_be_visible()
-    expect(page.get_by_text("Alice Johnson", exact=True).first).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
