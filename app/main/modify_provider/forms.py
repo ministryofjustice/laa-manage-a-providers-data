@@ -9,7 +9,7 @@ from app.forms import BaseForm
 from app.main.add_a_new_provider.forms import LiaisonManagerForm
 from app.main.utils import get_firm_account_number
 from app.models import Firm, Office
-from app.utils.formatting import format_office_address_one_line
+from app.utils.formatting import format_office_address_one_line, normalize_for_search
 from app.widgets import GovRadioInput, GovTextInput
 
 
@@ -123,11 +123,14 @@ class AssignChambersForm(BaseForm):
 
         # Filter chambers based on search term
         if self.search_term:
-            search_lower = self.search_term.lower()
+            search_lower = normalize_for_search(self.search_term)
             chambers = [
                 chamber
                 for chamber in chambers
-                if (search_lower in chamber.firm_name.lower() or search_lower in str(chamber.firm_id).lower())
+                if (
+                    search_lower in normalize_for_search(chamber.firm_name)
+                    or search_lower in normalize_for_search(str(chamber.firm_id))
+                )
             ]
 
         self.page = page
