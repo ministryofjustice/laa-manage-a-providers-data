@@ -176,6 +176,27 @@
       "county": "Devon",
       "country": "GB",
       "zip": "PL12 6QY"
+    },
+    {
+      "vendorSiteId": 1305,
+      "bankAccountId": 8,
+      "bankName": "Taylor, Baldwin and Williams",
+      "bankBranchName": "TBW Powell Plains",
+      "sortCode": "556677",
+      "accountNumber": "55667788",
+      "bankAccountName": "Karen Sillen Second Account",
+      "currencyCode": "GBP",
+      "accountType": "Current Account",
+      "primaryFlag": "N",
+      "addressLine1": "7 Powell Plains",
+      "addressLine2": null,
+      "addressLine3": null,
+      "city": "Plymouth",
+      "county": "Devon",
+      "country": "GB",
+      "zip": "PL12 6QY",
+      "startDate": "2025-10-10",
+      "endDate": "2025-11-06"
     }
   ]
 }
