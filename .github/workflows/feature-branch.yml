@@ -57,20 +57,3 @@ jobs:
        KUBE_CLUSTER: ${{ secrets.KUBE_CLUSTER }}
        KUBE_NAMESPACE: ${{ secrets.KUBE_NAMESPACE }}
        KUBE_TOKEN: ${{ secrets.KUBE_TOKEN }}
-
-  deploy-uat:
-     name: UAT
-     uses: ./.github/workflows/deploy.yml
-     needs: build-and-push
-     with:
-       environment: uat
-       ECR_REGION: ${{vars.ECR_REGION}}
-       ECR_REPOSITORY: ${{vars.ECR_REPOSITORY}}
-       DEPLOYMENT_URL: ${{vars.DEPLOYMENT_URL}}
-     secrets:
-       ECR_REGISTRY_URL: ${{ secrets.ECR_REGISTRY_URL }}
-       ECR_ROLE_TO_ASSUME: ${{ secrets.ECR_ROLE_TO_ASSUME }}
-       KUBE_CERT: ${{ secrets.KUBE_CERT }}
-       KUBE_CLUSTER: ${{ secrets.KUBE_CLUSTER }}
-       KUBE_NAMESPACE: ${{ secrets.KUBE_NAMESPACE }}
-       KUBE_TOKEN: ${{ secrets.KUBE_TOKEN }}
