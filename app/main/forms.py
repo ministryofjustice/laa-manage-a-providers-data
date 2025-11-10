@@ -274,9 +274,8 @@ class BaseBankAccountSearchForm(SearchableTableForm):
             return bank_accounts
 
         matched_bank_accounts = []
-        search_lower = search_term.lower()
         for bank_account in bank_accounts:
             search_fields = [bank_account["account_number"], bank_account["sort_code"]]
-            if search_lower in search_fields:
+            if search_term in search_fields:
                 matched_bank_accounts.append(bank_account)
         return matched_bank_accounts

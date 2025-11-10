@@ -526,3 +526,4 @@ class ProviderDataApi:
         Get all bank accounts.
         Returns: List[BankAccount]
         """
+        raise NotImplementedError("Getting all bank accounts is currently not supported by the real Provider Data API")
