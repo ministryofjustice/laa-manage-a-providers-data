@@ -7,7 +7,7 @@
 
   {%- set queryString = '' %}
 
-  {%- if searchTerm %}
+  {%- if searchTerm is not none%}
     {# If you need to preserve additional query string args add them here #}
     {%- set queryString = '&search=' + searchTerm | urlencode %}
   {%- endif %}

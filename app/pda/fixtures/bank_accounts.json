@@ -39,6 +39,27 @@
       "country": "GB",
       "zip": "W22 2HP",
       "startDate": "2025-09-10",
+      "endDate": "2025-10-08"
+    },
+    {
+      "bankAccountId": 902,
+      "vendorSiteId": 101,
+      "bankName": "Third Bank Partners",
+      "bankBranchName": "Manchester City Centre",
+      "sortCode": "102030",
+      "accountNumber": "90807060",
+      "bankAccountName": "Third Bank Account",
+      "currencyCode": "GBP",
+      "accountType": "Current Account",
+      "primaryFlag": "N",
+      "addressLine1": "3 Second Place",
+      "addressLine2": "Canary Wharf",
+      "addressLine3": null,
+      "city": "London",
+      "county": "Greater London",
+      "country": "GB",
+      "zip": "W33 3HP",
+      "startDate": "2025-10-08",
       "endDate": "2025-10-10"
     },
     {
@@ -58,7 +79,8 @@
       "city": "London",
       "county": "Greater London",
       "country": "GB",
-      "zip": "E14 5HQ"
+      "zip": "E14 5HQ",
+      "startDate": "2020-08-10"
     },
     {
       "bankAccountId": 3,
@@ -138,6 +160,7 @@
     },
     {
       "vendorSiteId": 1305,
+      "bankAccountId": 7,
       "bankName": "Taylor, Baldwin and Williams",
       "bankBranchName": "TBW Powell Plains",
       "sortCode": "398334",
@@ -153,6 +176,27 @@
       "county": "Devon",
       "country": "GB",
       "zip": "PL12 6QY"
+    },
+    {
+      "vendorSiteId": 1305,
+      "bankAccountId": 8,
+      "bankName": "Taylor, Baldwin and Williams",
+      "bankBranchName": "TBW Powell Plains",
+      "sortCode": "556677",
+      "accountNumber": "55667788",
+      "bankAccountName": "Karen Sillen Second Account",
+      "currencyCode": "GBP",
+      "accountType": "Current Account",
+      "primaryFlag": "N",
+      "addressLine1": "7 Powell Plains",
+      "addressLine2": null,
+      "addressLine3": null,
+      "city": "Plymouth",
+      "county": "Devon",
+      "country": "GB",
+      "zip": "PL12 6QY",
+      "startDate": "2025-10-10",
+      "endDate": "2025-11-06"
     }
   ]
 }

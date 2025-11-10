@@ -795,11 +795,19 @@ class MockProviderDataApi:
         Returns:
             BankAccount: The bank account that was assigned to the office
         """
-        bank_accounts_data = self._get_firm_bank_details_raw(firm_id)
-        selected_bank_account = bank_accounts_data[int(bank_account_id)]
+
+        selected_bank_account = list(
+            filter(lambda account: account["bankAccountId"] == int(bank_account_id), self._mock_data["bank_accounts"])
+        )[0]
         # Copy the selected bank account
         copy_bank_account_data = selected_bank_account.copy()
-        copy_bank_account_data.update({"bankAccountId": int(time.time())})
+        copy_bank_account_data.update(
+            {
+                "bankAccountId": int(time.time()),
+                "startDate": date.today(),
+                "endDate": None,
+            }
+        )
         new_bank_account = BankAccount(**copy_bank_account_data)
 
         # Create the new bank account and assign it to the office
@@ -812,3 +820,10 @@ class MockProviderDataApi:
     def add_bank_account_to_office(self, firm_id: int, office_code: str, bank_account: BankAccount) -> BankAccount:
         bank_account.bank_account_id = int(time.time())
         return self.create_office_bank_account(firm_id, office_code, bank_account)
+
+    def get_all_bank_accounts(self) -> List[BankAccount]:
+        # Get all bank accounts
+        bank_accounts = []
+        for account in self._mock_data["bank_accounts"]:
+            bank_accounts.append(BankAccount(**account))
+        return bank_accounts

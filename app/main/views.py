@@ -16,11 +16,7 @@ from app.main.table_builders import (
     get_status_table,
     get_vat_registration_table,
 )
-from app.main.utils import (
-    create_provider_from_session,
-    get_firm_tags,
-    get_office_tags,
-)
+from app.main.utils import create_provider_from_session, firm_office_url_for, get_firm_tags, get_office_tags
 from app.models import Firm, Office
 from app.utils.formatting import (
     format_office_address_multi_line_html,
@@ -229,11 +225,15 @@ class ViewProvider(MethodView):
 
         if self.subpage == "bank-accounts-payment":
             if head_office:
+                add_bank_account_url = firm_office_url_for("main.search_bank_account", firm=firm, office=head_office)
                 context.update(
                     {
                         "vat_registration_table": get_vat_registration_table(firm, head_office),
                         "payment_information_table": get_payment_information_table(firm, head_office),
-                        "bank_account_tables": get_bank_account_tables(firm=firm, office=head_office),
+                        "bank_account_tables": get_bank_account_tables(
+                            firm=firm, office=head_office, action_url=add_bank_account_url
+                        ),
+                        "add_new_bank_account_url": add_bank_account_url,
                     }
                 )
 
@@ -325,3 +325,22 @@ class ViewOffice(MethodView):
         context = self.get_context(firm, office)
 
         return render_template(self.template, **context)
+
+
+class AdvocateBarristerOfficeMixin:
+    def get_success_url(self, form) -> str:
+        if form.firm.is_advocate or form.firm.is_barrister:
+            return url_for(self.provider_success_url, firm=form.firm)
+
+        return url_for(self.office_success_url, firm=form.firm, office=form.office)
+
+    def dispatch_request(self, *args, **kwargs):
+        firm: Firm = kwargs.get("firm")
+        office: Office | None = kwargs.get("office")
+
+        if not firm.is_advocate and not firm.is_barrister and not office:
+            abort(404)
+
+        kwargs["office"] = office if office else self.get_api().get_head_office(firm.firm_id)
+
+        return super().dispatch_request(*args, **kwargs)

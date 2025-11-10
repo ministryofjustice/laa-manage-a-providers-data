@@ -1,10 +1,13 @@
+from datetime import datetime, timedelta
+from typing import Any, List
+
 from flask import current_app, url_for
 from wtforms.fields.simple import StringField
-from wtforms.validators import InputRequired, Length
+from wtforms.validators import DataRequired, InputRequired, Length
 
-from app.components.tables import DataTable, TableStructureItem
+from app.components.tables import DataTable, RadioDataTable, TableStructureItem
 from app.forms import BaseForm
-from app.models import Firm
+from app.models import BankAccount, Firm
 from app.utils.formatting import format_sentence_case, normalize_for_search
 from app.validators import ValidateAccountNumber, ValidateSortCode
 from app.widgets import GovTextInput
@@ -123,3 +126,156 @@ class BaseBankAccountForm(BaseForm):
             ValidateAccountNumber(),
         ],
     )
+
+
+class SearchableTableForm(BaseForm):
+    ITEMS_PER_PAGE = 10
+    SEARCH_FIELD_LABEL = "Search term"
+    SEARCH_FIELD_HINT = None
+    SEARCH_FIELD_VALIDATORS = []
+
+    search = StringField(
+        SEARCH_FIELD_LABEL,
+        widget=GovTextInput(
+            form_group_classes="govuk-!-width-two-thirds",
+            heading_class="govuk-fieldset__legend--s",
+            hint=SEARCH_FIELD_LABEL,
+        ),
+        validators=[],
+    )
+
+    def __init__(self, *args, search_term="", page=1, selected_value=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.search.label.text = self.SEARCH_FIELD_LABEL
+        self.search.widget.hint_text = self.SEARCH_FIELD_HINT
+        self.search.validators = self.SEARCH_FIELD_VALIDATORS
+
+        self.page = page
+
+        # Set search field data
+        self.search_term = search_term
+        if search_term:
+            self.search.data = search_term
+
+        # Filter bank accounts based on search term
+        if search_term is None:
+            return
+
+        data = self.get_searchable_data()
+        data = self.filter_searchable_data(data, search_term)
+        self.num_results = len(data)
+        # Limit results and populate choices
+        data = self.paginate_data(data, page)
+
+        # Create RadioDataTable for contract managers
+        table_structure: list[TableStructureItem] = self.describe_data_structure()
+        self.bank_accounts_table = RadioDataTable(
+            structure=table_structure,
+            data=data,
+            radio_field_name="bank_account",
+            radio_value_key="bank_account_id",
+        )
+
+        # Store selected value for table rendering
+        self.selected_value = selected_value
+
+    def describe_data_structure(self) -> list[dict[str, str]]:
+        """Example return results
+         [
+            {"text": "Label", "id": "data_field_name"},
+            {"text": "Account number", "id": "account_number"},
+            {"text": "Account name", "id": "bank_account_name"},
+        ]
+        """
+        return []
+
+    def get_searchable_data(self, *args, **kwargs) -> List[dict[str, Any]]:
+        """get a list of data that can be searched"""
+        return []
+
+    def filter_searchable_data(self, data: List[dict[str, Any]], search_term: str) -> List[dict[str, Any]]:
+        """Filter data based on search term."""
+        return data
+
+    def paginate_data(self, data: List[dict[str, Any]], page: int) -> List[dict[str, Any]]:
+        start_id = self.ITEMS_PER_PAGE * (page - 1)
+        end_id = self.ITEMS_PER_PAGE * (page - 1) + self.ITEMS_PER_PAGE
+        return data[start_id:end_id]
+
+
+class NoBankAccountsError(Exception):
+    pass
+
+
+class BaseBankAccountSearchForm(SearchableTableForm):
+    title = "Search for bank account"
+    SEARCH_FIELD_LABEL = "Search for a bank account"
+    SEARCH_FIELD_HINT = "You can search by sort code or account number"
+    SEARCH_FIELD_MAX_CHARS = 8
+    bank_account = StringField(
+        validators=[DataRequired(message="Select a bank account or search again")],
+    )
+
+    def describe_data_structure(self) -> list[dict[str, Any]]:
+        return [
+            {"text": "Sort code", "id": "sort_code"},
+            {"text": "Account number", "id": "account_number"},
+            {"text": "Account name", "id": "bank_account_name"},
+        ]
+
+    def get_bank_accounts(self, *args, **kwargs) -> List[BankAccount]:
+        """
+        Get list of all bank accounts
+
+        Returns:
+            List[dict[str, any]: List of bank accounts
+
+        Raises:
+            NoBankAccountsError: No bank accounts found
+        """
+        pda = current_app.extensions["pda"]
+        return pda.get_all_bank_accounts()
+
+    @classmethod
+    def sort_bank_accounts(
+        cls,
+        bank_accounts: List[BankAccount],
+    ) -> list[BankAccount]:
+        """Sort bank accounts based on the start date"""
+
+        # Sink bank accounts with no start date to the bottom
+        no_start_date_default = (datetime.today() - timedelta(weeks=5200)).date()
+        return sorted(
+            bank_accounts,
+            key=lambda account: account.start_date if account.start_date else no_start_date_default,
+            reverse=True,
+        )
+
+    def get_searchable_data(self, *args, **kwargs) -> List[dict[str, Any]]:
+        bank_accounts = self.get_bank_accounts(*args, **kwargs)
+
+        if not bank_accounts:
+            raise NoBankAccountsError("No bank accounts found")
+        bank_accounts = self.sort_bank_accounts(bank_accounts)
+        return [bank_account.to_internal_dict() for bank_account in bank_accounts]
+
+    def filter_searchable_data(self, bank_accounts: List[dict[str, Any]], search_term: str) -> List[dict[str, Any]]:
+        """
+        Get bank accounts matching the search term
+
+        Args:
+        search_term: A bank account sort code or account number to search for
+
+        Returns:
+            List[dict[str, any]: List of bank accounts that match the search term
+        """
+        if not search_term:
+            # Return all bank accounts when no search term is provided.
+            return bank_accounts
+
+        matched_bank_accounts = []
+        for bank_account in bank_accounts:
+            search_fields = [bank_account["account_number"], bank_account["sort_code"]]
+            if search_term in search_fields:
+                matched_bank_accounts.append(bank_account)
+        return matched_bank_accounts

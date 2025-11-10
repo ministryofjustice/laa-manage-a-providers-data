@@ -520,3 +520,10 @@ class ProviderDataApi:
             BankAccount: The bank account added to the given office
         """
         raise NotImplementedError("Adding bank account to an office is not yet supported by the real Provider Data API")
+
+    def get_all_bank_accounts(self) -> List[BankAccount]:
+        """
+        Get all bank accounts.
+        Returns: List[BankAccount]
+        """
+        raise NotImplementedError("Getting all bank accounts is currently not supported by the real Provider Data API")

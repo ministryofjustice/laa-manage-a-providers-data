@@ -562,3 +562,12 @@ def reassign_head_office(firm: Firm | int, new_head_office: Office | str) -> Off
 
 def contract_manager_hide_default(value):
     return None if value == DEFAULT_CONTRACT_MANAGER_NAME else value
+
+
+def firm_office_url_for(endpoint, firm: Firm, **kwargs) -> str:
+    kwargs["firm"] = firm
+    if firm.is_advocate or firm.is_barrister:
+        if "office" in kwargs:
+            del kwargs["office"]
+
+    return url_for(endpoint, **kwargs)
