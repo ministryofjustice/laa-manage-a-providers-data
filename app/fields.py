@@ -1,5 +1,6 @@
 from wtforms.fields import DateField
 from wtforms.fields.choices import RadioField
+from wtforms.utils import unset_value
 
 from app.components.tables import RadioDataTable, TableStructureItem
 
@@ -155,4 +156,12 @@ def none_coerce(value):
 class GovUKRadioField(RadioField):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("coerce", none_coerce)
+        kwargs.setdefault("default", unset_value)
         super().__init__(*args, **kwargs)
+
+    def process_data(self, value):
+        # Only set .data if it's not unset_value — prevents auto-select
+        if value is not unset_value:
+            super().process_data(value)
+        else:
+            self.data = ""  # leave unselected
