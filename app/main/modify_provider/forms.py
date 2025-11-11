@@ -207,6 +207,7 @@ class ReassignHeadOfficeForm(BaseForm):
 
 class BarristerChangeDetailsForm(AddBarristerDetailsForm):
     url = "provider/<firm:firm>/change-barrister-details"
+    submit_button_text = "Submit"
 
     @property
     def caption(self):

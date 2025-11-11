@@ -235,11 +235,17 @@ class BarristerChangeDetailsView(AdvocateBarristerOfficeMixin, BaseFormView):
     def form_valid(self, form):
         barrister_details = {
             "firmName": form.data["barrister_name"],
-            "advocateLevel": None if form.data["barrister_level"] == "None" else form.data["barrister_level"],
+            "advocateLevel": form.data["barrister_level"],
             "barCouncilRoll": form.data["bar_council_roll_number"],
         }
         self.get_api().update_barrister_details(firm_id=form.firm.firm_id, barrister_details=barrister_details)
+        flash("Barrister overview updated successfully", category="success")
         return super().form_valid(form)
+
+    def get_context_data(self, form, context):
+        context = super().get_context_data(form)
+        context.update({"cancel_url": self.get_success_url(form)})
+        return context
 
     def get(self, firm: Firm, office: Office, context, **kwargs):
         form = self.get_form_class()(
