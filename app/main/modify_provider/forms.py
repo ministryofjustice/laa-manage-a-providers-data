@@ -72,16 +72,20 @@ class ChangeProviderActiveStatusForm(ChangeForm, BaseForm):
 class ChangeContractManagerForm(AssignContractManagerForm):
     url = "provider/<firm:firm>/change-contract-manager"
     skip = SubmitField("Unknown: Set as default", widget=GovSubmitInput(classes="govuk-button--secondary"))
-    office: Office | None = None
 
-    def __init__(self, firm: Firm, office: Office | None = None, *args, **kwargs):
+    def __init__(self, firm: Firm, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.firm = firm
-        self.office = office
 
 
 class ChangeOfficeContractManagerForm(ChangeContractManagerForm):
     url = "provider/<firm:firm>/office/<office:office>/change-contract-manager"
+    office: Office | None = None
+
+    def __init__(self, firm: Firm, office: Office | None = None, *args, **kwargs):
+        super().__init__(firm, *args, **kwargs)
+        self.firm = firm
+        self.office = office
 
 
 class AssignChambersForm(BaseForm):

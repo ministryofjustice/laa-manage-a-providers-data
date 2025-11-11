@@ -87,15 +87,19 @@ def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | N
         if data_source is None:
             raise ValueError(f"{field.get('data_source', 'firm')} is not a valid data source")
 
-        row_action_urls: dict = field.get("row_action_urls", None)
+        configured_action_urls: dict = field.get("row_action_urls", None)
+        row_action_urls: dict | None = None
         # If we have row actions, replace endpoints with generated URLs
-        if row_action_urls:
-            for action_key, endpoint in row_action_urls.items():
+        if configured_action_urls:
+            row_action_urls = {}
+            for action_key, endpoint in configured_action_urls.items():
                 try:
                     url = url_for(endpoint, firm=firm.firm_id)
                     row_action_urls[action_key] = url
                 except Exception as e:
-                    logger.error(f"{e.__class__.__name__} whilst generating a url for ({action_key}) {endpoint}: {e}")
+                    logger.error(
+                        f"{e.__class__.__name__} whilst generating a url for firm {firm} ({action_key}) {endpoint}: {e}"
+                    )
 
         _add_table_row_from_config(main_table, field, data_source, row_action_urls)
 
