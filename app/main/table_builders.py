@@ -97,8 +97,9 @@ def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | N
         # Build row action URLs if change_link is present
         row_action_urls = None
         if change_link := field.get("change_link"):
+            change_link_anchor = field.get("change_link_anchor")
             key = "change" if value else "enter"
-            row_action_urls = {key: url_for(change_link, firm=firm)}
+            row_action_urls = {key: url_for(change_link, firm=firm, _anchor=change_link_anchor)}
 
         _add_table_row_from_config(main_table, field, data_source, row_action_urls)
 

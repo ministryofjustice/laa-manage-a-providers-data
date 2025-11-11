@@ -7,7 +7,7 @@ from flask import Response, abort, current_app, flash, redirect, render_template
 from app.forms import BaseForm
 from app.main.modify_provider import AssignChambersForm, ReassignHeadOfficeForm
 from app.main.utils import assign_firm_to_a_new_chambers, change_liaison_manager, reassign_head_office
-from app.main.views import get_main_table
+from app.main.views import AdvocateBarristerOfficeMixin, get_main_table
 from app.models import Contact, Firm, Office
 from app.pda.errors import ProviderDataApiError
 from app.views import BaseFormView, FullWidthBaseFormView
@@ -224,6 +224,37 @@ class ReassignHeadOfficeFormView(BaseFormView):
         if not firm:
             abort(400)
         form = self.get_form_class()(firm=firm)
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        return self.form_invalid(form)
+
+
+class BarristerChangeDetailsView(AdvocateBarristerOfficeMixin, BaseFormView):
+    provider_success_url = "main.view_provider"
+
+    def form_valid(self, form):
+        barrister_details = {
+            "firmName": form.data["barrister_name"],
+            "advocateLevel": None if form.data["barrister_level"] == "None" else form.data["barrister_level"],
+            "barCouncilRoll": form.data["bar_council_roll_number"],
+        }
+        self.get_api().update_barrister_details(firm_id=form.firm.firm_id, barrister_details=barrister_details)
+        return super().form_valid(form)
+
+    def get(self, firm: Firm, office: Office, context, **kwargs):
+        form = self.get_form_class()(
+            firm=firm,
+            office=office,
+            **{
+                "barrister_name": firm.firm_name,
+                "barrister_level": firm.advocate_level,
+                "bar_council_roll_number": firm.bar_council_roll,
+            },
+        )
+        return render_template(self.get_template(), **self.get_context_data(form, context))
+
+    def post(self, firm: Firm, office: Office, context) -> Response | str:
+        form = self.get_form_class()(firm=firm, office=office)
         if form.validate_on_submit():
             return self.form_valid(form)
         return self.form_invalid(form)
