@@ -8,6 +8,8 @@ on:
       - main
   pull_request:
     types:
+      - opened
+      - synchronize
       - reopened
 
 jobs:
@@ -46,6 +48,7 @@ jobs:
      name: Ephemeral
      uses: ./.github/workflows/deploy-ephemeral.yml
      needs: build-and-push
+     if: github.event_name == 'pull_request'
      with:
        environment: uat
        ECR_REGION: ${{vars.ECR_REGION}}
