@@ -6,7 +6,11 @@ from datetime import date
 from flask import current_app, flash, session, url_for
 
 from app.components.tag import Tag, TagType
-from app.constants import DEFAULT_CONTRACT_MANAGER_NAME
+from app.constants import (
+    STATUS_CONTRACT_MANAGER_DEBT_RECOVERY,
+    STATUS_CONTRACT_MANAGER_DEFAULT,
+    STATUS_CONTRACT_MANAGER_NAMES,
+)
 from app.models import BankAccount, Contact, Firm, Office
 from app.pda.errors import ProviderDataApiError
 from app.pda.mock_api import MockProviderDataApi
@@ -561,7 +565,18 @@ def reassign_head_office(firm: Firm | int, new_head_office: Office | str) -> Off
 
 
 def contract_manager_hide_default(value):
-    return None if value == DEFAULT_CONTRACT_MANAGER_NAME else value
+    return None if value == STATUS_CONTRACT_MANAGER_DEFAULT else value
+
+
+def contract_manager_visible_and_changeable(entity: dict):
+    contract_manager = entity.get("contract_manager", None)
+    return contract_manager not in STATUS_CONTRACT_MANAGER_NAMES or contract_manager == STATUS_CONTRACT_MANAGER_DEFAULT
+
+
+def get_entity_referred_to_debt_recovery_text(entity: dict) -> str:
+    if entity.get("contract_manager", None) == STATUS_CONTRACT_MANAGER_DEBT_RECOVERY:
+        return "Yes"
+    return "No"
 
 
 def firm_office_url_for(endpoint, firm: Firm, **kwargs) -> str:

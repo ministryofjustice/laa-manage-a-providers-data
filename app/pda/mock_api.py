@@ -701,7 +701,7 @@ class MockProviderDataApi:
         # Set the vendor_site_id to the office ID and creation_date to today in ISO format
         updates = {"vendor_site_id": office_id, "contact_id": new_contact_id}
         if not contact.creation_date:
-            updates["creation_date"] = date.today().isoformat()
+            updates["creation_date"] = date.today()
 
         updated_contact = contact.model_copy(update=updates)
 

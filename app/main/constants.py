@@ -1,4 +1,10 @@
-from app.main.utils import get_entity_active_text, provider_name_html
+from app.main.utils import (
+    contract_manager_hide_default,
+    contract_manager_visible_and_changeable,
+    get_entity_active_text,
+    get_entity_referred_to_debt_recovery_text,
+    provider_name_html,
+)
 from app.utils.formatting import (
     format_advocate_level,
     format_constitutional_status,
@@ -24,6 +30,11 @@ STATUS_TABLE_FIELD_CONFIG = {
             "default": "No",
         },
         {"label": "Intervened", "default": "No"},
+        {
+            "label": "Referred to debt recovery",
+            "text_renderer": get_entity_referred_to_debt_recovery_text,
+            "default": "No",
+        },
     ],
     "Chambers": [
         {
@@ -45,7 +56,11 @@ STATUS_TABLE_FIELD_CONFIG = {
             "default": "No",
         },
         {"label": "Intervened", "default": "No"},
-        {"label": "Referred to debt recovery", "default": "No"},
+        {
+            "label": "Referred to debt recovery",
+            "text_renderer": get_entity_referred_to_debt_recovery_text,
+            "default": "No",
+        },
     ],
     "Advocate": [
         {
@@ -60,7 +75,11 @@ STATUS_TABLE_FIELD_CONFIG = {
             "default": "No",
         },
         {"label": "Intervened", "default": "No"},
-        {"label": "Referred to debt recovery", "default": "No"},
+        {
+            "label": "Referred to debt recovery",
+            "text_renderer": get_entity_referred_to_debt_recovery_text,
+            "default": "No",
+        },
     ],
     "Office": [
         {
@@ -113,6 +132,13 @@ MAIN_TABLE_FIELD_CONFIG = {
             "default": "Not provided",
         },
         {"label": "Companies House number", "id": "company_house_number", "default": "Not provided"},
+        {
+            "label": "Contract manager",
+            "id": "contract_manager",
+            "row_action_urls": {"change": "main.change_contract_manager", "enter": "main.change_contract_manager"},
+            "value_preprocessor": contract_manager_hide_default,
+            "visible": contract_manager_visible_and_changeable,
+        },
     ],
     "Chambers": [
         {"label": "Provider name", "id": "firm_name"},
@@ -135,7 +161,7 @@ MAIN_TABLE_FIELD_CONFIG = {
             "id": "firm_name",
             "html_renderer": provider_name_html,
             "data_source": "parent_firm",
-            "change_link": "main.assign_chambers",
+            "row_action_urls": {"enter": "main.assign_chambers", "change": "main.assign_chambers"},
         },
         {"label": "Barrister level", "id": "advocate_level", "formatter": format_advocate_level},
         {"label": "Bar Council roll number", "id": "bar_council_roll"},
@@ -149,7 +175,7 @@ MAIN_TABLE_FIELD_CONFIG = {
             "id": "firm_name",
             "html_renderer": provider_name_html,
             "data_source": "parent_firm",
-            "change_link": "main.assign_chambers",
+            "row_action_urls": {"enter": "main.assign_chambers", "change": "main.assign_chambers"},
         },
         {"label": "Advocate level", "id": "advocate_level", "formatter": format_advocate_level},
         {"label": "Solicitors Regulation Authority roll number", "id": "bar_council_roll"},

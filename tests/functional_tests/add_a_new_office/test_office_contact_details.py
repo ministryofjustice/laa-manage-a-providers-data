@@ -152,6 +152,12 @@ def test_successful_form_submission_minimal(page: Page):
     page.get_by_role("textbox", name="DX centre").fill("Test Centre")
     page.get_by_role("button", name="Submit").click()
 
+    # Firm in mock data has Mr.Default contract manager, so we get a prompt to set a contract manager for the office
+    expect(page.get_by_text("Search for a contract manager")).to_be_visible()
+    expect(page.get_by_role("button", name="Unknown: Set as default")).to_be_visible()
+    page.get_by_role("row", name="Select this row  Alice Johnson").get_by_label("Select this row").check()
+    page.get_by_role("button", name="Submit").click()
+
     # Should redirect to the new office
     expect(page.locator("span").filter(has_text="SMITH & PARTNERS SOLICITORS")).to_be_visible()
     expect(page.get_by_role("heading", name="Office: ")).to_be_visible()
@@ -183,6 +189,12 @@ def test_successful_form_submission_all_fields(page: Page):
     page.get_by_role("textbox", name="DX centre").fill("Test Centre")
     page.get_by_role("button", name="Submit").click()
 
+    # Firm in mock data has Mr.Default contract manager, so we get a prompt to set a contract manager for the office
+    expect(page.get_by_text("Search for a contract manager")).to_be_visible()
+    expect(page.get_by_role("button", name="Unknown: Set as default")).to_be_visible()
+    page.get_by_role("row", name="Select this row  Alice Johnson").get_by_label("Select this row").check()
+    page.get_by_role("button", name="Submit").click()
+
     # Should redirect to the new office
     expect(page.locator("span").filter(has_text="SMITH & PARTNERS SOLICITORS")).to_be_visible()
     expect(page.get_by_role("heading", name="Office: ")).to_be_visible()
@@ -211,6 +223,12 @@ def test_optional_fields_not_required(page: Page):
     page.get_by_role("textbox", name="DX number").fill("DX123456")
     page.get_by_role("textbox", name="DX centre").fill("Test Centre")
     # Leave optional fields empty: address_line_2-4, county
+    page.get_by_role("button", name="Submit").click()
+
+    # Firm in mock data has Mr.Default contract manager, so we get a prompt to set a contract manager for the office
+    expect(page.get_by_text("Search for a contract manager")).to_be_visible()
+    expect(page.get_by_role("button", name="Unknown: Set as default")).to_be_visible()
+    page.get_by_role("row", name="Select this row  Alice Johnson").get_by_label("Select this row").check()
     page.get_by_role("button", name="Submit").click()
 
     # Should redirect to the new office

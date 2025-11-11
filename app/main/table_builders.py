@@ -1,11 +1,12 @@
 import datetime
+import logging
 from collections.abc import Callable
 from typing import List
 
 from flask import current_app, url_for
 
 from app.components.tables import Card, DataTable, SummaryList
-from app.constants import DISPLAY_DATE_FORMAT
+from app.constants import DISPLAY_DATE_FORMAT, STATUS_CONTRACT_MANAGER_DEFAULT, STATUS_CONTRACT_MANAGER_NAMES
 from app.main.constants import MAIN_TABLE_FIELD_CONFIG, STATUS_TABLE_FIELD_CONFIG
 from app.main.utils import provider_name_html
 from app.models import BankAccount, Contact, Firm, Office
@@ -15,6 +16,8 @@ from app.utils.formatting import (
     format_head_office,
     format_office_address_multi_line_html,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def _add_table_row_from_config(table: SummaryList, field: dict, data_source: dict, row_action_urls: dict = None):
@@ -84,21 +87,15 @@ def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | N
         if data_source is None:
             raise ValueError(f"{field.get('data_source', 'firm')} is not a valid data source")
 
-        # Skip row if hide_if_null is set and value is empty
-        value = data_source.get(field.get("id", ""))
-        if not value and field.get("hide_if_null", False):
-            continue
-
-        if value_preprocessor := field.get("value_preprocessor"):
-            if not isinstance(value_preprocessor, Callable):
-                raise ValueError("value_preprocessor must be callable")
-            value = value_preprocessor(value)
-
-        # Build row action URLs if change_link is present
-        row_action_urls = None
-        if change_link := field.get("change_link"):
-            key = "change" if value else "enter"
-            row_action_urls = {key: url_for(change_link, firm=firm)}
+        row_action_urls: dict = field.get("row_action_urls", None)
+        # If we have row actions, replace endpoints with generated URLs
+        if row_action_urls:
+            for action_key, endpoint in row_action_urls.items():
+                try:
+                    url = url_for(endpoint, firm=firm.firm_id)
+                    row_action_urls[action_key] = url
+                except Exception as e:
+                    logger.error(f"{e.__class__.__name__} whilst generating a url for ({action_key}) {endpoint}: {e}")
 
         _add_table_row_from_config(main_table, field, data_source, row_action_urls)
 
@@ -302,6 +299,11 @@ def get_office_overview_table(firm: Firm, office: Office) -> DataTable:
     table.add_row("Account number", office.firm_office_code)
     table.add_row("Head office", office.head_office, format_head_office)
     table.add_row("Supplier type", firm.firm_type, format_firm_type)
+    if (
+        office.contract_manager not in STATUS_CONTRACT_MANAGER_NAMES
+        or office.contract_manager == STATUS_CONTRACT_MANAGER_DEFAULT
+    ):
+        table.add_row("Contract manager", office.contract_manager)
     return table
 
 

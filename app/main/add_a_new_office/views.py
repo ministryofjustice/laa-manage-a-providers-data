@@ -1,5 +1,6 @@
 from flask import Response, redirect, render_template, url_for
 
+from app.constants import STATUS_CONTRACT_MANAGER_NAMES
 from app.main.utils import add_new_office
 from app.models import Firm, Office
 from app.views import BaseFormView
@@ -9,6 +10,9 @@ class OfficeContactDetailsFormView(BaseFormView):
     """Form view for the Office Contact Details page"""
 
     def get_success_url(self, new_office: Office, firm: Firm) -> str:
+        if firm.contract_manager in STATUS_CONTRACT_MANAGER_NAMES:
+            # Set contract manager on office if parent firm has a status workaround contract manager
+            return url_for("main.change_office_contract_manager", firm=firm, office=new_office)
         return url_for("main.view_office", firm=firm, office=new_office)
 
     def form_valid(self, form):
@@ -28,7 +32,8 @@ class OfficeContactDetailsFormView(BaseFormView):
             "email_address": form.data.get("email_address"),
             "dx_number": form.data.get("dx_number"),
             "dx_centre": form.data.get("dx_centre"),
-            "payment_method": "Electronic",  # The new office must be set to Electronic payment method so we do it here before the offcie is created
+            "payment_method": "Electronic",  # The new office must be set to Electronic payment method so we do it here before the office is created
+            "contract_manager": form.firm.contract_manager,  # Inherit the contract manager
         }
 
         # Create the office
