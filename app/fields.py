@@ -140,3 +140,19 @@ class GovUKTableRadioField(RadioField):
         )
 
         return table.to_govuk_params(selected_value=self.data, **kwargs)
+
+
+def none_coerce(value):
+    """
+    Converts 'None', '', or 'null' strings to Python None.
+    Useful for form fields that have 'None of the above' options.
+    """
+    if value in (None, "", "None", "null"):
+        return None
+    return value
+
+
+class GovUKRadioField(RadioField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("coerce", none_coerce)
+        super().__init__(*args, **kwargs)
