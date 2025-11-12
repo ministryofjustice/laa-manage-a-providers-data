@@ -307,7 +307,15 @@ def get_office_overview_table(firm: Firm, office: Office) -> DataTable:
         office.contract_manager not in STATUS_CONTRACT_MANAGER_NAMES
         or office.contract_manager == STATUS_CONTRACT_MANAGER_DEFAULT
     ):
-        table.add_row("Contract manager", office.contract_manager)
+        url = url_for("main.change_office_contract_manager", firm=firm, office=office)
+        table.add_row(
+            "Contract manager",
+            office.contract_manager,
+            row_action_urls={
+                "enter": url,
+                "change": url,
+            },
+        )
     return table
 
 
