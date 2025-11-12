@@ -135,7 +135,7 @@ MAIN_TABLE_FIELD_CONFIG = {
         {
             "label": "Contract manager",
             "id": "contract_manager",
-            "row_action_urls": {"change": "main.change_contract_manager", "enter": "main.change_contract_manager"},
+            "data_source": "head_office",
             "value_preprocessor": contract_manager_hide_default,
             "visible": contract_manager_visible_and_changeable,
         },
