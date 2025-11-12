@@ -4,6 +4,7 @@ from typing import Any
 
 from flask import Response, abort, current_app, flash, redirect, render_template, request, session, url_for
 
+from app.constants import DEFAULT_CONTRACT_MANAGER_NAME, STATUS_CONTRACT_MANAGER_NAMES
 from app.forms import BaseForm
 from app.main.forms import NoBankAccountsError
 from app.main.utils import firm_office_url_for
@@ -306,3 +307,87 @@ class AddBankAccountFormView(AdvocateBarristerOfficeMixin, BaseFormView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form, **kwargs)
+
+
+class ChangeContractManagerFormView(BaseFormView):
+    """Form view to change contract manager on an Office"""
+
+    template = "add_provider/assign-contract-manager.html"
+    success_endpoint = "main.create_provider"
+
+    def get_success_url(self, firm, office: Office) -> str:
+        return url_for("main.view_office", firm=firm.firm_id, office=office.firm_office_code)
+
+    def change_contract_manager(self, contract_manager: str, firm, office=None):
+        pda = current_app.extensions.get("pda")
+        if not pda:
+            raise RuntimeError("Provider Data API not initialized")
+
+        change_fields = {"contractManager": contract_manager}
+        try:
+            pda.patch_office(firm.firm_id, office.firm_office_code, change_fields)
+        except ProviderDataApiError as e:
+            logger.error(f"{e.__class__.__name__} whilst changing contract manager on firm {firm} office {office}: {e}")
+            return False
+        return True
+
+    def form_valid(self, form) -> Response:
+        contract_manager = form.data.get("contract_manager")
+        if self.change_contract_manager(contract_manager, form.firm, form.office):
+            # Flash success
+            flash(
+                f"<b>Contract manager for {form.office.firm_office_code} changed to {contract_manager}</b>",
+                category="success",
+            )
+        else:
+            flash("Unable to change contract manager", category="error")
+
+        return redirect(self.get_success_url(form.firm, form.office))
+
+    def skip_form(self, form) -> Response:
+        # Set contract manager to be default
+        contract_manager = DEFAULT_CONTRACT_MANAGER_NAME
+        self.change_contract_manager(contract_manager, form.firm, form.office)
+        return redirect(self.get_success_url(form.firm, form.office))
+
+    @staticmethod
+    def get_valid_firm_or_abort(firm):
+        if not firm:
+            abort(400)
+
+    def get(self, firm, context, office: Office, **kwargs) -> str:
+        self.get_valid_firm_or_abort(firm)
+
+        # Take contract manager from the head office
+        pda = current_app.extensions.get("pda")
+        if not pda:
+            raise RuntimeError("Provider Data API not initialized")
+        head_office = pda.get_head_office(firm.firm_id)
+        selected_contract_manager = head_office.contract_manager
+
+        if selected_contract_manager in STATUS_CONTRACT_MANAGER_NAMES:
+            selected_contract_manager = None
+
+        search_term = request.args.get("search", "").strip()
+        page = int(request.args.get("page", 1))
+        form = self.get_form_class()(
+            firm, office=office, search_term=search_term, page=page, selected_value=selected_contract_manager
+        )
+
+        if search_term:
+            form.search.validate(form)
+
+        return render_template(self.get_template(), **self.get_context_data(form, **kwargs))
+
+    def post(self, firm, context, office: Office | None = None, **kwargs) -> Response | str:
+        self.get_valid_firm_or_abort(firm)
+
+        search_term = request.args.get("search", "").strip()
+        page = int(request.args.get("page", 1))
+        form = self.get_form_class()(firm, office, search_term=search_term, page=page)
+
+        if form.skip.data:
+            return self.skip_form(form)
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        return self.form_invalid(form, **kwargs)
