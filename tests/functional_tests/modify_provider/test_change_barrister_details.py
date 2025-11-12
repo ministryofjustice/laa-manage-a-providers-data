@@ -4,7 +4,7 @@ from playwright.sync_api import Page, expect
 
 
 def _navigate_to_provider_page(page: Page, provider_name: str):
-    """Helper function to navigate to the Add Office form via UI flow."""
+    """Helper function to navigate to a given provider page."""
     # Navigate to the providers list
     page.goto(url_for("main.providers", _external=True))
 
@@ -69,3 +69,12 @@ def test_change_barrister_details_cancel(page: Page):
 
     page.get_by_role("link", name="Cancel").click()
     expect(page.get_by_text("Barrister overview updated successfully")).not_to_be_visible()
+
+
+@pytest.mark.usefixtures("live_server")
+def test_change_barrister_details_no_changes(page: Page):
+    _navigate_to_provider_page(page, "Karen Sillen")
+    page.get_by_role("link", name="Change barrister name").click()
+
+    page.get_by_role("button", name="Submit").click()
+    expect(page.get_by_text("No changes made to Barrister overview details")).to_be_visible()
