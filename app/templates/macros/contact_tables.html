@@ -12,7 +12,7 @@
         {# Additional contacts in one details component #}
         {% if contact_tables|length > 1 %}
             {% set additional_contacts_html %}
-                {% for contact_table in contact_tables[1:]|reverse %}
+                {% for contact_table in contact_tables[1:] %}
                     {{ govukSummaryList(contact_table.to_summary_govuk_params()) }}
                 {% endfor %}
             {% endset %}
