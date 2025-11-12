@@ -10,8 +10,10 @@ class OfficeContactDetailsFormView(BaseFormView):
     """Form view for the Office Contact Details page"""
 
     def get_success_url(self, new_office: Office, firm: Firm) -> str:
-        if firm.contract_manager in STATUS_CONTRACT_MANAGER_NAMES:
-            # Set contract manager on office if parent firm has a status workaround contract manager
+        # Check if the head office has a status workaround contract manager
+        head_office: Office = self.get_api().get_head_office(firm.firm_id)
+        if head_office.contract_manager in STATUS_CONTRACT_MANAGER_NAMES:
+            # Set contract manager on office if head office has a status workaround contract manager
             return url_for("main.change_office_contract_manager", firm=firm, office=new_office)
         return url_for("main.view_office", firm=firm, office=new_office)
 
@@ -33,7 +35,7 @@ class OfficeContactDetailsFormView(BaseFormView):
             "dx_number": form.data.get("dx_number"),
             "dx_centre": form.data.get("dx_centre"),
             "payment_method": "Electronic",  # The new office must be set to Electronic payment method so we do it here before the office is created
-            "contract_manager": form.firm.contract_manager,  # Inherit the contract manager
+            "contract_manager": head_office.contract_manager,  # Inherit the contract manager from the head office
         }
 
         # Create the office
