@@ -574,7 +574,15 @@ def contract_manager_visible_and_changeable(entity: dict):
 
 
 def get_entity_referred_to_debt_recovery_text(entity: dict) -> str:
-    if entity.get("contract_manager", None) == STATUS_CONTRACT_MANAGER_DEBT_RECOVERY:
+    contract_manager = entity.get("contract_manager", None)
+    if contract_manager is None and "firm_id" in entity:
+        pda = current_app.extensions.get("pda")
+        if not pda:
+            raise RuntimeError("Provider Data API not initialized")
+        head_office = pda.get_head_office(entity["firm_id"])
+        contract_manager = head_office.contract_manager
+
+    if contract_manager == STATUS_CONTRACT_MANAGER_DEBT_RECOVERY:
         return "Yes"
     return "No"
 
