@@ -2,19 +2,7 @@ import pytest
 from flask import url_for
 from playwright.sync_api import Page, expect
 
-
-def table_to_dict(page: Page, table_selector: str) -> dict:
-    """Convert a two-column table (<th> + <td>) into a Python dict."""
-    table_dict = {}
-    rows = page.locator(f"{table_selector} tr")
-
-    for i in range(rows.count()):
-        row = rows.nth(i)
-        header = row.locator("th").inner_text().strip()
-        cell = row.locator("td").inner_text().strip()
-        table_dict[header] = cell
-
-    return table_dict
+from tests.functional_tests.utils import definition_list_to_dict
 
 
 def navigate_to_office_contact_details(page: Page, provider_name="SMITH & PARTNERS SOLICITORS", has_office=True):
@@ -154,7 +142,7 @@ def test_successful_form_submission_minimal(page: Page):
 
     # Firm in mock data has Mr.Default contract manager, so we get a prompt to set a contract manager for the office
     expect(page.get_by_text("Search for a contract manager")).to_be_visible()
-    expect(page.get_by_role("button", name="Unknown: Set as default")).to_be_visible()
+    expect(page.get_by_role("button", name="Unknown: Skip this step")).to_be_visible()
     page.get_by_role("row", name="Select this row  Alice Johnson").get_by_label("Select this row").check()
     page.get_by_role("button", name="Submit").click()
 
@@ -191,7 +179,7 @@ def test_successful_form_submission_all_fields(page: Page):
 
     # Firm in mock data has Mr.Default contract manager, so we get a prompt to set a contract manager for the office
     expect(page.get_by_text("Search for a contract manager")).to_be_visible()
-    expect(page.get_by_role("button", name="Unknown: Set as default")).to_be_visible()
+    expect(page.get_by_role("button", name="Unknown: Skip this step")).to_be_visible()
     page.get_by_role("row", name="Select this row  Alice Johnson").get_by_label("Select this row").check()
     page.get_by_role("button", name="Submit").click()
 
@@ -227,7 +215,7 @@ def test_optional_fields_not_required(page: Page):
 
     # Firm in mock data has Mr.Default contract manager, so we get a prompt to set a contract manager for the office
     expect(page.get_by_text("Search for a contract manager")).to_be_visible()
-    expect(page.get_by_role("button", name="Unknown: Set as default")).to_be_visible()
+    expect(page.get_by_role("button", name="Unknown: Skip this step")).to_be_visible()
     page.get_by_role("row", name="Select this row  Alice Johnson").get_by_label("Select this row").check()
     page.get_by_role("button", name="Submit").click()
 
@@ -239,8 +227,8 @@ def test_optional_fields_not_required(page: Page):
     expect(page.get_by_text("TE1 5ST")).to_be_visible()
 
     # Make sure the new office is NOT marked as the head office because this provider has a head office.
-    overview_table = table_to_dict(page, "h2:has-text('Overview') + table")
-    assert overview_table["Head office"] == "No"
+    overview_list = definition_list_to_dict(page, "h2:has-text('Overview') + dl")
+    assert overview_list["Head office"] == "No"
 
 
 @pytest.mark.usefixtures("live_server")
@@ -258,7 +246,9 @@ def test_add_head_office(page: Page):
     page.get_by_role("textbox", name="DX centre").fill("Test Centre")
     # Leave optional fields empty: address_line_2-4, county
     page.get_by_role("button", name="Submit").click()
+    # Skip setting a contract manager
+    page.get_by_role("button", name="Unknown: Skip this step").click()
 
     # Make sure the new office is marked as the head office because this provider did not have head office.
-    overview_table = table_to_dict(page, "h2:has-text('Overview') + table")
-    assert overview_table["Head office"] == "Yes"
+    overview_list = definition_list_to_dict(page, "h2:has-text('Overview') + dl")
+    assert overview_list["Head office"] == "Yes"

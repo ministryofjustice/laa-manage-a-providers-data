@@ -580,7 +580,9 @@ def get_entity_referred_to_debt_recovery_text(entity: dict) -> str:
         if not pda:
             raise RuntimeError("Provider Data API not initialized")
         head_office = pda.get_head_office(entity["firm_id"])
-        contract_manager = head_office.contract_manager
+        if head_office:
+            logger.warning(f"Firm {entity['firm_id']} does not have a head office")
+            contract_manager = head_office.contract_manager
 
     if contract_manager == STATUS_CONTRACT_MANAGER_DEBT_RECOVERY:
         return "Yes"

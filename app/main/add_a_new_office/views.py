@@ -1,6 +1,6 @@
 from flask import Response, redirect, render_template, url_for
 
-from app.constants import STATUS_CONTRACT_MANAGER_NAMES
+from app.constants import STATUS_CONTRACT_MANAGER_DEFAULT, STATUS_CONTRACT_MANAGER_NAMES
 from app.main.utils import add_new_office
 from app.models import Firm, Office
 from app.views import BaseFormView
@@ -18,7 +18,11 @@ class OfficeContactDetailsFormView(BaseFormView):
         return url_for("main.view_office", firm=firm, office=new_office)
 
     def form_valid(self, form):
+        # Inherit the contract manager from the head office (if present), otherwise set as the default
+        contract_manager = STATUS_CONTRACT_MANAGER_DEFAULT
         head_office: Office = self.get_api().get_head_office(form.firm.firm_id)
+        if head_office:
+            contract_manager = head_office.contract_manager
         # Add contact details to the existing office dict
         office_details = {
             "office_name": form.firm.firm_name,
@@ -35,7 +39,7 @@ class OfficeContactDetailsFormView(BaseFormView):
             "dx_number": form.data.get("dx_number"),
             "dx_centre": form.data.get("dx_centre"),
             "payment_method": "Electronic",  # The new office must be set to Electronic payment method so we do it here before the office is created
-            "contract_manager": head_office.contract_manager,  # Inherit the contract manager from the head office
+            "contract_manager": contract_manager,
         }
 
         # Create the office

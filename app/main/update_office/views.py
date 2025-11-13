@@ -358,20 +358,27 @@ class ChangeContractManagerFormView(BaseFormView):
     def get(self, firm, context, office: Office, **kwargs) -> str:
         self.get_valid_firm_or_abort(firm)
 
-        # Take contract manager from the head office
+        # By default (new offices), pre-select the contract manager from the head office...
         pda = current_app.extensions.get("pda")
         if not pda:
             raise RuntimeError("Provider Data API not initialized")
         head_office = pda.get_head_office(firm.firm_id)
-        selected_contract_manager = head_office.contract_manager
+        head_contract_manager = head_office.contract_manager
+        selected_contract_manager = head_contract_manager
 
+        # ...but if we're changing an existing office contract manager, pre-select that instead.
+        office_contract_manager = office.contract_manager
+        if office_contract_manager not in STATUS_CONTRACT_MANAGER_NAMES:
+            selected_contract_manager = office_contract_manager
+
+        # If we have a status workaround manager, they will not be in the list to pre-select.
         if selected_contract_manager in STATUS_CONTRACT_MANAGER_NAMES:
             selected_contract_manager = None
 
         search_term = request.args.get("search", "").strip()
         page = int(request.args.get("page", 1))
         form = self.get_form_class()(
-            firm, office=office, search_term=search_term, page=page, selected_value=selected_contract_manager
+            firm, office, search_term=search_term, page=page, selected_value=selected_contract_manager
         )
 
         if search_term:
