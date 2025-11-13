@@ -246,7 +246,7 @@ class BarristerChangeDetailsView(AdvocateBarristerOfficeMixin, BaseFormView):
 
         return super().form_valid(form)
 
-    def get_context_data(self, form, context):
+    def get_context_data(self, form: BaseForm, context=None):
         context = super().get_context_data(form)
         context.update({"cancel_url": self.get_success_url(form)})
         return context
