@@ -6,6 +6,7 @@ from wtforms.validators import InputRequired, Length
 from app.constants import PROVIDER_ACTIVE_STATUS_CHOICES
 from app.fields import GovUKTableRadioField
 from app.forms import BaseForm
+from app.main.add_a_new_provider import LspDetailsForm
 from app.main.add_a_new_provider.forms import LiaisonManagerForm
 from app.main.utils import get_firm_account_number
 from app.models import Firm, Office
@@ -203,3 +204,17 @@ class ReassignHeadOfficeForm(BaseForm):
             )
 
         self.office.choices = choices
+
+
+class ChangeLspDetailsForm(LspDetailsForm):
+    title = "Legal services provider details"
+    url = "provider/<firm('Legal Services Provider'):firm>/change-legal-services-provider-details"
+    submit_button_text = "Submit"
+
+    def __init__(self, firm: Firm, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.firm = firm
+
+    @property
+    def caption(self):
+        return self.firm.firm_name

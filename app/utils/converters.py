@@ -16,6 +16,10 @@ class FirmConverter(BaseConverter):
             return f"Firm name: {firm.firm_name}"
     """
 
+    def __init__(self, map, firm_type=None):
+        super().__init__(map)
+        self.firm_type = firm_type
+
     def to_python(self, value):
         """Convert URL parameter to a Firm object."""
         try:
@@ -32,6 +36,9 @@ class FirmConverter(BaseConverter):
         firm = pda.get_provider_firm(firm_id)
         if not firm:
             raise NotFound(f"Firm with ID {firm_id} not found")
+
+        if self.firm_type and firm.firm_type.lower() != self.firm_type.lower():
+            raise NotFound(f"{self.firm_type} firm with ID {firm_id} not found")
 
         return firm
 

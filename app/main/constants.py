@@ -105,14 +105,21 @@ MAIN_TABLE_FIELD_CONFIG = {
             "label": "Constitutional status",
             "id": "constitutional_status",
             "formatter": format_constitutional_status,
+            "change_link": "main.change_lsp_details",
         },
         {
             "label": "Indemnity received date",
             "id": "indemnity_received_date",
             "formatter": format_date,
             "default": "Not provided",
+            "change_link": "main.change_lsp_details",
         },
-        {"label": "Companies House number", "id": "company_house_number", "default": "Not provided"},
+        {
+            "label": "Companies House number",
+            "id": "company_house_number",
+            "default": "Not provided",
+            "change_link": "main.change_lsp_details",
+        },
     ],
     "Chambers": [
         {"label": "Provider name", "id": "firm_name"},
