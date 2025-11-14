@@ -210,7 +210,7 @@ class ChangeLspDetailsForm(NoChangesMixin, LspDetailsForm):
     title = "Legal services provider details"
     url = "provider/<firm('Legal Services Provider'):firm>/change-legal-services-provider-details"
     submit_button_text = "Submit"
-    no_changes_error_message = "No changes made to legal services provider overview"
+    no_changes_error_message = "You have not changed anything. Cancel if you do not want to make a change."
 
     def __init__(self, firm: Firm, *args, **kwargs):
         super().__init__(*args, **kwargs)
