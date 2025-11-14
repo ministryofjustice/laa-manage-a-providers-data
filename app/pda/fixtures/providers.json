@@ -9,7 +9,7 @@
     "solicitorAdvocateYN": null,
     "advocateLevel": null,
     "barCouncilRoll": null,
-    "companyHouseNumber": null,
+    "companyHouseNumber": "12345678",
     "indemnityReceivedDate": null,
     "highRiskSupplier": null,
     "holdAllPaymentsFlag": "N",
