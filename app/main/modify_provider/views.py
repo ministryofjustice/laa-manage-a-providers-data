@@ -238,15 +238,19 @@ class ChangeLspDetailsFormView(BaseFormView):
         return url_for("main.view_provider", firm=form.firm)
 
     def form_valid(self, form):
-        data = dict(
-            constitutionalStatus=form.data.get("constitutional_status"),
-            indemnityReceivedDate=form.data.get("indemnity_received_date"),
-            companyHouseNumber=form.data.get("companies_house_number"),
-        )
-        if data["indemnityReceivedDate"]:
-            data["indemnityReceivedDate"] = data["indemnityReceivedDate"].isoformat()
-        self.get_api().update_legal_service_provider_details(form.firm.firm_id, data)
-        flash("Legal services provider overview successfully updated", category="success")
+        if form.has_changed():
+            data = dict(
+                constitutionalStatus=form.data.get("constitutional_status"),
+                indemnityReceivedDate=form.data.get("indemnity_received_date"),
+                companyHouseNumber=form.data.get("companies_house_number"),
+            )
+            if data["indemnityReceivedDate"]:
+                data["indemnityReceivedDate"] = data["indemnityReceivedDate"].isoformat()
+            self.get_api().update_legal_service_provider_details(form.firm.firm_id, data)
+            flash("Legal services provider overview successfully updated", category="success")
+        else:
+            flash("No changes made to legal services provider overview")
+
         return super().form_valid(form)
 
     def get_form_instance(self, firm: Firm) -> BaseForm:
