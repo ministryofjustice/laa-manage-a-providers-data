@@ -158,6 +158,7 @@ def get_sorted_contacts(firm: Firm, office: Office = None) -> List[Contact]:
     """
     For the specified office (part of the specified firm), get a list of contacts with
     the contacts marked primary appearing first in the list.
+    Previous contacts ordered by most-recent first (by inactive_date, then creation_date).
     """
     if not firm.firm_id or not office:
         return []
@@ -171,6 +172,13 @@ def get_sorted_contacts(firm: Firm, office: Office = None) -> List[Contact]:
     # Sort contacts: primary first, then others
     primary_contacts = [c for c in contacts if c.primary == "Y"]
     other_contacts = [c for c in contacts if c.primary != "Y"]
+
+    # Previous contacts ordered by inactive_date first, then creation_date
+    other_contacts.sort(
+        key=lambda c: ((c.inactive_date) or (c.creation_date)),
+        reverse=True,
+    )
+
     sorted_contacts = primary_contacts + other_contacts
 
     return sorted_contacts
