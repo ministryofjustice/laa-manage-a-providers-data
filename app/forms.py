@@ -8,3 +8,13 @@ class BaseForm(FlaskForm):
     caption: str | None = None  # Optional caption text that will render above the form title
     description: str | None = None  # Optional description text that will render under the form title
     submit_button_text: str = "Continue"  # Should be "Submit" on final page before creating a new entity.
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._original_data = {
+            name: kwargs.get(name, field.default) for name, field in self._fields.items() if name != "csrf_token"
+        }
+
+    def has_changed(self):
+        form_data = {name: field.data for name, field in self._fields.items() if name != "csrf_token"}
+        return form_data != self._original_data

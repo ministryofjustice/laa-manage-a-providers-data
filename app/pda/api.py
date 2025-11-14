@@ -527,3 +527,14 @@ class ProviderDataApi:
         Returns: List[BankAccount]
         """
         raise NotImplementedError("Getting all bank accounts is currently not supported by the real Provider Data API")
+
+    def update_barrister_details(self, firm_id, barrister_details: dict) -> Firm:
+        """
+        Update an existing barrister details.
+        Args:
+            firm_id: Firm Id of the firm that the office belongs to
+            barrister_details: A dict of fields to update
+
+        Returns: Firm
+        """
+        raise NotImplementedError("Updating barrister details is currently not supported by the real Provider Data API")

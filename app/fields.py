@@ -1,5 +1,6 @@
 from wtforms.fields import DateField
 from wtforms.fields.choices import RadioField
+from wtforms.utils import unset_value
 
 from app.components.tables import RadioDataTable, TableStructureItem
 
@@ -140,3 +141,27 @@ class GovUKTableRadioField(RadioField):
         )
 
         return table.to_govuk_params(selected_value=self.data, **kwargs)
+
+
+def none_coerce(value):
+    """
+    Converts 'None', '', or 'null' strings to Python None.
+    Useful for form fields that have 'None of the above' options.
+    """
+    if value in (None, "", "None", "null"):
+        return None
+    return value
+
+
+class GovUKRadioField(RadioField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("coerce", none_coerce)
+        kwargs.setdefault("default", unset_value)
+        super().__init__(*args, **kwargs)
+
+    def process_data(self, value):
+        # Only set .data if it's not unset_value — prevents auto-select
+        if value is not unset_value:
+            super().process_data(value)
+        else:
+            self.data = ""  # leave unselected
