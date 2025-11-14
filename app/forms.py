@@ -9,6 +9,8 @@ class BaseForm(FlaskForm):
     description: str | None = None  # Optional description text that will render under the form title
     submit_button_text: str = "Continue"  # Should be "Submit" on final page before creating a new entity.
 
+
+class NoChangesMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._original_data = {
@@ -18,3 +20,10 @@ class BaseForm(FlaskForm):
     def has_changed(self):
         form_data = {name: field.data for name, field in self._fields.items() if name != "csrf_token"}
         return form_data != self._original_data
+
+    def validate(self, *args, **kwargs):
+        valid = super().validate(*args, **kwargs)
+        if valid and not self.has_changed():
+            self.form_errors.append(self.no_changes_error_message)
+            valid = False
+        return valid

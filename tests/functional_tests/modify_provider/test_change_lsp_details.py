@@ -70,7 +70,5 @@ def test_change_lsp_details_no_changes(page: Page):
     page.get_by_role("link", name="Change companies House number").click()
     page.get_by_role("button", name="Submit").click()
 
+    expect(page.get_by_text("There is a problem")).to_be_visible()
     expect(page.get_by_text("No changes made to legal services provider overview"))
-    expect(page.get_by_text("12345678")).to_be_visible()
-    expect(page.get_by_text("Partnership")).to_be_visible()
-    expect(page.get_by_role("link", name="Enter indemnity received date"))
