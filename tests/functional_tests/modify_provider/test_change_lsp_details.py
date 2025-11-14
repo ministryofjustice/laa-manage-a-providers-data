@@ -71,7 +71,7 @@ def test_change_lsp_details_no_changes(page: Page):
     page.get_by_role("button", name="Submit").click()
 
     expect(page.get_by_text("There is a problem")).to_be_visible()
-    expect(page.get_by_text("No changes made to legal services provider overview"))
+    expect(page.get_by_text("You have not changed anything. Cancel if you do not want to make a change."))
 
 
 @pytest.mark.usefixtures("live_server")
