@@ -261,6 +261,11 @@ class ChangeLspDetailsFormView(BaseFormView):
         )
         return self.get_form_class()(firm=firm, **data)
 
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update({"cancel_url": self.get_success_url(form)})
+        return context
+
     def get(self, firm: Firm, context=None, **kwargs):
         form = self.get_form_instance(firm)
         return render_template(self.get_template(), **self.get_context_data(form, context))
