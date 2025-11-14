@@ -52,8 +52,10 @@
 
           <br>
 
-          {{ govukButton({'text': 'Submit'}) }} {{ form.skip }}
-
+        <div class="govuk-button-group">
+          {{ govukButton({'text': 'Submit'}) }}
+          {{ form.skip }}
+        </div>
         </form>
       {% endif %}
     </div>

@@ -71,5 +71,18 @@ OFFICE_ACTIVE_STATUS_CHOICES = [
     ("inactive", "Inactive"),
 ]
 
-DEFAULT_CONTRACT_MANAGER_NAME = "Mr.Default"
+# The historic data used the contract manager field to record some statuses as a workaround for the
+# absence of specific status fields.
+STATUS_CONTRACT_MANAGER_DEBT_RECOVERY = "Mr.DebtRecovery"  # Active firm passed to the debt recovery unit
+STATUS_CONTRACT_MANAGER_FALSE_BALANCE = "Mr.FalseBalance"  # Inactive firm from which money is to be recovered
+STATUS_CONTRACT_MANAGER_INACTIVE = "Mr.Inactive"
+STATUS_CONTRACT_MANAGER_DEFAULT = "Mr.Default"  # Undecided or not chosen yet
+DEFAULT_CONTRACT_MANAGER_NAME = STATUS_CONTRACT_MANAGER_DEFAULT
+STATUS_CONTRACT_MANAGER_NAMES = [
+    STATUS_CONTRACT_MANAGER_INACTIVE,
+    STATUS_CONTRACT_MANAGER_DEFAULT,
+    STATUS_CONTRACT_MANAGER_FALSE_BALANCE,
+    STATUS_CONTRACT_MANAGER_DEBT_RECOVERY,
+]
+
 DISPLAY_DATE_FORMAT = "%d %b %Y"

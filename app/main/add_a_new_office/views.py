@@ -1,5 +1,6 @@
 from flask import Response, redirect, render_template, url_for
 
+from app.constants import STATUS_CONTRACT_MANAGER_DEFAULT, STATUS_CONTRACT_MANAGER_NAMES
 from app.main.utils import add_new_office
 from app.models import Firm, Office
 from app.views import BaseFormView
@@ -9,10 +10,19 @@ class OfficeContactDetailsFormView(BaseFormView):
     """Form view for the Office Contact Details page"""
 
     def get_success_url(self, new_office: Office, firm: Firm) -> str:
+        # Check if the head office has a status workaround contract manager
+        head_office: Office = self.get_api().get_head_office(firm.firm_id)
+        if head_office.contract_manager in STATUS_CONTRACT_MANAGER_NAMES:
+            # Set contract manager on office if head office has a status workaround contract manager
+            return url_for("main.change_office_contract_manager", firm=firm, office=new_office)
         return url_for("main.view_office", firm=firm, office=new_office)
 
     def form_valid(self, form):
+        # Inherit the contract manager from the head office (if present), otherwise set as the default
+        contract_manager = STATUS_CONTRACT_MANAGER_DEFAULT
         head_office: Office = self.get_api().get_head_office(form.firm.firm_id)
+        if head_office:
+            contract_manager = head_office.contract_manager
         # Add contact details to the existing office dict
         office_details = {
             "office_name": form.firm.firm_name,
@@ -28,7 +38,8 @@ class OfficeContactDetailsFormView(BaseFormView):
             "email_address": form.data.get("email_address"),
             "dx_number": form.data.get("dx_number"),
             "dx_centre": form.data.get("dx_centre"),
-            "payment_method": "Electronic",  # The new office must be set to Electronic payment method so we do it here before the offcie is created
+            "payment_method": "Electronic",  # The new office must be set to Electronic payment method so we do it here before the office is created
+            "contract_manager": contract_manager,
         }
 
         # Create the office

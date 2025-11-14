@@ -72,7 +72,7 @@
     {% if subpage == "overview" %}
         {% if overview_table %}
           <h2 class="govuk-heading-m">Overview</h2>
-          {{ govukTable(overview_table.to_govuk_params()) }}
+          {{ govukSummaryList(overview_table.to_summary_govuk_params()) }}
         {% endif %}
     {% endif %}
     
