@@ -52,14 +52,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: Lint
-        uses: chartboost/ruff-action@e18ae971ccee1b2d7bbef113930f00c670b78da4 # v1.0.0
+        uses: astral-sh/ruff-action@57714a7c8a2e59f32539362ba31877a1957dded1 # v3.5.1
         with:
           args: check --output-format=github
-          version: 0.12.3
+          version: ">=0.12.3"
       - name: Format
-        uses: chartboost/ruff-action@e18ae971ccee1b2d7bbef113930f00c670b78da4 # v1.0.0
+        uses: astral-sh/ruff-action@57714a7c8a2e59f32539362ba31877a1957dded1 # v3.5.1
         with:
           args: format --check
+          version: ">=0.12.3"
 
   sonarqube:
     name: SonarQube
