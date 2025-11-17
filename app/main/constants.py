@@ -138,6 +138,11 @@ MAIN_TABLE_FIELD_CONFIG = {
             "data_source": "head_office",
             "value_preprocessor": contract_manager_nonstatus_name,
             "visible": contract_manager_changeable,
+            "row_action_urls": {
+                "enter": "main.change_office_contract_manager",
+                "change": "main.change_office_contract_manager",
+            },
+            "row_action_texts": {"enter": "Assign contract manager"},
         },
     ],
     "Chambers": [

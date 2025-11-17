@@ -20,7 +20,9 @@ from app.utils.formatting import (
 logger = logging.getLogger(__name__)
 
 
-def _add_table_row_from_config(table: SummaryList, field: dict, data_source: dict, row_action_urls: dict = None):
+def _add_table_row_from_config(
+    table: SummaryList, field: dict, data_source: dict, row_action_urls: dict = None, row_action_texts: dict = None
+):
     """
     Helper to add a row to a SummaryList table based on field configuration.
 
@@ -69,6 +71,7 @@ def _add_table_row_from_config(table: SummaryList, field: dict, data_source: dic
         html=html_content,
         row_action_urls=row_action_urls,
         default_value=field.get("default", "No data"),
+        row_action_texts=row_action_texts,
     )
 
 
@@ -94,14 +97,24 @@ def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | N
             row_action_urls = {}
             for action_key, endpoint in configured_action_urls.items():
                 try:
-                    url = url_for(endpoint, firm=firm.firm_id)
+                    # If data source is an office, use both firm and office
+                    if head_office:
+                        url = url_for(endpoint, firm=firm.firm_id, office=head_office.firm_office_code)
+                    else:
+                        url = url_for(endpoint, firm=firm.firm_id)
                     row_action_urls[action_key] = url
                 except Exception as e:
                     logger.error(
-                        f"{e.__class__.__name__} whilst generating a url for firm {firm} ({action_key}) {endpoint}: {e}"
+                        f"{e.__class__.__name__} whilst generating a url for a {data_source} ({action_key}) {endpoint}: {e}"
                     )
 
-        _add_table_row_from_config(main_table, field, data_source, row_action_urls)
+        _add_table_row_from_config(
+            main_table,
+            field,
+            data_source,
+            row_action_urls=row_action_urls,
+            row_action_texts=field.get("row_action_texts", None),
+        )
 
     return main_table
 
