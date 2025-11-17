@@ -62,7 +62,7 @@ def test_change_contract_manager_skip_sets_default(page: Page):
     page.get_by_role("button", name="Unknown: Skip this step").click()
 
     # ...and see the contract manager is unset and can be changed.
-    expect(page.get_by_role("link", name="Enter contract manager")).to_be_visible()
+    expect(page.get_by_role("link", name="Assign contract manager")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")

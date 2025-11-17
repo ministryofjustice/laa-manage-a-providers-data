@@ -321,6 +321,7 @@ def get_office_overview_table(firm: Firm, office: Office) -> DataTable:
                 "enter": url,
                 "change": url,
             },
+            row_action_texts={"enter": "Assign contract manager"},
         )
     return table
 
