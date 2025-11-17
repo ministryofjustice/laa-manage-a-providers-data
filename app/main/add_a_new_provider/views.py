@@ -299,11 +299,11 @@ class AssignContractManagerFormView(BaseFormView):
     success_endpoint = "main.create_provider"
 
     def form_valid(self, form):
-        session.get("new_provider").update({"contract_manager": form.data.get("contract_manager")})
+        session.get("new_head_office").update({"contract_manager": form.data.get("contract_manager")})
         return super().form_valid(form)
 
     def skip_form(self, form):
-        session.get("new_provider").update({"contract_manager": DEFAULT_CONTRACT_MANAGER_NAME})
+        session.get("new_head_office").update({"contract_manager": DEFAULT_CONTRACT_MANAGER_NAME})
         return super().form_valid(form)
 
     @staticmethod
