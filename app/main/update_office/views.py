@@ -347,13 +347,18 @@ class ChangeContractManagerFormView(BaseFormView):
     def skip_form(self, form) -> Response:
         # Set contract manager to be default
         contract_manager = DEFAULT_CONTRACT_MANAGER_NAME
-        value_changed = contract_manager != form.office.contract_manager
+        value_changed = (
+            contract_manager != form.office.contract_manager
+            and form.office.contract_manager not in STATUS_CONTRACT_MANAGER_NAMES
+        )
         if self.change_contract_manager(contract_manager, form.firm, form.office):
             if value_changed:
                 flash(
                     f"<b>Contract manager for {form.office.firm_office_code} removed.</b>",
                     category="success",
                 )
+        else:
+            flash("Unable to change contract manager", category="error")
         return redirect(self.get_success_url(form.firm, form.office))
 
     @staticmethod
