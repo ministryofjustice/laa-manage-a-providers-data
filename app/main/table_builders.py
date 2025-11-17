@@ -6,9 +6,9 @@ from typing import List
 from flask import current_app, url_for
 
 from app.components.tables import Card, DataTable, SummaryList
-from app.constants import DISPLAY_DATE_FORMAT, STATUS_CONTRACT_MANAGER_DEFAULT, STATUS_CONTRACT_MANAGER_NAMES
+from app.constants import DISPLAY_DATE_FORMAT
 from app.main.constants import MAIN_TABLE_FIELD_CONFIG, STATUS_TABLE_FIELD_CONFIG
-from app.main.utils import provider_name_html
+from app.main.utils import contract_manager_changeable, contract_manager_nonstatus_name, provider_name_html
 from app.models import BankAccount, Contact, Firm, Office
 from app.utils.formatting import (
     format_date,
@@ -311,14 +311,12 @@ def get_office_overview_table(firm: Firm, office: Office) -> DataTable:
     table.add_row("Account number", office.firm_office_code)
     table.add_row("Head office", office.head_office, format_head_office)
     table.add_row("Supplier type", firm.firm_type, format_firm_type)
-    if (
-        office.contract_manager not in STATUS_CONTRACT_MANAGER_NAMES
-        or office.contract_manager == STATUS_CONTRACT_MANAGER_DEFAULT
-    ):
+    # If contract manager is a status workaround, do not show them, unless they are the workaround for unchosen
+    if contract_manager_changeable(office):
         url = url_for("main.change_office_contract_manager", firm=firm, office=office)
         table.add_row(
             "Contract manager",
-            office.contract_manager,
+            value=contract_manager_nonstatus_name(office),
             row_action_urls={
                 "enter": url,
                 "change": url,

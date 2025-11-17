@@ -1,6 +1,6 @@
 from app.main.utils import (
-    contract_manager_hide_default,
-    contract_manager_visible_and_changeable,
+    contract_manager_changeable,
+    contract_manager_nonstatus_name,
     get_entity_active_text,
     get_entity_referred_to_debt_recovery_text,
     provider_name_html,
@@ -136,8 +136,8 @@ MAIN_TABLE_FIELD_CONFIG = {
             "label": "Contract manager",
             "id": "contract_manager",
             "data_source": "head_office",
-            "value_preprocessor": contract_manager_hide_default,
-            "visible": contract_manager_visible_and_changeable,
+            "value_preprocessor": contract_manager_nonstatus_name,
+            "visible": contract_manager_changeable,
         },
     ],
     "Chambers": [
