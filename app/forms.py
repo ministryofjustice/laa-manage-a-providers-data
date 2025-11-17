@@ -11,6 +11,8 @@ class BaseForm(FlaskForm):
 
 
 class NoChangesMixin:
+    no_changes_error_message = "You have not changed anything. Cancel if you do not want to make a change."
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._original_data = {
