@@ -5,7 +5,7 @@ from wtforms.validators import InputRequired, Length
 
 from app.constants import PROVIDER_ACTIVE_STATUS_CHOICES
 from app.fields import GovUKTableRadioField
-from app.forms import BaseForm
+from app.forms import BaseForm, NoChangesMixin
 from app.main.add_a_new_provider.forms import AddBarristerDetailsForm, LiaisonManagerForm
 from app.main.utils import get_firm_account_number
 from app.models import Firm, Office
@@ -205,7 +205,7 @@ class ReassignHeadOfficeForm(BaseForm):
         self.office.choices = choices
 
 
-class BarristerChangeDetailsForm(AddBarristerDetailsForm):
+class BarristerChangeDetailsForm(NoChangesMixin, AddBarristerDetailsForm):
     url = "provider/<firm:firm>/change-barrister-details"
     submit_button_text = "Submit"
 

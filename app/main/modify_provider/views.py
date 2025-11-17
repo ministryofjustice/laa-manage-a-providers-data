@@ -233,16 +233,13 @@ class BarristerChangeDetailsView(AdvocateBarristerOfficeMixin, BaseFormView):
     provider_success_url = "main.view_provider"
 
     def form_valid(self, form):
-        if form.has_changed():
-            barrister_details = {
-                "firmName": form.data["barrister_name"],
-                "advocateLevel": form.data["barrister_level"],
-                "barCouncilRoll": form.data["bar_council_roll_number"],
-            }
-            self.get_api().update_barrister_details(firm_id=form.firm.firm_id, barrister_details=barrister_details)
-            flash("Barrister overview updated successfully", category="success")
-        else:
-            flash("No changes made to Barrister overview details")
+        barrister_details = {
+            "firmName": form.data["barrister_name"],
+            "advocateLevel": form.data["barrister_level"],
+            "barCouncilRoll": form.data["bar_council_roll_number"],
+        }
+        self.get_api().update_barrister_details(firm_id=form.firm.firm_id, barrister_details=barrister_details)
+        flash("Barrister overview updated successfully", category="success")
 
         return super().form_valid(form)
 
