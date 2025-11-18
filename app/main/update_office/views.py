@@ -319,10 +319,7 @@ class ChangeContractManagerFormView(BaseFormView):
         return url_for("main.view_office", firm=firm.firm_id, office=office.firm_office_code)
 
     def change_contract_manager(self, contract_manager: str, firm, office=None):
-        pda = current_app.extensions.get("pda")
-        if not pda:
-            raise RuntimeError("Provider Data API not initialized")
-
+        pda = self.get_api()
         change_fields = {"contractManager": contract_manager}
         try:
             pda.patch_office(firm.firm_id, office.firm_office_code, change_fields)
@@ -361,30 +358,21 @@ class ChangeContractManagerFormView(BaseFormView):
             flash("Unable to change contract manager", category="error")
         return redirect(self.get_success_url(form.firm, form.office))
 
-    @staticmethod
-    def get_valid_firm_or_abort(firm):
-        if not firm:
-            abort(400)
-
     def get(self, firm, context, office: Office, **kwargs) -> str:
-        self.get_valid_firm_or_abort(firm)
-
-        # By default (new offices), pre-select the contract manager from the head office...
-        pda = current_app.extensions.get("pda")
-        if not pda:
-            raise RuntimeError("Provider Data API not initialized")
+        # Pre-select the contract manager in the form
+        pda = self.get_api()
         head_office = pda.get_head_office(firm.firm_id)
         head_contract_manager = head_office.contract_manager
-        selected_contract_manager = head_contract_manager
-
-        # ...but if we're changing an existing office contract manager, pre-select that instead.
         office_contract_manager = office.contract_manager
-        if office_contract_manager not in STATUS_CONTRACT_MANAGER_NAMES:
-            selected_contract_manager = office_contract_manager
 
-        # If we have a status workaround manager, they will not be in the list to pre-select.
+        # Pre-select the office contract manager...
+        selected_contract_manager = office_contract_manager
+        # ...but we do not pre-select status workaround names...
         if selected_contract_manager in STATUS_CONTRACT_MANAGER_NAMES:
-            selected_contract_manager = None
+            # ...so default to head office contract manager if they are also not a status workaround.
+            selected_contract_manager = (
+                None if head_contract_manager in STATUS_CONTRACT_MANAGER_NAMES else head_contract_manager
+            )
 
         search_term = request.args.get("search", "").strip()
         page = int(request.args.get("page", 1))
@@ -398,8 +386,6 @@ class ChangeContractManagerFormView(BaseFormView):
         return render_template(self.get_template(), **self.get_context_data(form, **kwargs))
 
     def post(self, firm, context, office: Office | None = None, **kwargs) -> Response | str:
-        self.get_valid_firm_or_abort(firm)
-
         search_term = request.args.get("search", "").strip()
         page = int(request.args.get("page", 1))
         form = self.get_form_class()(firm, office, search_term=search_term, page=page)
