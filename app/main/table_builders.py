@@ -107,6 +107,7 @@ def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | N
                     logger.error(
                         f"{e.__class__.__name__} whilst generating a url for a {data_source} ({action_key}) {endpoint}: {e}"
                     )
+                    raise e
 
         _add_table_row_from_config(
             main_table,
