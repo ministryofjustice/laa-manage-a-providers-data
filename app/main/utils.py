@@ -6,7 +6,11 @@ from datetime import date
 from flask import current_app, flash, session, url_for
 
 from app.components.tag import Tag, TagType
-from app.constants import DEFAULT_CONTRACT_MANAGER_NAME
+from app.constants import (
+    STATUS_CONTRACT_MANAGER_DEBT_RECOVERY,
+    STATUS_CONTRACT_MANAGER_DEFAULT,
+    STATUS_CONTRACT_MANAGER_NAMES,
+)
 from app.models import BankAccount, Contact, Firm, Office
 from app.pda.errors import ProviderDataApiError
 from app.pda.mock_api import MockProviderDataApi
@@ -560,8 +564,58 @@ def reassign_head_office(firm: Firm | int, new_head_office: Office | str) -> Off
     return pda.get_head_office(firm.firm_id)
 
 
-def contract_manager_hide_default(value):
-    return None if value == DEFAULT_CONTRACT_MANAGER_NAME else value
+def contract_manager_nonstatus_name(value: str | dict | Office) -> str | None:
+    """
+    Returns the contract manager name if it can be displayed, or None if it is one of the status workaround names.
+
+    Parameters:
+        entity: Can be the contract manager name, an office, or a dict with the 'contract_manager' key
+
+    Returns:
+        str unchanged contract manager name or None if the contract manager name is a status workaround
+    """
+    contract_manager = value
+    if hasattr(value, "contract_manager"):
+        contract_manager = value.contract_manager
+    elif isinstance(value, dict):
+        contract_manager = value.get("contract_manager", None)
+    return None if contract_manager in STATUS_CONTRACT_MANAGER_NAMES else contract_manager
+
+
+def contract_manager_changeable(entity: Office | dict | str):
+    """
+    Determines if the contract manager can be changed as a normal contract manager, returning False if it is one of
+    the status workaround names.
+
+    Parameters:
+        entity: Can be an office, a dict with the 'contract_manager' key, or the contract manager name.
+
+    Returns:
+        bool True if the contract manager can be changed using a normal dialog, False is the contract manager is being
+        used as a status workaround
+    """
+    contract_manager = entity
+    if hasattr(entity, "contract_manager"):
+        contract_manager = entity.contract_manager
+    elif isinstance(entity, dict):
+        contract_manager = entity.get("contract_manager", None)
+    return contract_manager not in STATUS_CONTRACT_MANAGER_NAMES or contract_manager == STATUS_CONTRACT_MANAGER_DEFAULT
+
+
+def get_entity_referred_to_debt_recovery_text(entity: dict) -> str:
+    contract_manager = entity.get("contract_manager", None)
+    if contract_manager is None and "firm_id" in entity:
+        pda = current_app.extensions.get("pda")
+        if not pda:
+            raise RuntimeError("Provider Data API not initialized")
+        head_office = pda.get_head_office(entity["firm_id"])
+        if head_office:
+            logger.warning(f"Firm {entity['firm_id']} does not have a head office")
+            contract_manager = head_office.contract_manager
+
+    if contract_manager == STATUS_CONTRACT_MANAGER_DEBT_RECOVERY:
+        return "Yes"
+    return "No"
 
 
 def firm_office_url_for(endpoint, firm: Firm, **kwargs) -> str:

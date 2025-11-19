@@ -38,6 +38,9 @@ class SummaryTableStructureItem(TableStructureItem):
     """
 
     row_action_urls: dict[RowActionTypes, str] | None  # Optional URLs used if the cell needs corresponding row actions
+    row_action_texts: (
+        dict[RowActionTypes, str] | None
+    )  # Optional labels to override the generated '{Action} {field name}'
 
 
 class Card(TypedDict, total=False):
@@ -223,6 +226,7 @@ class SummaryList(DataTable):
         html=None,
         row_action_urls: dict[RowActionTypes, str] | None = None,
         default_value: str = "No data",
+        row_action_texts: dict[RowActionTypes, str] | None = None,
     ):
         """
         Helper to add a single field to this table, optionally specifying which row actions should
@@ -242,9 +246,12 @@ class SummaryList(DataTable):
             html: Optional Callable, used during table generation to provide the HTML for the cell
             row_action_urls: Optional dict, using `RowActionTypes` as key and a URL as value.
             default_value: Optional string used when there is no value and no `enter` URL in `row_action_urls`
+            row_action_labels: Optional dict, using `RowActionTypes` as key and string link or button text as value
         """
         if row_action_urls is None:
             row_action_urls = {}
+        if row_action_texts is None:
+            row_action_texts = {}
 
         # Convert label to snake_case for the ID
         field_id = label.lower().replace(" ", "_")
@@ -255,10 +262,9 @@ class SummaryList(DataTable):
         if empty_value_has_row_action:
             # If we do not have a value but do have a link to enter a new value, show the HTML change link
             # where the value would normally go.
+            action_text = row_action_texts.get("enter", f"Enter {format_uncapitalized(label)}")
             structure_item.update(
-                {
-                    "html_renderer": f"<a class='govuk-link', href='{row_action_urls.get('enter')}'>Enter {format_uncapitalized(label)}</a>"
-                }
+                {"html_renderer": f"<a class='govuk-link', href='{row_action_urls.get('enter')}'>{action_text}</a>"}
             )
             # Note we are not adding any other row actions even if provided.
         else:
@@ -271,6 +277,8 @@ class SummaryList(DataTable):
                 structure_item.update({"html_renderer": html})
             if row_action_urls:
                 structure_item.update({"row_action_urls": row_action_urls})
+            if row_action_texts:
+                structure_item.update({"row_action_texts": row_action_texts})
 
         self.structure.append(structure_item)
         if len(self.data) == 0:
@@ -307,10 +315,15 @@ class SummaryList(DataTable):
                 # 'Enter' actions are rendered where the value would be, so here we are only looking
                 # for 'Add' or 'Change' row actions
                 row_action_add_url = structure_item.get("row_action_urls", {}).get("add", None)
+                row_action_add_text = structure_item.get("row_action_texts", {}).get("add", "Add")
                 row_action_change_url = structure_item.get("row_action_urls", {}).get("change", None)
+                row_action_change_text = structure_item.get("row_action_texts", {}).get("change", "Change")
                 label = format_uncapitalized(structure_item.get("text", ""))
 
-                for action, url in [("Add", row_action_add_url), ("Change", row_action_change_url)]:
+                for action, url in [
+                    (row_action_add_text, row_action_add_url),
+                    (row_action_change_text, row_action_change_url),
+                ]:
                     if url is None:
                         continue
                     action_cell = {"text": action, "href": url, "visuallyHiddenText": label}

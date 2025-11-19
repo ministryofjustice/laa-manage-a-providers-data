@@ -5,11 +5,13 @@ from .forms import (
     BankAccountSearchForm,
     ChangeOfficeActiveStatusForm,
     ChangeOfficeContactDetailsForm,
+    ChangeOfficeContractManagerForm,
     PaymentMethodForm,
     UpdateVATRegistrationNumberForm,
 )
 from .views import (
     AddBankAccountFormView,
+    ChangeContractManagerFormView,
     ChangeOfficeContactDetailsFormView,
     OfficeActiveStatusFormView,
     PaymentMethodFormView,
@@ -54,4 +56,10 @@ def register_views(bp):
         view_class=AddBankAccountFormView,
         blueprint=bp,
         endpoint="add_office_bank_account",
+    )
+    register_form_view(
+        form_class=ChangeOfficeContractManagerForm,
+        view_class=ChangeContractManagerFormView,
+        blueprint=bp,
+        endpoint="change_office_contract_manager",
     )
