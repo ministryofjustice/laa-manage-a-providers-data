@@ -32,7 +32,7 @@
   "policeStationAreaName": "Leicester",
   "dutySolicitorAreaName": "Leicester",
   "inactiveDate": "2025-09-25",
-  "contractManager": "Mr.Default"
+  "contractManager": "Mr ISD Default"
 },
   {
   "_firmId": 1,
@@ -67,7 +67,7 @@
   "policeStationAreaName": "Leicester",
   "dutySolicitorAreaName": "Leicester",
   "inactiveDate": "2025-09-25",
-  "contractManager": "Mr.Default"
+  "contractManager": "Mr ISD Default"
 },
   {
   "_firmId": 2,
@@ -101,7 +101,7 @@
   "localAuthority": "City of Leicester",
   "policeStationAreaName": "Leicester",
   "dutySolicitorAreaName": "Leicester",
-  "contractManager": "Mr.Default"
+  "contractManager": "Mr ISD Default"
 },
   {
   "_firmId": 2,
@@ -169,7 +169,7 @@
   "policeStationAreaName": "Leicester",
   "dutySolicitorAreaName": "Leicester",
   "inactiveDate": "2025-09-25",
-  "contractManager": "Mr.DebtRecovery"
+  "contractManager": "Mr Debt Recovery"
 },
   {
   "_firmId": 4,
@@ -371,7 +371,7 @@
   "localAuthority": "City of Leicester",
   "policeStationAreaName": "Leicester",
   "dutySolicitorAreaName": "Leicester",
-  "contractManager": "Mr.Default"
+  "contractManager": "Mr ISD Default"
 },
   {
   "_firmId": 12,
@@ -405,7 +405,7 @@
   "localAuthority": "City of Leicester",
   "policeStationAreaName": "Leicester",
   "dutySolicitorAreaName": "Leicester",
-  "contractManager": "Mr.Default"
+  "contractManager": "Mr ISD Default"
 },
       {
   "_firmId": 13,
@@ -439,7 +439,7 @@
   "localAuthority": "City of Leicester",
   "policeStationAreaName": "Leicester",
   "dutySolicitorAreaName": "Leicester",
-  "contractManager": "Mr.Default"
+  "contractManager": "Mr ISD Default"
 }
 ]
 }
