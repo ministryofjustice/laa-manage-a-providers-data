@@ -4,6 +4,7 @@ from collections.abc import Callable
 from typing import List
 
 from flask import current_app, url_for
+from werkzeug.routing.exceptions import BuildError
 
 from app.components.tables import Card, DataTable, SummaryList
 from app.constants import DISPLAY_DATE_FORMAT
@@ -103,11 +104,11 @@ def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | N
                     else:
                         url = url_for(endpoint, firm=firm.firm_id)
                     row_action_urls[action_key] = url
-                except Exception as e:
+                except BuildError as e:
                     logger.error(
-                        f"{e.__class__.__name__} whilst generating a url for a {data_source} ({action_key}) {endpoint}: {e}"
+                        f"Unable to generate URL configured for {action_key} ({endpoint}) based on the {field.get('data_source', 'firm')}: {e}"
                     )
-                    raise e
+                    # Do not re-raise exception, allowing display of the field without a row action
 
         _add_table_row_from_config(
             main_table,
