@@ -238,6 +238,10 @@ class ChangeLegalServicesProviderNameFormView(BaseFormView):
     def get_form_instance(self, firm: Firm):
         return self.get_form_class()(firm=firm, provider_name=firm.firm_name)
 
+    def form_valid(self, form):
+        self.get_api().update_provider_firm_name(form.firm.firm_id, form.provider_name.data)
+        return super().form_valid(form)
+
     def get(self, firm: Firm, **kwargs):
         form = self.get_form_instance(firm)
         return render_template(self.get_template(), **self.get_context_data(form, **kwargs))
