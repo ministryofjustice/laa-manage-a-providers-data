@@ -5,7 +5,7 @@ from wtforms.validators import InputRequired, Length
 
 from app.constants import PROVIDER_ACTIVE_STATUS_CHOICES
 from app.fields import GovUKTableRadioField
-from app.forms import BaseForm
+from app.forms import BaseForm, NoChangesMixin
 from app.main.add_a_new_provider.forms import LiaisonManagerForm
 from app.main.utils import get_firm_account_number
 from app.models import Firm, Office
@@ -203,3 +203,28 @@ class ReassignHeadOfficeForm(BaseForm):
             )
 
         self.office.choices = choices
+
+
+class ChangeLegalServicesProviderNameForm(NoChangesMixin, BaseForm):
+    url = "provider/<firm('Legal Services Provider'):firm>/change-name"
+    title = "Change provider name"
+    submit_button_text = "Submit"
+    no_changes_error_message = "You have not changed the provider name. Cancel if you do not want to change it."
+
+    provider_name = StringField(
+        "New provider name",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m", hint="Do not include the provider type or address in the name"
+        ),
+        validators=[
+            InputRequired(message="Enter the provider name"),
+        ],
+    )
+
+    @property
+    def caption(self):
+        return self.firm.firm_name
+
+    def __init__(self, firm: Firm, *args, **kwargs):
+        self.firm = firm
+        super().__init__(*args, **kwargs)
