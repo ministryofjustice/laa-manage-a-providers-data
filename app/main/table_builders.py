@@ -9,7 +9,12 @@ from werkzeug.routing.exceptions import BuildError
 from app.components.tables import Card, DataTable, SummaryList
 from app.constants import DISPLAY_DATE_FORMAT
 from app.main.constants import MAIN_TABLE_FIELD_CONFIG, STATUS_TABLE_FIELD_CONFIG
-from app.main.utils import contract_manager_changeable, contract_manager_nonstatus_name, provider_name_html
+from app.main.utils import (
+    contract_manager_changeable,
+    contract_manager_nonstatus_name,
+    firm_office_url_for,
+    provider_name_html,
+)
 from app.models import BankAccount, Contact, Firm, Office
 from app.utils.formatting import (
     format_date,
@@ -96,13 +101,15 @@ def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | N
         # If we have row actions, replace endpoints with generated URLs
         if configured_action_urls:
             row_action_urls = {}
-            for action_key, endpoint in configured_action_urls.items():
+            for action_key, data in configured_action_urls.items():
+                endpoint = data
+                anchor = None
+                if isinstance(data, dict):
+                    endpoint = data["link"]
+                    anchor = data.get("anchor")
+
                 try:
-                    # If data source is an office, use both firm and office
-                    if head_office:
-                        url = url_for(endpoint, firm=firm.firm_id, office=head_office.firm_office_code)
-                    else:
-                        url = url_for(endpoint, firm=firm.firm_id)
+                    url = firm_office_url_for(endpoint, firm=firm, office=head_office.firm_office_code, _anchor=anchor)
                     row_action_urls[action_key] = url
                 except BuildError as e:
                     logger.error(

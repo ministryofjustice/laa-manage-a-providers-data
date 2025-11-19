@@ -21,7 +21,10 @@ STATUS_TABLE_FIELD_CONFIG = {
         {
             "label": "Active",
             "text_renderer": get_entity_active_text,
-            "change_link": "main.change_provider_active_status",
+            "row_action_urls": {
+                "change": "main.change_provider_active_status",
+                "enter": "main.change_provider_active_status",
+            },
         },
         {
             "label": "Payments on hold",
@@ -40,14 +43,20 @@ STATUS_TABLE_FIELD_CONFIG = {
         {
             "label": "Active",
             "text_renderer": get_entity_active_text,
-            "change_link": "main.change_provider_active_status",
+            "row_action_urls": {
+                "change": "main.change_provider_active_status",
+                "enter": "main.change_provider_active_status",
+            },
         },
     ],
     "Barrister": [
         {
             "label": "Active",
             "text_renderer": get_entity_active_text,
-            "change_link": "main.change_provider_active_status",
+            "row_action_urls": {
+                "change": "main.change_provider_active_status",
+                "enter": "main.change_provider_active_status",
+            },
         },
         {
             "label": "Payments on hold",
@@ -66,7 +75,10 @@ STATUS_TABLE_FIELD_CONFIG = {
         {
             "label": "Active",
             "text_renderer": get_entity_active_text,
-            "change_link": "main.change_provider_active_status",
+            "row_action_urls": {
+                "change": "main.change_provider_active_status",
+                "enter": "main.change_provider_active_status",
+            },
         },
         {
             "label": "Payments on hold",
@@ -85,7 +97,10 @@ STATUS_TABLE_FIELD_CONFIG = {
         {
             "label": "Active",
             "text_renderer": get_entity_active_text,
-            "change_link": "main.office_active_status_form",
+            "row_action_urls": {
+                "change": "main.office_active_status_form",
+                "enter": "main.office_active_status_form",
+            },
         },
         {
             "label": "Payments on hold",
@@ -161,8 +176,16 @@ MAIN_TABLE_FIELD_CONFIG = {
         {
             "label": "Barrister name",
             "id": "firm_name",
-            "change_link": "main.barrister_change_details",
-            "change_link_anchor": "barrister_name",
+            "row_action_urls": {
+                "change": {
+                    "link": "main.barrister_change_details",
+                    "anchor": "barrister_name",
+                },
+                "enter": {
+                    "link": "main.barrister_change_details",
+                    "anchor": "barrister_name",
+                },
+            },
         },
         {"label": "Barrister number", "id": "firm_number"},
         {"label": "Account number", "id": "firm_office_code", "data_source": "head_office"},
@@ -177,14 +200,30 @@ MAIN_TABLE_FIELD_CONFIG = {
             "label": "Barrister level",
             "id": "advocate_level",
             "formatter": format_advocate_level,
-            "change_link": "main.barrister_change_details",
-            "change_link_anchor": "barrister_level",
+            "row_action_urls": {
+                "change": {
+                    "link": "main.barrister_change_details",
+                    "anchor": "barrister_level",
+                },
+                "enter": {
+                    "link": "main.barrister_change_details",
+                    "anchor": "barrister_level",
+                },
+            },
         },
         {
             "label": "Bar Council roll number",
             "id": "bar_council_roll",
-            "change_link": "main.barrister_change_details",
-            "change_link_anchor": "bar_council_roll_number",
+            "row_action_urls": {
+                "change": {
+                    "link": "main.barrister_change_details",
+                    "anchor": "bar_council_roll_number",
+                },
+                "enter": {
+                    "link": "main.barrister_change_details",
+                    "anchor": "bar_council_roll_number",
+                },
+            },
         },
     ],
     "Advocate": [
