@@ -158,7 +158,20 @@ MAIN_TABLE_FIELD_CONFIG = {
         },
     ],
     "Barrister": [
-        {"label": "Barrister name", "id": "firm_name"},
+        {
+            "label": "Barrister name",
+            "id": "firm_name",
+            "row_action_urls": {
+                "change": {
+                    "link": "main.barrister_change_details",
+                    "anchor": "barrister_name",
+                },
+                "enter": {
+                    "link": "main.barrister_change_details",
+                    "anchor": "barrister_name",
+                },
+            },
+        },
         {"label": "Barrister number", "id": "firm_number"},
         {"label": "Account number", "id": "firm_office_code", "data_source": "head_office"},
         {
@@ -168,8 +181,35 @@ MAIN_TABLE_FIELD_CONFIG = {
             "data_source": "parent_firm",
             "row_action_urls": {"enter": "main.assign_chambers", "change": "main.assign_chambers"},
         },
-        {"label": "Barrister level", "id": "advocate_level", "formatter": format_advocate_level},
-        {"label": "Bar Council roll number", "id": "bar_council_roll"},
+        {
+            "label": "Barrister level",
+            "id": "advocate_level",
+            "formatter": format_advocate_level,
+            "row_action_urls": {
+                "change": {
+                    "link": "main.barrister_change_details",
+                    "anchor": "barrister_level",
+                },
+                "enter": {
+                    "link": "main.barrister_change_details",
+                    "anchor": "barrister_level",
+                },
+            },
+        },
+        {
+            "label": "Bar Council roll number",
+            "id": "bar_council_roll",
+            "row_action_urls": {
+                "change": {
+                    "link": "main.barrister_change_details",
+                    "anchor": "bar_council_roll_number",
+                },
+                "enter": {
+                    "link": "main.barrister_change_details",
+                    "anchor": "bar_council_roll_number",
+                },
+            },
+        },
     ],
     "Advocate": [
         {"label": "Advocate name", "id": "firm_name"},

@@ -624,4 +624,8 @@ def firm_office_url_for(endpoint, firm: Firm, **kwargs) -> str:
         if "office" in kwargs:
             del kwargs["office"]
 
+    # Remove a null office from the url before generating otherwise it will be added as a querystring
+    if "office" in kwargs and not kwargs["office"]:
+        del kwargs["office"]
+
     return url_for(endpoint, **kwargs)

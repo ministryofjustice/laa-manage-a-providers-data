@@ -827,3 +827,8 @@ class MockProviderDataApi:
         for account in self._mock_data["bank_accounts"]:
             bank_accounts.append(BankAccount(**account))
         return bank_accounts
+
+    def update_barrister_details(self, firm_id, barrister_details: dict) -> Firm:
+        firm_details = self._find_firm_data(firm_id)
+        firm_details.update(barrister_details)
+        return Firm(**firm_details)
