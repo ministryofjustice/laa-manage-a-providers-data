@@ -20,7 +20,7 @@ from app.validators import (
 )
 from app.widgets import GovDateInput, GovRadioInput, GovRadioInputWithDivider, GovSubmitInput, GovTextInput
 
-from ...fields import GovDateField
+from ...fields import GovDateField, GovUKRadioField
 from ..add_a_new_office import OfficeContactDetailsForm
 
 
@@ -393,7 +393,7 @@ class AddBarristerDetailsForm(BaseForm):
         ],
     )
 
-    barrister_level = RadioField(
+    barrister_level = GovUKRadioField(
         "Barrister level",
         widget=GovRadioInputWithDivider(heading_class="govuk-fieldset__legend--s"),
         choices=ADVOCATE_LEVEL_CHOICES,

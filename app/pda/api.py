@@ -537,3 +537,14 @@ class ProviderDataApi:
         Returns: Firm
         """
         raise NotImplementedError("Updating provider firm name is not yet supported by the real API")
+
+    def update_barrister_details(self, firm_id, barrister_details: dict) -> Firm:
+        """
+        Update an existing barrister details.
+        Args:
+            firm_id: Firm Id of the firm that the office belongs to
+            barrister_details: A dict of fields to update
+
+        Returns: Firm
+        """
+        raise NotImplementedError("Updating barrister details is currently not supported by the real Provider Data API")

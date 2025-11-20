@@ -71,5 +71,20 @@ OFFICE_ACTIVE_STATUS_CHOICES = [
     ("inactive", "Inactive"),
 ]
 
-DEFAULT_CONTRACT_MANAGER_NAME = "Mr.Default"
+# The historic data used the contract manager field to record some statuses as a workaround for the
+# absence of specific status fields.
+STATUS_CONTRACT_MANAGER_DEBT_RECOVERY = "Mr Debt Recovery"  # Active firm
+STATUS_CONTRACT_MANAGER_FALSE_BALANCE = "Mr False Balance"  # Inactive firm which still does not have a nil balance
+STATUS_CONTRACT_MANAGER_INACTIVE = "Mr Inactive"  # A firm which no longer has an active contract with LAA
+STATUS_CONTRACT_MANAGER_DEFAULT = (
+    "Mr ISD Default"  # When the contract manager is not known, or for barristers or advocates
+)
+DEFAULT_CONTRACT_MANAGER_NAME = STATUS_CONTRACT_MANAGER_DEFAULT
+STATUS_CONTRACT_MANAGER_NAMES = [
+    STATUS_CONTRACT_MANAGER_INACTIVE,
+    STATUS_CONTRACT_MANAGER_DEFAULT,
+    STATUS_CONTRACT_MANAGER_FALSE_BALANCE,
+    STATUS_CONTRACT_MANAGER_DEBT_RECOVERY,
+]
+
 DISPLAY_DATE_FORMAT = "%d %b %Y"
