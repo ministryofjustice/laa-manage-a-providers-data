@@ -1,13 +1,20 @@
 import datetime
+import logging
 from collections.abc import Callable
 from typing import List
 
 from flask import current_app, url_for
+from werkzeug.routing.exceptions import BuildError
 
 from app.components.tables import Card, DataTable, SummaryList
 from app.constants import DISPLAY_DATE_FORMAT
 from app.main.constants import MAIN_TABLE_FIELD_CONFIG, STATUS_TABLE_FIELD_CONFIG
-from app.main.utils import provider_name_html
+from app.main.utils import (
+    contract_manager_changeable,
+    contract_manager_nonstatus_name,
+    firm_office_url_for,
+    provider_name_html,
+)
 from app.models import BankAccount, Contact, Firm, Office
 from app.utils.formatting import (
     format_date,
@@ -16,8 +23,12 @@ from app.utils.formatting import (
     format_office_address_multi_line_html,
 )
 
+logger = logging.getLogger(__name__)
 
-def _add_table_row_from_config(table: SummaryList, field: dict, data_source: dict, row_action_urls: dict = None):
+
+def _add_table_row_from_config(
+    table: SummaryList, field: dict, data_source: dict, row_action_urls: dict = None, row_action_texts: dict = None
+):
     """
     Helper to add a row to a SummaryList table based on field configuration.
 
@@ -66,6 +77,7 @@ def _add_table_row_from_config(table: SummaryList, field: dict, data_source: dic
         html=html_content,
         row_action_urls=row_action_urls,
         default_value=field.get("default", "No data"),
+        row_action_texts=row_action_texts,
     )
 
 
@@ -84,24 +96,33 @@ def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | N
         if data_source is None:
             raise ValueError(f"{field.get('data_source', 'firm')} is not a valid data source")
 
-        # Skip row if hide_if_null is set and value is empty
-        value = data_source.get(field.get("id", ""))
-        if not value and field.get("hide_if_null", False):
-            continue
+        configured_action_urls: dict = field.get("row_action_urls", None)
+        row_action_urls: dict | None = None
+        # If we have row actions, replace endpoints with generated URLs
+        if configured_action_urls:
+            row_action_urls = {}
+            for action_key, data in configured_action_urls.items():
+                endpoint = data
+                anchor = None
+                if isinstance(data, dict):
+                    endpoint = data["link"]
+                    anchor = data.get("anchor")
+                try:
+                    url = firm_office_url_for(endpoint, firm=firm, office=head_office, _anchor=anchor)
+                    row_action_urls[action_key] = url
+                except BuildError as e:
+                    logger.error(
+                        f"Unable to generate URL configured for {action_key} ({endpoint}) based on the {field.get('data_source', 'firm')}: {e}"
+                    )
+                    # Do not re-raise exception, allowing display of the field without a row action
 
-        if value_preprocessor := field.get("value_preprocessor"):
-            if not isinstance(value_preprocessor, Callable):
-                raise ValueError("value_preprocessor must be callable")
-            value = value_preprocessor(value)
-
-        # Build row action URLs if change_link is present
-        row_action_urls = None
-        if change_link := field.get("change_link"):
-            change_link_anchor = field.get("change_link_anchor")
-            key = "change" if value else "enter"
-            row_action_urls = {key: url_for(change_link, firm=firm, _anchor=change_link_anchor)}
-
-        _add_table_row_from_config(main_table, field, data_source, row_action_urls)
+        _add_table_row_from_config(
+            main_table,
+            field,
+            data_source,
+            row_action_urls=row_action_urls,
+            row_action_texts=field.get("row_action_texts", None),
+        )
 
     return main_table
 
@@ -311,6 +332,18 @@ def get_office_overview_table(firm: Firm, office: Office) -> DataTable:
     table.add_row("Account number", office.firm_office_code)
     table.add_row("Head office", office.head_office, format_head_office)
     table.add_row("Supplier type", firm.firm_type, format_firm_type)
+    # If contract manager is a status workaround, do not show them, unless they are the workaround for unchosen
+    if contract_manager_changeable(office):
+        url = url_for("main.change_office_contract_manager", firm=firm, office=office)
+        table.add_row(
+            "Contract manager",
+            value=contract_manager_nonstatus_name(office),
+            row_action_urls={
+                "enter": url,
+                "change": url,
+            },
+            row_action_texts={"enter": "Assign contract manager"},
+        )
     return table
 
 

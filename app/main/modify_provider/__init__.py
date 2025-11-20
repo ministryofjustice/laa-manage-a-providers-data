@@ -4,6 +4,7 @@ from app.utils import register_form_view
 
 from .forms import (
     AssignChambersForm,
+    BarristerChangeDetailsForm,
     ChangeLiaisonManagerForm,
     ChangeLspDetailsForm,
     ChangeOfficeLiaisonManagerForm,
@@ -12,6 +13,7 @@ from .forms import (
 )
 from .views import (
     AssignChambersFormView,
+    BarristerChangeDetailsView,
     ChangeLiaisonManagerFormView,
     ChangeLspDetailsFormView,
     ChangeProviderActiveStatusFormView,
@@ -52,4 +54,10 @@ def register_views(bp: Blueprint):
         view_class=ChangeLspDetailsFormView,
         blueprint=bp,
         endpoint="change_lsp_details",
+    )
+    register_form_view(
+        form_class=BarristerChangeDetailsForm,
+        view_class=BarristerChangeDetailsView,
+        blueprint=bp,
+        endpoint="barrister_change_details",
     )

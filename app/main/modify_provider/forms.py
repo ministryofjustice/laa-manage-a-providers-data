@@ -6,8 +6,7 @@ from wtforms.validators import InputRequired, Length
 from app.constants import PROVIDER_ACTIVE_STATUS_CHOICES
 from app.fields import GovUKTableRadioField
 from app.forms import BaseForm, NoChangesMixin
-from app.main.add_a_new_provider import LspDetailsForm
-from app.main.add_a_new_provider.forms import LiaisonManagerForm
+from app.main.add_a_new_provider.forms import AddBarristerDetailsForm, LiaisonManagerForm, LspDetailsForm
 from app.main.utils import get_firm_account_number
 from app.models import Firm, Office
 from app.utils.formatting import format_office_address_one_line, normalize_for_search
@@ -214,6 +213,10 @@ class ChangeLspDetailsForm(NoChangesMixin, LspDetailsForm):
     def __init__(self, firm: Firm, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.firm = firm
+
+class BarristerChangeDetailsForm(NoChangesMixin, AddBarristerDetailsForm):
+    url = "provider/<firm:firm>/change-barrister-details"
+    submit_button_text = "Submit"
 
     @property
     def caption(self):

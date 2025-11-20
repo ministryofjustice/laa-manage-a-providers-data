@@ -301,23 +301,6 @@ class ViewOffice(MethodView):
 
         return context
 
-    def change_link_for_payment_method(self, row_data: Dict[str, str]) -> str | None:
-        firm_id = row_data.get("firm_id", None)
-        office_id = row_data.get("firm_office_id", None)
-        existing_payment_method = row_data.get("payment_method", None)
-        link_action = "Add" if existing_payment_method in ("", " ", None) else "Change"
-        if firm_id and office_id:
-            return f"<a class='govuk-link', href='#'>{link_action}</a>"
-        return None
-
-    def change_link_for_vat_registration(self, row_data: Dict[str, str]):
-        office_id = row_data.get("firm_office_id", None)
-        existing_vat_registration = row_data.get("vat_registration_number", None)
-        link_action = "Add VAT registration number" if existing_vat_registration in ("", " ", None) else "Change"
-        if office_id:
-            return f"<a class='govuk-link', href='#'>{link_action}</a>"
-        return None
-
     def get(self, firm: Firm, office: Office | None = None):
         if not firm or not office:
             abort(404)

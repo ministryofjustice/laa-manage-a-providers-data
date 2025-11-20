@@ -8,6 +8,7 @@ from wtforms.validators import InputRequired, Optional
 from app.constants import OFFICE_ACTIVE_STATUS_CHOICES, PAYMENT_METHOD_CHOICES
 from app.forms import BaseForm
 from app.main.add_a_new_office.forms import OfficeContactDetailsForm
+from app.main.add_a_new_provider import AssignContractManagerForm
 from app.main.forms import BaseBankAccountForm, BaseBankAccountSearchForm
 from app.models import BankAccount, Firm, Office
 from app.validators import (
@@ -137,6 +138,16 @@ class BankAccountForm(BaseBankAccountForm):
         return self.firm.firm_name
 
     def __init__(self, firm: Firm, office: Office, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.firm = firm
+        self.office = office
+
+
+class ChangeOfficeContractManagerForm(AssignContractManagerForm):
+    url = "provider/<firm:firm>/office/<office:office>/change-contract-manager"
+    office: Office | None = None
+
+    def __init__(self, firm: Firm, office: Office | None = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.firm = firm
         self.office = office

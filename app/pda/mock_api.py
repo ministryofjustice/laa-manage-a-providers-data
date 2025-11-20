@@ -701,7 +701,7 @@ class MockProviderDataApi:
         # Set the vendor_site_id to the office ID and creation_date to today in ISO format
         updates = {"vendor_site_id": office_id, "contact_id": new_contact_id}
         if not contact.creation_date:
-            updates["creation_date"] = date.today().isoformat()
+            updates["creation_date"] = date.today()
 
         updated_contact = contact.model_copy(update=updates)
 
@@ -831,4 +831,8 @@ class MockProviderDataApi:
     def update_legal_service_provider_details(self, firm_id: int, data: dict):
         firm_details = self._find_firm_data(firm_id)
         firm_details.update(data)
+
+    def update_barrister_details(self, firm_id, barrister_details: dict) -> Firm:
+        firm_details = self._find_firm_data(firm_id)
+        firm_details.update(barrister_details)
         return Firm(**firm_details)

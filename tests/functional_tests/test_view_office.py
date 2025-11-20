@@ -1,6 +1,8 @@
 import pytest
 from playwright.sync_api import expect
 
+from tests.functional_tests.utils import definition_list_to_dict
+
 
 def navigate_to_inactive_office_page(page):
     """Helper function to navigate to an office page via UI flow."""
@@ -57,14 +59,10 @@ def test_view_office_overview_section(page):
     expect(page.get_by_role("heading", name="Overview")).to_be_visible()
 
     # Check overview content
-    expect(page.get_by_role("rowheader", name="Parent provider")).to_be_visible()
-    expect(page.get_by_role("cell", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
-
-    expect(page.get_by_role("rowheader", name="Account number")).to_be_visible()
-    expect(page.get_by_role("row", name="Account number 1A001L").get_by_role("cell", name="1A001L")).to_be_visible()
-
-    expect(page.get_by_role("rowheader", name="Head office")).to_be_visible()
-    expect(page.get_by_role("cell", name="Yes")).to_be_visible()
+    overview_list = definition_list_to_dict(page, "h2:has-text('Overview') + dl")
+    assert overview_list["Parent provider"] == "SMITH & PARTNERS SOLICITORS"
+    assert overview_list["Account number"] == "1A001L"
+    assert overview_list["Head office"] == "Yes"
 
 
 @pytest.mark.usefixtures("live_server")
@@ -73,9 +71,7 @@ def test_view_office_parent_provider_link(page):
     navigate_to_inactive_office_page(page)
 
     # Click on parent provider link in overview section
-    page.get_by_role("row", name="Parent provider SMITH & PARTNERS SOLICITORS").get_by_role(
-        "link", name="SMITH & PARTNERS SOLICITORS"
-    ).click()
+    page.locator("#main-content").get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
 
     # Should navigate to provider page
     expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
