@@ -124,14 +124,48 @@ MAIN_TABLE_FIELD_CONFIG = {
             "label": "Constitutional status",
             "id": "constitutional_status",
             "formatter": format_constitutional_status,
+            "row_action_urls": {
+                "change": {
+                    "link": "main.change_lsp_details",
+                    "anchor": "constitutional_status",
+                },
+                "enter": {
+                    "link": "main.change_lsp_details",
+                    "anchor": "constitutional_status",
+                },
+            },
         },
         {
             "label": "Indemnity received date",
             "id": "indemnity_received_date",
             "formatter": format_date,
             "default": "Not provided",
+            "row_action_urls": {
+                "change": {
+                    "link": "main.change_lsp_details",
+                    "anchor": "indemnity_received_date",
+                },
+                "enter": {
+                    "link": "main.change_lsp_details",
+                    "anchor": "indemnity_received_date",
+                },
+            },
         },
-        {"label": "Companies House number", "id": "company_house_number", "default": "Not provided"},
+        {
+            "label": "Companies House number",
+            "id": "company_house_number",
+            "default": "Not provided",
+            "row_action_urls": {
+                "change": {
+                    "link": "main.change_lsp_details",
+                    "anchor": "companies_house_number",
+                },
+                "enter": {
+                    "link": "main.change_lsp_details",
+                    "anchor": "companies_house_number",
+                },
+            },
+        },
         {
             "label": "Contract manager",
             "id": "contract_manager",
