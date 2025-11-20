@@ -247,7 +247,7 @@ class ChangeLspDetailsFormView(BaseFormView):
             data["indemnityReceivedDate"] = data["indemnityReceivedDate"].isoformat()
 
         self.get_api().update_legal_service_provider_details(form.firm.firm_id, data)
-        flash("Legal services provider overview successfully updated", category="success")
+        flash("<b>Legal services provider overview successfully updated<b>", category="success")
         return super().form_valid(form)
 
     def get_form_instance(self, firm: Firm) -> BaseForm:
