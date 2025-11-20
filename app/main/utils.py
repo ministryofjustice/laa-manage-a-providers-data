@@ -624,8 +624,16 @@ def firm_office_url_for(endpoint, firm: Firm, **kwargs) -> str:
         if "office" in kwargs:
             del kwargs["office"]
 
-    # Remove a null office from the url before generating otherwise it will be added as a querystring
-    if "office" in kwargs and not kwargs["office"]:
-        del kwargs["office"]
+    if "office" in kwargs:
+        if not kwargs["office"]:
+            # Remove a null office from the url before generating otherwise it will be added as a querystring
+            del kwargs["office"]
+        else:
+            include_office = any(
+                ["office" in rule.arguments for rule in current_app.url_map._rules_by_endpoint[endpoint]]
+            )
+            if not include_office:
+                # This endpoint does not take an office argument
+                del kwargs["office"]
 
     return url_for(endpoint, **kwargs)
