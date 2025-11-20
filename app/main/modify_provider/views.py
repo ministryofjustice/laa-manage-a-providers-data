@@ -258,6 +258,54 @@ class ChangeLegalServicesProviderNameFormView(BaseFormView):
             return self.form_valid(form)
         return self.form_invalid(form)
 
+class ChangeLspDetailsFormView(BaseFormView):
+    """Form view for the Legal services provider details"""
+
+    success_endpoint = "main.view_provider"
+
+    def get_success_url(self, form: BaseForm) -> str:
+        return url_for("main.view_provider", firm=form.firm)
+
+    def form_valid(self, form):
+        data = dict(
+            constitutionalStatus=form.data.get("constitutional_status"),
+            indemnityReceivedDate=form.data.get("indemnity_received_date"),
+            companyHouseNumber=form.data.get("companies_house_number"),
+        )
+        if data["indemnityReceivedDate"]:
+            data["indemnityReceivedDate"] = data["indemnityReceivedDate"].isoformat()
+
+        self.get_api().update_legal_service_provider_details(form.firm.firm_id, data)
+        flash("<b>Legal services provider overview successfully updated<b>", category="success")
+        return super().form_valid(form)
+
+    def get_form_instance(self, firm: Firm) -> BaseForm:
+        indemnity_received_date = firm.indemnity_received_date
+        if indemnity_received_date:
+            indemnity_received_date = datetime.datetime.strptime(indemnity_received_date, "%Y-%m-%d").date()
+        data = dict(
+            constitutional_status=firm.constitutional_status,
+            indemnity_received_date=indemnity_received_date,
+            companies_house_number=firm.company_house_number,
+        )
+        return self.get_form_class()(firm=firm, **data)
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update({"cancel_url": self.get_success_url(form)})
+        return context
+
+    def get(self, firm: Firm, context=None, **kwargs):
+        form = self.get_form_instance(firm)
+        return render_template(self.get_template(), **self.get_context_data(form, context))
+
+    def post(self, firm: Firm, context) -> Response | str:
+        form = self.get_form_instance(firm)
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
 
 class BarristerChangeDetailsView(AdvocateBarristerOfficeMixin, BaseFormView):
     provider_success_url = "main.view_provider"

@@ -833,6 +833,11 @@ class MockProviderDataApi:
         firm_data.update({"firmName": new_firm_name})
         return Firm(**firm_data)
 
+    def update_legal_service_provider_details(self, firm_id: int, data: dict) -> Firm:
+        firm_details = self._find_firm_data(firm_id)
+        firm_details.update(data)
+        return Firm(**firm_details)
+
     def update_barrister_details(self, firm_id, barrister_details: dict) -> Firm:
         firm_details = self._find_firm_data(firm_id)
         firm_details.update(barrister_details)
