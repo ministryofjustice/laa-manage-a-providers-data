@@ -221,6 +221,10 @@ class ChangeLegalServicesProviderNameForm(NoChangesMixin, BaseForm):
         ],
     )
 
+    def __init__(self, firm: Firm, *args, **kwargs):
+        self.firm = firm
+        super().__init__(*args, **kwargs)
+
 
 class BarristerChangeDetailsForm(NoChangesMixin, AddBarristerDetailsForm):
     url = "provider/<firm:firm>/change-barrister-details"
@@ -229,7 +233,3 @@ class BarristerChangeDetailsForm(NoChangesMixin, AddBarristerDetailsForm):
     @property
     def caption(self):
         return self.firm.firm_name
-
-    def __init__(self, firm: Firm, *args, **kwargs):
-        self.firm = firm
-        super().__init__(*args, **kwargs)
