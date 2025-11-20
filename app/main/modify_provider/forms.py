@@ -214,6 +214,7 @@ class ChangeLspDetailsForm(NoChangesMixin, LspDetailsForm):
         super().__init__(*args, **kwargs)
         self.firm = firm
 
+
 class BarristerChangeDetailsForm(NoChangesMixin, AddBarristerDetailsForm):
     url = "provider/<firm:firm>/change-barrister-details"
     submit_button_text = "Submit"
