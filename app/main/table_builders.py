@@ -107,9 +107,8 @@ def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | N
                 if isinstance(data, dict):
                     endpoint = data["link"]
                     anchor = data.get("anchor")
-
                 try:
-                    url = firm_office_url_for(endpoint, firm=firm, office=head_office.firm_office_code, _anchor=anchor)
+                    url = firm_office_url_for(endpoint, firm=firm, office=head_office, _anchor=anchor)
                     row_action_urls[action_key] = url
                 except BuildError as e:
                     logger.error(

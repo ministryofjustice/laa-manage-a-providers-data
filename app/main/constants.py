@@ -21,10 +21,7 @@ STATUS_TABLE_FIELD_CONFIG = {
         {
             "label": "Active",
             "text_renderer": get_entity_active_text,
-            "row_action_urls": {
-                "change": "main.change_provider_active_status",
-                "enter": "main.change_provider_active_status",
-            },
+            "change_link": "main.change_provider_active_status",
         },
         {
             "label": "Payments on hold",
@@ -43,20 +40,14 @@ STATUS_TABLE_FIELD_CONFIG = {
         {
             "label": "Active",
             "text_renderer": get_entity_active_text,
-            "row_action_urls": {
-                "change": "main.change_provider_active_status",
-                "enter": "main.change_provider_active_status",
-            },
+            "change_link": "main.change_provider_active_status",
         },
     ],
     "Barrister": [
         {
             "label": "Active",
             "text_renderer": get_entity_active_text,
-            "row_action_urls": {
-                "change": "main.change_provider_active_status",
-                "enter": "main.change_provider_active_status",
-            },
+            "change_link": "main.change_provider_active_status",
         },
         {
             "label": "Payments on hold",
@@ -75,10 +66,7 @@ STATUS_TABLE_FIELD_CONFIG = {
         {
             "label": "Active",
             "text_renderer": get_entity_active_text,
-            "row_action_urls": {
-                "change": "main.change_provider_active_status",
-                "enter": "main.change_provider_active_status",
-            },
+            "change_link": "main.change_provider_active_status",
         },
         {
             "label": "Payments on hold",
@@ -97,10 +85,7 @@ STATUS_TABLE_FIELD_CONFIG = {
         {
             "label": "Active",
             "text_renderer": get_entity_active_text,
-            "row_action_urls": {
-                "change": "main.office_active_status_form",
-                "enter": "main.office_active_status_form",
-            },
+            "change_link": "main.office_active_status_form",
         },
         {
             "label": "Payments on hold",
