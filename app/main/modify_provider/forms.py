@@ -225,6 +225,10 @@ class ChangeLegalServicesProviderNameForm(NoChangesMixin, BaseForm):
         self.firm = firm
         super().__init__(*args, **kwargs)
 
+    def attach_no_change_error_to_element(self, error_message):
+        self.provider_name.errors.append(error_message)
+
+
 class ChangeLspDetailsForm(NoChangesMixin, LspDetailsForm):
     title = "Legal services provider details"
     url = "provider/<firm('Legal Services Provider'):firm>/change-legal-services-provider-details"

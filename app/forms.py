@@ -26,6 +26,9 @@ class NoChangesMixin:
     def validate(self, *args, **kwargs):
         valid = super().validate(*args, **kwargs)
         if valid and not self.has_changed():
-            self.form_errors.append(self.no_changes_error_message)
+            self.attach_no_change_error_to_element(self.no_changes_error_message)
             valid = False
         return valid
+
+    def attach_no_change_error_to_element(self, error_message):
+        self.form_errors.append(self.no_changes_error_message)
