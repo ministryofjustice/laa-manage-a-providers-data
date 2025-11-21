@@ -26,7 +26,7 @@ def test_change_lsp_name_no_change(page: Page):
     expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).not_to_be_visible()
     expect(page.get_by_role("heading", name="Change provider name")).to_be_visible()
     expect(
-        page.get_by_text("You have not changed the provider name. Cancel if you do not want to change it.")
+        page.get_by_role("link", name="You have not changed the provider name. Cancel if you do not want to change it.")
     ).to_be_visible()
 
 
