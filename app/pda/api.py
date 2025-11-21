@@ -528,6 +528,16 @@ class ProviderDataApi:
         """
         raise NotImplementedError("Getting all bank accounts is currently not supported by the real Provider Data API")
 
+    def update_provider_firm_name(self, firm_id: int, new_firm_name: str) -> Firm:
+        """
+        Update an existing firm name.
+        Args:
+            firm_id: The firm ID of the firm to update
+            new_firm_name: The new firm name
+        Returns: Firm
+        """
+        raise NotImplementedError("Updating provider firm name is not yet supported by the real API")
+
     def update_legal_service_provider_details(self, firm_id: int, data: dict):
         raise NotImplementedError(
             "Updating legal services provider details is not yet supported by the real Provider Data API"

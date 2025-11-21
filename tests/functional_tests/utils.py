@@ -1,4 +1,5 @@
-from playwright.sync_api import Page
+from flask import url_for
+from playwright.sync_api import Page, expect
 
 
 def table_to_dict(page: Page, table_selector: str) -> dict:
@@ -29,3 +30,17 @@ def definition_list_to_dict(page: Page, dl_selector: str) -> dict:
         except Exception as e:
             print(f"Failed to convert row {i} {row.all_inner_texts()}: {e}")
     return dl_dict
+
+
+def navigate_to_provider_page(page: Page, provider_name: str):
+    """Helper function to navigate to a given provider page."""
+    # Navigate to the providers list
+    page.goto(url_for("main.providers", _external=True))
+
+    page.get_by_role("textbox", name="Find a provider").fill(provider_name)
+    page.get_by_role("button", name="Search").click()
+
+    # Click on the first provider
+    page.get_by_role("link", name=provider_name).click()
+
+    expect(page.get_by_role("heading", name=provider_name)).to_be_visible()

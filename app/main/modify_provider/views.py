@@ -229,6 +229,36 @@ class ReassignHeadOfficeFormView(BaseFormView):
         return self.form_invalid(form)
 
 
+class ChangeLegalServicesProviderNameFormView(BaseFormView):
+    success_url = "main.view_provider"
+
+    def get_success_url(self, form):
+        return url_for(self.success_url, firm=form.firm)
+
+    def get_form_instance(self, firm: Firm):
+        return self.get_form_class()(firm=firm, provider_name=firm.firm_name)
+
+    def form_valid(self, form):
+        self.get_api().update_provider_firm_name(form.firm.firm_id, form.provider_name.data)
+        flash("<b>Legal services provider name successfully updated</b>", category="success")
+        return super().form_valid(form)
+
+    def get_context_data(self, form: BaseForm, context=None):
+        context = super().get_context_data(form)
+        context.update({"cancel_url": self.get_success_url(form)})
+        return context
+
+    def get(self, firm: Firm, **kwargs):
+        form = self.get_form_instance(firm)
+        return render_template(self.get_template(), **self.get_context_data(form, **kwargs))
+
+    def post(self, firm, **kwargs):
+        form = self.get_form_instance(firm)
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        return self.form_invalid(form)
+
+
 class ChangeLspDetailsFormView(BaseFormView):
     """Form view for the Legal services provider details"""
 

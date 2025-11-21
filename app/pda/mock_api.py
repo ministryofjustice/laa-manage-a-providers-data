@@ -828,6 +828,11 @@ class MockProviderDataApi:
             bank_accounts.append(BankAccount(**account))
         return bank_accounts
 
+    def update_provider_firm_name(self, firm_id: int, new_firm_name: str) -> Firm:
+        firm_data = self._find_firm_data(firm_id)
+        firm_data.update({"firmName": new_firm_name})
+        return Firm(**firm_data)
+
     def update_legal_service_provider_details(self, firm_id: int, data: dict) -> Firm:
         firm_details = self._find_firm_data(firm_id)
         firm_details.update(data)
