@@ -205,6 +205,30 @@ class ReassignHeadOfficeForm(BaseForm):
         self.office.choices = choices
 
 
+class ChangeLegalServicesProviderNameForm(NoChangesMixin, BaseForm):
+    url = "provider/<firm('Legal Services Provider'):firm>/change-name"
+    title = "Change provider name"
+    submit_button_text = "Submit"
+    no_changes_error_message = "You have not changed the provider name. Cancel if you do not want to change it."
+
+    provider_name = StringField(
+        "New provider name",
+        widget=GovTextInput(
+            heading_class="govuk-fieldset__legend--m", hint="Do not include the provider type or address in the name"
+        ),
+        validators=[
+            InputRequired(message="Enter the provider name"),
+        ],
+    )
+
+    def __init__(self, firm: Firm, *args, **kwargs):
+        self.firm = firm
+        super().__init__(*args, **kwargs)
+
+    def attach_no_change_error_to_element(self, error_message):
+        self.provider_name.errors.append(error_message)
+
+
 class ChangeLspDetailsForm(NoChangesMixin, LspDetailsForm):
     title = "Legal services provider details"
     url = "provider/<firm('Legal Services Provider'):firm>/change-legal-services-provider-details"
