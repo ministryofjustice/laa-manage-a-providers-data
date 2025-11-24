@@ -6,7 +6,12 @@ from wtforms.validators import InputRequired, Length
 from app.constants import PROVIDER_ACTIVE_STATUS_CHOICES
 from app.fields import GovUKTableRadioField
 from app.forms import BaseForm, NoChangesMixin
-from app.main.add_a_new_provider.forms import AddBarristerDetailsForm, LiaisonManagerForm, LspDetailsForm
+from app.main.add_a_new_provider.forms import (
+    AddBarristerDetailsForm,
+    LiaisonManagerForm,
+    LspDetailsForm,
+)
+from app.main.update_office import ChangeOfficeContactDetailsForm
 from app.main.utils import get_firm_account_number
 from app.models import Firm, Office
 from app.utils.formatting import format_office_address_one_line, normalize_for_search
@@ -252,3 +257,9 @@ class BarristerChangeDetailsForm(NoChangesMixin, AddBarristerDetailsForm):
     @property
     def caption(self):
         return self.firm.firm_name
+
+
+class ChangeChambersDetailsForm(NoChangesMixin, ChangeOfficeContactDetailsForm):
+    url = "provider/<firm('Chambers'):firm>/change-chambers-contact-details"
+    title = "Chambers contact details"
+    template = "modify_provider/change-chambers-contact-details-form.html"
