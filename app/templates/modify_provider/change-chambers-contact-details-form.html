@@ -1,0 +1,6 @@
+{% extends 'update_office/form.html' %}
+
+{% block pageHeading %}
+  <span class="govuk-caption-xl">{{ form.caption }}</span>
+  <h1 class="govuk-heading-xl govuk-!-margin-top-7 govuk-!-margin-bottom-2">{{ form.title|replace('\n', '<br>')|safe }}</h1>
+{% endblock %}
