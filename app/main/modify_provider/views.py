@@ -240,7 +240,7 @@ class ChangeLegalServicesProviderNameFormView(BaseFormView):
 
     def form_valid(self, form):
         self.get_api().update_provider_firm_name(form.firm.firm_id, form.provider_name.data)
-        flash("<b>Legal services provider name successfully updated</b>", category="success")
+        flash(f"<b>{form.firm.firm_type.lower().capitalize()} name successfully updated</b>", category="success")
         return super().form_valid(form)
 
     def get_context_data(self, form: BaseForm, context=None):

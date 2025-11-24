@@ -206,7 +206,7 @@ class ReassignHeadOfficeForm(BaseForm):
 
 
 class ChangeLegalServicesProviderNameForm(NoChangesMixin, BaseForm):
-    url = "provider/<firm('Legal Services Provider'):firm>/change-name"
+    url = "provider/<firm('Legal Services Provider', 'Chambers'):firm>/change-name"
     title = "Change provider name"
     submit_button_text = "Submit"
     no_changes_error_message = "You have not changed the provider name. Cancel if you do not want to change it."
@@ -224,6 +224,12 @@ class ChangeLegalServicesProviderNameForm(NoChangesMixin, BaseForm):
     def __init__(self, firm: Firm, *args, **kwargs):
         self.firm = firm
         super().__init__(*args, **kwargs)
+        # Make the labelling specific to the firm type
+        if firm.firm_type != "Legal Services Provider":
+            firm_type_label = firm.firm_type.lower()
+            self.title = self.title.replace("provider", firm_type_label)
+            self.provider_name.label.text = self.provider_name.label.text.replace("provider", firm_type_label)
+            self.no_changes_error_message = self.no_changes_error_message.replace("provider", firm_type_label)
 
     def attach_no_change_error_to_element(self, error_message):
         self.provider_name.errors.append(error_message)
