@@ -16,9 +16,12 @@ class FirmConverter(BaseConverter):
             return f"Firm name: {firm.firm_name}"
     """
 
-    def __init__(self, map, firm_type=None):
+    def __init__(self, map, *firm_types):
         super().__init__(map)
-        self.firm_type = firm_type
+        if len(firm_types) > 0:
+            self.firm_types = [ft.lower() for ft in firm_types]
+        else:
+            self.firm_types = None
 
     def to_python(self, value):
         """Convert URL parameter to a Firm object."""
@@ -37,8 +40,8 @@ class FirmConverter(BaseConverter):
         if not firm:
             raise NotFound(f"Firm with ID {firm_id} not found")
 
-        if self.firm_type and firm.firm_type.lower() != self.firm_type.lower():
-            raise NotFound(f"{self.firm_type} firm with ID {firm_id} not found")
+        if self.firm_types and firm.firm_type.lower() not in self.firm_types:
+            raise NotFound(f"{self.firm_types} firm with ID {firm_id} not found")
 
         return firm
 
