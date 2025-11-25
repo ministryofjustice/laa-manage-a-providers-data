@@ -225,7 +225,7 @@ class ChangeLegalServicesProviderNameForm(NoChangesMixin, BaseForm):
         self.firm = firm
         super().__init__(*args, **kwargs)
         # Make the labelling specific to the firm type
-        if firm.firm_type != "Legal Services Provider":
+        if not firm.is_legal_services_provider:
             firm_type_label = firm.firm_type.lower()
             self.title = self.title.replace("provider", firm_type_label)
             self.provider_name.label.text = self.provider_name.label.text.replace("provider", firm_type_label)
