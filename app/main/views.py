@@ -84,7 +84,7 @@ class ViewProvider(MethodView):
 
     def get_chambers_contact_details_table(self, firm, head_office: Office) -> SummaryList:
         """Gets information about the chambers head office"""
-        table = SummaryList()
+        table = SummaryList(additional_classes="chambers-contact-details")
 
         row_action_urls = {
             "address": {

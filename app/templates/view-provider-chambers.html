@@ -21,7 +21,7 @@
           <div class="govuk-grid-column-two-thirds">
         {% if contact_details_table %}
           <h3 class="govuk-heading-m">Contact details</h3>
-          {{ govukTable(contact_details_table.to_govuk_params()) }}
+          {{ govukSummaryList(contact_details_table.to_summary_govuk_params()) }}
         {% endif %}
         {{ contactCards(contact_tables) }}
           </div>

@@ -30,6 +30,7 @@
         {% endblock %}
       {% endif %}
 
+      {% block formPrefix %}{% endblock %}
       {% for field in form %}
         {% if field.type != 'CSRFToken' and field.type != 'HiddenField' and field.type != "SubmitField" %}
           {{ field }}
