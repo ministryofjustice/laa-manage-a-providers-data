@@ -28,7 +28,7 @@ def test_change_chambers_contact_details_address(page: Page) -> None:
     page.get_by_role("textbox", name="Town or city").fill("London")
     page.get_by_role("textbox", name="County (optional)").fill("")
     page.get_by_role("textbox", name="Postcode").fill("SW1 1AA")
-    page.get_by_role("Button", name="Submit").click()
+    page.get_by_role("button", name="Submit").click()
 
     page.get_by_text("Chambers contact details successfully updated")
     contact_details = definition_list_to_dict(page, dl_selector=".chambers-contact-details")
@@ -47,7 +47,7 @@ def test_change_chambers_contact_details_email_address(page: Page) -> None:
 
     # Change the values
     page.get_by_role("textbox", name="Office email address (optional)").fill("functional.tester@provider2.uk")
-    page.get_by_role("Button", name="Submit").click()
+    page.get_by_role("button", name="Submit").click()
 
     page.get_by_text("Chambers contact details successfully updated")
     contact_details = definition_list_to_dict(page, dl_selector=".chambers-contact-details")
@@ -66,7 +66,7 @@ def test_change_chambers_contact_details_telephone_number(page: Page) -> None:
 
     # Change the values
     page.get_by_role("textbox", name="Telephone number (optional)").fill("0000 111 2222")
-    page.get_by_role("Button", name="Submit").click()
+    page.get_by_role("button", name="Submit").click()
 
     page.get_by_text("Chambers contact details successfully updated")
     contact_details = definition_list_to_dict(page, dl_selector=".chambers-contact-details")
@@ -84,7 +84,7 @@ def test_change_chambers_contact_details_dx_number(page: Page) -> None:
 
     # Change the values
     page.get_by_role("textbox", name="DX number (optional)").fill("111222333444555")
-    page.get_by_role("Button", name="Submit").click()
+    page.get_by_role("button", name="Submit").click()
 
     page.get_by_text("Chambers contact details successfully updated")
     contact_details = definition_list_to_dict(page, dl_selector=".chambers-contact-details")
@@ -102,8 +102,32 @@ def test_change_chambers_contact_details_dx_centre(page: Page) -> None:
 
     # Change the values
     page.get_by_role("textbox", name="DX centre (optional)").fill("London")
-    page.get_by_role("Button", name="Submit").click()
+    page.get_by_role("button", name="Submit").click()
 
-    page.get_by_text("Chambers contact details successfully updated")
+    expect(page.get_by_text("Chambers contact details successfully updated")).to_be_visible()
     contact_details = definition_list_to_dict(page, dl_selector=".chambers-contact-details")
     assert contact_details["DX centre"] == "London"
+
+
+@pytest.mark.usefixtures("live_server")
+def test_change_chambers_contact_details_no_changes(page: Page) -> None:
+    navigate_to_provider_page(page, provider_name="JOHNSON LEGAL SERVICES")
+    provider_view_url = page.url
+    page.get_by_role("link", name="Change address").click()
+    page.get_by_role("button", name="Submit").click()
+
+    expect(
+        page.get_by_text("You have not changed anything. Cancel if you do not want to make a change.")
+    ).to_be_visible()
+    assert provider_view_url != page.url
+
+
+@pytest.mark.usefixtures("live_server")
+def test_change_chambers_contact_details_cancel(page: Page) -> None:
+    navigate_to_provider_page(page, provider_name="JOHNSON LEGAL SERVICES")
+    provider_view_url = page.url
+    page.get_by_role("link", name="Change address").click()
+    page.get_by_role("link", name="Cancel").click()
+
+    expect(page.get_by_text("Chambers contact details successfully updated")).not_to_be_visible()
+    assert provider_view_url == page.url

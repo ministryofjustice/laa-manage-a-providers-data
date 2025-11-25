@@ -357,6 +357,11 @@ class ChangeChambersDetailsFormView(ChangeOfficeContactDetailsFormView):
     def get_success_url(self, form) -> str:
         return url_for("main.view_provider", firm=form.firm)
 
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context)
+        context.update({"cancel_url": self.get_success_url(form)})
+        return context
+
     def dispatch_request(self, firm: Firm, context=None, **kwargs):
         office = self.get_api().get_head_office(firm.firm_id)
         return super().dispatch_request(firm=firm, office=office, context=context, **kwargs)
