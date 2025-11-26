@@ -2,6 +2,7 @@ from typing import Any
 
 from flask import Response, current_app, redirect, render_template, url_for
 from flask.views import MethodView
+from pydantic import BaseModel
 
 from app.forms import BaseForm
 from app.pda.api import ProviderDataApi
@@ -66,6 +67,32 @@ class BaseFormView(MethodView):
 
     def get_api(self) -> ProviderDataApi:
         return current_app.extensions["pda"]
+
+    def form_data_to_model_data(self, form: BaseForm, model_class: type[BaseModel]) -> dict:
+        """
+        Transform a form's submitted data into a dictionary compatible with a Pydantic model.
+
+        This function iterates over `form.data` and keeps only the fields that exist on the
+        target Pydantic model. If a model field defines an alias, the alias is used as the
+        output key; otherwise, the original field name is used.
+
+        Args:
+            form (BaseForm): The form instance containing user-submitted data.
+            model_class (type[BaseModel]): The Pydantic model class whose fields (and aliases)
+                determine which form fields should be included and how they should be named.
+
+        Returns:
+            dict: A dictionary mapping model field aliases (or names) to the corresponding
+                values from the form. Fields that do not exist on the model are omitted.
+        """
+
+        data = {}
+        for field_name, field_value in form.data.items():
+            model_field = model_class.model_fields.get(field_name)
+            if model_field:
+                alias = model_field.alias if model_field.alias else field_name
+                data[alias] = field_value
+        return data
 
 
 class FullWidthBaseFormView(BaseFormView):

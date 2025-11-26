@@ -236,18 +236,9 @@ class ChangeOfficeContactDetailsFormView(BaseFormView):
         context.update({"office_address": format_office_address_one_line(form.office)})
         return context
 
-    def form_data_to_api(self, form):
-        data = {}
-        for field_name, field_value in form.data.items():
-            model_field = Office.model_fields.get(field_name)
-            if model_field:
-                alias = model_field.alias if model_field.alias else field_name
-                data[alias] = field_value
-        return data
-
     def form_valid(self, form, **kwargs):
         pda = current_app.extensions["pda"]
-        data = self.form_data_to_api(form)
+        data = self.form_data_to_model_data(form, Office)
         try:
             pda.update_office_contact_details(form.firm.firm_id, form.office.firm_office_code, data)
         except ProviderDataApiError as e:
