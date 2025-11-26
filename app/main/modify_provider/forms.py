@@ -7,18 +7,12 @@ from app.constants import PROVIDER_ACTIVE_STATUS_CHOICES
 from app.fields import GovUKTableRadioField
 from app.forms import BaseForm, NoChangesMixin
 from app.main.add_a_new_provider.forms import (
-<<<<<<< HEAD
-=======
     AddAdvocateDetailsForm,
->>>>>>> a81c082 (Add Change flow for advocates journey)
     AddBarristerDetailsForm,
     LiaisonManagerForm,
     LspDetailsForm,
 )
-<<<<<<< HEAD
 from app.main.update_office import ChangeOfficeContactDetailsForm
-=======
->>>>>>> a81c082 (Add Change flow for advocates journey)
 from app.main.utils import get_firm_account_number
 from app.models import Firm, Office
 from app.utils.formatting import format_office_address_one_line, normalize_for_search
