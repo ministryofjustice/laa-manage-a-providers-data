@@ -553,3 +553,14 @@ class ProviderDataApi:
         Returns: Firm
         """
         raise NotImplementedError("Updating barrister details is currently not supported by the real Provider Data API")
+
+    def update_advocate_details(self, firm_id, advocate_details: dict) -> Firm:
+        """
+        Update an existing advocate details.
+        Args:
+            firm_id: The advocate firm Id
+            advocate_details: A dict of fields to update
+
+        Returns: Firm
+        """
+        raise NotImplementedError("Updating advocate details is currently not supported by the real API")

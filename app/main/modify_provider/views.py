@@ -319,6 +319,19 @@ class ChangeChambersDetailsFormView(ChangeOfficeContactDetailsFormView):
 
 
 class ChangeAdvocateDetailsFormView(BaseFormView):
+    def get_success_url(self, form):
+        return url_for("main.view_provider", firm=form.firm)
+
+    def form_valid(self, form: BaseForm) -> Response:
+        data = dict(
+            firmName=form.data.get("advocate_name"),
+            advocateLevel=form.data.get("advocate_level"),
+            barCouncilRoll=form.data.get("sra_roll_number"),
+        )
+        self.get_api().update_advocate_details(form.firm.firm_id, data)
+        flash("Advocate overview successfully updated", category="success")
+        return super().form_valid(form)
+
     def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(form, context, **kwargs)
         context.update({"cancel_url": self.get_success_url(form)})

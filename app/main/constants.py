@@ -260,7 +260,14 @@ MAIN_TABLE_FIELD_CONFIG = {
         },
     ],
     "Advocate": [
-        {"label": "Advocate name", "id": "firm_name"},
+        {
+            "label": "Advocate name",
+            "id": "firm_name",
+            "row_action_urls": {
+                "change": {"link": "main.change_advocate_details", "anchor": "advocate_name"},
+                "enter": {"link": "main.change_advocate_details", "anchor": "advocate_name"},
+            },
+        },
         {"label": "Advocate number", "id": "firm_number"},
         {"label": "Account number", "id": "firm_office_code", "data_source": "head_office"},
         {
@@ -270,7 +277,22 @@ MAIN_TABLE_FIELD_CONFIG = {
             "data_source": "parent_firm",
             "row_action_urls": {"enter": "main.assign_chambers", "change": "main.assign_chambers"},
         },
-        {"label": "Advocate level", "id": "advocate_level", "formatter": format_advocate_level},
-        {"label": "Solicitors Regulation Authority roll number", "id": "bar_council_roll"},
+        {
+            "label": "Advocate level",
+            "id": "advocate_level",
+            "formatter": format_advocate_level,
+            "row_action_urls": {
+                "change": {"link": "main.change_advocate_details", "anchor": "advocate_level"},
+                "enter": {"link": "main.change_advocate_details", "anchor": "advocate_level"},
+            },
+        },
+        {
+            "label": "Solicitors Regulation Authority roll number",
+            "id": "bar_council_roll",
+            "row_action_urls": {
+                "change": {"link": "main.change_advocate_details", "anchor": "sra_roll_number"},
+                "enter": {"link": "main.change_advocate_details", "anchor": "sra_roll_number"},
+            },
+        },
     ],
 }
