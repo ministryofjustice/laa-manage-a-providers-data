@@ -11,12 +11,30 @@ class BaseForm(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._original_data = {
-            name: kwargs.get(name, field.default) for name, field in self._fields.items() if name != "csrf_token"
-        }
+        self.capture_initial_data(**kwargs)
+
+    def capture_initial_data(self, **kwargs):
+        self._original_data = {}
+        for name, field in self._fields.items():
+            value = kwargs.get(name, field.default)
+            if name == "csrf_token":
+                continue
+            if value == "":
+                value = None
+
+            self._original_data[name] = value
 
     def has_changed(self):
-        form_data = {name: field.data for name, field in self._fields.items() if name != "csrf_token"}
+        form_data = {}
+        for name, field in self._fields.items():
+            value = field.data
+            if name == "csrf_token":
+                continue
+
+            if value == "":
+                value = None
+            form_data[name] = value
+
         return form_data != self._original_data
 
 

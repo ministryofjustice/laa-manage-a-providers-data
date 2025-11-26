@@ -84,13 +84,40 @@ class ViewProvider(MethodView):
 
     def get_chambers_contact_details_table(self, firm, head_office: Office) -> SummaryList:
         """Gets information about the chambers head office"""
-        table = SummaryList()
+        table = SummaryList(additional_classes="chambers-contact-details")
 
-        table.add_row("Address", "test", html=format_office_address_multi_line_html(head_office))
-        table.add_row("Email address", head_office.email_address)
-        table.add_row("Telephone number", head_office.telephone_number)
-        table.add_row("DX number", head_office.dx_number)
-        table.add_row("DX centre", head_office.dx_centre)
+        row_action_urls = {
+            "address": {
+                "enter": url_for("main.change_chambers_details", firm=firm, _anchor="address_line_1"),
+                "change": url_for("main.change_chambers_details", firm=firm, _anchor="address_line_1"),
+            },
+            "email": {
+                "enter": url_for("main.change_chambers_details", firm=firm, _anchor="email_address"),
+                "change": url_for("main.change_chambers_details", firm=firm, _anchor="email_address"),
+            },
+            "telephone": {
+                "enter": url_for("main.change_chambers_details", firm=firm, _anchor="telephone_number"),
+                "change": url_for("main.change_chambers_details", firm=firm, _anchor="telephone_number"),
+            },
+            "dx_number": {
+                "enter": url_for("main.change_chambers_details", firm=firm, _anchor="dx_number"),
+                "change": url_for("main.change_chambers_details", firm=firm, _anchor="dx_number"),
+            },
+            "dx_centre": {
+                "enter": url_for("main.change_chambers_details", firm=firm, _anchor="dx_centre"),
+                "change": url_for("main.change_chambers_details", firm=firm, _anchor="dx_centre"),
+            },
+        }
+        table.add_row(
+            "Address",
+            "test",
+            html=format_office_address_multi_line_html(head_office),
+            row_action_urls=row_action_urls["address"],
+        )
+        table.add_row("Email address", head_office.email_address, row_action_urls=row_action_urls["email"])
+        table.add_row("Telephone number", head_office.telephone_number, row_action_urls=row_action_urls["telephone"])
+        table.add_row("DX number", head_office.dx_number, row_action_urls=row_action_urls["dx_number"])
+        table.add_row("DX centre", head_office.dx_centre, row_action_urls=row_action_urls["dx_centre"])
 
         return table
 

@@ -6,6 +6,7 @@ from flask import Response, abort, current_app, flash, redirect, render_template
 
 from app.forms import BaseForm
 from app.main.modify_provider import AssignChambersForm, ReassignHeadOfficeForm
+from app.main.update_office import ChangeOfficeContactDetailsFormView
 from app.main.utils import assign_firm_to_a_new_chambers, change_liaison_manager, reassign_head_office
 from app.main.views import AdvocateBarristerOfficeMixin, get_main_table
 from app.models import Contact, Firm, Office
@@ -347,3 +348,20 @@ class BarristerChangeDetailsView(AdvocateBarristerOfficeMixin, BaseFormView):
         if form.validate_on_submit():
             return self.form_valid(form)
         return self.form_invalid(form)
+
+
+class ChangeChambersDetailsFormView(ChangeOfficeContactDetailsFormView):
+    success_message = "Chambers contact details successfully updated"
+    error_message = "We couldn’t update the Chambers contact details. Try again later."
+
+    def get_success_url(self, form) -> str:
+        return url_for("main.view_provider", firm=form.firm)
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context)
+        context.update({"cancel_url": self.get_success_url(form)})
+        return context
+
+    def dispatch_request(self, firm: Firm, context=None, **kwargs):
+        office = self.get_api().get_head_office(firm.firm_id)
+        return super().dispatch_request(firm=firm, office=office, context=context, **kwargs)
