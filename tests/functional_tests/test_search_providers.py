@@ -15,7 +15,7 @@ def test_search_providers_page_ui_loads(page):
     # Check table is not visible
     expect(page.get_by_role("columnheader", name="Provider name")).not_to_be_visible()
     expect(page.get_by_role("columnheader", name="Provider type")).not_to_be_visible()
-    expect(page.get_by_role("columnheader", name="Provider number")).not_to_be_visible()
+    expect(page.get_by_role("columnheader", name="Account number")).not_to_be_visible()
     expect(page.get_by_role("columnheader", name="Status")).not_to_be_visible()
 
 
@@ -25,7 +25,7 @@ def test_empty_search_shows_all_providers(page):
     page.get_by_role("button", name="Search").click()
     expect(page.get_by_role("columnheader", name="Provider name")).to_be_visible()
     expect(page.get_by_role("columnheader", name="Provider type")).to_be_visible()
-    expect(page.get_by_role("columnheader", name="Provider number")).to_be_visible()
+    expect(page.get_by_role("columnheader", name="Account number")).to_be_visible()
     expect(page.get_by_role("columnheader", name="Status")).to_be_visible()
     expect(page.get_by_text("Showing 1 to 14 of 14 results")).to_be_visible()
 

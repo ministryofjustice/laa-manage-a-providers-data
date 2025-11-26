@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta
 from typing import Any, List
 
@@ -7,10 +8,13 @@ from wtforms.validators import DataRequired, InputRequired, Length
 
 from app.components.tables import DataTable, RadioDataTable, TableStructureItem
 from app.forms import BaseForm
+from app.main.utils import get_firm_account_number
 from app.models import BankAccount, Firm
 from app.utils.formatting import format_sentence_case, normalize_for_search
 from app.validators import ValidateAccountNumber, ValidateSortCode
 from app.widgets import GovTextInput
+
+logger = logging.getLogger(__name__)
 
 
 def firm_name_html(row_data: dict[str, str]) -> str:
@@ -22,6 +26,17 @@ def firm_name_html(row_data: dict[str, str]) -> str:
 def get_firm_statuses(row_data):
     # Add logic to render firm status tags here when available.
     return "<p class='govuk-visually-hidden'>No statuses</p>"
+
+
+def firm_account_number_html(row_data: dict[str, str]) -> str:
+    firm_id = row_data.get("firm_id")
+    firm_account_number = "UNKNOWN"
+    if firm_id:
+        try:
+            firm_account_number = get_firm_account_number(int(firm_id))
+        except ValueError:
+            logger.error(f"Invalid firm number: {firm_id} from {row_data}")
+    return firm_account_number
 
 
 class ProviderListForm(BaseForm):
@@ -80,7 +95,7 @@ class ProviderListForm(BaseForm):
         columns: list[TableStructureItem] = [
             {"text": "Provider name", "id": "firm_name", "html_renderer": firm_name_html},
             {"text": "Provider type", "id": "firm_type", "format_text": format_sentence_case},
-            {"text": "Provider number", "id": "firm_number"},
+            {"text": "Account number", "html_renderer": firm_account_number_html},
             {"text": "Status", "html_renderer": get_firm_statuses},  # Add status tags here when available.
         ]
 
