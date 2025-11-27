@@ -5,8 +5,8 @@ from wtforms.fields.choices import RadioField
 from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired, Optional
 
-from app.constants import OFFICE_ACTIVE_STATUS_CHOICES, PAYMENT_METHOD_CHOICES
-from app.forms import BaseForm
+from app.constants import OFFICE_ACTIVE_STATUS_CHOICES, PAYMENT_METHOD_CHOICES, YES_NO_CHOICES
+from app.forms import BaseForm, NoChangesMixin
 from app.main.add_a_new_office.forms import OfficeContactDetailsForm
 from app.main.add_a_new_provider import AssignContractManagerForm
 from app.main.forms import BaseBankAccountForm, BaseBankAccountSearchForm
@@ -150,4 +150,29 @@ class ChangeOfficeContractManagerForm(AssignContractManagerForm):
     def __init__(self, firm: Firm, office: Office | None = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.firm = firm
+        self.office = office
+
+
+class ChangeOfficeFalseBalanceForm(NoChangesMixin, UpdateOfficeBaseForm):
+    url = "provider/<firm:firm>/office/<office:office>/change-false-balance"
+    title = "Does this office have a false balance?"
+    submit_button_text = "Submit"
+    no_changes_error_message = "You have not changed the false balance status. Cancel if you do not want to change it."
+
+    @property
+    def caption(self):
+        return self.firm.firm_name
+
+    status = RadioField(
+        label="",
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
+        choices=YES_NO_CHOICES,
+        validators=[InputRequired("Please select a valid choice.")],
+        default="No",
+    )
+
+    def __init__(self, firm: Firm, office: Office, *args, **kwargs):
+        super().__init__(firm, office, *args, **kwargs)
+        self.firm = firm
+        print(self.firm)
         self.office = office

@@ -9,6 +9,7 @@ from app.components.tag import Tag, TagType
 from app.constants import (
     STATUS_CONTRACT_MANAGER_DEBT_RECOVERY,
     STATUS_CONTRACT_MANAGER_DEFAULT,
+    STATUS_CONTRACT_MANAGER_FALSE_BALANCE,
     STATUS_CONTRACT_MANAGER_NAMES,
 )
 from app.models import BankAccount, Contact, Firm, Office
@@ -629,6 +630,28 @@ def get_entity_referred_to_debt_recovery_text(entity: dict) -> str:
 
     if contract_manager == STATUS_CONTRACT_MANAGER_DEBT_RECOVERY:
         return "Yes"
+    return "No"
+
+
+def get_firm_false_balance_text(entity: dict) -> str:
+    pda = current_app.extensions.get("pda")
+    if not pda:
+        raise RuntimeError("Provider Data API not initialized")
+    head_office = pda.get_head_office(entity["firm_id"])
+    if not head_office:
+        return "No"
+
+    return get_office_false_balance_text(head_office.to_internal_dict())
+
+
+def get_office_false_balance_text(office: dict) -> str:
+    contract_manager = office.get("contract_manager")
+    if not contract_manager:
+        return "No"
+
+    if contract_manager == STATUS_CONTRACT_MANAGER_FALSE_BALANCE:
+        return "Yes"
+
     return "No"
 
 

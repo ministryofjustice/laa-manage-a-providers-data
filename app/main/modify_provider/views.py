@@ -6,7 +6,7 @@ from flask import Response, abort, current_app, flash, redirect, render_template
 
 from app.forms import BaseForm
 from app.main.modify_provider import AssignChambersForm, ReassignHeadOfficeForm
-from app.main.update_office import ChangeOfficeContactDetailsFormView
+from app.main.update_office import ChangeOfficeContactDetailsFormView, ChangeOfficeFalseBalanceFormView
 from app.main.utils import assign_firm_to_a_new_chambers, change_liaison_manager, reassign_head_office
 from app.main.views import AdvocateBarristerOfficeMixin, get_main_table
 from app.models import Contact, Firm, Office
@@ -348,12 +348,8 @@ class ChangeAdvocateDetailsFormView(BaseFormView):
         )
         return self.get_form_class()(firm=firm, **details)
 
-    def get(self, firm: Firm, context=None, **kwargs):
-        form = self.get_form_instance(firm)
-        return render_template(self.get_template(), **self.get_context_data(form, context))
 
-    def post(self, firm: Firm, context) -> Response | str:
-        form = self.get_form_instance(firm)
-        if form.validate_on_submit():
-            return self.form_valid(form)
-        return self.form_invalid(form)
+class ChangeFirmFalseBalanceFormView(AdvocateBarristerOfficeMixin, ChangeOfficeFalseBalanceFormView):
+    def get_success_url(self, form):
+        return url_for("main.view_provider", firm=form.firm)
+

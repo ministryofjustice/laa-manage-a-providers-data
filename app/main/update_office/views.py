@@ -4,7 +4,11 @@ from typing import Any
 
 from flask import Response, abort, current_app, flash, redirect, render_template, request, session, url_for
 
-from app.constants import DEFAULT_CONTRACT_MANAGER_NAME, STATUS_CONTRACT_MANAGER_NAMES
+from app.constants import (
+    DEFAULT_CONTRACT_MANAGER_NAME,
+    STATUS_CONTRACT_MANAGER_FALSE_BALANCE,
+    STATUS_CONTRACT_MANAGER_NAMES,
+)
 from app.forms import BaseForm
 from app.main.forms import NoBankAccountsError
 from app.main.utils import firm_office_url_for
@@ -392,3 +396,34 @@ class ChangeContractManagerFormView(BaseFormView):
         if form.validate_on_submit():
             return self.form_valid(form)
         return self.form_invalid(form, **kwargs)
+
+
+class ChangeOfficeFalseBalanceFormView(BaseFormView):
+    def get_success_url(self, form):
+        return url_for("main.view_office", firm=form.firm, office=form.office)
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update(
+            {"cancel_url": self.get_success_url(form), "office_address": format_office_address_one_line(form.office)}
+        )
+        return context
+
+    def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
+        return self.get_form_class()(firm, office)
+
+    def form_valid(self, form, **kwargs) -> Response:
+        status = form.data.get("status", "")
+        if status.lower() == "yes":
+            data = {
+                "contractManager": STATUS_CONTRACT_MANAGER_FALSE_BALANCE,
+            }
+            self.get_api().update_office_false_balance(
+                firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, data=data
+            )
+            flash("<b>False balance changed to yes.</b>", category="success")
+        else:
+            # Todo: what should be sent to backend here?
+            pass
+
+        return super().form_valid(form, **kwargs)
