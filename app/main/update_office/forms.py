@@ -170,9 +170,3 @@ class ChangeOfficeFalseBalanceForm(NoChangesMixin, UpdateOfficeBaseForm):
         validators=[InputRequired("Please select a valid choice.")],
         default="No",
     )
-
-    def __init__(self, firm: Firm, office: Office, *args, **kwargs):
-        super().__init__(firm, office, *args, **kwargs)
-        self.firm = firm
-        print(self.firm)
-        self.office = office
