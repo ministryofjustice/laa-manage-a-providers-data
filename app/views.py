@@ -56,8 +56,8 @@ class BaseFormView(MethodView):
     def get_form_instance(self, *args, **kwargs) -> BaseForm:
         return self.get_form_class()()
 
-    def get(self, **kwargs) -> str:
-        form = self.get_form_instance(**kwargs)
+    def get(self, *args, **kwargs) -> str:
+        form = self.get_form_instance(*args, **kwargs)
         return render_template(self.get_template(), **self.get_context_data(form, **kwargs))
 
     def post(self, *args, **kwargs) -> Response | str:

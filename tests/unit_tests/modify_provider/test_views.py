@@ -7,7 +7,7 @@ from app.main.modify_provider.views import ChangeProviderActiveStatusFormView
 
 
 class TestChangeProviderActiveStatusFormView:
-    @patch("app.main.modify_provider.views.render_template")
+    @patch("app.views.render_template")
     def test_get_inactive_firm(self, mock_render_template, app):
         """Test default form for an inactive provider firm."""
         pda = app.extensions["pda"]
@@ -19,7 +19,7 @@ class TestChangeProviderActiveStatusFormView:
         call_kwargs = mock_render_template.call_args.kwargs
         assert call_kwargs["form"].status.data == "inactive"
 
-    @patch("app.main.modify_provider.views.render_template")
+    @patch("app.views.render_template")
     def test_get_active_firm(self, mock_render_template, app):
         """Test default form for an active provider firm."""
         pda = app.extensions["pda"]
