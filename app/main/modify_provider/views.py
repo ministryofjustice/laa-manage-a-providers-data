@@ -113,18 +113,10 @@ class ChangeProviderActiveStatusFormView(FullWidthBaseFormView):
 
         return context
 
-    def get(self, firm: Firm, context, **kwargs):
+    def get_form_instance(self, firm: Firm, **kwargs) -> BaseForm:
         status = "inactive" if firm.inactive_date else "active"
         form = self.get_form_class()(status=status, firm=firm)
-        return render_template(self.template, **self.get_context_data(form))
-
-    def post(self, firm, context, **kwargs):
-        form = self.get_form_class()(firm=firm)
-
-        if form.validate_on_submit():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form, **kwargs)
+        return form
 
     def form_valid(self, form):
         status = form.data.get("status")
@@ -155,6 +147,14 @@ class AssignChambersFormView(BaseFormView):
         assign_firm_to_a_new_chambers(form.firm, new_chambers_id)
         return redirect(self.get_success_url(form))
 
+    def get_form_instance(self, firm: Firm, **kwargs) -> BaseForm:
+        search_term = request.args.get("search", "").strip()
+        page = int(request.args.get("page", 1))
+        form = self.get_form_class()(firm=firm, search_term=search_term, page=page)
+        if request.method.upper() == "GET" and search_term:
+            form.search.validate(form)
+        return form
+
     @staticmethod
     def get_valid_firm_or_abort(firm):
         if not firm:
@@ -174,16 +174,6 @@ class AssignChambersFormView(BaseFormView):
 
         return render_template(self.get_template(), **self.get_context_data(form, context))
 
-    def post(self, firm, context) -> Response | str:
-        self.get_valid_firm_or_abort(firm)
-        search_term = request.args.get("search", "").strip()
-        page = int(request.args.get("page", 1))
-        form = self.get_form_class()(firm=firm, search_term=search_term, page=page)
-        if form.validate_on_submit():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
 
 class ReassignHeadOfficeFormView(BaseFormView):
     form_class = ReassignHeadOfficeForm
@@ -191,22 +181,22 @@ class ReassignHeadOfficeFormView(BaseFormView):
     def get_success_url(self, form: BaseForm | None = None) -> str:
         return url_for("main.view_provider_offices", firm=form.firm)
 
-    def get(self, firm, context=None, **kwargs):
-        if not firm:
-            abort(400)
-        form = self.get_form_class()(firm=firm)
-        # Pre-select the current head office
-        if hasattr(form, "current_head_office"):
-            form.office.data = form.current_head_office.firm_office_code
-        context = self.get_context_data(form, context=context)
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
         context.update({"cancel_url": self.get_success_url(form)})
-        return render_template(self.get_template(), **context)
+        return context
 
-    def form_valid(self, form):
+    def get_form_instance(self, firm: Firm, **kwargs) -> BaseForm:
+        head_office = self.get_api().get_head_office(firm.firm_id)
+        default_office = head_office.firm_office_code if head_office else None
+        form = self.get_form_class()(firm=firm, office=default_office)
+
+        return form
+
+    def form_valid(self, form: BaseForm):
         new_head_office_code = form.data.get("office")
-        current_head_office = form.current_head_office
 
-        if new_head_office_code == current_head_office.firm_office_code:
+        if not form.has_changed():
             flash(f"No change made because {new_head_office_code} is already the head office")
             return redirect(self.get_success_url(form))
 
@@ -221,14 +211,6 @@ class ReassignHeadOfficeFormView(BaseFormView):
 
         return redirect(self.get_success_url(form))
 
-    def post(self, firm, context) -> Response | str:
-        if not firm:
-            abort(400)
-        form = self.get_form_class()(firm=firm)
-        if form.validate_on_submit():
-            return self.form_valid(form)
-        return self.form_invalid(form)
-
 
 class ChangeLegalServicesProviderNameFormView(BaseFormView):
     success_url = "main.view_provider"
@@ -236,7 +218,7 @@ class ChangeLegalServicesProviderNameFormView(BaseFormView):
     def get_success_url(self, form):
         return url_for(self.success_url, firm=form.firm)
 
-    def get_form_instance(self, firm: Firm):
+    def get_form_instance(self, firm: Firm, **kwargs):
         return self.get_form_class()(firm=firm, provider_name=firm.firm_name)
 
     def form_valid(self, form):
@@ -244,20 +226,10 @@ class ChangeLegalServicesProviderNameFormView(BaseFormView):
         flash(f"<b>{form.firm.firm_type.lower().capitalize()} name successfully updated</b>", category="success")
         return super().form_valid(form)
 
-    def get_context_data(self, form: BaseForm, context=None):
-        context = super().get_context_data(form)
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
         context.update({"cancel_url": self.get_success_url(form)})
         return context
-
-    def get(self, firm: Firm, **kwargs):
-        form = self.get_form_instance(firm)
-        return render_template(self.get_template(), **self.get_context_data(form, **kwargs))
-
-    def post(self, firm, **kwargs):
-        form = self.get_form_instance(firm)
-        if form.validate_on_submit():
-            return self.form_valid(form)
-        return self.form_invalid(form)
 
 
 class ChangeLspDetailsFormView(BaseFormView):
@@ -281,7 +253,7 @@ class ChangeLspDetailsFormView(BaseFormView):
         flash("<b>Legal services provider overview successfully updated<b>", category="success")
         return super().form_valid(form)
 
-    def get_form_instance(self, firm: Firm) -> BaseForm:
+    def get_form_instance(self, firm: Firm, **kwargs) -> BaseForm:
         indemnity_received_date = firm.indemnity_received_date
         if indemnity_received_date:
             indemnity_received_date = datetime.datetime.strptime(indemnity_received_date, "%Y-%m-%d").date()
@@ -296,17 +268,6 @@ class ChangeLspDetailsFormView(BaseFormView):
         context = super().get_context_data(form, context, **kwargs)
         context.update({"cancel_url": self.get_success_url(form)})
         return context
-
-    def get(self, firm: Firm, context=None, **kwargs):
-        form = self.get_form_instance(firm)
-        return render_template(self.get_template(), **self.get_context_data(form, context))
-
-    def post(self, firm: Firm, context) -> Response | str:
-        form = self.get_form_instance(firm)
-        if form.validate_on_submit():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
 
 
 class BarristerChangeDetailsView(AdvocateBarristerOfficeMixin, BaseFormView):
@@ -323,12 +284,12 @@ class BarristerChangeDetailsView(AdvocateBarristerOfficeMixin, BaseFormView):
 
         return super().form_valid(form)
 
-    def get_context_data(self, form: BaseForm, context=None):
-        context = super().get_context_data(form)
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
         context.update({"cancel_url": self.get_success_url(form)})
         return context
 
-    def get_form_instance(self, firm: Firm, office: Office):
+    def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
         return self.get_form_class()(
             firm=firm,
             office=office,
@@ -338,16 +299,6 @@ class BarristerChangeDetailsView(AdvocateBarristerOfficeMixin, BaseFormView):
                 "bar_council_roll_number": firm.bar_council_roll,
             },
         )
-
-    def get(self, firm: Firm, office: Office, context, **kwargs):
-        form = self.get_form_instance(firm, office)
-        return render_template(self.get_template(), **self.get_context_data(form, context))
-
-    def post(self, firm: Firm, office: Office, context) -> Response | str:
-        form = self.get_form_instance(firm, office)
-        if form.validate_on_submit():
-            return self.form_valid(form)
-        return self.form_invalid(form)
 
 
 class ChangeChambersDetailsFormView(ChangeOfficeContactDetailsFormView):
