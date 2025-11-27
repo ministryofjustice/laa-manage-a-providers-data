@@ -5,6 +5,7 @@ class TagType(Enum):
     INACTIVE = ("Inactive", "govuk-tag--grey")
     ON_HOLD = ("On hold", "govuk-tag--yellow")
     FIRM_INTERVENED = ("Firm intervened", "govuk-tag--pink")
+    FALSE_BALANCE = ("False balance", "govuk-tag--blue")
 
     def __init__(self, text, css_class):
         self.text = text
