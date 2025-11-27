@@ -12,7 +12,7 @@ from app.main.add_a_new_provider.forms import (
     LiaisonManagerForm,
     LspDetailsForm,
 )
-from app.main.update_office import ChangeOfficeContactDetailsForm
+from app.main.update_office import ChangeOfficeContactDetailsForm, ChangeOfficeFalseBalanceForm
 from app.main.utils import get_firm_account_number
 from app.models import Firm, Office
 from app.utils.formatting import format_office_address_one_line, normalize_for_search
@@ -263,4 +263,9 @@ class ChangeChambersDetailsForm(NoChangesMixin, ChangeOfficeContactDetailsForm):
 
 class ChangeAdvocateDetailsForm(NoChangesMixin, AddAdvocateDetailsForm):
     url = "provider/<firm('Advocate'):firm>/change-advocate-details"
+
+
+class ChangeFirmFalseBalanceForm(ChangeOfficeFalseBalanceForm):
+    url = "provider/<firm('Barrister'):firm>/change-false-balance"
+    title = "Do they have a false balance?"
     submit_button_text = "Submit"

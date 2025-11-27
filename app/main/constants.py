@@ -3,6 +3,8 @@ from app.main.utils import (
     contract_manager_nonstatus_name,
     get_entity_active_text,
     get_entity_referred_to_debt_recovery_text,
+    get_firm_false_balance_text,
+    get_office_false_balance_text,
     provider_name_html,
 )
 from app.utils.formatting import (
@@ -61,6 +63,13 @@ STATUS_TABLE_FIELD_CONFIG = {
             "text_renderer": get_entity_referred_to_debt_recovery_text,
             "default": "No",
         },
+        {
+            "label": "False balance",
+            "text_renderer": get_firm_false_balance_text,
+            "default": "No",
+            "visible": lambda office: office.get("inactive_date") is not None,
+            "change_link": "main.change_firm_false_balance",
+        },
     ],
     "Advocate": [
         {
@@ -79,6 +88,13 @@ STATUS_TABLE_FIELD_CONFIG = {
             "label": "Referred to debt recovery",
             "text_renderer": get_entity_referred_to_debt_recovery_text,
             "default": "No",
+        },
+        {
+            "label": "False balance",
+            "text_renderer": get_firm_false_balance_text,
+            "default": "No",
+            "visible": lambda office: office.get("inactive_date") is not None,
+            "change_link": "main.change_firm_false_balance",
         },
     ],
     "Office": [
@@ -102,7 +118,9 @@ STATUS_TABLE_FIELD_CONFIG = {
         {
             "label": "False balance",
             "default": "No",
+            "text_renderer": get_office_false_balance_text,
             "visible": lambda office: office.get("inactive_date"),
+            "change_link": "main.change_office_false_balance",
         },  # Show if active
     ],
 }

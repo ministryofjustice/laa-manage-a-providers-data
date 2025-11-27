@@ -62,7 +62,6 @@ class BaseFormView(MethodView):
 
     def post(self, *args, **kwargs) -> Response | str:
         form = self.get_form_instance(**kwargs)
-
         if form.validate_on_submit():
             return self.form_valid(form)
         else:

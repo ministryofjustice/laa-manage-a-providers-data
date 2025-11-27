@@ -564,3 +564,17 @@ class ProviderDataApi:
         Returns: Firm
         """
         raise NotImplementedError("Updating advocate details is currently not supported by the real API")
+
+    def update_office_false_balance(self, firm_id: int, office_code: str, data: dict) -> Office:
+        """
+        Update an existing office false balance.
+        Args:
+            firm_id: Firm Id of the firm that the office belongs to
+            office_code: The code of the office to update
+            data: a dict containing the office false balance
+
+        Returns: Office
+        """
+        raise NotImplementedError(
+            "Updating office false balance is currently not supported by the real Provider Data API"
+        )
