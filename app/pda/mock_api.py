@@ -710,7 +710,7 @@ class MockProviderDataApi:
 
         return updated_contact
 
-    def patch_office(self, firm_id: int, office_code: str, fields_to_update: dict):
+    def patch_office(self, firm_id: int, office_code: str, fields_to_update: dict) -> Office:
         office = self._find_office_data(firm_id, office_code)
         if office:
             office.update(fields_to_update)
@@ -847,3 +847,6 @@ class MockProviderDataApi:
         firm_details = self._find_firm_data(firm_id)
         firm_details.update(advocate_details)
         return Firm(**firm_details)
+
+    def update_office_false_balance(self, firm_id: int, office_code: str, data: dict) -> Office:
+        return self.patch_office(firm_id, office_code, data)

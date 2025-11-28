@@ -160,7 +160,7 @@ def get_status_table(entity: Firm | Office, firm: Firm | None = None, office: Of
     else:
         raise ValueError(f"Entity must be Firm or Office, got {type(entity)}")
 
-    status_table = SummaryList()
+    status_table = SummaryList(additional_classes="status-table")
 
     _all_fields = STATUS_TABLE_FIELD_CONFIG.get(entity_type, [])
 
