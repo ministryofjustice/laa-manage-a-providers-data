@@ -439,8 +439,7 @@ def get_office_tags(office: Office | dict):
     if office_data.get("hold_all_payments_flag", "N") == "Y":
         tags.append(Tag(TagType.ON_HOLD))
 
-    contract_manager = office.contract_manager if office.contract_manager else ""
-    if contract_manager == STATUS_CONTRACT_MANAGER_FALSE_BALANCE:
+    if office.contract_manager == STATUS_CONTRACT_MANAGER_FALSE_BALANCE:
         tags.append(Tag(TagType.FALSE_BALANCE))
 
     return tags
@@ -688,5 +687,4 @@ def get_firm_contract_manager(firm_id: int) -> str:
     if not pda:
         raise RuntimeError("Provider Data API not initialized")
     head_office = pda.get_head_office(firm_id)
-    contract_manager = head_office.contract_manager if head_office.contract_manager else ""
-    return contract_manager
+    return head_office.contract_manager
