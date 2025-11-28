@@ -32,7 +32,7 @@ def definition_list_to_dict(page: Page, dl_selector: str) -> dict:
     return dl_dict
 
 
-def navigate_to_provider_page(page: Page, provider_name: str):
+def navigate_to_provider_page(page: Page, provider_name: str, office_code: str | None = None):
     """Helper function to navigate to a given provider page."""
     # Navigate to the providers list
     page.goto(url_for("main.providers", _external=True))
@@ -44,3 +44,15 @@ def navigate_to_provider_page(page: Page, provider_name: str):
     page.get_by_role("link", name=provider_name).click()
 
     expect(page.get_by_role("heading", name=provider_name)).to_be_visible()
+
+    if not office_code:
+        return
+
+    # Click on the Offices sub-navigation
+    page.get_by_role("link", name="Offices").click()
+
+    # Click "A specific office" button
+    page.get_by_role("link", name=office_code).click()
+
+    # Verify we're on view office page
+    expect(page.get_by_role("heading", name=f"Office: {office_code}")).to_be_visible()

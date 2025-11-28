@@ -266,6 +266,6 @@ class ChangeAdvocateDetailsForm(NoChangesMixin, AddAdvocateDetailsForm):
 
 
 class ChangeFirmFalseBalanceForm(ChangeOfficeFalseBalanceForm):
-    url = "provider/<firm('Barrister'):firm>/change-false-balance"
+    url = "provider/<firm('Barrister','Advocate'):firm>/change-false-balance"
     title = "Do they have a false balance?"
     submit_button_text = "Submit"
