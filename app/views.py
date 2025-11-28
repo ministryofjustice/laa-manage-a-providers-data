@@ -53,12 +53,15 @@ class BaseFormView(MethodView):
     def form_invalid(self, form: BaseForm, **kwargs) -> str:
         return render_template(self.get_template(), **self.get_context_data(form, **kwargs))
 
-    def get(self, **kwargs) -> str:
-        form = self.get_form_class()()
+    def get_form_instance(self, *args, **kwargs) -> BaseForm:
+        return self.get_form_class()()
+
+    def get(self, *args, **kwargs) -> str:
+        form = self.get_form_instance(*args, **kwargs)
         return render_template(self.get_template(), **self.get_context_data(form, **kwargs))
 
     def post(self, *args, **kwargs) -> Response | str:
-        form = self.get_form_class()()
+        form = self.get_form_instance(**kwargs)
 
         if form.validate_on_submit():
             return self.form_valid(form)
