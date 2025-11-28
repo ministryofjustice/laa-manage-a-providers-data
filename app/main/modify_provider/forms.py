@@ -7,6 +7,7 @@ from app.constants import PROVIDER_ACTIVE_STATUS_CHOICES
 from app.fields import GovUKTableRadioField
 from app.forms import BaseForm, NoChangesMixin
 from app.main.add_a_new_provider.forms import (
+    AddAdvocateDetailsForm,
     AddBarristerDetailsForm,
     LiaisonManagerForm,
     LspDetailsForm,
@@ -258,3 +259,8 @@ class ChangeChambersDetailsForm(NoChangesMixin, ChangeOfficeContactDetailsForm):
     url = "provider/<firm('Chambers'):firm>/change-chambers-contact-details"
     title = "Chambers contact details"
     template = "modify_provider/change-chambers-contact-details-form.html"
+
+
+class ChangeAdvocateDetailsForm(NoChangesMixin, AddAdvocateDetailsForm):
+    url = "provider/<firm('Advocate'):firm>/change-advocate-details"
+    submit_button_text = "Submit"

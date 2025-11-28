@@ -316,3 +316,41 @@ class ChangeChambersDetailsFormView(ChangeOfficeContactDetailsFormView):
     def dispatch_request(self, firm: Firm, context=None, **kwargs):
         office = self.get_api().get_head_office(firm.firm_id)
         return super().dispatch_request(firm=firm, office=office, context=context, **kwargs)
+
+
+class ChangeAdvocateDetailsFormView(BaseFormView):
+    def get_success_url(self, form):
+        return url_for("main.view_provider", firm=form.firm)
+
+    def form_valid(self, form: BaseForm) -> Response:
+        data = dict(
+            firmName=form.data.get("advocate_name"),
+            advocateLevel=form.data.get("advocate_level"),
+            barCouncilRoll=form.data.get("sra_roll_number"),
+        )
+        self.get_api().update_advocate_details(form.firm.firm_id, data)
+        flash("<b>Advocate overview successfully updated<b>", category="success")
+        return super().form_valid(form)
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update({"cancel_url": self.get_success_url(form)})
+        return context
+
+    def get_form_instance(self, firm: Firm) -> BaseForm:
+        details = dict(
+            advocate_name=firm.firm_name,
+            advocate_level=firm.advocate_level,
+            sra_roll_number=firm.bar_council_roll,
+        )
+        return self.get_form_class()(firm=firm, **details)
+
+    def get(self, firm: Firm, context=None, **kwargs):
+        form = self.get_form_instance(firm)
+        return render_template(self.get_template(), **self.get_context_data(form, context))
+
+    def post(self, firm: Firm, context) -> Response | str:
+        form = self.get_form_instance(firm)
+        if form.validate_on_submit():
+            return self.form_valid(form)
+        return self.form_invalid(form)
