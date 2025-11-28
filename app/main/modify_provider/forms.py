@@ -74,7 +74,7 @@ class ChangeProviderActiveStatusForm(ChangeForm, BaseForm):
 
 
 class AssignChambersForm(BaseForm):
-    url = "provider/<firm:firm>/assign-chambers"
+    url = "provider/<firm('Advocate', 'Barrister'):firm>/assign-chambers"
     template = "add_provider/assign-chambers.html"
     success_url = "main.providers"
     submit_button_text = "Submit"
@@ -181,7 +181,6 @@ class ReassignHeadOfficeForm(BaseForm):
         validators=[],  # Set dynamically to add provider name
     )
     firm: Firm
-    current_head_office: Office
 
     def __init__(self, firm: Firm, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -190,10 +189,6 @@ class ReassignHeadOfficeForm(BaseForm):
 
         pda = current_app.extensions["pda"]
         firm_offices = pda.get_provider_offices(firm_id=self.firm.firm_id)
-        # Preload the current (without change) head office so the view can determine any changes
-        head_office = pda.get_head_office(firm_id=self.firm.firm_id)
-        self.current_head_office = head_office
-
         # Populate the choice of offices for the firm
         choices = []
         for office in firm_offices:
