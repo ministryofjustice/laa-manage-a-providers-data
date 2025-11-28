@@ -842,3 +842,8 @@ class MockProviderDataApi:
         firm_details = self._find_firm_data(firm_id)
         firm_details.update(barrister_details)
         return Firm(**firm_details)
+
+    def update_advocate_details(self, firm_id, advocate_details: dict) -> Firm:
+        firm_details = self._find_firm_data(firm_id)
+        firm_details.update(advocate_details)
+        return Firm(**firm_details)
