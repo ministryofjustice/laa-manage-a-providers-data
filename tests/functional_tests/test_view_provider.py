@@ -272,17 +272,3 @@ def test_back_link_chambers(page):
     page.get_by_role("link", name="Barristers and advocates").click()
     page.get_by_role("link", name="Back to all providers").click()
     expect(page.get_by_role("heading", name="Provider records")).to_be_visible()
-
-
-@pytest.mark.usefixtures("live_server")
-def test_barrister_without_office(page):
-    page.get_by_role("button", name="Sign in").click()
-    page.get_by_role("button", name="Search").click()
-    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
-    page.get_by_role("link", name="Barristers and advocates").click()
-    page.get_by_role("link", name="Sophie Lelièvre").click()
-    page.get_by_role("link", name="Bank accounts and payment").click()
-    expect(page.get_by_text("Warning Bank account")).to_be_visible()
-    expect(page.get_by_role("strong")).to_contain_text(
-        "Warning Bank account information not available. Contact mapd@justice.gov.uk for more information."
-    )

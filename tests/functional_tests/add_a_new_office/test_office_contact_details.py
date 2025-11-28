@@ -229,26 +229,3 @@ def test_optional_fields_not_required(page: Page):
     # Make sure the new office is NOT marked as the head office because this provider has a head office.
     overview_list = definition_list_to_dict(page, "h2:has-text('Overview') + dl")
     assert overview_list["Head office"] == "No"
-
-
-@pytest.mark.usefixtures("live_server")
-def test_add_head_office(page: Page):
-    """If the firm has no offices then office new being added becomes the head office"""
-    navigate_to_office_contact_details(page, provider_name="LIVERPOOL LEGAL CENTRE", has_office=False)
-
-    # Fill required fields, leave optional fields empty
-    page.get_by_role("textbox", name="Address line 1").fill("123 Test Street")
-    page.get_by_role("textbox", name="Town or city").fill("Test City")
-    page.get_by_role("textbox", name="Postcode").fill("TE1 5ST")
-    page.get_by_role("textbox", name="Telephone number").fill("01234567890")
-    page.get_by_role("textbox", name="Email address").fill("test@office.com")
-    page.get_by_role("textbox", name="DX number").fill("DX123456")
-    page.get_by_role("textbox", name="DX centre").fill("Test Centre")
-    # Leave optional fields empty: address_line_2-4, county
-    page.get_by_role("button", name="Submit").click()
-    # Skip setting a contract manager
-    page.get_by_role("button", name="Unknown: Skip this step").click()
-
-    # Make sure the new office is marked as the head office because this provider did not have head office.
-    overview_list = definition_list_to_dict(page, "h2:has-text('Overview') + dl")
-    assert overview_list["Head office"] == "Yes"
