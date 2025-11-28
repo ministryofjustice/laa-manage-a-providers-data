@@ -7,6 +7,7 @@ from flask import Response, abort, current_app, flash, redirect, render_template
 from app.constants import (
     DEFAULT_CONTRACT_MANAGER_NAME,
     STATUS_CONTRACT_MANAGER_FALSE_BALANCE,
+    STATUS_CONTRACT_MANAGER_INACTIVE,
     STATUS_CONTRACT_MANAGER_NAMES,
 )
 from app.forms import BaseForm
@@ -410,20 +411,19 @@ class ChangeOfficeFalseBalanceFormView(BaseFormView):
         return context
 
     def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
-        return self.get_form_class()(firm, office)
+        status = "Yes" if office.contract_manager == STATUS_CONTRACT_MANAGER_FALSE_BALANCE else "No"
+        return self.get_form_class()(firm, office, status=status)
 
     def form_valid(self, form, **kwargs) -> Response:
-        status = form.data.get("status", "")
-        if status.lower() == "yes":
-            data = {
-                "contractManager": STATUS_CONTRACT_MANAGER_FALSE_BALANCE,
-            }
-            self.get_api().update_office_false_balance(
-                firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, data=data
-            )
-            flash("<b>False balance changed to yes.</b>", category="success")
+        if form.data.get("status", "").lower() == "yes":
+            contract_manager = STATUS_CONTRACT_MANAGER_FALSE_BALANCE
         else:
-            # Todo: what should be sent to backend here?
-            pass
+            contract_manager = STATUS_CONTRACT_MANAGER_INACTIVE
 
+        data = {"contractManager": contract_manager}
+        self.get_api().update_office_false_balance(
+            firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, data=data
+        )
+
+        flash(f"<b>False balance changed to {form.data.get('status', '').lower()}.</b>", category="success")
         return super().form_valid(form, **kwargs)
