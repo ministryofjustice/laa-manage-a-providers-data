@@ -2,8 +2,14 @@ from unittest.mock import patch
 
 from flask import url_for
 
+from app.constants import (
+    STATUS_CONTRACT_MANAGER_DEFAULT,
+    STATUS_CONTRACT_MANAGER_FALSE_BALANCE,
+    STATUS_CONTRACT_MANAGER_INACTIVE,
+)
 from app.main.modify_provider.forms import ChangeProviderActiveStatusForm
 from app.main.modify_provider.views import ChangeProviderActiveStatusFormView
+from tests.unit_tests.utils import get_firm_by_name, get_firm_office_by_office_code
 
 
 class TestChangeProviderActiveStatusFormView:
@@ -62,3 +68,41 @@ class TestChangeProviderActiveStatusFormView:
         assert response.headers["Location"] == expected_redirect_url
 
         assert pda.get_provider_firm(firm.firm_id).inactive_date is not None
+
+
+class TestChangeOfficeFalseBalanceFormView:
+    def test_false_balance_set_to_yes(self, app, client):
+        """Test that setting False balance to yes changes the contract manager to Mr False Balance"""
+        firm = get_firm_by_name(app, "SMITH & PARTNERS SOLICITORS")
+        office = get_firm_office_by_office_code(app, "1A001L")
+        assert office.contract_manager == STATUS_CONTRACT_MANAGER_DEFAULT
+
+        url = url_for("main.change_office_false_balance", firm=firm, office=office)
+        payload = {"status": "Yes"}
+        client.post(url, data=payload)
+
+        # reload the office
+        office = get_firm_office_by_office_code(app, "1A001L")
+        assert office.contract_manager == STATUS_CONTRACT_MANAGER_FALSE_BALANCE
+
+    def test_false_balance_set_to_no(self, app, client):
+        """Test that changing False balance from yes to no, should set the contract manager to Mr Inactive"""
+
+        firm = get_firm_by_name(app, "SMITH & PARTNERS SOLICITORS")
+        office = get_firm_office_by_office_code(app, "1A001L")
+        assert office.contract_manager == STATUS_CONTRACT_MANAGER_DEFAULT
+
+        url = url_for("main.change_office_false_balance", firm=firm, office=office)
+        payload = {"status": "Yes"}
+        client.post(url, data=payload)
+
+        # reload the office
+        office = get_firm_office_by_office_code(app, "1A001L")
+        assert office.contract_manager == STATUS_CONTRACT_MANAGER_FALSE_BALANCE
+
+        # Change False balance to No
+        payload = {"status": "No"}
+        client.post(url, data=payload)
+        # reload the office
+        office = get_firm_office_by_office_code(app, "1A001L")
+        assert office.contract_manager == STATUS_CONTRACT_MANAGER_INACTIVE
