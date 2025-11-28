@@ -28,7 +28,7 @@
 
   {{ govukServiceNavigation({
     'serviceName': config['SERVICE_NAME'],
-    'serviceUrl': url_for('main.index')
+    'serviceUrl': url_for('main.providers') if current_user else url_for('main.index')
   }) }}
 {% endblock %}
 
