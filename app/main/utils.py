@@ -682,9 +682,11 @@ def firm_office_url_for(endpoint, firm: Firm, **kwargs) -> str:
     return url_for(endpoint, **kwargs)
 
 
-def get_firm_contract_manager(firm_id: int) -> str:
+def get_firm_contract_manager(firm_id: int) -> str | None:
     pda = current_app.extensions.get("pda")
     if not pda:
         raise RuntimeError("Provider Data API not initialized")
     head_office = pda.get_head_office(firm_id)
+    if not head_office:
+        return None
     return head_office.contract_manager

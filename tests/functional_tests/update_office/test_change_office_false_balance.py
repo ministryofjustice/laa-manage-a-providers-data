@@ -11,7 +11,7 @@ def make_inactive(page: Page):
     page.get_by_role("radio", name="Inactive").click()
     page.get_by_role("button", name="Save").click()
 
-    today = date.today().strftime("%d %b %Y")
+    today = date.today().strftime("%-d %b %Y")
     expect(page.get_by_text(f"Made inactive on {today}")).to_be_visible()
 
 
