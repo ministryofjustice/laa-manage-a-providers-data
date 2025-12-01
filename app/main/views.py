@@ -65,10 +65,16 @@ class ViewProvider(MethodView):
             _office_code = row_data.get("firm_office_code", "")
             return f"<a class='govuk-link' href='{url_for('main.view_office', firm=firm.firm_id, office=_office_code)}'>{_office_code}</a>"
 
+        def firm_office_statuses(row_data: dict[str, str]) -> str:
+            status_tags = get_office_tags(office=row_data)
+            if status_tags:
+                return f"<div>{''.join([s.render() for s in status_tags])}</div>"
+            return "<p class='govuk-visually-hidden'>No statuses</p>"
+
         office_table_structure: list[TableStructureItem] = [
             {"text": "Account number", "id": "firm_office_code", "html_renderer": firm_office_html},
             {"text": "Address", "text_renderer": format_office_address_one_line},
-            {"text": "Status", "id": "firm_number"},
+            {"text": "Status", "id": "firm_number", "html_renderer": firm_office_statuses},
         ]
 
         if head_office:
