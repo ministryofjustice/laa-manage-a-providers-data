@@ -425,5 +425,5 @@ class ChangeOfficeFalseBalanceFormView(BaseFormView):
             firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, data=data
         )
 
-        flash(f"<b>False balance changed to {form.data.get('status', '').lower()}.</b>", category="success")
+        flash(f"<b>False balance status changed to {form.data.get('status', '').lower()}.</b>", category="success")
         return super().form_valid(form, **kwargs)
