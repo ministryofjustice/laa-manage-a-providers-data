@@ -340,7 +340,7 @@ class ChangeAdvocateDetailsFormView(BaseFormView):
         context.update({"cancel_url": self.get_success_url(form)})
         return context
 
-    def get_form_instance(self, firm: Firm) -> BaseForm:
+    def get_form_instance(self, firm: Firm, context=None, **kwargs) -> BaseForm:
         details = dict(
             advocate_name=firm.firm_name,
             advocate_level=firm.advocate_level,
@@ -352,4 +352,3 @@ class ChangeAdvocateDetailsFormView(BaseFormView):
 class ChangeFirmFalseBalanceFormView(AdvocateBarristerOfficeMixin, ChangeOfficeFalseBalanceFormView):
     def get_success_url(self, form):
         return url_for("main.view_provider", firm=form.firm)
-

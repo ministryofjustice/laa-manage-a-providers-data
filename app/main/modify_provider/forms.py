@@ -263,6 +263,7 @@ class ChangeChambersDetailsForm(NoChangesMixin, ChangeOfficeContactDetailsForm):
 
 class ChangeAdvocateDetailsForm(NoChangesMixin, AddAdvocateDetailsForm):
     url = "provider/<firm('Advocate'):firm>/change-advocate-details"
+    submit_button_text = "Submit"
 
 
 class ChangeFirmFalseBalanceForm(ChangeOfficeFalseBalanceForm):
