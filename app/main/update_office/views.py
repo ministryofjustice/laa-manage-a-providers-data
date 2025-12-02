@@ -125,7 +125,7 @@ class OfficeActiveStatusFormView(BaseFormView):
         if not hasattr(form, "firm") or not hasattr(form, "office"):
             abort(400)
 
-        office_active_status = form.data.get("active_status")
+        office_active_status = form.data.get("active_status").lower()
         office = form.office
         current_status = "inactive" if office.inactive_date else "active"
         if office_active_status == current_status:
@@ -135,14 +135,17 @@ class OfficeActiveStatusFormView(BaseFormView):
         inactive_date = None
         hold_payments = None
         hold_reason = None
+        contract_manager = DEFAULT_CONTRACT_MANAGER_NAME
         if office_active_status == "inactive":
             inactive_date = datetime.date.today().strftime("%Y-%m-%d")
             hold_payments = "Y"
             hold_reason = "Office made inactive"
+            contract_manager = STATUS_CONTRACT_MANAGER_INACTIVE
         data = {
             Office.model_fields["inactive_date"].alias: inactive_date,
             Office.model_fields["hold_all_payments_flag"].alias: hold_payments,
             Office.model_fields["hold_reason"].alias: hold_reason,
+            Office.model_fields["contract_manager"].alias: contract_manager,
         }
 
         pda = current_app.extensions["pda"]
