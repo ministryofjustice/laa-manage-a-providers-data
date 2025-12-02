@@ -112,6 +112,8 @@ class OfficeActiveStatusFormView(BaseFormView):
     """Form view for the office active status form"""
 
     def get_success_url(self, form, firm, office):
+        if form.data.get("active_status", "").lower() == "active":
+            return url_for("main.change_office_contract_manager", firm=firm, office=office)
         return url_for("main.view_office", firm=firm, office=office)
 
     def form_valid(self, form):
@@ -146,7 +148,9 @@ class OfficeActiveStatusFormView(BaseFormView):
             flash("<b>Failed to update office active status</b>", "error")
             return self.form_invalid(form)
 
-        flash(f"<b>Office marked as {office_active_status}</b>", "success")
+        if office_active_status == "inactive":
+            flash(f"<b>Office marked as {office_active_status}</b>", "success")
+
         return redirect(self.get_success_url(form, form.firm, form.office))
 
     def get(self, context, firm: Firm, office: Office, **kwargs):
