@@ -41,9 +41,9 @@ def _generate_unique_office_code(existing_codes: List[str], max_attempts: int = 
     raise MockPDAError(f"Could not generate unique office code after {max_attempts} attempts")
 
 
-def _load_mock_data() -> Dict[str, Any]:
+def _load_mock_data(fixture_set: str = "ui") -> Dict[str, Any]:
     """Load mock data from JSON fixture files."""
-    fixtures_dir = os.path.join(os.path.dirname(__file__), "fixtures")
+    fixtures_dir = os.path.join(os.path.dirname(__file__), "fixtures", fixture_set)
 
     # Load all fixture files - keep raw data with relationships
     providers_data = _load_fixture(os.path.join(fixtures_dir, "providers.json"))
@@ -72,15 +72,15 @@ class MockProviderDataApi:
     predefined mock data instead of making actual HTTP requests.
     """
 
-    def __init__(self):
+    def __init__(self, fixture_set: str = "ui") -> None:
         self.app = None
         self.base_url: Optional[str] = None
         self.session = Mock()
         self.logger = logging.getLogger(__name__)
         self._initialized = False
-
+        self.fixture_set = fixture_set
         # Load mock data from fixtures
-        self._mock_data = _load_mock_data()
+        self._mock_data = _load_mock_data(fixture_set=fixture_set)
 
     def _find_office_data(self, firm_id: int, office_code: str) -> Optional[Dict[str, Any]]:
         """Find office by firm_id and office_code."""

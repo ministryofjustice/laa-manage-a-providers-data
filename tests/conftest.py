@@ -23,6 +23,7 @@ class TestConfig(Config):
     SECRET_KEY = "TEST_KEY"
     PDA_URL = "http://mock-api.test"
     PDA_API_KEY = "test-key"
+    PDA_FIXTURE_SET = "tests"
     SERVER_NAME = "localhost"
     PREFERRED_URL_SCHEME = "http"
     SKIP_AUTH = True
