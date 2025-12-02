@@ -134,6 +134,18 @@
       "jobTitle": "Liaison manager",
       "primary": "Y",
       "creationDate": "2023-12-20"
+    },
+    {
+      "contactId": 12,
+      "vendorSiteId": 1448,
+      "firstName": "Robert",
+      "lastName": "MacLeod",
+      "emailAddress": "robert.macleod@scottishlegal.com",
+      "telephoneNumber": "0131 222 3344",
+      "website": "https://www.scottishlegal.com",
+      "jobTitle": "Liaison manager",
+      "primary": "Y",
+      "creationDate": "2023-09-20"
     }
   ]
 }

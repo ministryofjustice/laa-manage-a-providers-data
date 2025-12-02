@@ -281,7 +281,7 @@
   "firmType": "Barrister",
   "constitutionalStatus": "Partnership",
   "solicitorAdvocateYN": "No",
-  "advocateLevel": null,
+  "advocateLevel": "KC",
   "barCouncilRoll": "5292932",
   "companyHouseNumber": null,
   "indemnityReceivedDate": null,
