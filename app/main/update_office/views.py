@@ -112,6 +112,8 @@ class OfficeActiveStatusFormView(BaseFormView):
     """Form view for the office active status form"""
 
     def get_success_url(self, form, firm, office):
+        if form.has_changed() and form.data.get("active_status", "").lower() == "active":
+            return url_for("main.change_office_contract_manager", firm=firm, office=office)
         return url_for("main.view_office", firm=firm, office=office)
 
     def form_valid(self, form):
@@ -146,28 +148,23 @@ class OfficeActiveStatusFormView(BaseFormView):
             flash("<b>Failed to update office active status</b>", "error")
             return self.form_invalid(form)
 
-        flash(f"<b>Office marked as {office_active_status}</b>", "success")
+        if office_active_status == "inactive":
+            flash(f"<b>Office marked as {office_active_status}</b>", "success")
+
         return redirect(self.get_success_url(form, form.firm, form.office))
 
-    def get(self, context, firm: Firm, office: Office, **kwargs):
+    def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
         active_status = "active"
         if getattr(office, "inactive_date", None):
             active_status = "inactive"
 
-        form = self.get_form_class()(firm=firm, office=office, active_status=active_status)
+        return self.get_form_class()(firm=firm, office=office, active_status=active_status)
 
-        context = self.get_context_data(form, **kwargs)
-        context.update({"office_address": format_office_address_one_line(office)})
-        context.update({"cancel_url": url_for("main.view_office", firm=firm, office=office)})
-
-        return render_template(self.template, **context)
-
-    def post(self, firm: Firm, office: Office, *args, **kwargs) -> Response | str:
-        form = self.get_form_class()(firm=firm, office=office)
-        if form.validate_on_submit():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form, **kwargs)
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update({"office_address": format_office_address_one_line(form.office)})
+        context.update({"cancel_url": url_for("main.view_office", firm=form.firm, office=form.office)})
+        return context
 
 
 class SearchBankAccountFormView(AdvocateBarristerOfficeMixin, BaseFormView):
