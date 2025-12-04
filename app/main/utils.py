@@ -420,7 +420,7 @@ def get_firm_tags(firm: Firm | dict):
         tags.append(Tag(TagType.INACTIVE))
     if firm_data.get("hold_all_payments_flag", "N") == "Y":
         tags.append(Tag(TagType.ON_HOLD))
-    if STATUS_CONTRACT_MANAGER_FALSE_BALANCE == get_firm_contract_manager(firm.firm_id):
+    if STATUS_CONTRACT_MANAGER_FALSE_BALANCE == get_firm_contract_manager(firm_data["firm_id"]):
         tags.append(Tag(TagType.FALSE_BALANCE))
     return tags
 
@@ -439,7 +439,7 @@ def get_office_tags(office: Office | dict):
     if office_data.get("hold_all_payments_flag", "N") == "Y":
         tags.append(Tag(TagType.ON_HOLD))
 
-    if office.contract_manager == STATUS_CONTRACT_MANAGER_FALSE_BALANCE:
+    if office_data["contract_manager"] == STATUS_CONTRACT_MANAGER_FALSE_BALANCE:
         tags.append(Tag(TagType.FALSE_BALANCE))
 
     return tags
