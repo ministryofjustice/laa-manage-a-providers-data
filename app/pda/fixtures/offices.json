@@ -32,7 +32,8 @@
   "policeStationAreaName": "Leicester",
   "dutySolicitorAreaName": "Leicester",
   "inactiveDate": "2025-09-25",
-  "contractManager": "Mr ISD Default"
+  "contractManager": "Mr Inactive",
+  "debtRecoveryFlag": "No"
 },
   {
   "_firmId": 1,

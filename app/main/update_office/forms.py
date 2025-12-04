@@ -159,6 +159,13 @@ class ChangeOfficeFalseBalanceForm(NoChangesMixin, UpdateOfficeBaseForm):
     submit_button_text = "Submit"
     no_changes_error_message = "You have not changed the false balance status. Cancel if you do not want to change it."
 
+
+class ChangeDebtRecoveryForm(NoChangesMixin, UpdateOfficeBaseForm):
+    url = "provider/<firm:firm>/office/<office:office>/debt-recovery-unit-referral"
+    title = "Has this office been referred to the Debt Recovery Unit?"
+    submit_button_text = "Submit"
+    no_changes_error_message = "Select no if the office is no longer referred to the Debt Recovery Unit. Cancel if you do not want to change the answer."
+
     @property
     def caption(self):
         return self.firm.firm_name
@@ -170,3 +177,6 @@ class ChangeOfficeFalseBalanceForm(NoChangesMixin, UpdateOfficeBaseForm):
         validators=[InputRequired("Please select a valid choice.")],
         default="No",
     )
+
+    def attach_no_change_error_to_element(self, error_message):
+        self.status.errors.append(error_message)

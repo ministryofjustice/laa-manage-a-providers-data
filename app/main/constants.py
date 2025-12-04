@@ -113,6 +113,7 @@ STATUS_TABLE_FIELD_CONFIG = {
         {
             "label": "Referred to debt recovery",
             "default": "No",
+            "change_link": "main.change_office_debt_recovery",
             "visible": lambda office: office.get("inactive_date") is None,
         },  # Show if inactive
         {

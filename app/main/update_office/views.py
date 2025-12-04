@@ -430,3 +430,23 @@ class ChangeOfficeFalseBalanceFormView(BaseFormView):
 
         flash(f"<b>False balance status changed to {form.data.get('status', '').lower()}.</b>", category="success")
         return super().form_valid(form, **kwargs)
+
+
+class ChangeDebtRecoveryFormView(BaseFormView):
+    def get_cancel_url(self, form: BaseForm | None = None) -> str:
+        return url_for("main.view_office", firm=form.firm, office=form.office)
+
+    def get_success_url(self, form: BaseForm | None = None) -> str:
+        status = form.data.get("status", "No").lower()
+        if status == "yes":
+            return url_for("main.view_office", firm=form.firm, office=form.office)
+        return self.get_success_url(form)
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update({"cancel_url": self.get_cancel_url(form)})
+        return context
+
+    def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
+        current_status = office.debt_recovery_flag or "No"
+        return self.get_form_class()(firm=firm, office=office, status=current_status, **kwargs)

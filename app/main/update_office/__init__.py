@@ -3,6 +3,7 @@ from app.utils import register_form_view
 from .forms import (
     BankAccountForm,
     BankAccountSearchForm,
+    ChangeDebtRecoveryForm,
     ChangeOfficeActiveStatusForm,
     ChangeOfficeContactDetailsForm,
     ChangeOfficeContractManagerForm,
@@ -13,6 +14,7 @@ from .forms import (
 from .views import (
     AddBankAccountFormView,
     ChangeContractManagerFormView,
+    ChangeDebtRecoveryFormView,
     ChangeOfficeContactDetailsFormView,
     ChangeOfficeFalseBalanceFormView,
     OfficeActiveStatusFormView,
@@ -70,4 +72,10 @@ def register_views(bp):
         view_class=ChangeOfficeFalseBalanceFormView,
         blueprint=bp,
         endpoint="change_office_false_balance",
+    )
+    register_form_view(
+        form_class=ChangeDebtRecoveryForm,
+        view_class=ChangeDebtRecoveryFormView,
+        blueprint=bp,
+        endpoint="change_office_debt_recovery",
     )
