@@ -38,6 +38,7 @@ class TestConfig(Config):
 
 @pytest.fixture(scope="session")
 def app(config=TestConfig):
+    print("tests/conftest", config, getattr(config, "PDA_FIXTURE_SET", "No fixture set specified"))
     app = create_app(config, MockProviderDataApi)
     with app.app_context():
         yield app
