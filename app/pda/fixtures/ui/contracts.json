@@ -1,0 +1,56 @@
+{"contracts": [{
+  "_firmOfficeId": 101,
+  "categoryOfLaw": "MAT",
+  "subCategoryLaw": "Not Applicable",
+  "authorisationType": "Schedule",
+  "newMatters": "Yes",
+  "contractualDevolvedPowers": "Yes - Excluding JR Proceedings",
+  "remainderAuthorisation": "Yes"
+},
+  {
+  "_firmOfficeId": 101,
+  "categoryOfLaw": "MSC",
+  "subCategoryLaw": "Not Applicable",
+  "authorisationType": "Schedule",
+  "newMatters": "Yes",
+  "contractualDevolvedPowers": "Yes - Excluding JR Proceedings",
+  "remainderAuthorisation": "Yes"
+},
+  {
+  "_firmOfficeId": 102,
+  "categoryOfLaw": "PCW",
+  "subCategoryLaw": "Not Applicable",
+  "authorisationType": "Schedule",
+  "newMatters": "Yes",
+  "contractualDevolvedPowers": "No",
+  "remainderAuthorisation": "Yes"
+},
+  {
+  "_firmOfficeId": 201,
+  "categoryOfLaw": "HOU",
+  "subCategoryLaw": "Not Applicable",
+  "authorisationType": "Schedule",
+  "newMatters": "Yes",
+  "contractualDevolvedPowers": "No",
+  "remainderAuthorisation": "Yes"
+},
+  {
+  "_firmOfficeId": 202,
+  "categoryOfLaw": "EMP",
+  "subCategoryLaw": "Not Applicable",
+  "authorisationType": "Schedule",
+  "newMatters": "Yes",
+  "contractualDevolvedPowers": "No",
+  "remainderAuthorisation": "Yes"
+},
+  {
+  "_firmOfficeId": 301,
+  "categoryOfLaw": "IMM",
+  "subCategoryLaw": "Not Applicable",
+  "authorisationType": "Schedule",
+  "newMatters": "Yes",
+  "contractualDevolvedPowers": "No",
+  "remainderAuthorisation": "Yes"
+}
+]
+}
