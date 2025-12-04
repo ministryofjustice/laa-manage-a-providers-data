@@ -1,5 +1,8 @@
+import datetime
+
 from flask import url_for
 
+from app.constants import DEFAULT_CONTRACT_MANAGER_NAME, STATUS_CONTRACT_MANAGER_INACTIVE
 from app.main.update_office.forms import BankAccountSearchForm
 from app.main.update_office.views import SearchBankAccountFormView
 from app.models import Firm, Office
@@ -62,3 +65,38 @@ class TestSearchBankAccountsFormView:
         view = SearchBankAccountFormView(form_class=BankAccountSearchForm)
         response = view.get(firm, office, context={})
         assert isinstance(response, str)
+
+
+class TestOfficeActiveStatusFormView:
+    def test_change_inactive_to_active(self, app, client):
+        pda = app.extensions["pda"]
+        firm = pda.create_provider_firm(
+            Firm(
+                **{
+                    "firmId": 12345,
+                    "firmName": "Test firm name",
+                    "firmType": "Legal Services Provider",
+                }
+            )
+        )
+        office = pda.create_provider_office(
+            Office(
+                **{
+                    "firmOfficeId": 12345,
+                    "officeName": "Test office name",
+                    "firm_office_code": "10001",
+                    "inactiveDate": datetime.date.today(),
+                    "contractManager": STATUS_CONTRACT_MANAGER_INACTIVE,
+                }
+            ),
+            firm_id=firm.firm_id,
+        )
+
+        url = url_for("main.office_active_status_form", firm=firm, office=office)
+        payload = dict(active_status="active")
+        response = client.post(url, data=payload)
+        assert response.status_code == 302
+
+        office = pda.get_provider_office(office.firm_office_code)
+        assert office.contract_manager == DEFAULT_CONTRACT_MANAGER_NAME
+        assert office.inactive_date is None
