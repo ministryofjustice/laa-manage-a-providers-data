@@ -8,7 +8,7 @@ from wtforms.validators import DataRequired, InputRequired, Length
 
 from app.components.tables import DataTable, RadioDataTable, TableStructureItem
 from app.forms import BaseForm
-from app.main.utils import get_firm_account_number
+from app.main.utils import get_firm_account_number, get_firm_tags
 from app.models import BankAccount, Firm
 from app.utils.formatting import format_sentence_case, normalize_for_search
 from app.validators import ValidateAccountNumber, ValidateSortCode
@@ -24,7 +24,9 @@ def firm_name_html(row_data: dict[str, str]) -> str:
 
 
 def get_firm_statuses(row_data):
-    # Add logic to render firm status tags here when available.
+    status_tags = get_firm_tags(firm=row_data)
+    if status_tags:
+        return f"<div>{''.join([s.render() for s in status_tags])}</div>"
     return "<p class='govuk-visually-hidden'>No statuses</p>"
 
 

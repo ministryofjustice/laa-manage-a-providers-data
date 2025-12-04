@@ -20,3 +20,6 @@ class Tag:
 
     def to_gov_params(self):
         return {"text": self.tag_type.text, "class": self.tag_type.css_class}
+
+    def render(self) -> str:
+        return f"<strong class='govuk-tag {self.tag_type.css_class}'>{self.tag_type.text}</strong>"
