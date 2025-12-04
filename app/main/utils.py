@@ -439,7 +439,7 @@ def get_office_tags(office: Office | dict):
     if office_data.get("hold_all_payments_flag", "N") == "Y":
         tags.append(Tag(TagType.ON_HOLD))
 
-    if office_data["contract_manager"] == STATUS_CONTRACT_MANAGER_FALSE_BALANCE:
+    if office_data.get("contract_manager") == STATUS_CONTRACT_MANAGER_FALSE_BALANCE:
         tags.append(Tag(TagType.FALSE_BALANCE))
 
     return tags
