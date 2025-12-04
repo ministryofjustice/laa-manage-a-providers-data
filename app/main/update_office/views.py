@@ -450,3 +450,10 @@ class ChangeDebtRecoveryFormView(BaseFormView):
     def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
         current_status = office.debt_recovery_flag or "No"
         return self.get_form_class()(firm=firm, office=office, status=current_status, **kwargs)
+
+    def form_valid(self, form: BaseForm) -> Response:
+        self.get_api().update_office_debt_referral(
+            firm_id=form.firm.firm_id, office_code=form.office.office_code, debt_referral=form.data.get("debt_referral")
+        )
+        flash(f"Office {form.office.firm_office_code} is not referred to the Debt Recovery Unit.")
+        return super().form_valid(form)
