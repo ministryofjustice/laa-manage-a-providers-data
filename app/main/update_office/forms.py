@@ -159,6 +159,18 @@ class ChangeOfficeFalseBalanceForm(NoChangesMixin, UpdateOfficeBaseForm):
     submit_button_text = "Submit"
     no_changes_error_message = "You have not changed the false balance status. Cancel if you do not want to change it."
 
+    @property
+    def caption(self):
+        return self.firm.firm_name
+
+    status = RadioField(
+        label="",
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
+        choices=YES_NO_CHOICES,
+        validators=[InputRequired("Please select a valid choice.")],
+        default="No",
+    )
+
 
 class ChangeDebtRecoveryForm(NoChangesMixin, UpdateOfficeBaseForm):
     url = "provider/<firm:firm>/office/<office:office>/debt-recovery-unit-referral"
