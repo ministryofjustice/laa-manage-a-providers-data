@@ -4,7 +4,12 @@ from typing import Any
 
 from flask import Response, abort, current_app, flash, redirect, render_template, request, session, url_for
 
-from app.constants import DEFAULT_CONTRACT_MANAGER_NAME, STATUS_CONTRACT_MANAGER_NAMES
+from app.constants import (
+    DEFAULT_CONTRACT_MANAGER_NAME,
+    STATUS_CONTRACT_MANAGER_FALSE_BALANCE,
+    STATUS_CONTRACT_MANAGER_INACTIVE,
+    STATUS_CONTRACT_MANAGER_NAMES,
+)
 from app.forms import BaseForm
 from app.main.forms import NoBankAccountsError
 from app.main.utils import firm_office_url_for
@@ -120,7 +125,7 @@ class OfficeActiveStatusFormView(BaseFormView):
         if not hasattr(form, "firm") or not hasattr(form, "office"):
             abort(400)
 
-        office_active_status = form.data.get("active_status")
+        office_active_status = form.data.get("active_status").lower()
         office = form.office
         current_status = "inactive" if office.inactive_date else "active"
         if office_active_status == current_status:
@@ -130,14 +135,17 @@ class OfficeActiveStatusFormView(BaseFormView):
         inactive_date = None
         hold_payments = None
         hold_reason = None
+        contract_manager = DEFAULT_CONTRACT_MANAGER_NAME
         if office_active_status == "inactive":
             inactive_date = datetime.date.today().strftime("%Y-%m-%d")
             hold_payments = "Y"
             hold_reason = "Office made inactive"
+            contract_manager = STATUS_CONTRACT_MANAGER_INACTIVE
         data = {
             Office.model_fields["inactive_date"].alias: inactive_date,
             Office.model_fields["hold_all_payments_flag"].alias: hold_payments,
             Office.model_fields["hold_reason"].alias: hold_reason,
+            Office.model_fields["contract_manager"].alias: contract_manager,
         }
 
         pda = current_app.extensions["pda"]
@@ -392,3 +400,33 @@ class ChangeContractManagerFormView(BaseFormView):
         if form.validate_on_submit():
             return self.form_valid(form)
         return self.form_invalid(form, **kwargs)
+
+
+class ChangeOfficeFalseBalanceFormView(BaseFormView):
+    def get_success_url(self, form):
+        return url_for("main.view_office", firm=form.firm, office=form.office)
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update(
+            {"cancel_url": self.get_success_url(form), "office_address": format_office_address_one_line(form.office)}
+        )
+        return context
+
+    def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
+        status = "Yes" if office.contract_manager == STATUS_CONTRACT_MANAGER_FALSE_BALANCE else "No"
+        return self.get_form_class()(firm, office, status=status)
+
+    def form_valid(self, form, **kwargs) -> Response:
+        if form.data.get("status", "").lower() == "yes":
+            contract_manager = STATUS_CONTRACT_MANAGER_FALSE_BALANCE
+        else:
+            contract_manager = STATUS_CONTRACT_MANAGER_INACTIVE
+
+        data = {"contractManager": contract_manager}
+        self.get_api().update_office_false_balance(
+            firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, data=data
+        )
+
+        flash(f"<b>False balance status changed to {form.data.get('status', '').lower()}.</b>", category="success")
+        return super().form_valid(form, **kwargs)
