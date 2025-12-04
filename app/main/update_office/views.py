@@ -433,14 +433,16 @@ class ChangeOfficeFalseBalanceFormView(BaseFormView):
 
 
 class ChangeDebtRecoveryFormView(BaseFormView):
+    success_endpoint = "main.view_office"
+
     def get_cancel_url(self, form: BaseForm | None = None) -> str:
         return url_for("main.view_office", firm=form.firm, office=form.office)
 
+    def get_yes_success_url(self, form: BaseForm | None = None) -> str:
+        return url_for("main.view_office", firm=form.firm, office=form.office)
+
     def get_success_url(self, form: BaseForm | None = None) -> str:
-        status = form.data.get("status", "No").lower()
-        if status == "yes":
-            return url_for("main.view_office", firm=form.firm, office=form.office)
-        return self.get_success_url(form)
+        return url_for("main.view_office", firm=form.firm, office=form.office)
 
     def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(form, context, **kwargs)
@@ -452,8 +454,15 @@ class ChangeDebtRecoveryFormView(BaseFormView):
         return self.get_form_class()(firm=firm, office=office, status=current_status, **kwargs)
 
     def form_valid(self, form: BaseForm) -> Response:
-        self.get_api().update_office_debt_referral(
-            firm_id=form.firm.firm_id, office_code=form.office.office_code, debt_referral=form.data.get("debt_referral")
+        status = form.data.get("status")
+        self.get_api().update_office_debt_recovery(
+            firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, debt_recovery=status
         )
-        flash(f"Office {form.office.firm_office_code} is not referred to the Debt Recovery Unit.")
-        return super().form_valid(form)
+        if status == "Yes":
+            flash(f"{form.office.firm_office_code} is referred to the Debt Recovery Unit", category="success")
+            return redirect(self.get_yes_success_url(form))
+        else:
+            flash(
+                f"Office {form.office.firm_office_code} is not referred to the Debt Recovery Unit.", category="success"
+            )
+            return redirect(self.get_success_url(form))
