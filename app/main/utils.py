@@ -9,6 +9,7 @@ from app.components.tag import Tag, TagType
 from app.constants import (
     STATUS_CONTRACT_MANAGER_DEBT_RECOVERY,
     STATUS_CONTRACT_MANAGER_DEFAULT,
+    STATUS_CONTRACT_MANAGER_FALSE_BALANCE,
     STATUS_CONTRACT_MANAGER_NAMES,
 )
 from app.models import BankAccount, Contact, Firm, Office
@@ -406,21 +407,41 @@ def _replicate_office_contacts(
     return replicated_contacts
 
 
-def get_firm_tags(firm: Firm):
+def get_firm_tags(firm: Firm | dict):
     tags: list[Tag] = []
-    if firm.inactive_date:
+    if hasattr(firm, "to_internal_dict"):
+        firm_data = firm.to_internal_dict()
+    elif isinstance(firm, dict):
+        firm_data = firm
+    else:
+        raise TypeError("Firm must be of type dict or Firm")
+
+    if firm_data.get("inactive_date"):
         tags.append(Tag(TagType.INACTIVE))
-    if firm.hold_all_payments_flag == "Y":
+    if firm_data.get("hold_all_payments_flag", "N") == "Y":
         tags.append(Tag(TagType.ON_HOLD))
+    if STATUS_CONTRACT_MANAGER_FALSE_BALANCE == get_firm_contract_manager(firm_data["firm_id"]):
+        tags.append(Tag(TagType.FALSE_BALANCE))
     return tags
 
 
-def get_office_tags(office: Office):
+def get_office_tags(office: Office | dict):
     tags: list[Tag] = []
-    if office.inactive_date:
+    if hasattr(office, "to_internal_dict"):
+        office_data = office.to_internal_dict()
+    elif isinstance(office, dict):
+        office_data = office
+    else:
+        raise TypeError("Office must be of type dict or Office")
+
+    if office_data.get("inactive_date"):
         tags.append(Tag(TagType.INACTIVE))
-    if office.hold_all_payments_flag == "Y":
+    if office_data.get("hold_all_payments_flag", "N") == "Y":
         tags.append(Tag(TagType.ON_HOLD))
+
+    if office_data.get("contract_manager") == STATUS_CONTRACT_MANAGER_FALSE_BALANCE:
+        tags.append(Tag(TagType.FALSE_BALANCE))
+
     return tags
 
 
@@ -618,6 +639,28 @@ def get_entity_referred_to_debt_recovery_text(entity: dict) -> str:
     return "No"
 
 
+def get_firm_false_balance_text(entity: dict) -> str:
+    pda = current_app.extensions.get("pda")
+    if not pda:
+        raise RuntimeError("Provider Data API not initialized")
+    head_office = pda.get_head_office(entity["firm_id"])
+    if not head_office:
+        return "No"
+
+    return get_office_false_balance_text(head_office.to_internal_dict())
+
+
+def get_office_false_balance_text(office: dict) -> str:
+    contract_manager = office.get("contract_manager")
+    if not contract_manager:
+        return "No"
+
+    if contract_manager == STATUS_CONTRACT_MANAGER_FALSE_BALANCE:
+        return "Yes"
+
+    return "No"
+
+
 def firm_office_url_for(endpoint, firm: Firm, **kwargs) -> str:
     kwargs["firm"] = firm
     if firm.is_advocate or firm.is_barrister:
@@ -637,3 +680,13 @@ def firm_office_url_for(endpoint, firm: Firm, **kwargs) -> str:
                 del kwargs["office"]
 
     return url_for(endpoint, **kwargs)
+
+
+def get_firm_contract_manager(firm_id: int) -> str | None:
+    pda = current_app.extensions.get("pda")
+    if not pda:
+        raise RuntimeError("Provider Data API not initialized")
+    head_office = pda.get_head_office(firm_id)
+    if not head_office:
+        return None
+    return head_office.contract_manager

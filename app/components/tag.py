@@ -5,6 +5,7 @@ class TagType(Enum):
     INACTIVE = ("Inactive", "govuk-tag--grey")
     ON_HOLD = ("On hold", "govuk-tag--yellow")
     FIRM_INTERVENED = ("Firm intervened", "govuk-tag--pink")
+    FALSE_BALANCE = ("False balance", "govuk-tag--blue")
 
     def __init__(self, text, css_class):
         self.text = text
@@ -20,3 +21,6 @@ class Tag:
 
     def to_gov_params(self):
         return {"text": self.tag_type.text, "class": self.tag_type.css_class}
+
+    def render(self) -> str:
+        return f"<strong class='govuk-tag {self.tag_type.css_class}'>{self.tag_type.text}</strong>"

@@ -98,7 +98,7 @@ jobs:
           COMMIT_MSG=$(git log -1 --pretty=format:"%s" ${{ github.sha }} 2>/dev/null || echo "Latest changes")
           
           # Create comment
-          gh pr comment ${{ github.event.number }} --body "## 🚀 Ephermal Deployment Successful
+          gh pr comment ${{ github.event.number }} --body "## 🚀 Ephemeral Deployment Successful
           
           **Build:** [\`${SHORT_SHA}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) • ${COMMIT_MSG}
           
