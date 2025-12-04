@@ -10,7 +10,7 @@ from unittest.mock import Mock
 
 from pydantic import ValidationError
 
-from app.constants import FirmType, YesNo
+from app.constants import FirmType
 from app.models import BankAccount, Contact, Firm, Office
 from app.pda.errors import ProviderDataApiError
 
@@ -851,7 +851,7 @@ class MockProviderDataApi:
     def update_office_false_balance(self, firm_id: int, office_code: str, data: dict) -> Office:
         return self.patch_office(firm_id, office_code, data)
 
-    def update_office_debt_recovery(self, firm_id: int, office_code: str, debt_recovery: YesNo) -> Office:
+    def update_office_debt_recovery(self, firm_id: int, office_code: str, data: dict) -> Office:
         office_data = self._find_office_data(firm_id, office_code)
-        office_data.update({"debtRecoveryFlag": debt_recovery})
+        office_data.update(data)
         return Office(**_clean_data(office_data))

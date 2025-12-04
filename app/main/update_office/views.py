@@ -6,6 +6,7 @@ from flask import Response, abort, current_app, flash, redirect, render_template
 
 from app.constants import (
     DEFAULT_CONTRACT_MANAGER_NAME,
+    STATUS_CONTRACT_MANAGER_DEBT_RECOVERY,
     STATUS_CONTRACT_MANAGER_FALSE_BALANCE,
     STATUS_CONTRACT_MANAGER_INACTIVE,
     STATUS_CONTRACT_MANAGER_NAMES,
@@ -433,13 +434,11 @@ class ChangeOfficeFalseBalanceFormView(BaseFormView):
 
 
 class ChangeDebtRecoveryFormView(BaseFormView):
-    success_endpoint = "main.view_office"
-
     def get_cancel_url(self, form: BaseForm | None = None) -> str:
         return url_for("main.view_office", firm=form.firm, office=form.office)
 
-    def get_yes_success_url(self, form: BaseForm | None = None) -> str:
-        return url_for("main.view_office", firm=form.firm, office=form.office)
+    def get_no_success_url(self, form: BaseForm | None = None) -> str:
+        return url_for("main.change_office_contract_manager", firm=form.firm, office=form.office)
 
     def get_success_url(self, form: BaseForm | None = None) -> str:
         return url_for("main.view_office", firm=form.firm, office=form.office)
@@ -455,14 +454,20 @@ class ChangeDebtRecoveryFormView(BaseFormView):
 
     def form_valid(self, form: BaseForm) -> Response:
         status = form.data.get("status")
+        payload = {
+            "debtRecoveryFlag": status,
+            "contractManager": STATUS_CONTRACT_MANAGER_DEBT_RECOVERY
+            if status == "Yes"
+            else DEFAULT_CONTRACT_MANAGER_NAME,
+        }
         self.get_api().update_office_debt_recovery(
-            firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, debt_recovery=status
+            firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, data=payload
         )
         if status == "Yes":
             flash(f"{form.office.firm_office_code} is referred to the Debt Recovery Unit", category="success")
-            return redirect(self.get_yes_success_url(form))
+            return redirect(self.get_success_url(form))
         else:
             flash(
                 f"Office {form.office.firm_office_code} is not referred to the Debt Recovery Unit.", category="success"
             )
-            return redirect(self.get_success_url(form))
+            return redirect(self.get_no_success_url(form))

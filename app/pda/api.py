@@ -580,13 +580,13 @@ class ProviderDataApi:
             "Updating office false balance is currently not supported by the real Provider Data API"
         )
 
-    def update_office_debt_recovery(self, firm_id: int, office_code: str, debt_recovery: YesNo) -> Office:
+    def update_office_debt_recovery(self, firm_id: int, office_code: str, data: YesNo) -> Office:
         """
         Update an existing office debt recovery.
         Args:
             firm_id: The advocate firm Id
             office_code: The code of the office to update
-            debt_recovery: Yes | No
+            data: a dict containing the office fields to update
 
         Returns: Office
         """
