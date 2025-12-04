@@ -9,6 +9,7 @@ class TestGetOfficeTags:
     def test_office_with_inactive_date_returns_inactive_tag(self):
         office = Mock()
         office.inactive_date = date(2024, 9, 12)
+        office.to_internal_dict = Mock(return_value={"inactive_date": office.inactive_date})
 
         tags = get_office_tags(office)
 
@@ -20,6 +21,7 @@ class TestGetOfficeTags:
     def test_office_without_inactive_date_returns_empty_list(self):
         office = Mock()
         office.inactive_date = None
+        office.to_internal_dict = Mock(return_value={"inactive_date": office.inactive_date})
 
         tags = get_office_tags(office)
 
@@ -29,6 +31,7 @@ class TestGetOfficeTags:
     def test_office_with_falsy_inactive_date_returns_empty_list(self):
         office = Mock()
         office.inactive_date = ""
+        office.to_internal_dict = Mock(return_value={"inactive_date": office.inactive_date})
 
         tags = get_office_tags(office)
 

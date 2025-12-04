@@ -104,7 +104,10 @@ class ChangeProviderActiveStatusFormView(FullWidthBaseFormView):
             context.update(
                 {
                     "main_table": get_main_table(
-                        form.firm, head_office=context.get("head_office"), parent_firm=context.get("parent_provider")
+                        form.firm,
+                        head_office=context.get("head_office"),
+                        parent_firm=context.get("parent_provider"),
+                        include_links=False,
                     ),
                 }
             )

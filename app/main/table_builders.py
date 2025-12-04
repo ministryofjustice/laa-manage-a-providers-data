@@ -81,7 +81,7 @@ def _add_table_row_from_config(
     )
 
 
-def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | None) -> SummaryList:
+def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | None, include_links=True) -> SummaryList:
     """Creates the main overview table for a firm."""
     data_source_map = {
         "firm": firm.to_internal_dict() if firm else {},
@@ -99,7 +99,7 @@ def get_main_table(firm: Firm, head_office: Office | None, parent_firm: Firm | N
         configured_action_urls: dict = field.get("row_action_urls", None)
         row_action_urls: dict | None = None
         # If we have row actions, replace endpoints with generated URLs
-        if configured_action_urls:
+        if include_links and configured_action_urls:
             row_action_urls = {}
             for action_key, data in configured_action_urls.items():
                 endpoint = data
