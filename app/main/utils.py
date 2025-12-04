@@ -406,20 +406,34 @@ def _replicate_office_contacts(
     return replicated_contacts
 
 
-def get_firm_tags(firm: Firm):
+def get_firm_tags(firm: Firm | dict):
     tags: list[Tag] = []
-    if firm.inactive_date:
+    if hasattr(firm, "to_internal_dict"):
+        firm_data = firm.to_internal_dict()
+    elif isinstance(firm, dict):
+        firm_data = firm
+    else:
+        raise TypeError("Firm must be of type dict or Firm")
+
+    if firm_data.get("inactive_date"):
         tags.append(Tag(TagType.INACTIVE))
-    if firm.hold_all_payments_flag == "Y":
+    if firm_data.get("hold_all_payments_flag", "N") == "Y":
         tags.append(Tag(TagType.ON_HOLD))
     return tags
 
 
-def get_office_tags(office: Office):
+def get_office_tags(office: Office | dict):
     tags: list[Tag] = []
-    if office.inactive_date:
+    if hasattr(office, "to_internal_dict"):
+        office_data = office.to_internal_dict()
+    elif isinstance(office, dict):
+        office_data = office
+    else:
+        raise TypeError("Office must be of type dict or Office")
+
+    if office_data.get("inactive_date"):
         tags.append(Tag(TagType.INACTIVE))
-    if office.hold_all_payments_flag == "Y":
+    if office_data.get("hold_all_payments_flag", "N") == "Y":
         tags.append(Tag(TagType.ON_HOLD))
     return tags
 
