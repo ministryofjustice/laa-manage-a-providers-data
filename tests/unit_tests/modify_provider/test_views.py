@@ -3,7 +3,6 @@ from unittest.mock import patch
 from flask import url_for
 
 from app.constants import (
-    STATUS_CONTRACT_MANAGER_DEFAULT,
     STATUS_CONTRACT_MANAGER_FALSE_BALANCE,
     STATUS_CONTRACT_MANAGER_INACTIVE,
 )
@@ -75,7 +74,7 @@ class TestChangeOfficeFalseBalanceFormView:
         """Test that setting False balance to yes changes the contract manager to Mr False Balance"""
         firm = get_firm_by_name(app, "SMITH & PARTNERS SOLICITORS")
         office = get_firm_office_by_office_code(app, "1A001L")
-        assert office.contract_manager == STATUS_CONTRACT_MANAGER_DEFAULT
+        assert office.contract_manager == STATUS_CONTRACT_MANAGER_INACTIVE
 
         url = url_for("main.change_office_false_balance", firm=firm, office=office)
         payload = {"status": "Yes"}
@@ -90,7 +89,7 @@ class TestChangeOfficeFalseBalanceFormView:
 
         firm = get_firm_by_name(app, "SMITH & PARTNERS SOLICITORS")
         office = get_firm_office_by_office_code(app, "1A001L")
-        assert office.contract_manager == STATUS_CONTRACT_MANAGER_DEFAULT
+        assert office.contract_manager == STATUS_CONTRACT_MANAGER_INACTIVE
 
         url = url_for("main.change_office_false_balance", firm=firm, office=office)
         payload = {"status": "Yes"}
