@@ -433,15 +433,21 @@ class ChangeOfficeFalseBalanceFormView(BaseFormView):
         return super().form_valid(form, **kwargs)
 
 
-class ChangeDebtRecoveryFormView(BaseFormView):
+class ChangeOfficeDebtRecoveryFormView(BaseFormView):
     def get_cancel_url(self, form: BaseForm | None = None) -> str:
         return url_for("main.view_office", firm=form.firm, office=form.office)
 
-    def get_no_success_url(self, form: BaseForm | None = None) -> str:
+    def get_no_value_success_url(self, form: BaseForm | None = None) -> str:
         return url_for("main.change_office_contract_manager", firm=form.firm, office=form.office)
 
     def get_success_url(self, form: BaseForm | None = None) -> str:
         return url_for("main.view_office", firm=form.firm, office=form.office)
+
+    def get_yes_value_success_message(self, form: BaseForm | None = None) -> str:
+        return f"{form.office.firm_office_code} is referred to the Debt Recovery Unit"
+
+    def get_no_value_success_message(self, form: BaseForm | None = None) -> str:
+        return f"Office {form.office.firm_office_code} is not referred to the Debt Recovery Unit."
 
     def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(form, context, **kwargs)
@@ -464,10 +470,8 @@ class ChangeDebtRecoveryFormView(BaseFormView):
             firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, data=payload
         )
         if status == "Yes":
-            flash(f"{form.office.firm_office_code} is referred to the Debt Recovery Unit", category="success")
+            flash(self.get_yes_value_success_message(form), category="success")
             return redirect(self.get_success_url(form))
         else:
-            flash(
-                f"Office {form.office.firm_office_code} is not referred to the Debt Recovery Unit.", category="success"
-            )
-            return redirect(self.get_no_success_url(form))
+            flash(self.get_no_value_success_message(form), category="success")
+            return redirect(self.get_no_value_success_url(form))
