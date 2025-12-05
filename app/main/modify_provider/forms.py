@@ -12,7 +12,11 @@ from app.main.add_a_new_provider.forms import (
     LiaisonManagerForm,
     LspDetailsForm,
 )
-from app.main.update_office import ChangeOfficeContactDetailsForm, ChangeOfficeFalseBalanceForm
+from app.main.update_office import (
+    ChangeOfficeContactDetailsForm,
+    ChangeOfficeDebtRecoveryForm,
+    ChangeOfficeFalseBalanceForm,
+)
 from app.main.utils import get_firm_account_number
 from app.models import Firm, Office
 from app.utils.formatting import format_office_address_one_line, normalize_for_search
@@ -270,3 +274,10 @@ class ChangeFirmFalseBalanceForm(ChangeOfficeFalseBalanceForm):
     url = "provider/<firm('Barrister','Advocate'):firm>/change-false-balance"
     title = "Do they have a false balance?"
     submit_button_text = "Submit"
+
+
+class ChangeFirmDebtRecoveryForm(ChangeOfficeDebtRecoveryForm):
+    url = "provider/<firm('Barrister','Advocate'):firm>/debt-recovery-unit-referral"
+    title = "Have they have been referred to the Debt Recovery Unit?"
+    yes_no_changes_error_message = "Select no if they are no longer referred to the Debt Recovery Unit. Cancel if you do not want to change the answer."
+    no_no_changes_error_message = "Select yes if they have been referred to the Debt Recovery Unit. Cancel if you do not want to change the answer."
