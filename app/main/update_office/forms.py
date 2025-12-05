@@ -181,7 +181,7 @@ class ChangeOfficeDebtRecoveryForm(NoChangesMixin, UpdateOfficeBaseForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.status.default == "Yes":
+        if self.status.data == "Yes":
             self.no_changes_error_message = self.yes_no_changes_error_message
         else:
             self.no_changes_error_message = self.no_no_changes_error_message
