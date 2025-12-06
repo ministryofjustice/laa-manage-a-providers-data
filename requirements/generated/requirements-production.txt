@@ -43,7 +43,7 @@ sentry-sdk==2.37.0
 structlog==25.4.0
 typing-extensions==4.15.0
 typing-inspection==0.4.1
-urllib3==2.5.0
+urllib3==2.6.0
 werkzeug==3.1.4
 wrapt==1.17.3
 wtforms==3.2.1
