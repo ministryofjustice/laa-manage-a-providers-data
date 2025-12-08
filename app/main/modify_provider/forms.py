@@ -51,7 +51,7 @@ class ChangeOfficeLiaisonManagerForm(ChangeLiaisonManagerForm):
         self.office = office
 
 
-class ChangeProviderActiveStatusForm(ChangeForm, BaseForm):
+class ChangeProviderActiveStatusForm(NoChangesMixin, ChangeForm, BaseForm):
     def __init__(self, firm: Firm, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.firm = firm
@@ -68,6 +68,7 @@ class ChangeProviderActiveStatusForm(ChangeForm, BaseForm):
 
     title = "Change active status"
     url = "provider/<firm:firm>/confirm-provider-status"
+    no_changes_error_message = "You have not changed the active status. Cancel if you do not want to change it."
     template = "modify_provider/form.html"
     status = RadioField(
         "",
@@ -76,6 +77,9 @@ class ChangeProviderActiveStatusForm(ChangeForm, BaseForm):
         ),
         choices=PROVIDER_ACTIVE_STATUS_CHOICES,
     )
+
+    def attach_no_change_error_to_element(self, error_message):
+        self.status.errors.append(error_message)
 
 
 class AssignChambersForm(BaseForm):
