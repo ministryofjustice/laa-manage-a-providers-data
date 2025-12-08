@@ -79,6 +79,7 @@ class MockProviderDataApi:
         self.logger = logging.getLogger(__name__)
         self._initialized = False
         self.fixture_set = fixture_set
+        self.logger.info(f"Initializing Mock Provider Data API using fixture set: {self.fixture_set}")
         # Load mock data from fixtures
         self._mock_data = _load_mock_data(fixture_set=fixture_set)
 
