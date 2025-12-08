@@ -3,6 +3,8 @@ from unittest.mock import patch
 from flask import url_for
 
 from app.constants import (
+    DEFAULT_CONTRACT_MANAGER_NAME,
+    STATUS_CONTRACT_MANAGER_DEBT_RECOVERY,
     STATUS_CONTRACT_MANAGER_FALSE_BALANCE,
     STATUS_CONTRACT_MANAGER_INACTIVE,
 )
@@ -105,3 +107,41 @@ class TestChangeOfficeFalseBalanceFormView:
         # reload the office
         office = get_firm_office_by_office_code(app, "1A001L")
         assert office.contract_manager == STATUS_CONTRACT_MANAGER_INACTIVE
+
+
+class TestChangeOfficeDebtRecoveryFormView:
+    def test_debt_recovery_set_to_yes(self, app, client):
+        """Test that setting Debt recovery to yes changes the contract manager to Mr Debt Recovery"""
+        firm = get_firm_by_name(app, "SMITH & PARTNERS SOLICITORS")
+        office = get_firm_office_by_office_code(app, "1A001L")
+        assert office.contract_manager == STATUS_CONTRACT_MANAGER_INACTIVE
+
+        url = url_for("main.change_office_debt_recovery", firm=firm, office=office)
+        payload = {"status": "Yes"}
+        client.post(url, data=payload)
+
+        # reload the office
+        office = get_firm_office_by_office_code(app, "1A001L")
+        assert office.contract_manager == STATUS_CONTRACT_MANAGER_DEBT_RECOVERY
+
+    def test_debt_recovery_set_to_no(self, app, client):
+        """Test that changing Debt recovery from yes to no, should set the contract manager to Mr ISD Default"""
+
+        firm = get_firm_by_name(app, "SMITH & PARTNERS SOLICITORS")
+        office = get_firm_office_by_office_code(app, "1A001L")
+        assert office.contract_manager == STATUS_CONTRACT_MANAGER_INACTIVE
+
+        url = url_for("main.change_office_debt_recovery", firm=firm, office=office)
+        payload = {"status": "Yes"}
+        client.post(url, data=payload)
+
+        # reload the office
+        office = get_firm_office_by_office_code(app, "1A001L")
+        assert office.contract_manager == STATUS_CONTRACT_MANAGER_DEBT_RECOVERY
+
+        # Change Debt recovery to No
+        payload = {"status": "No"}
+        client.post(url, data=payload)
+        # reload the office
+        office = get_firm_office_by_office_code(app, "1A001L")
+        assert office.contract_manager == DEFAULT_CONTRACT_MANAGER_NAME
