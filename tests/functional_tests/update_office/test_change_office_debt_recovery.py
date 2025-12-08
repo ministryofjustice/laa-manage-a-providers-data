@@ -4,9 +4,7 @@ from playwright.sync_api import Page, expect
 from tests.functional_tests.utils import definition_list_to_dict, navigate_to_provider_page
 
 
-def change_and_confirm_debt_recovery(
-    page: Page, debt_recovery: str, office_code: str = None, provider_name: str = None
-):
+def change_and_confirm_debt_recovery(page: Page, debt_recovery: str, office_code: str):
     page.get_by_role("link", name="Change referred to debt recovery").click()
     expect(page.get_by_role("heading", name="Has this office been referred to the Debt Recovery Unit?", exact=True))
     page.get_by_role("radio", name=debt_recovery).click()
@@ -15,11 +13,6 @@ def change_and_confirm_debt_recovery(
         text = f"{office_code} is referred to the Debt Recovery Unit"
         if debt_recovery.lower() in "no":
             text = f"Office {office_code} is not referred to the Debt Recovery Unit."
-        expect(page.get_by_text(text)).to_be_visible()
-    elif provider_name:
-        text = f"{provider_name} is referred to the Debt Recovery Unit"
-        if debt_recovery.lower() in "no":
-            text = f"{provider_name} is not referred to the Debt Recovery Unit."
         expect(page.get_by_text(text)).to_be_visible()
 
     # If we are changing from yes to no then we will be taken to the `assign contract manager` page which
@@ -103,4 +96,4 @@ def test_change_office_debt_recovery_no(page: Page):
 
     # Check we are on the assign contract manager page
     expect(page.get_by_role("heading", name="Assign contract manager")).to_be_visible()
-    expect(page.get_by_role("textbox", name="Search for a contract manager"))
+    expect(page.get_by_role("textbox", name="Search for a contract manager")).to_be_visible()

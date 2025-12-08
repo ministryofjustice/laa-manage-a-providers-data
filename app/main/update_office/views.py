@@ -434,9 +434,6 @@ class ChangeOfficeFalseBalanceFormView(BaseFormView):
 
 
 class ChangeOfficeDebtRecoveryFormView(BaseFormView):
-    def get_cancel_url(self, form: BaseForm | None = None) -> str:
-        return url_for("main.view_office", firm=form.firm, office=form.office)
-
     def get_no_value_success_url(self, form: BaseForm | None = None) -> str:
         return url_for("main.change_office_contract_manager", firm=form.firm, office=form.office)
 
@@ -451,7 +448,7 @@ class ChangeOfficeDebtRecoveryFormView(BaseFormView):
 
     def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(form, context, **kwargs)
-        context.update({"cancel_url": self.get_cancel_url(form)})
+        context.update({"cancel_url": self.get_success_url(form)})
         return context
 
     def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
