@@ -43,6 +43,7 @@ class Config(object):
     SKIP_AUTH = os.environ.get("ENTRA_ID_SKIP_AUTH", "false").lower() == "true"
 
     PDA_USE_MOCK_API = os.environ.get("PDA_USE_MOCK_API", "False").lower() == "true"
+    PDA_FIXTURE_SET = os.environ.get("PDA_FIXTURE_SET", "ui")
     PDA_URL = os.environ.get("PDA_URL")
     PDA_ENVIRONMENT = os.environ.get("PDA_ENVIRONMENT")
     PDA_API_KEY = os.environ.get("PDA_API_KEY")

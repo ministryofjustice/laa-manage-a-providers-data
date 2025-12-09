@@ -203,7 +203,7 @@ class TestChangeLiaisonManager:
     def setup_mock_api(self, app):
         """Ensure each test starts with a clean MockProviderDataApi."""
         with app.app_context():
-            mock_pda = MockProviderDataApi()
+            mock_pda = MockProviderDataApi(fixture_set=app.config.get("PDA_FIXTURE_SET", "tests"))
             mock_pda.init_app(app)
             app.extensions["pda"] = mock_pda
 
@@ -482,7 +482,7 @@ class TestReassignHeadOffice:
     def setup_mock_api(self, app):
         """Ensure each test starts with a clean MockProviderDataApi."""
         with app.app_context():
-            mock_pda = MockProviderDataApi()
+            mock_pda = MockProviderDataApi(fixture_set=app.config.get("PDA_FIXTURE_SET", "tests"))
             mock_pda.init_app(app)
             app.extensions["pda"] = mock_pda
             mock_pda._mock_data = {
