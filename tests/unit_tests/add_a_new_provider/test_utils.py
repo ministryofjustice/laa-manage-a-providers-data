@@ -17,7 +17,7 @@ class TestAddNewProvider:
             # Always ensure we have MockProviderDataApi for these tests
             from app.pda.mock_api import MockProviderDataApi
 
-            mock_pda = MockProviderDataApi(fixture_set=app.config.get("PDA_FIXTURE_SET", "tests"))
+            mock_pda = MockProviderDataApi(fixture_set=app.config["PDA_FIXTURE_SET"])
             mock_pda.init_app(app)
             app.extensions["pda"] = mock_pda
 
@@ -121,7 +121,7 @@ class TestCreateProviderFromSession:
         with app.app_context():
             from app.pda.mock_api import MockProviderDataApi
 
-            mock_pda = MockProviderDataApi()
+            mock_pda = MockProviderDataApi(fixture_set=app.config["PDA_FIXTURE_SET"])
             mock_pda.init_app(app)
             app.extensions["pda"] = mock_pda
 

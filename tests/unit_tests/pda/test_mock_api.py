@@ -101,7 +101,7 @@ class TestDataLoadFunctions:
 class TestMockProviderDataApi:
     @pytest.fixture
     def mock_api(self):
-        return MockProviderDataApi()
+        return MockProviderDataApi(fixture_set="tests")
 
     @pytest.fixture
     def mock_app(self):

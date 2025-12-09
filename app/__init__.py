@@ -138,10 +138,7 @@ def create_app(config_class=Config, pda_class=ProviderDataApi):
     if app.config.get("PDA_USE_MOCK_API", False):
         from app.pda.mock_api import MockProviderDataApi
 
-        print(
-            f"Using mock API with test fixtures {getattr(app.config, 'PDA_FIXTURE_SET', 'No fixture set specified')}: {app.config}"
-        )
-        pda = MockProviderDataApi(fixture_set=app.config.get("PDA_FIXTURE_SET", "ui"))
+        pda = MockProviderDataApi(fixture_set=app.config["PDA_FIXTURE_SET"])
     else:
         pda = pda_class()
 

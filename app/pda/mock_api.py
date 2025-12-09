@@ -72,7 +72,7 @@ class MockProviderDataApi:
     predefined mock data instead of making actual HTTP requests.
     """
 
-    def __init__(self, fixture_set: str | None = None) -> None:
+    def __init__(self, fixture_set: str = "ui") -> None:
         self.app = None
         self.base_url: Optional[str] = None
         self.session = Mock()
@@ -80,10 +80,8 @@ class MockProviderDataApi:
         self._initialized = False
         self.fixture_set = fixture_set
         self.logger.info(f"Initializing Mock Provider Data API using fixture set: {self.fixture_set}")
-        if self.fixture_set is None:
-            self.fixture_set = "ui"
         # Load mock data from fixtures
-        self._mock_data = _load_mock_data(fixture_set=fixture_set)
+        self._mock_data = _load_mock_data(fixture_set=self.fixture_set)
 
     def _find_office_data(self, firm_id: int, office_code: str) -> Optional[Dict[str, Any]]:
         """Find office by firm_id and office_code."""
