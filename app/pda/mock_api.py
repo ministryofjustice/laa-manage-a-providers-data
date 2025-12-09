@@ -1,3 +1,4 @@
+import inspect
 import json
 import logging
 import os
@@ -72,13 +73,17 @@ class MockProviderDataApi:
     predefined mock data instead of making actual HTTP requests.
     """
 
-    def __init__(self, fixture_set: str = "ui") -> None:
+    def __init__(self, fixture_set: str = "") -> None:
         self.app = None
         self.base_url: Optional[str] = None
         self.session = Mock()
         self.logger = logging.getLogger(__name__)
         self._initialized = False
         self.fixture_set = fixture_set
+        if fixture_set == "":
+            stack = inspect.stack()
+            self.logger.info(f"Called without specifying a fixture set: {stack[1]}")
+            self.fixture_set = "ui"
         self.logger.info(f"Initializing Mock Provider Data API using fixture set: {self.fixture_set}")
         # Load mock data from fixtures
         self._mock_data = _load_mock_data(fixture_set=self.fixture_set)
