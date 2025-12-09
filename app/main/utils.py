@@ -631,13 +631,25 @@ def get_entity_referred_to_debt_recovery_text(entity: dict) -> str:
             raise RuntimeError("Provider Data API not initialized")
         head_office = pda.get_head_office(entity["firm_id"])
         if head_office:
-            logger.warning(f"Firm {entity['firm_id']} does not have a head office")
             contract_manager = head_office.contract_manager
 
     if contract_manager == STATUS_CONTRACT_MANAGER_DEBT_RECOVERY:
         return "Yes"
     return "No"
 
+def get_entity_intervened_text(entity: dict) -> str:
+    intervened_date = entity.get("intervened_date", None)
+    if intervened_date is None and "firm_id" in entity:
+        pda = current_app.extensions.get("pda")
+        if not pda:
+            raise RuntimeError("Provider Data API not initialized")
+        head_office = pda.get_head_office(entity["firm_id"])
+        if head_office:
+            intervened_date = head_office.intervened_date
+
+    if intervened_date:
+        return f"Yes on {intervened_date.strftime('%d/%m/%Y')}"
+    return "No"
 
 def get_firm_false_balance_text(entity: dict) -> str:
     pda = current_app.extensions.get("pda")

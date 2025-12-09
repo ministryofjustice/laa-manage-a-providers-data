@@ -5,7 +5,7 @@ from app.main.utils import (
     get_entity_referred_to_debt_recovery_text,
     get_firm_false_balance_text,
     get_office_false_balance_text,
-    provider_name_html,
+    provider_name_html, get_entity_intervened_text,
 )
 from app.utils.formatting import (
     format_advocate_level,
@@ -57,7 +57,7 @@ STATUS_TABLE_FIELD_CONFIG = {
             "formatter": format_yes_no,
             "default": "No",
         },
-        {"label": "Intervened", "default": "No"},
+        {"label": "Intervened", "default": "No", "text_renderer": get_entity_intervened_text, "change_link": "main.change_office_intervened"},
         {
             "label": "Referred to debt recovery",
             "text_renderer": get_entity_referred_to_debt_recovery_text,
@@ -83,7 +83,7 @@ STATUS_TABLE_FIELD_CONFIG = {
             "formatter": format_yes_no,
             "default": "No",
         },
-        {"label": "Intervened", "default": "No"},
+        {"label": "Intervened", "default": "No", "text_renderer": get_entity_intervened_text, "change_link": "main.change_office_intervened"},
         {
             "label": "Referred to debt recovery",
             "text_renderer": get_entity_referred_to_debt_recovery_text,
@@ -109,7 +109,7 @@ STATUS_TABLE_FIELD_CONFIG = {
             "formatter": format_yes_no,
             "default": "No",
         },
-        {"label": "Intervened", "default": "No"},
+        {"label": "Intervened", "default": "No", "text_renderer": get_entity_intervened_text, "change_link": "main.change_office_intervened"},
         {
             "label": "Referred to debt recovery",
             "default": "No",

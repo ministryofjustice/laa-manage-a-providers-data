@@ -430,3 +430,27 @@ class ChangeOfficeFalseBalanceFormView(BaseFormView):
 
         flash(f"<b>False balance status changed to {form.data.get('status', '').lower()}.</b>", category="success")
         return super().form_valid(form, **kwargs)
+
+
+class ChangeOfficeIntervenedFormView(BaseFormView):
+    def get_success_url(self, form):
+        return url_for("main.view_office", firm=form.firm, office=form.office)
+
+    def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
+        status = "Yes" if office.intervened_date else "No"
+        return self.get_form_class()(firm, office, status=status, intervened_date=office.intervened_date)
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update(
+            {"cancel_url": self.get_success_url(form), "office_address": format_office_address_one_line(form.office)}
+        )
+        return context
+
+    def form_valid(self, form: BaseForm, **kwargs) -> Response:
+        status = form.data.get("status", "")
+        data = {
+            "intervenedDate": form.data.get("intervened_date") if status == "Yes" else None,
+        }
+        self.get_api().update_office_intervened_date(firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, data=data)
+        return redirect(self.get_success_url(form))

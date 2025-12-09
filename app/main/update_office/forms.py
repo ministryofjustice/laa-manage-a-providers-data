@@ -12,9 +12,10 @@ from app.main.add_a_new_provider import AssignContractManagerForm
 from app.main.forms import BaseBankAccountForm, BaseBankAccountSearchForm
 from app.models import BankAccount, Firm, Office
 from app.validators import (
-    ValidateVATRegistrationNumber,
+    ValidateVATRegistrationNumber, ValidateGovDateField, ValidatePastDate, ValidateIf,
 )
-from app.widgets import GovRadioInput, GovTextInput
+from app.widgets import GovRadioInput, GovTextInput, GovDateInput
+from ...fields import GovDateField, GovUKRadioField
 
 
 class UpdateOfficeBaseForm(BaseForm):
@@ -169,4 +170,43 @@ class ChangeOfficeFalseBalanceForm(NoChangesMixin, UpdateOfficeBaseForm):
         choices=YES_NO_CHOICES,
         validators=[InputRequired("Please select a valid choice.")],
         default="No",
+    )
+
+
+class ChangeOfficeIntervenedForm(NoChangesMixin, UpdateOfficeBaseForm):
+    template = "update_office/intervened-form.html"
+    url = "provider/<firm:firm>/office/<office:office>/intervention-status"
+    title = "Has this office been intervened?"
+    submit_button_text = "Submit"
+    yes_no_changes_error_message = "Select no if this provider has not been intervened. Cancel if you do not want to change the answer."
+    no_no_changes_error_message = "Select yes if this provider has been intervened. Cancel if you do not want to change the answer."
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.status.data == "Yes":
+            self.no_changes_error_message = self.yes_no_changes_error_message
+        else:
+            self.no_changes_error_message = self.no_no_changes_error_message
+
+    @property
+    def caption(self):
+        return self.firm.firm_name
+
+    status = RadioField(
+        label="",
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
+        choices=YES_NO_CHOICES,
+        validators=[InputRequired("Please select a valid choice.")],
+        default="No",
+    )
+
+    intervened_date = GovDateField(
+        "Date intervened",
+        widget=GovDateInput(heading_class="govuk-fieldset__legend--m", hint="For example 27 3 2025"),
+        format="%d %m %Y",
+        validators=[
+            ValidateIf("status", "Yes"),
+            ValidateGovDateField(),
+            ValidatePastDate()
+        ],
     )
