@@ -448,9 +448,32 @@ class ChangeOfficeIntervenedFormView(BaseFormView):
         return context
 
     def form_valid(self, form: BaseForm, **kwargs) -> Response:
-        status = form.data.get("status", "")
+        status = form.data.get("status")
         data = {
             "intervenedDate": form.data.get("intervened_date") if status == "Yes" else None,
         }
         self.get_api().update_office_intervened_date(firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, data=data)
+        flash(self.get_form_valid_success_message(form), category="success")
         return redirect(self.get_success_url(form))
+
+    def get_form_valid_success_message(self, form):
+        if form.data.get("status") == "Yes":
+            return f"Office {form.office.firm_office_code} marked as intervened."
+        else:
+            return f"Office {form.office.firm_office_code} marked as not intervened."
+
+
+class HeadOfficeInterventionFormView(BaseFormView):
+    def get_success_url(self, form):
+        return url_for("main.view_office", firm=form.firm, office=form.office)
+
+    def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
+        status = "Yes" if office.intervened_date else "No"
+        return self.get_form_class()(firm, office, status=status, intervened_date=office.intervened_date)
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update(
+            {"cancel_url": self.get_success_url(form), "office_address": format_office_address_one_line(form.office)}
+        )
+        return context

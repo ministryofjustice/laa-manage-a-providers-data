@@ -15,6 +15,7 @@ from app.validators import (
     ValidateVATRegistrationNumber, ValidateGovDateField, ValidatePastDate, ValidateIf,
 )
 from app.widgets import GovRadioInput, GovTextInput, GovDateInput
+from ...components.tables import RadioDataTable, TableStructureItem, CheckDataTable
 from ...fields import GovDateField, GovUKRadioField
 
 
@@ -178,8 +179,8 @@ class ChangeOfficeIntervenedForm(NoChangesMixin, UpdateOfficeBaseForm):
     url = "provider/<firm:firm>/office/<office:office>/intervention-status"
     title = "Has this office been intervened?"
     submit_button_text = "Submit"
-    yes_no_changes_error_message = "Select no if this provider has not been intervened. Cancel if you do not want to change the answer."
-    no_no_changes_error_message = "Select yes if this provider has been intervened. Cancel if you do not want to change the answer."
+    yes_no_changes_error_message = "Select no if this office has not been intervened. Cancel if you do not want to change the answer."
+    no_no_changes_error_message = "Select yes if this office has been intervened. Cancel if you do not want to change the answer."
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -206,7 +207,40 @@ class ChangeOfficeIntervenedForm(NoChangesMixin, UpdateOfficeBaseForm):
         format="%d %m %Y",
         validators=[
             ValidateIf("status", "Yes"),
+            InputRequired("Enter the intervention date"),
             ValidateGovDateField(),
             ValidatePastDate()
         ],
     )
+
+class HeadOfficeInterventionForm(NoChangesMixin, UpdateOfficeBaseForm):
+    url = "provider/<firm:firm>/office/<office:office>/head-office-intervention"
+    template = "update_office/intervened-head-office-form.html"
+    def __init__(self, firm: Firm, office: Office, *args, **kwargs):
+        super().__init__(firm, office, *args, **kwargs)
+        table_structure: list[TableStructureItem] = [
+            {"text": "Account number", "id": "bank_account_number"},
+            {"text": "Address", "id": "address"},
+            {"text": "Status", "id": "status"},
+        ]
+        data = [
+            {
+                "bank_account_number": "12345678",
+                "address": "123 fake street",
+                "status": "Inactive",
+                "office_code": "10001",
+            },
+            {
+                "bank_account_number": "11223344",
+                "address": "double fake street",
+                "status": "Great",
+                "office_code": "10002",
+            },
+        ]
+        super().__init__(firm, office, *args, **kwargs)
+        self.data_table = CheckDataTable(
+            structure=table_structure,
+            data=data,
+            radio_field_name="office_code",
+            radio_value_key="office_code",
+        )

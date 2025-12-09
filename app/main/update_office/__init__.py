@@ -8,7 +8,7 @@ from .forms import (
     ChangeOfficeContractManagerForm,
     ChangeOfficeFalseBalanceForm,
     PaymentMethodForm,
-    UpdateVATRegistrationNumberForm, ChangeOfficeIntervenedForm,
+    UpdateVATRegistrationNumberForm, ChangeOfficeIntervenedForm, HeadOfficeInterventionForm,
 )
 from .views import (
     AddBankAccountFormView,
@@ -18,7 +18,7 @@ from .views import (
     OfficeActiveStatusFormView,
     PaymentMethodFormView,
     SearchBankAccountFormView,
-    UpdateVATRegistrationNumberFormView, ChangeOfficeIntervenedFormView,
+    UpdateVATRegistrationNumberFormView, ChangeOfficeIntervenedFormView, HeadOfficeInterventionFormView,
 )
 
 
@@ -76,4 +76,10 @@ def register_views(bp):
         view_class=ChangeOfficeIntervenedFormView,
         blueprint=bp,
         endpoint="change_office_intervened",
+    )
+    register_form_view(
+        form_class=HeadOfficeInterventionForm,
+        view_class=HeadOfficeInterventionFormView,
+        blueprint=bp,
+        endpoint="change_head_office_intervention",
     )

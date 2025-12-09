@@ -1,0 +1,19 @@
+{% extends 'form.html' %}
+{%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
+
+{% block pageContent %}
+{{ govukTable(form.data_table.to_govuk_params()) }}
+
+
+{% set submitButtonText = form.submit_button_text or "Continue" %}
+<div class="govuk-button-group">
+
+    {{ govukButton({
+        'text': submitButtonText
+    }) }}
+    {% if cancel_url %}
+      <a class="mapd-cancel-btn govuk-link govuk-link--no-visited-state" href="{{ cancel_url }}">Cancel</a>
+    {% endif %}
+</div>
+
+{% endblock %}
