@@ -10,7 +10,7 @@ A flask application for managing legal aid providers' data.
 
 ### Setup
 
-> **Note:** You must use **Python 3.11+**
+> **Note:** You must use **Python 3.13+**
 
 Create a virtual environment:
 
