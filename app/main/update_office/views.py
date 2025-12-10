@@ -339,7 +339,7 @@ class ChangeContractManagerFormView(BaseFormView):
         if self.change_contract_manager(contract_manager, form.firm, form.office):
             # Flash success
             flash(
-                f"<b>Contract manager for {form.office.firm_office_code} changed to {contract_manager}</b>",
+                f"<b>Contract manager for {form.office.firm_office_code} changed to {contract_manager}.</b>",
                 category="success",
             )
         else:
@@ -441,10 +441,10 @@ class ChangeOfficeDebtRecoveryFormView(BaseFormView):
         return url_for("main.view_office", firm=form.firm, office=form.office)
 
     def get_yes_value_success_message(self, form: BaseForm | None = None) -> str:
-        return f"{form.office.firm_office_code} is referred to the Debt Recovery Unit"
+        return f"<b>Office {form.office.firm_office_code} is referred to the Debt Recovery Unit.</b>"
 
     def get_no_value_success_message(self, form: BaseForm | None = None) -> str:
-        return f"Office {form.office.firm_office_code} is not referred to the Debt Recovery Unit."
+        return f"<b>Office {form.office.firm_office_code} is not referred to the Debt Recovery Unit.</b>"
 
     def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(form, context, **kwargs)
