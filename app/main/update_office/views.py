@@ -12,6 +12,7 @@ from app.constants import (
 )
 from app.forms import BaseForm
 from app.main.forms import NoBankAccountsError
+from app.main.table_builders import get_main_table
 from app.main.utils import firm_office_url_for
 from app.main.views import AdvocateBarristerOfficeMixin
 from app.models import BankAccount, Firm, Office
@@ -434,6 +435,10 @@ class ChangeOfficeFalseBalanceFormView(BaseFormView):
 
 class ChangeOfficeIntervenedFormView(BaseFormView):
     def get_success_url(self, form):
+        if form.data.get("status") == "No":
+            head_office = self.get_api().get_head_office(form.firm.firm_id)
+            if form.office.firm_office_code == head_office.firm_office_code:
+                return url_for("main.change_head_office_intervention", firm=form.firm, office=form.office)
         return url_for("main.view_office", firm=form.firm, office=form.office)
 
     def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
@@ -452,7 +457,9 @@ class ChangeOfficeIntervenedFormView(BaseFormView):
         data = {
             "intervenedDate": form.data.get("intervened_date") if status == "Yes" else None,
         }
-        self.get_api().update_office_intervened_date(firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, data=data)
+        self.get_api().update_office_intervened_date(
+            firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, data=data
+        )
         flash(self.get_form_valid_success_message(form), category="success")
         return redirect(self.get_success_url(form))
 
@@ -468,12 +475,27 @@ class HeadOfficeInterventionFormView(BaseFormView):
         return url_for("main.view_office", firm=form.firm, office=form.office)
 
     def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
-        status = "Yes" if office.intervened_date else "No"
-        return self.get_form_class()(firm, office, status=status, intervened_date=office.intervened_date)
+        return self.get_form_class()(firm, office)
 
     def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(form, context, **kwargs)
+
+        if form.firm.is_legal_services_provider or form.firm.is_chambers:
+            context.update(
+                {
+                    "main_table": get_main_table(
+                        form.firm,
+                        head_office=self.get_api().get_head_office(form.firm.firm_id),
+                        parent_firm=None,
+                        include_links=False,
+                    ),
+                }
+            )
+
         context.update(
-            {"cancel_url": self.get_success_url(form), "office_address": format_office_address_one_line(form.office)}
+            {
+                "cancel_url": self.get_success_url(form),
+                "office_address": format_office_address_one_line(form.office),
+            }
         )
         return context

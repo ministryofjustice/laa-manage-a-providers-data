@@ -1,19 +1,17 @@
 {% extends 'form.html' %}
 {%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
+{%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
 
-{% block pageContent %}
-{{ govukTable(form.data_table.to_govuk_params()) }}
+{% block pageHeading %}
+    <h1 class="govuk-heading-l">{{ form.title|replace('\n', '<br>')|safe }}</h1>
 
-
-{% set submitButtonText = form.submit_button_text or "Continue" %}
-<div class="govuk-button-group">
-
-    {{ govukButton({
-        'text': submitButtonText
-    }) }}
-    {% if cancel_url %}
-      <a class="mapd-cancel-btn govuk-link govuk-link--no-visited-state" href="{{ cancel_url }}">Cancel</a>
+    {%  if main_table %}
+        {{ govukTable(main_table.to_govuk_params()) }}
     {% endif %}
-</div>
+
+    <span class="govuk-caption-m govuk-!-margin-bottom-4">{{ form.caption }}</span>
+{% endblock %}
+{% block renderFields %}
+{{ govukTable(form.data_table.to_govuk_params()) }}
 
 {% endblock %}

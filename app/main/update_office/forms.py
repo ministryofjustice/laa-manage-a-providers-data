@@ -10,13 +10,19 @@ from app.forms import BaseForm, NoChangesMixin
 from app.main.add_a_new_office.forms import OfficeContactDetailsForm
 from app.main.add_a_new_provider import AssignContractManagerForm
 from app.main.forms import BaseBankAccountForm, BaseBankAccountSearchForm
+from app.main.utils import get_office_tags
 from app.models import BankAccount, Firm, Office
+from app.utils.formatting import format_office_address_one_line
 from app.validators import (
-    ValidateVATRegistrationNumber, ValidateGovDateField, ValidatePastDate, ValidateIf,
+    ValidateGovDateField,
+    ValidateIf,
+    ValidatePastDate,
+    ValidateVATRegistrationNumber,
 )
-from app.widgets import GovRadioInput, GovTextInput, GovDateInput
-from ...components.tables import RadioDataTable, TableStructureItem, CheckDataTable
-from ...fields import GovDateField, GovUKRadioField
+from app.widgets import GovDateInput, GovRadioInput, GovTextInput
+
+from ...components.tables import CheckDataTable, TableStructureItem
+from ...fields import GovDateField
 
 
 class UpdateOfficeBaseForm(BaseForm):
@@ -179,8 +185,12 @@ class ChangeOfficeIntervenedForm(NoChangesMixin, UpdateOfficeBaseForm):
     url = "provider/<firm:firm>/office/<office:office>/intervention-status"
     title = "Has this office been intervened?"
     submit_button_text = "Submit"
-    yes_no_changes_error_message = "Select no if this office has not been intervened. Cancel if you do not want to change the answer."
-    no_no_changes_error_message = "Select yes if this office has been intervened. Cancel if you do not want to change the answer."
+    yes_no_changes_error_message = (
+        "Select no if this office has not been intervened. Cancel if you do not want to change the answer."
+    )
+    no_no_changes_error_message = (
+        "Select yes if this office has been intervened. Cancel if you do not want to change the answer."
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -209,38 +219,51 @@ class ChangeOfficeIntervenedForm(NoChangesMixin, UpdateOfficeBaseForm):
             ValidateIf("status", "Yes"),
             InputRequired("Enter the intervention date"),
             ValidateGovDateField(),
-            ValidatePastDate()
+            ValidatePastDate(),
         ],
     )
+
 
 class HeadOfficeInterventionForm(NoChangesMixin, UpdateOfficeBaseForm):
     url = "provider/<firm:firm>/office/<office:office>/head-office-intervention"
     template = "update_office/intervened-head-office-form.html"
+    caption = "Select any other offices you want to apply the intervention for"
+
+    @property
+    def title(self):
+        return f"Apply intervention on {self.firm.firm_name}"
+
     def __init__(self, firm: Firm, office: Office, *args, **kwargs):
         super().__init__(firm, office, *args, **kwargs)
         table_structure: list[TableStructureItem] = [
-            {"text": "Account number", "id": "bank_account_number"},
+            {"text": "Account number", "id": "firm_office_code"},
             {"text": "Address", "id": "address"},
-            {"text": "Status", "id": "status"},
-        ]
-        data = [
-            {
-                "bank_account_number": "12345678",
-                "address": "123 fake street",
-                "status": "Inactive",
-                "office_code": "10001",
-            },
-            {
-                "bank_account_number": "11223344",
-                "address": "double fake street",
-                "status": "Great",
-                "office_code": "10002",
-            },
+            {"text": "Status", "id": "status", "html_renderer": lambda data: data["status"]},
         ]
         super().__init__(firm, office, *args, **kwargs)
         self.data_table = CheckDataTable(
             structure=table_structure,
-            data=data,
+            data=self.get_data(),
             radio_field_name="office_code",
             radio_value_key="office_code",
         )
+
+    def get_data(self):
+        pda = current_app.extensions["pda"]
+        offices = pda.get_provider_offices(firm_id=self.firm.firm_id)
+        data = []
+        for office in offices:
+            data.append(
+                {
+                    "firm_office_code": office.firm_office_code,
+                    "address": format_office_address_one_line(office),
+                    "status": self.get_office_status_tags(office),
+                }
+            )
+        return data
+
+    def get_office_status_tags(self, office: Office):
+        status_tags = get_office_tags(office)
+        if status_tags:
+            return f"<div>{''.join([s.render() for s in status_tags])}</div>"
+        return "<p class='govuk-visually-hidden'>No statuses</p>"
