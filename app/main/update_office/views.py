@@ -477,8 +477,8 @@ class ApplyHeadOfficeInterventionFormView(BaseFormView):
         return url_for("main.view_office", firm=form.firm, office=form.office)
 
     def get_success_message(self, form):
-        office_codes = form.data.get("office_codes", [])
-        return f"The following offices have also been marked as intervened: {', '.join(office_codes)}."
+        office_codes = form.data.get("offices", [])
+        return f"<b>The following offices have also been marked as intervened: {', '.join(office_codes)}.</b>"
 
     def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
         return self.get_form_class()(firm, office)
@@ -520,4 +520,4 @@ class ApplyHeadOfficeInterventionFormView(BaseFormView):
 class RemoveHeadOfficeInterventionFormView(ApplyHeadOfficeInterventionFormView):
     def get_success_message(self, form):
         office_codes = form.data.get("offices", [])
-        return f"The following offices have also been removed as intervened: {', '.join(office_codes)}."
+        return f"<b>The following offices have also been removed as intervened: {', '.join(office_codes)}."

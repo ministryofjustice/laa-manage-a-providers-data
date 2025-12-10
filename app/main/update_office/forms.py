@@ -253,8 +253,8 @@ class ApplyHeadOfficeInterventionForm(UpdateOfficeBaseForm):
         self.data_table = CheckDataTable(
             structure=table_structure,
             data=data,
-            radio_field_name="offices",
-            radio_value_key="firm_office_code",
+            field_name="offices",
+            field_value_key="firm_office_code",
         )
 
     def get_data(self):
