@@ -435,10 +435,12 @@ class ChangeOfficeFalseBalanceFormView(BaseFormView):
 
 class ChangeOfficeIntervenedFormView(BaseFormView):
     def get_success_url(self, form):
-        if form.data.get("status") == "No":
-            head_office = self.get_api().get_head_office(form.firm.firm_id)
-            if form.office.firm_office_code == head_office.firm_office_code:
-                return url_for("main.change_head_office_intervention", firm=form.firm, office=form.office)
+        head_office = self.get_api().get_head_office(form.firm.firm_id)
+        if form.office.firm_office_code == head_office.firm_office_code:
+            if form.data.get("status") == "Yes":
+                return url_for("main.apply_head_office_intervention", firm=form.firm, office=form.office)
+            else:
+                return url_for("main.remove_head_office_intervention", firm=form.firm, office=form.office)
         return url_for("main.view_office", firm=form.firm, office=form.office)
 
     def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
@@ -470,9 +472,13 @@ class ChangeOfficeIntervenedFormView(BaseFormView):
             return f"Office {form.office.firm_office_code} marked as not intervened."
 
 
-class HeadOfficeInterventionFormView(BaseFormView):
+class ApplyHeadOfficeInterventionFormView(BaseFormView):
     def get_success_url(self, form):
         return url_for("main.view_office", firm=form.firm, office=form.office)
+
+    def get_success_message(self, form):
+        office_codes = form.data.get("office_codes", [])
+        return f"The following offices have also been marked as intervened: {', '.join(office_codes)}."
 
     def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
         return self.get_form_class()(firm, office)
@@ -499,3 +505,19 @@ class HeadOfficeInterventionFormView(BaseFormView):
             }
         )
         return context
+
+    def form_valid(self, form: BaseForm, **kwargs) -> Response:
+        office_codes = form.data.get("offices", [])
+        for office_code in office_codes:
+            data = {
+                "intervenedDate": form.office.intervened_date,
+            }
+            self.get_api().update_office_intervened_date(firm_id=form.firm.firm_id, office_code=office_code, data=data)
+        flash(self.get_success_message(form), category="success")
+        return redirect(self.get_success_url(form))
+
+
+class RemoveHeadOfficeInterventionFormView(ApplyHeadOfficeInterventionFormView):
+    def get_success_message(self, form):
+        office_codes = form.data.get("offices", [])
+        return f"The following offices have also been removed as intervened: {', '.join(office_codes)}."

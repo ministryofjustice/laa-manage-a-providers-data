@@ -1,7 +1,7 @@
 from typing import List
 
 from flask import current_app
-from wtforms.fields.choices import RadioField
+from wtforms.fields.choices import RadioField, SelectMultipleField
 from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired, Optional
 
@@ -224,10 +224,16 @@ class ChangeOfficeIntervenedForm(NoChangesMixin, UpdateOfficeBaseForm):
     )
 
 
-class HeadOfficeInterventionForm(NoChangesMixin, UpdateOfficeBaseForm):
-    url = "provider/<firm:firm>/office/<office:office>/head-office-intervention"
+class ApplyHeadOfficeInterventionForm(UpdateOfficeBaseForm):
+    url = "provider/<firm:firm>/office/<office:office>/apply-head-office-intervention"
     template = "update_office/intervened-head-office-form.html"
     caption = "Select any other offices you want to apply the intervention for"
+    submit_button_text = "Apply intervention for provider and selected offices"
+
+    offices = SelectMultipleField(
+        label="",
+        validators=[InputRequired("Please select an office or use the cancel button")],
+    )
 
     @property
     def title(self):
@@ -240,12 +246,15 @@ class HeadOfficeInterventionForm(NoChangesMixin, UpdateOfficeBaseForm):
             {"text": "Address", "id": "address"},
             {"text": "Status", "id": "status", "html_renderer": lambda data: data["status"]},
         ]
-        super().__init__(firm, office, *args, **kwargs)
+
+        data = self.get_data()
+        self.offices.choices = [(item["firm_office_code"]) for item in data]
+
         self.data_table = CheckDataTable(
             structure=table_structure,
-            data=self.get_data(),
-            radio_field_name="office_code",
-            radio_value_key="office_code",
+            data=data,
+            radio_field_name="offices",
+            radio_value_key="firm_office_code",
         )
 
     def get_data(self):
@@ -267,3 +276,10 @@ class HeadOfficeInterventionForm(NoChangesMixin, UpdateOfficeBaseForm):
         if status_tags:
             return f"<div>{''.join([s.render() for s in status_tags])}</div>"
         return "<p class='govuk-visually-hidden'>No statuses</p>"
+
+
+class RemoveHeadOfficeInterventionForm(ApplyHeadOfficeInterventionForm):
+    url = "provider/<firm:firm>/office/<office:office>/remove-head-office-intervention"
+    template = "update_office/intervened-head-office-form.html"
+    caption = "Select any other offices you want to remove the intervention for"
+    submit_button_text = "Remove intervention for provider and selected offices"

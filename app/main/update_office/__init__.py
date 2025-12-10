@@ -1,24 +1,30 @@
 from app.utils import register_form_view
 
 from .forms import (
+    ApplyHeadOfficeInterventionForm,
     BankAccountForm,
     BankAccountSearchForm,
     ChangeOfficeActiveStatusForm,
     ChangeOfficeContactDetailsForm,
     ChangeOfficeContractManagerForm,
     ChangeOfficeFalseBalanceForm,
+    ChangeOfficeIntervenedForm,
     PaymentMethodForm,
-    UpdateVATRegistrationNumberForm, ChangeOfficeIntervenedForm, HeadOfficeInterventionForm,
+    RemoveHeadOfficeInterventionForm,
+    UpdateVATRegistrationNumberForm,
 )
 from .views import (
     AddBankAccountFormView,
+    ApplyHeadOfficeInterventionFormView,
     ChangeContractManagerFormView,
     ChangeOfficeContactDetailsFormView,
     ChangeOfficeFalseBalanceFormView,
+    ChangeOfficeIntervenedFormView,
     OfficeActiveStatusFormView,
     PaymentMethodFormView,
+    RemoveHeadOfficeInterventionFormView,
     SearchBankAccountFormView,
-    UpdateVATRegistrationNumberFormView, ChangeOfficeIntervenedFormView, HeadOfficeInterventionFormView,
+    UpdateVATRegistrationNumberFormView,
 )
 
 
@@ -78,8 +84,14 @@ def register_views(bp):
         endpoint="change_office_intervened",
     )
     register_form_view(
-        form_class=HeadOfficeInterventionForm,
-        view_class=HeadOfficeInterventionFormView,
+        form_class=ApplyHeadOfficeInterventionForm,
+        view_class=ApplyHeadOfficeInterventionFormView,
         blueprint=bp,
-        endpoint="change_head_office_intervention",
+        endpoint="apply_head_office_intervention",
+    )
+    register_form_view(
+        form_class=RemoveHeadOfficeInterventionForm,
+        view_class=RemoveHeadOfficeInterventionFormView,
+        blueprint=bp,
+        endpoint="remove_head_office_intervention",
     )
