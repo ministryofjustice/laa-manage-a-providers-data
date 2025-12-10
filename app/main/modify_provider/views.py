@@ -6,7 +6,11 @@ from flask import Response, abort, current_app, flash, redirect, render_template
 
 from app.forms import BaseForm
 from app.main.modify_provider import AssignChambersForm, ReassignHeadOfficeForm
-from app.main.update_office import ChangeOfficeContactDetailsFormView, ChangeOfficeFalseBalanceFormView
+from app.main.update_office import (
+    ChangeOfficeContactDetailsFormView,
+    ChangeOfficeFalseBalanceFormView,
+    ChangeOfficeIntervenedFormView,
+)
 from app.main.utils import assign_firm_to_a_new_chambers, change_liaison_manager, reassign_head_office
 from app.main.views import AdvocateBarristerOfficeMixin, get_main_table
 from app.models import Contact, Firm, Office
@@ -350,5 +354,14 @@ class ChangeAdvocateDetailsFormView(BaseFormView):
 
 
 class ChangeFirmFalseBalanceFormView(AdvocateBarristerOfficeMixin, ChangeOfficeFalseBalanceFormView):
-    def get_success_url(self, form):
-        return url_for("main.view_provider", firm=form.firm)
+    provider_success_url = "main.view_provider"
+
+
+class ChangeFirmIntervenedFormView(AdvocateBarristerOfficeMixin, ChangeOfficeIntervenedFormView):
+    provider_success_url = "main.view_provider"
+
+    def get_form_valid_success_message(self, form):
+        if form.data.get("status") == "Yes":
+            return f"<b>{form.firm.firm_name} marked as intervened.</b>"
+        else:
+            return f"<b>{form.firm.firm_name} marked as not intervened.</b>"

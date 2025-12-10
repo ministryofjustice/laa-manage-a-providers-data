@@ -12,7 +12,11 @@ from app.main.add_a_new_provider.forms import (
     LiaisonManagerForm,
     LspDetailsForm,
 )
-from app.main.update_office import ChangeOfficeContactDetailsForm, ChangeOfficeFalseBalanceForm
+from app.main.update_office import (
+    ChangeOfficeContactDetailsForm,
+    ChangeOfficeFalseBalanceForm,
+    ChangeOfficeIntervenedForm,
+)
 from app.main.utils import get_firm_account_number
 from app.models import Firm, Office
 from app.utils.formatting import format_office_address_one_line, normalize_for_search
@@ -274,3 +278,16 @@ class ChangeFirmFalseBalanceForm(ChangeOfficeFalseBalanceForm):
     url = "provider/<firm('Barrister','Advocate'):firm>/change-false-balance"
     title = "Do they have a false balance?"
     submit_button_text = "Submit"
+
+
+class ChangeFirmIntervenedForm(ChangeOfficeIntervenedForm):
+    template = "update_office/intervened-form.html"
+    url = "provider/<firm('Barrister','Advocate'):firm>//intervention-status"
+    title = "Have they been intervened?"
+    submit_button_text = "Submit"
+    yes_no_changes_error_message = (
+        "Select no if they have not been intervened. Cancel if you do not want to change the answer."
+    )
+    no_no_changes_error_message = (
+        "Select yes if they have been intervened. Cancel if you do not want to change the answer."
+    )
