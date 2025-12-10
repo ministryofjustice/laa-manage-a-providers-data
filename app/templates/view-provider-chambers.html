@@ -16,7 +16,6 @@
   }) }}
 
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
       {% if subpage == "contact" %}
           <div class="govuk-grid-column-two-thirds">
         {% if contact_details_table %}
@@ -26,7 +25,7 @@
         {{ contactCards(contact_tables) }}
           </div>
       {% endif %}
-      
+    <div class="govuk-grid-column-full">
       {% if subpage == "barristers-advocates" %}
         {% if barristers_table %}
             <h3 class="govuk-heading-m">Barristers</h3>
