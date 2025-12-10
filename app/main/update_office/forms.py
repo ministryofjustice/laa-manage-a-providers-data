@@ -283,3 +283,7 @@ class RemoveHeadOfficeInterventionForm(ApplyHeadOfficeInterventionForm):
     template = "update_office/intervened-head-office-form.html"
     caption = "Select any other offices you want to remove the intervention for"
     submit_button_text = "Remove intervention for provider and selected offices"
+
+    @property
+    def title(self):
+        return f"Remove intervention on {self.firm.firm_name}"
