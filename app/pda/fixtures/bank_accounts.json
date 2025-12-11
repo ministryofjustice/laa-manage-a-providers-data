@@ -197,6 +197,26 @@
       "zip": "PL12 6QY",
       "startDate": "2025-10-10",
       "endDate": "2025-11-06"
+    },
+    {
+      "vendorSiteId": 1448,
+      "bankAccountId": 9,
+      "bankName": "Mary Anning Financials",
+      "bankBranchName": "7 Gill Road",
+      "sortCode": "001199",
+      "accountNumber": "87654321",
+      "bankAccountName": "Johnson Legal Services Business Account",
+      "currencyCode": "GBP",
+      "accountType": "Current Account",
+      "primaryFlag": "Y",
+      "addressLine1": "7 Powell Plains",
+      "addressLine2": null,
+      "addressLine3": null,
+      "city": "Lyme Regis",
+      "county": "Dorset",
+      "country": "GB",
+      "zip": "DT72 1RJ",
+      "startDate": "2024-09-01"
     }
   ]
 }

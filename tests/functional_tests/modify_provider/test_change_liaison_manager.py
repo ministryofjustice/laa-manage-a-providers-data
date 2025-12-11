@@ -12,11 +12,11 @@ def navigate_to_existing_provider(page: Page, firm_id: int = 1):
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
 
-    # Click on the first provider (SMITH & PARTNERS SOLICITORS - firm ID 1)
-    page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
+    # Click on the first provider (Smith & Partners Solicitors - firm ID 1)
+    page.get_by_role("link", name="Smith & Partners Solicitors").click()
 
     # Verify we're on the provider details page
-    expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.get_by_role("heading", name="Smith & Partners Solicitors")).to_be_visible()
 
 
 def navigate_to_change_liaison_manager_form(page: Page, firm_id: int = 1):
@@ -34,7 +34,7 @@ def test_change_liaison_manager_form_loads_correctly(page: Page):
     expect(page.get_by_role("heading", name="Change liaison manager")).to_be_visible()
 
     # Check that firm name appears in caption
-    expect(page.get_by_text("SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.get_by_text("Smith & Partners Solicitors")).to_be_visible()
 
     # Check description text includes the current liaison manager's name
     expect(page.get_by_text("This change will:")).to_be_visible()
@@ -68,7 +68,7 @@ def test_change_liaison_manager_successful_submission(page: Page):
     page.get_by_role("button", name="Save").click()
 
     # Should redirect to the provider details page
-    expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.get_by_role("heading", name="Smith & Partners Solicitors")).to_be_visible()
 
     # Should show success message
     expect(page.get_by_text("Jane Doe is the new liaison manager")).to_be_visible()
@@ -105,7 +105,7 @@ def test_change_liaison_manager_form_partial_data(page: Page):
     page.get_by_role("button", name="Save").click()
 
     # Should redirect to the provider details page
-    expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.get_by_role("heading", name="Smith & Partners Solicitors")).to_be_visible()
 
     # Should show success message
     expect(page.get_by_text("John Smith is the new liaison manager")).to_be_visible()
@@ -187,6 +187,6 @@ def test_change_liaison_manager_only_on_office(page: Page):
     page.get_by_role("link", name="Contact").click()
     expect(page.get_by_text("Alice Acrington Change")).to_be_visible()
     # ...and that at the provider level...
-    page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
+    page.get_by_role("link", name="Smith & Partners Solicitors").click()
     # ...the liaison manager has not changed.
     expect(page.get_by_role("heading", name="Alice Acrington")).not_to_be_visible()

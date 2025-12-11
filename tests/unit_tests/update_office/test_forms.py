@@ -117,7 +117,10 @@ class TestSearchBankAccountForm:
         )
         office = Office(officeName="Test Office Name", firmOfficeId=2001, firmOfficeCode="T2001")
         form = BankAccountSearchForm(firm=firm, office=office, search_term="")
-        assert len(form.bank_accounts_table.data) == len(self.all_bank_accounts)
+        if len(self.all_bank_accounts) > BankAccountSearchForm.ITEMS_PER_PAGE:
+            assert len(form.bank_accounts_table.data) == BankAccountSearchForm.ITEMS_PER_PAGE
+        else:
+            assert len(form.bank_accounts_table.data) == len(self.all_bank_accounts)
 
     def test_no_bank_accounts_barrister(self, app):
         firm = Firm(
@@ -127,4 +130,7 @@ class TestSearchBankAccountForm:
         )
         office = Office(officeName="Test Office Name", firmOfficeId=2001, firmOfficeCode="T2001")
         form = BankAccountSearchForm(firm=firm, office=office, search_term="")
-        assert len(form.bank_accounts_table.data) == len(self.all_bank_accounts)
+        if len(self.all_bank_accounts) > BankAccountSearchForm.ITEMS_PER_PAGE:
+            assert len(form.bank_accounts_table.data) == BankAccountSearchForm.ITEMS_PER_PAGE
+        else:
+            assert len(form.bank_accounts_table.data) == len(self.all_bank_accounts)

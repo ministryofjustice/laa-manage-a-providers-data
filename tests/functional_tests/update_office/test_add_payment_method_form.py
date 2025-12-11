@@ -8,12 +8,12 @@ def navigate_to_payment_method_form(page: Page):
     # Navigate to the providers list
     page.goto(url_for("main.providers", _external=True))
 
-    # Search for "Smith" to find "SMITH & PARTNERS SOLICITORS"
+    # Search for "Smith" to find "Smith & Partners Solicitors"
     page.get_by_role("textbox", name="Find a provider").fill("smith")
     page.get_by_role("button", name="Search").click()
 
-    # Click on the first provider (should be "SMITH & PARTNERS SOLICITORS" from fixtures)
-    page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
+    # Click on the first provider (should be "Smith & Partners Solicitors" from fixtures)
+    page.get_by_role("link", name="Smith & Partners Solicitors").click()
 
     # Click on the Offices sub-navigation
     page.get_by_role("link", name="Offices").click()

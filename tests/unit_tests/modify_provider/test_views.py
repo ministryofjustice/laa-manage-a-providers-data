@@ -72,7 +72,7 @@ class TestChangeProviderActiveStatusFormView:
 class TestChangeOfficeFalseBalanceFormView:
     def test_false_balance_set_to_yes(self, app, client):
         """Test that setting False balance to yes changes the contract manager to Mr False Balance"""
-        firm = get_firm_by_name(app, "SMITH & PARTNERS SOLICITORS")
+        firm = get_firm_by_name(app, "Smith & Partners Solicitors")
         office = get_firm_office_by_office_code(app, "1A001L")
         assert office.contract_manager == STATUS_CONTRACT_MANAGER_INACTIVE
 
@@ -87,7 +87,7 @@ class TestChangeOfficeFalseBalanceFormView:
     def test_false_balance_set_to_no(self, app, client):
         """Test that changing False balance from yes to no, should set the contract manager to Mr Inactive"""
 
-        firm = get_firm_by_name(app, "SMITH & PARTNERS SOLICITORS")
+        firm = get_firm_by_name(app, "Smith & Partners Solicitors")
         office = get_firm_office_by_office_code(app, "1A001L")
         assert office.contract_manager == STATUS_CONTRACT_MANAGER_INACTIVE
 

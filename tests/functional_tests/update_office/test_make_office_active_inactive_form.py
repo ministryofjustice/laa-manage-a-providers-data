@@ -7,13 +7,13 @@ from tests.functional_tests.utils import navigate_to_provider_page
 
 @pytest.mark.usefixtures("live_server")
 def test_change_office_from_active_to_inactive_to_active(page: Page):
-    navigate_to_provider_page(page, provider_name="BIRMINGHAM LEGAL AID CENTRE", office_code="6A002L")
+    navigate_to_provider_page(page, provider_name="Birmingham Legal Aid Centre", office_code="6A002L")
 
     # Active -> Inactive
     page.get_by_role("link", name="Change active").click()
 
     # After clicking the 'make inactive' button, check we have the correct screen
-    expect(page.get_by_text("BIRMINGHAM LEGAL AID CENTRE")).to_be_visible()
+    expect(page.get_by_text("Birmingham Legal Aid Centre")).to_be_visible()
     expect(page.get_by_role("heading", name="Office: 6A002L")).to_be_visible()
     expect(page.get_by_role("heading", name="Change active status")).to_be_visible()
     expect(page.get_by_role("button", name="Submit")).to_be_visible()
@@ -45,7 +45,7 @@ def test_change_office_from_active_to_inactive_to_active(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_change_office_active_status_cancel(page: Page):
-    navigate_to_provider_page(page, provider_name="BIRMINGHAM LEGAL AID CENTRE", office_code="6A002L")
+    navigate_to_provider_page(page, provider_name="Birmingham Legal Aid Centre", office_code="6A002L")
     expect(page.get_by_role("heading", name="Office: 6A002L")).to_be_visible()
 
     # Start with an active office
@@ -70,7 +70,7 @@ def test_change_office_active_status_cancel(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_change_office_active_status_nochange(page: Page):
-    navigate_to_provider_page(page, provider_name="BIRMINGHAM LEGAL AID CENTRE", office_code="6A002L")
+    navigate_to_provider_page(page, provider_name="Birmingham Legal Aid Centre", office_code="6A002L")
 
     # Start with an active office
     expect(page.get_by_role("heading", name="Office: 6A002L")).to_be_visible()

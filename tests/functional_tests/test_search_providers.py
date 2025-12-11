@@ -36,7 +36,7 @@ def test_search_shows_correct__providers(page):
     page.get_by_role("textbox", name="Find a provider").fill("Metro")
     page.get_by_role("button", name="Search").click()
     expect(page.get_by_role("heading", name="search result for ‘Metro’")).to_be_visible()
-    expect(page.get_by_role("cell", name="METROPOLITAN LAW CENTRE")).to_be_visible()
+    expect(page.get_by_role("cell", name="Metropolitan Law Centre")).to_be_visible()
     expect(page.get_by_role("cell", name="Legal Services Provider")).to_be_visible()
     expect(page.get_by_role("cell", name="3")).to_be_visible()
     expect(page.get_by_role("cell", name="No statuses")).to_be_visible()

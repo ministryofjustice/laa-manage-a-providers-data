@@ -5,12 +5,12 @@ from playwright.sync_api import Page, expect
 from tests.functional_tests.utils import definition_list_to_dict
 
 
-def navigate_to_office_contact_details(page: Page, provider_name="SMITH & PARTNERS SOLICITORS", has_office=True):
+def navigate_to_office_contact_details(page: Page, provider_name="Smith & Partners Solicitors", has_office=True):
     """Helper function to navigate to the Office Contact Details form via UI flow."""
     # Navigate to the providers list
     page.goto(url_for("main.providers", _external=True))
 
-    # Search for "Smith" to find "SMITH & PARTNERS SOLICITORS"
+    # Search for "Smith" to find "Smith & Partners Solicitors"
     page.get_by_role("textbox", name="Find a provider").fill(provider_name)
     page.get_by_role("button", name="Search").click()
 
@@ -147,7 +147,7 @@ def test_successful_form_submission_minimal(page: Page):
     page.get_by_role("button", name="Submit").click()
 
     # Should redirect to the new office
-    expect(page.locator("span").filter(has_text="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.locator("span").filter(has_text="Smith & Partners Solicitors")).to_be_visible()
     expect(page.get_by_role("heading", name="Office: ")).to_be_visible()
     expect(page.get_by_text("123 Test Street")).to_be_visible()
     expect(page.get_by_text("Test City")).to_be_visible()
@@ -184,7 +184,7 @@ def test_successful_form_submission_all_fields(page: Page):
     page.get_by_role("button", name="Submit").click()
 
     # Should redirect to the new office
-    expect(page.locator("span").filter(has_text="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.locator("span").filter(has_text="Smith & Partners Solicitors")).to_be_visible()
     expect(page.get_by_role("heading", name="Office: ")).to_be_visible()
     expect(page.get_by_text("123 Test Street")).to_be_visible()
     expect(page.get_by_text("Suite 456")).to_be_visible()
@@ -220,7 +220,7 @@ def test_optional_fields_not_required(page: Page):
     page.get_by_role("button", name="Submit").click()
 
     # Should redirect to the new office
-    expect(page.locator("span").filter(has_text="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.locator("span").filter(has_text="Smith & Partners Solicitors")).to_be_visible()
     expect(page.get_by_role("heading", name="Office: ")).to_be_visible()
     expect(page.get_by_text("123 Test Street")).to_be_visible()
     expect(page.get_by_text("Test City")).to_be_visible()
