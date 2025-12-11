@@ -1,6 +1,6 @@
 import re
-from enum import Enum
 from datetime import date
+from enum import Enum
 
 from wtforms import ValidationError
 from wtforms.validators import StopValidation

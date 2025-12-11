@@ -637,6 +637,7 @@ def get_entity_referred_to_debt_recovery_text(entity: dict) -> str:
         return "Yes"
     return "No"
 
+
 def get_entity_intervened_text(entity: dict) -> str:
     intervened_date = entity.get("intervened_date", None)
     if intervened_date is None and "firm_id" in entity:
@@ -650,6 +651,7 @@ def get_entity_intervened_text(entity: dict) -> str:
     if intervened_date:
         return f"Yes on {intervened_date.strftime('%d/%m/%Y')}"
     return "No"
+
 
 def get_firm_false_balance_text(entity: dict) -> str:
     pda = current_app.extensions.get("pda")

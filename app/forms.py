@@ -49,15 +49,7 @@ class BaseForm(FlaskForm):
 
         sub_field_rendered = sub_field()
         conditional = {"value": conditional_value, "html": sub_field_rendered}
-        params = {
-            "params": {
-                "items": [
-                    {
-                        "conditional": conditional
-                    }
-                ]
-            }
-        }
+        params = {"params": {"items": [{"conditional": conditional}]}}
         return field(**params)
 
 
