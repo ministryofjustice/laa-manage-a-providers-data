@@ -2,7 +2,7 @@ import datetime
 import logging
 from typing import Any
 
-from flask import Response, abort, current_app, flash, redirect, render_template, request, url_for
+from flask import Response, current_app, flash, redirect, render_template, request, url_for
 
 from app.forms import BaseForm
 from app.main.modify_provider import AssignChambersForm, ReassignHeadOfficeForm
@@ -153,29 +153,15 @@ class AssignChambersFormView(BaseFormView):
     def get_form_instance(self, firm: Firm, **kwargs) -> BaseForm:
         search_term = request.args.get("search", "").strip()
         page = int(request.args.get("page", 1))
-        form = self.get_form_class()(firm=firm, search_term=search_term, page=page)
+        form = self.get_form_class()(firm=firm, search_term=search_term, page=page, provider=firm.parent_firm_id)
         if request.method.upper() == "GET" and search_term:
             form.search.validate(form)
         return form
 
-    @staticmethod
-    def get_valid_firm_or_abort(firm):
-        if not firm:
-            abort(400)
-
-        if firm.firm_type not in ["Barrister", "Advocate"]:
-            abort(400)
-
-    def get(self, firm, context):
-        self.get_valid_firm_or_abort(firm)
-        search_term = request.args.get("search", "").strip()
-        page = int(request.args.get("page", 1))
-        form = self.get_form_class()(firm=firm, search_term=search_term, page=page)
-
-        if search_term:
-            form.search.validate(form)
-
-        return render_template(self.get_template(), **self.get_context_data(form, context))
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update({"cancel_url": self.get_success_url(form)})
+        return context
 
 
 class ReassignHeadOfficeFormView(BaseFormView):
