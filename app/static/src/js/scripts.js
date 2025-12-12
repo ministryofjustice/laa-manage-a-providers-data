@@ -5,3 +5,4 @@ MOJFrontend.initAll();
 
 import "./back_link";
 import "./focus-error-summary";
+import "./select-all";

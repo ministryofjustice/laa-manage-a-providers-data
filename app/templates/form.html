@@ -31,11 +31,13 @@
       {% endif %}
 
       {% block formPrefix %}{% endblock %}
+        {% block renderFields %}
       {% for field in form %}
         {% if field.type != 'CSRFToken' and field.type != 'HiddenField' and field.type != "SubmitField" %}
           {{ field }}
         {% endif %}
       {% endfor %}
+            {% endblock %}
         
       {%  block formButtons %}
           {% set submitButtonText = form.submit_button_text or "Continue" %}

@@ -1,7 +1,7 @@
 from typing import List
 
 from flask import current_app
-from wtforms.fields.choices import RadioField
+from wtforms.fields.choices import RadioField, SelectMultipleField
 from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired, Optional
 
@@ -10,11 +10,19 @@ from app.forms import BaseForm, NoChangesMixin
 from app.main.add_a_new_office.forms import OfficeContactDetailsForm
 from app.main.add_a_new_provider import AssignContractManagerForm
 from app.main.forms import BaseBankAccountForm, BaseBankAccountSearchForm
+from app.main.utils import get_office_tags
 from app.models import BankAccount, Firm, Office
+from app.utils.formatting import format_office_address_one_line
 from app.validators import (
+    ValidateGovDateField,
+    ValidateIf,
+    ValidatePastDate,
     ValidateVATRegistrationNumber,
 )
-from app.widgets import GovRadioInput, GovTextInput
+from app.widgets import GovDateInput, GovRadioInput, GovTextInput
+
+from ...components.tables import CheckDataTable, TableStructureItem
+from ...fields import GovDateField
 
 
 class UpdateOfficeBaseForm(BaseForm):
@@ -170,3 +178,112 @@ class ChangeOfficeFalseBalanceForm(NoChangesMixin, UpdateOfficeBaseForm):
         validators=[InputRequired("Please select a valid choice.")],
         default="No",
     )
+
+
+class ChangeOfficeIntervenedForm(NoChangesMixin, UpdateOfficeBaseForm):
+    template = "update_office/intervened-form.html"
+    url = "provider/<firm:firm>/office/<office:office>/intervention-status"
+    title = "Has this office been intervened?"
+    submit_button_text = "Submit"
+    yes_no_changes_error_message = (
+        "Select no if this office has not been intervened. Cancel if you do not want to change the answer."
+    )
+    no_no_changes_error_message = (
+        "Select yes if this office has been intervened. Cancel if you do not want to change the answer."
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.status.data == "Yes":
+            self.no_changes_error_message = self.yes_no_changes_error_message
+        else:
+            self.no_changes_error_message = self.no_no_changes_error_message
+
+    @property
+    def caption(self):
+        return self.firm.firm_name
+
+    status = RadioField(
+        label="",
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
+        choices=YES_NO_CHOICES,
+        validators=[InputRequired("Please select a valid choice.")],
+        default="No",
+    )
+
+    intervened_date = GovDateField(
+        "Date intervened",
+        widget=GovDateInput(heading_class="govuk-fieldset__legend--m", hint="For example 27 3 2025"),
+        format="%d %m %Y",
+        validators=[
+            ValidateIf("status", "Yes"),
+            InputRequired("Enter the intervention date"),
+            ValidateGovDateField(),
+            ValidatePastDate(),
+        ],
+    )
+
+
+class ApplyHeadOfficeInterventionForm(UpdateOfficeBaseForm):
+    url = "provider/<firm:firm>/office/<office:office>/apply-head-office-intervention"
+    template = "update_office/intervened-head-office-form.html"
+    caption = "Select any other offices you want to apply the intervention for"
+    submit_button_text = "Apply intervention for provider and selected offices"
+
+    offices = SelectMultipleField(
+        label="",
+        validators=[InputRequired("Please select an office or use the cancel button")],
+    )
+
+    @property
+    def title(self):
+        return f"Apply intervention on {self.firm.firm_name}"
+
+    def __init__(self, firm: Firm, office: Office, *args, **kwargs):
+        super().__init__(firm, office, *args, **kwargs)
+        table_structure: list[TableStructureItem] = [
+            {"text": "Account number", "id": "firm_office_code"},
+            {"text": "Address", "id": "address"},
+            {"text": "Status", "id": "status", "html_renderer": lambda data: data["status"]},
+        ]
+
+        data = self.get_data()
+        self.offices.choices = [(item["firm_office_code"]) for item in data]
+
+        self.data_table = CheckDataTable(
+            structure=table_structure,
+            data=data,
+            field_name="offices",
+            field_value_key="firm_office_code",
+        )
+
+    def get_data(self):
+        pda = current_app.extensions["pda"]
+        offices = pda.get_provider_offices(firm_id=self.firm.firm_id)
+        data = []
+        for office in offices:
+            data.append(
+                {
+                    "firm_office_code": office.firm_office_code,
+                    "address": format_office_address_one_line(office),
+                    "status": self.get_office_status_tags(office),
+                }
+            )
+        return data
+
+    def get_office_status_tags(self, office: Office):
+        status_tags = get_office_tags(office)
+        if status_tags:
+            return f"<div>{''.join([s.render() for s in status_tags])}</div>"
+        return "<p class='govuk-visually-hidden'>No statuses</p>"
+
+
+class RemoveHeadOfficeInterventionForm(ApplyHeadOfficeInterventionForm):
+    url = "provider/<firm:firm>/office/<office:office>/remove-head-office-intervention"
+    template = "update_office/intervened-head-office-form.html"
+    caption = "Select any other offices you want to remove the intervention for"
+    submit_button_text = "Remove intervention for provider and selected offices"
+
+    @property
+    def title(self):
+        return f"Remove intervention on {self.firm.firm_name}"
