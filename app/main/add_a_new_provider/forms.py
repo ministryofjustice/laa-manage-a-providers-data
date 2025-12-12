@@ -1,4 +1,4 @@
-from flask import session
+from flask import current_app, session
 from wtforms import RadioField, SubmitField
 from wtforms.fields.simple import StringField
 from wtforms.validators import Email, InputRequired, Length, Optional
@@ -315,21 +315,7 @@ class AssignContractManagerForm(BaseForm):
     def __init__(self, search_term=None, page=1, selected_value=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Static list of 12 fake contract managers
-        self.contract_managers = [
-            {"name": "Alice Johnson"},
-            {"name": "Robert Smith"},
-            {"name": "Sarah Wilson"},
-            {"name": "Michael Brown"},
-            {"name": "Emma Davis"},
-            {"name": "Lewis Green"},
-            {"name": "Olivia Garcia"},
-            {"name": "William Martinez"},
-            {"name": "Sophia Anderson"},
-            {"name": "David Taylor"},
-            {"name": "Isabella Thomas"},
-            {"name": "Christopher Lee"},
-        ]
+        self.contract_managers = self.get_contract_managers()
 
         # Set search field data
         self.search_term = search_term
@@ -367,6 +353,11 @@ class AssignContractManagerForm(BaseForm):
 
         # Store selected value for table rendering
         self.selected_value = selected_value
+
+    def get_contract_managers(self):
+        pda = current_app.extensions["pda"]
+        managers = pda.get_all_contacts()
+        return [{"name": f"{manager.first_name} {manager.last_name}"} for manager in managers]
 
 
 class AddBarristerDetailsForm(BaseForm):
