@@ -25,11 +25,11 @@ def change_and_confirm_debt_recovery(page: Page, debt_recovery: str, office_code
 @pytest.mark.usefixtures("live_server")
 def test_change_office_debt_recovery_visible(page: Page):
     # `Referred to debt recovery` should be visible for active office
-    navigate_to_provider_page(page, provider_name="BIRMINGHAM LEGAL AID CENTRE", office_code="6A001L")
+    navigate_to_provider_page(page, provider_name="Birmingham Legal Aid Centre", office_code="6A001L")
     expect(page.get_by_text("Referred to debt recovery", exact=True)).to_be_visible()
 
     # `Referred to debt recovery` should NOT be visible for active office
-    navigate_to_provider_page(page, provider_name="SMITH & PARTNERS SOLICITORS", office_code="1A001L")
+    navigate_to_provider_page(page, provider_name="Smith & Partners Solicitors", office_code="1A001L")
     expect(page.get_by_text("Referred to debt recovery", exact=True)).not_to_be_visible()
 
 
@@ -37,7 +37,7 @@ def test_change_office_debt_recovery_visible(page: Page):
 def test_change_office_debt_recovery_no_change__no(page: Page):
     """Test correct message when submit a default form without any change"""
 
-    navigate_to_provider_page(page, provider_name="BIRMINGHAM LEGAL AID CENTRE", office_code="6A001L")
+    navigate_to_provider_page(page, provider_name="Birmingham Legal Aid Centre", office_code="6A001L")
     page.get_by_role("link", name="Change referred to debt recovery").click()
     page.get_by_role("button", name="submit").click()
     expect(
@@ -52,7 +52,7 @@ def test_change_office_debt_recovery_no_change__no(page: Page):
 def test_change_office_debt_recovery_no_change__yes(page: Page):
     """Test correct message when submit a default form without any change"""
 
-    navigate_to_provider_page(page, provider_name="BIRMINGHAM LEGAL AID CENTRE", office_code="6A001L")
+    navigate_to_provider_page(page, provider_name="Birmingham Legal Aid Centre", office_code="6A001L")
     # First put the office into debt recovery
     change_and_confirm_debt_recovery(page, "Yes", office_code="6A001L")
 
@@ -69,7 +69,7 @@ def test_change_office_debt_recovery_no_change__yes(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_change_office_debt_recovery_cancel(page: Page):
-    navigate_to_provider_page(page, provider_name="BIRMINGHAM LEGAL AID CENTRE", office_code="6A001L")
+    navigate_to_provider_page(page, provider_name="Birmingham Legal Aid Centre", office_code="6A001L")
     url = page.url
     page.get_by_role("link", name="Change referred to debt recovery").click()
     page.get_by_role("link", name="Cancel").click()
@@ -79,7 +79,7 @@ def test_change_office_debt_recovery_cancel(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_change_office_debt_recovery_yes(page: Page):
-    navigate_to_provider_page(page, provider_name="BIRMINGHAM LEGAL AID CENTRE", office_code="6A001L")
+    navigate_to_provider_page(page, provider_name="Birmingham Legal Aid Centre", office_code="6A001L")
     change_and_confirm_debt_recovery(page, "Yes", office_code="6A001L")
     # Confirm the tag is displayed
     page.locator(".referred-to-debt-recovery", has_text="Referred to debt recovery")
@@ -87,7 +87,7 @@ def test_change_office_debt_recovery_yes(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_change_office_debt_recovery_no(page: Page):
-    navigate_to_provider_page(page, provider_name="BIRMINGHAM LEGAL AID CENTRE", office_code="6A001L")
+    navigate_to_provider_page(page, provider_name="Birmingham Legal Aid Centre", office_code="6A001L")
 
     # First put the office into debt recovery
     change_and_confirm_debt_recovery(page, "Yes", office_code="6A001L")
