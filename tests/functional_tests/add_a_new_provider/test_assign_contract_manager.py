@@ -129,7 +129,7 @@ def test_assign_contract_manager_case_insensitive_search(page: Page):
     page.get_by_role("textbox", name="Search for a contract manager").fill("alice")
     page.get_by_role("button", name="Search").click()
 
-    # Should still find Alice Johnson
+    # Should still find Alice Brown
     expect(page.get_by_text("1 search result for 'alice'")).to_be_visible()
     expect(page.get_by_text("Alice Brown")).to_be_visible()
 

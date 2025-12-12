@@ -42,7 +42,7 @@ def test_change_contract_manager_success(page: Page):
     navigate_to_change_contract_manager_form(page)
 
     # Select a contract manger
-    page.get_by_role("row", name="Select this row  Alice Johnson").get_by_label("Select this row").check()
+    page.get_by_role("row", name="Select this row  Alice Brown").get_by_label("Select this row").check()
     page.get_by_role("button", name="Submit").click()
 
     # See the success flash...
@@ -50,7 +50,7 @@ def test_change_contract_manager_success(page: Page):
 
     # ...and the contract manager is set.
     overview_list = definition_list_to_dict(page, "h2:has-text('Overview') + dl")
-    assert overview_list["Contract manager"] == "Alice Johnson"
+    assert overview_list["Contract manager"] == "Alice Brown"
 
 
 @pytest.mark.usefixtures("live_server")
@@ -88,8 +88,8 @@ def test_change_contract_manager_on_head_office_changes_firm_overview(page: Page
 
     # When changing the contract manager on the head office...
     page.get_by_role("link", name="Change   contract manager").click()
-    # ...to Alice Johnson...
-    page.get_by_role("row", name="Select this row  Alice Johnson").get_by_label("Select this row").check()
+    # ...to Alice Brown...
+    page.get_by_role("row", name="Select this row  Alice Brown").get_by_label("Select this row").check()
     page.get_by_role("button", name="Submit").click()
     expect(page.get_by_label("Success").locator("div").filter(has_text="Contract manager for 6A001L")).to_be_visible()
     # ...we see on the parent firm...
@@ -97,6 +97,6 @@ def test_change_contract_manager_on_head_office_changes_firm_overview(page: Page
     page.get_by_role("button", name="Sign in").click()
     page.get_by_role("button", name="Search").click()
     page.get_by_role("link", name="Birmingham Legal Aid Centre").click()
-    # ...the contract manager is shown as Alice Johnson.
+    # ...the contract manager is shown as Alice Brown.
     office_overview = definition_list_to_dict(page, "h2:has-text('Overview') + dl")
-    assert office_overview["Contract manager"] == "Alice Johnson"
+    assert office_overview["Contract manager"] == "Alice Brown"
