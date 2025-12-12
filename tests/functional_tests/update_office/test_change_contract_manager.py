@@ -12,11 +12,11 @@ def navigate_to_existing_provider(page: Page, firm_id: int = 1):
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
 
-    # Click on the first provider (SMITH & PARTNERS SOLICITORS - firm ID 1)
-    page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
+    # Click on the first provider (Smith & Partners Solicitors - firm ID 1)
+    page.get_by_role("link", name="Smith & Partners Solicitors").click()
 
     # Verify we're on the provider details page
-    expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.get_by_role("heading", name="Smith & Partners Solicitors")).to_be_visible()
 
 
 def navigate_to_change_contract_manager_form(page: Page, firm_id: int = 1, firm_office_code: str = "1A001L"):
@@ -71,8 +71,8 @@ def test_change_contract_manager_on_head_office_changes_firm_overview(page: Page
     page.get_by_role("link", name="Manage a provider's data").click()
     page.get_by_role("button", name="Sign in").click()
     page.get_by_role("button", name="Search").click()
-    page.get_by_role("link", name="BIRMINGHAM LEGAL AID CENTRE").click()
-    expect(page.get_by_role("heading", name="BIRMINGHAM LEGAL AID CENTRE")).to_be_visible()
+    page.get_by_role("link", name="Birmingham Legal Aid Centre").click()
+    expect(page.get_by_role("heading", name="Birmingham Legal Aid Centre")).to_be_visible()
 
     # Check the contract manager shown for the firm...
     firm_overview = definition_list_to_dict(page, "h2:has-text('Overview') + dl")
@@ -96,7 +96,7 @@ def test_change_contract_manager_on_head_office_changes_firm_overview(page: Page
     page.get_by_role("link", name="Manage a provider's data").click()
     page.get_by_role("button", name="Sign in").click()
     page.get_by_role("button", name="Search").click()
-    page.get_by_role("link", name="BIRMINGHAM LEGAL AID CENTRE").click()
+    page.get_by_role("link", name="Birmingham Legal Aid Centre").click()
     # ...the contract manager is shown as Alice Johnson.
     office_overview = definition_list_to_dict(page, "h2:has-text('Overview') + dl")
     assert office_overview["Contract manager"] == "Alice Johnson"

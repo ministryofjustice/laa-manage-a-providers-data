@@ -9,7 +9,7 @@ def test_view_provider_page_ui_loads(page):
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
 
-    page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
+    page.get_by_role("link", name="Smith & Partners Solicitors").click()
 
     expect(page.get_by_role("link", name="Offices")).to_be_visible()
 
@@ -35,7 +35,7 @@ def test_view_provider_page_ui_loads(page):
 
     # Main table
     expect(page.get_by_text("Provider name", exact=True).first).to_be_visible()
-    expect(page.get_by_text("SMITH & PARTNERS SOLICITORS", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Smith & Partners Solicitors", exact=True).first).to_be_visible()
 
     expect(page.get_by_text("Provider number", exact=True).first).to_be_visible()
     expect(page.get_by_text("1", exact=True).first).to_be_visible()
@@ -55,11 +55,11 @@ def test_view_parent_provider(page):
     page.get_by_role("button", name="Search").click()
 
     # Click child provider
-    page.get_by_role("link", name="ALAN DAVIES").click()
+    page.get_by_role("link", name="Alan Davies").click()
 
     # Assert we can see the parent provider
     expect(page.get_by_text("Chambers", exact=True)).to_be_visible()
-    expect(page.get_by_role("link", name="JOHNSON LEGAL SERVICES").first).to_be_visible()
+    expect(page.get_by_role("link", name="Johnson Legal Services").first).to_be_visible()
 
     # Assert we can see the Provider contact details
     expect(page.get_by_role("heading", name="Chambers contact details")).to_be_visible()
@@ -71,9 +71,9 @@ def test_view_parent_provider(page):
     expect(page.get_by_text("555201")).to_be_visible()
 
     # Click parent provider
-    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").first.click()
+    page.get_by_role("link", name="Johnson Legal Services").first.click()
     expect(page.get_by_text("Provider name", exact=True).first).to_be_visible()
-    expect(page.get_by_text("JOHNSON LEGAL SERVICES", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Johnson Legal Services", exact=True).first).to_be_visible()
     expect(page.get_by_text("Provider number", exact=True).first).to_be_visible()
     expect(page.get_by_text("2", exact=True).first).to_be_visible()
     expect(page.get_by_text("Chambers number", exact=True).first).to_be_visible()
@@ -139,7 +139,7 @@ def test_lsp_contact(page):
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
 
-    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
+    page.get_by_role("link", name="Johnson Legal Services").click()
 
     # Contact subpage visible on landing
     expect(page.get_by_role("heading", name="Contacts")).to_be_visible()
@@ -159,13 +159,13 @@ def test_back_link_lsp(page):
     page.get_by_role("button", name="Sign in").click()
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
-    page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
+    page.get_by_role("link", name="Smith & Partners Solicitors").click()
 
     page.get_by_role("link", name="Back to all providers").click()
     expect(page.get_by_role("heading", name="Provider records")).to_be_visible()
 
     page.get_by_role("button", name="Search").click()
-    page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
+    page.get_by_role("link", name="Smith & Partners Solicitors").click()
 
     page.get_by_role("link", name="Offices").click()
     page.get_by_role("link", name="Back to all providers").click()
@@ -180,11 +180,11 @@ def test_view_advocate_provider_main_table(page):
     page.get_by_role("button", name="Search").click()
 
     # Click on an Advocate provider
-    page.get_by_role("link", name="ALAN DAVIES").click()
+    page.get_by_role("link", name="Alan Davies").click()
 
     # Check Advocate-specific main table fields
     expect(page.get_by_text("Advocate name", exact=True).first).to_be_visible()
-    expect(page.get_by_text("ALAN DAVIES", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Alan Davies", exact=True).first).to_be_visible()
 
     expect(page.get_by_text("Advocate number", exact=True).first).to_be_visible()
     expect(page.get_by_text("4", exact=True).first).to_be_visible()
@@ -193,7 +193,7 @@ def test_view_advocate_provider_main_table(page):
 
     # Check that Chambers link is visible and clickable
     expect(page.get_by_text("Chambers", exact=True).first).to_be_visible()
-    expect(page.get_by_role("link", name="JOHNSON LEGAL SERVICES").first).to_be_visible()
+    expect(page.get_by_role("link", name="Johnson Legal Services").first).to_be_visible()
 
     # Check for Advocate level field (even if no data)
     expect(page.get_by_text("Advocate level", exact=True).first).to_be_visible()
@@ -210,7 +210,7 @@ def test_view_barrister_provider_main_table(page):
     page.get_by_role("button", name="Search").click()
 
     # Click on a Barrister provider - need to navigate via Chambers first
-    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
+    page.get_by_role("link", name="Johnson Legal Services").click()
     page.get_by_role("link", name="Barristers and advocates").click()
 
     # Click on a barrister
@@ -227,7 +227,7 @@ def test_view_barrister_provider_main_table(page):
 
     # Check that Chambers link is visible and clickable
     expect(page.get_by_text("Chambers", exact=True).first).to_be_visible()
-    expect(page.get_by_role("link", name="JOHNSON LEGAL SERVICES").first).to_be_visible()
+    expect(page.get_by_role("link", name="Johnson Legal Services").first).to_be_visible()
 
     # Check for Barrister level field
     expect(page.get_by_text("Barrister level", exact=True).first).to_be_visible()
@@ -244,11 +244,11 @@ def test_view_chambers_provider_main_table(page):
     page.get_by_role("button", name="Search").click()
 
     # Click on a Chambers provider
-    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
+    page.get_by_role("link", name="Johnson Legal Services").click()
 
     # Check Chambers-specific main table fields (simplified compared to LSP)
     expect(page.get_by_text("Provider name", exact=True).first).to_be_visible()
-    expect(page.get_by_text("JOHNSON LEGAL SERVICES", exact=True).first).to_be_visible()
+    expect(page.get_by_text("Johnson Legal Services", exact=True).first).to_be_visible()
 
     expect(page.get_by_text("Provider number", exact=True).first).to_be_visible()
     expect(page.get_by_text("2", exact=True).first).to_be_visible()
@@ -261,13 +261,13 @@ def test_back_link_chambers(page):
     page.get_by_role("button", name="Sign in").click()
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
-    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
+    page.get_by_role("link", name="Johnson Legal Services").click()
 
     page.get_by_role("link", name="Back to all providers").click()
     expect(page.get_by_role("heading", name="Provider records")).to_be_visible()
 
     page.get_by_role("button", name="Search").click()
-    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
+    page.get_by_role("link", name="Johnson Legal Services").click()
 
     page.get_by_role("link", name="Barristers and advocates").click()
     page.get_by_role("link", name="Back to all providers").click()

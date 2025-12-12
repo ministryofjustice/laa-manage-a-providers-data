@@ -11,7 +11,7 @@ def navigate_to_inactive_office_page(page):
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
 
-    page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
+    page.get_by_role("link", name="Smith & Partners Solicitors").click()
     page.get_by_role("link", name="Offices").click()
     page.get_by_role("link", name="1A001L").click()
 
@@ -19,7 +19,7 @@ def navigate_to_inactive_office_page(page):
 def navigate_to_active_office_page(page):
     page.get_by_role("button", name="Sign in").click()
     page.get_by_role("button", name="Search").click()
-    page.get_by_role("link", name="BIRMINGHAM LEGAL AID CENTRE").click()
+    page.get_by_role("link", name="Birmingham Legal Aid Centre").click()
     page.get_by_role("link", name="Offices").click()
     page.get_by_role("link", name="6A002L").click()
 
@@ -31,7 +31,7 @@ def test_view_office_page_loads(page):
 
     # Check page title and office code
     expect(page.get_by_role("heading", name="Office: 1A001L")).to_be_visible()
-    expect(page.locator("span.govuk-caption-xl")).to_contain_text("SMITH & PARTNERS SOLICITORS")
+    expect(page.locator("span.govuk-caption-xl")).to_contain_text("Smith & Partners Solicitors")
 
     # Check status table is present
     expect(page.get_by_text("Active", exact=True).first).to_be_visible()
@@ -60,7 +60,7 @@ def test_view_office_overview_section(page):
 
     # Check overview content
     overview_list = definition_list_to_dict(page, "h2:has-text('Overview') + dl")
-    assert overview_list["Parent provider"] == "SMITH & PARTNERS SOLICITORS"
+    assert overview_list["Parent provider"] == "Smith & Partners Solicitors"
     assert overview_list["Account number"] == "1A001L"
     assert overview_list["Head office"] == "Yes"
 
@@ -71,10 +71,10 @@ def test_view_office_parent_provider_link(page):
     navigate_to_inactive_office_page(page)
 
     # Click on parent provider link in overview section
-    page.locator("#main-content").get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
+    page.locator("#main-content").get_by_role("link", name="Smith & Partners Solicitors").click()
 
     # Should navigate to provider page
-    expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.get_by_role("heading", name="Smith & Partners Solicitors")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -84,7 +84,7 @@ def test_office_page_navigation_from_offices_list(page):
 
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
-    page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
+    page.get_by_role("link", name="Smith & Partners Solicitors").click()
     page.get_by_role("link", name="Offices").click()
 
     # Click on office code link
@@ -100,14 +100,14 @@ def test_office_breadcrumbs(page):
     navigate_to_inactive_office_page(page)
 
     # Check breadcrumb links are visible
-    expect(page.get_by_label("Breadcrumb").get_by_role("link", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.get_by_label("Breadcrumb").get_by_role("link", name="Smith & Partners Solicitors")).to_be_visible()
     expect(page.get_by_role("link", name="Office: 1A001L")).to_be_visible()
 
     # Test breadcrumb navigation - click on provider name should go to provider page
-    page.get_by_label("Breadcrumb").get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
+    page.get_by_label("Breadcrumb").get_by_role("link", name="Smith & Partners Solicitors").click()
 
     # Should navigate to provider page
-    expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS")).to_be_visible()
+    expect(page.get_by_role("heading", name="Smith & Partners Solicitors")).to_be_visible()
     expect(page.get_by_role("link", name="Contact")).to_be_visible()  # Provider nav tabs
 
 
@@ -170,7 +170,7 @@ def test_office_no_vat_registration_number(page):
     # Perform a blank search to view all providers
     page.get_by_role("button", name="Search").click()
 
-    page.get_by_role("link", name="METROPOLITAN LAW CENTRE").click()
+    page.get_by_role("link", name="Metropolitan Law Centre").click()
     page.get_by_role("link", name="Offices").click()
     page.get_by_role("link", name="3A001L").click()
     page.get_by_role("link", name="Bank accounts and payment").click()

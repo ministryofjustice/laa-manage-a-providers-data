@@ -35,11 +35,11 @@ def test_change_barrister_details_change_name(page: Page):
 @pytest.mark.usefixtures("live_server")
 def test_change_barrister_details_change_barrister_level(page: Page):
     _navigate_to_provider_page(page, "Karen Sillen")
-    page.get_by_role("link", name="Enter barrister level").click()
+    page.get_by_role("link", name="Change barrister level").click()
     expect(page.get_by_role("heading", name="Barrister details")).to_be_visible()
     assert "#barrister_level" in page.url
 
-    expect(page.get_by_role("radio", name="None of the above")).to_be_checked()
+    expect(page.get_by_role("radio", name="Junior")).to_be_checked()
     page.get_by_role("radio", name="King's Counsel (KC, previously QC)").click()
     page.get_by_role("button", name="Submit").click()
 
@@ -50,7 +50,7 @@ def test_change_barrister_details_change_barrister_level(page: Page):
 @pytest.mark.usefixtures("live_server")
 def test_change_barrister_details_change_bar_council_number(page: Page):
     _navigate_to_provider_page(page, "Karen Sillen")
-    page.get_by_role("link", name="Enter barrister level").click()
+    page.get_by_role("link", name="Change barrister level").click()
     expect(page.get_by_role("heading", name="Barrister details")).to_be_visible()
     assert "#barrister_level" in page.url
 

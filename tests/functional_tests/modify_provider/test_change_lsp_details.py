@@ -19,7 +19,7 @@ def _navigate_to_provider_page(page: Page, provider_name: str):
 
 @pytest.mark.usefixtures("live_server")
 def test_change_lsp_details_constitutional_status(page: Page):
-    _navigate_to_provider_page(page, "SMITH & PARTNERS SOLICITORS")
+    _navigate_to_provider_page(page, "Smith & Partners Solicitors")
     page.get_by_role("link", name="Change constitutional status").click()
     expect(page.get_by_role("radio", name="Partnership", exact=True)).to_be_checked()
     page.get_by_role("radio", name="Limited Liability Partnership (LLP)").click()
@@ -30,7 +30,7 @@ def test_change_lsp_details_constitutional_status(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_change_lsp_details_indemnity_received_date(page: Page):
-    _navigate_to_provider_page(page, "SMITH & PARTNERS SOLICITORS")
+    _navigate_to_provider_page(page, "Smith & Partners Solicitors")
     page.get_by_role("link", name="Enter indemnity received date").click()
 
     expect(page.get_by_role("textbox", name="Day", exact=True)).to_be_empty()
@@ -48,7 +48,7 @@ def test_change_lsp_details_indemnity_received_date(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_change_lsp_details_companies_house_number(page: Page):
-    _navigate_to_provider_page(page, "SMITH & PARTNERS SOLICITORS")
+    _navigate_to_provider_page(page, "Smith & Partners Solicitors")
     page.get_by_role("link", name="Change companies House number").click()
 
     expect(page.get_by_role("textbox", name="Companies House number (optional)", exact=True)).to_have_value("12345678")
@@ -61,7 +61,7 @@ def test_change_lsp_details_companies_house_number(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_change_lsp_details_no_changes(page: Page):
-    _navigate_to_provider_page(page, "SMITH & PARTNERS SOLICITORS")
+    _navigate_to_provider_page(page, "Smith & Partners Solicitors")
 
     expect(page.get_by_text("12345678")).to_be_visible()
     expect(page.get_by_text("Partnership")).to_be_visible()
@@ -76,7 +76,7 @@ def test_change_lsp_details_no_changes(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_change_lsp_details_cancel(page: Page):
-    _navigate_to_provider_page(page, "SMITH & PARTNERS SOLICITORS")
+    _navigate_to_provider_page(page, "Smith & Partners Solicitors")
 
     expect(page.get_by_text("12345678")).to_be_visible()
     expect(page.get_by_text("Partnership")).to_be_visible()
