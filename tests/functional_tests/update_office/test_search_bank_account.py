@@ -51,10 +51,10 @@ def test_search_bank_account(page: Page):
     expect(page.locator("td:text('203045')")).to_be_visible()
     expect(page.locator("td:text('12345678')")).to_be_visible()
     expect(page.locator("td:text('Smith & Partners Solicitors Client Account')")).to_be_visible()
-    # Account 2
-    expect(page.locator("td:text('404516')")).to_be_visible()
-    expect(page.locator("td:text('87654321')")).to_be_visible()
-    expect(page.locator("td:text('Johnson Legal Services Business Account')")).to_be_visible()
+    # Account 2 (there are multiples of this account)
+    expect(page.get_by_role("cell", name="404516").first).to_be_visible()
+    expect(page.get_by_role("cell", name="87654321").first).to_be_visible()
+    expect(page.get_by_role("cell", name="Johnson Legal Services Business Account").first).to_be_visible()
 
     # Select a bank account
     page.locator('input[type="radio"][value="2"][name="bank_account"]').click()
@@ -126,17 +126,18 @@ def _test_search_bank_account_advocate_barrister(
     expect(page.locator("td:text('203045')")).to_be_visible()
     expect(page.locator("td:text('12345678')")).to_be_visible()
     expect(page.locator("td:text('Smith & Partners Solicitors Client Account')")).to_be_visible()
-    # Johnson Legal Services Business Account
-    expect(page.locator("td:text('404516')")).to_be_visible()
-    expect(page.locator("td:text('87654321')")).to_be_visible()
-    expect(page.locator("td:text('Johnson Legal Services Business Account')")).to_be_visible()
+    # Johnson Legal Services Business Account (there are multiples of this account)
+    expect(page.get_by_role("cell", name="404516").first).to_be_visible()
+    expect(page.get_by_role("cell", name="87654321").first).to_be_visible()
+    expect(page.get_by_role("cell", name="Johnson Legal Services Business Account").first).to_be_visible()
     # Brown & Associates Client Account
     expect(page.locator("td:text('309634')")).to_be_visible()
     expect(page.locator("td:text('11223344')")).to_be_visible()
     expect(page.locator("td:text('Brown & Associates Client Account')")).to_be_visible()
 
     # Select a bank account
-    page.locator('input[type="radio"][value="3"][name="bank_account"]').click()
+    page.get_by_role("row", name="Select this row  309634").get_by_label("Select this row").check()
+    # page.locator('input[type="radio"][value="3"][name="bank_account"]').click()
     page.get_by_role("button", name="Submit").click()
 
     assert page.url == expected_return_page_url
