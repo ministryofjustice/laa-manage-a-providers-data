@@ -9,6 +9,15 @@ from tests.functional_tests.utils import definition_list_to_dict, navigate_to_pr
 def change_and_confirm_intervened(
     page: Page, intervened_date: str | None, office_code: str, fail_on_purpose: bool = False
 ):
+    """
+    Helper function to change and confirm and intervention change of an office
+    Args:
+        page: Page element
+        intervened_date: The date of the intervention or None if removing an intervention
+        office_code: The code of the office to intervene
+        fail_on_purpose: Set true if when clicking the submit button will fail with the no changes made error
+    """
+
     status = "Yes" if intervened_date else "No"
     page.get_by_role("link", name="Change intervened").click()
     page.get_by_role("radio", name=status).click()
@@ -39,6 +48,8 @@ def change_and_confirm_intervened(
 
 @pytest.mark.usefixtures("live_server")
 def test_change_office_intervened_default_value(page: Page):
+    """Test the default display value is No"""
+
     navigate_to_provider_page(page, provider_name="SMITH & PARTNERS SOLICITORS", office_code="1A001L")
     data = definition_list_to_dict(page, dl_selector=".status-table")
     assert data["Intervened"] == "No"
@@ -46,7 +57,8 @@ def test_change_office_intervened_default_value(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_change_office_intervened_yes(page: Page):
-    "Intervened changed from no to yes"
+    """Test changing office intervention from no to yes"""
+
     navigate_to_provider_page(page, provider_name="SMITH & PARTNERS SOLICITORS", office_code="1A001L")
     # Make office intervened
     change_and_confirm_intervened(page, date.today().strftime("%d/%m/%Y"), office_code="1A001L")
@@ -63,7 +75,8 @@ def test_change_office_intervened_yes(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_change_office_intervened_no(page: Page):
-    "Intervened changed from yes to no"
+    """Test changing office intervention from yes to no"""
+
     navigate_to_provider_page(page, provider_name="SMITH & PARTNERS SOLICITORS", office_code="1A001L")
     # Make office intervened
     change_and_confirm_intervened(page, date.today().strftime("%d/%m/%Y"), office_code="1A001L")
@@ -86,6 +99,8 @@ def test_change_office_intervened_no(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_change_office_intervened_no_changes__no(page: Page):
+    """Test making no changes displays the correct `No` specific message"""
+
     navigate_to_provider_page(page, provider_name="SMITH & PARTNERS SOLICITORS", office_code="1A002L")
     change_and_confirm_intervened(page, intervened_date=None, office_code="1A002L", fail_on_purpose=True)
     expect(page.get_by_text("There is a problem")).to_be_visible()
@@ -98,6 +113,8 @@ def test_change_office_intervened_no_changes__no(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_change_office_intervened_no_changes__yes(page: Page):
+    """Test making no changes displays the correct `Yes` specific message"""
+
     # Set intervened to Yes
     navigate_to_provider_page(page, provider_name="SMITH & PARTNERS SOLICITORS", office_code="1A002L")
     change_and_confirm_intervened(page, "10/12/2025", "1A002L")
@@ -116,6 +133,8 @@ def test_change_office_intervened_no_changes__yes(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_change_office_intervened_cancel(page: Page):
+    """Test cancelling intervention takes you back to the office view page"""
+
     navigate_to_provider_page(page, provider_name="SMITH & PARTNERS SOLICITORS", office_code="1A002L")
     url = page.url
     page.get_by_role("link", name="Change intervened").click()
