@@ -659,12 +659,15 @@ class MockProviderDataApi:
         # Find all contacts for this office
         contacts = []
         for contact in self._mock_data["contacts"]:
+            contact_name = f"{contact['firstName']} {contact['lastName']}"
             if contact.get("vendorSiteId") == office_id:
                 try:
                     contacts.append(Contact(**contact))
                 except ValidationError as e:
                     self.logger.error(f"Invalid contact data in mock for office {office_code}: {e}")
                     raise MockPDAError(f"Invalid contact data: {e}")
+            elif contact_name == office_data.get("contractManager"):
+                contacts.append(Contact(**contact))
 
         return contacts
 
@@ -850,3 +853,6 @@ class MockProviderDataApi:
 
     def update_office_false_balance(self, firm_id: int, office_code: str, data: dict) -> Office:
         return self.patch_office(firm_id, office_code, data)
+
+    def get_all_contacts(self) -> list[Contact]:
+        return [Contact(**contact) for contact in self._mock_data["contacts"]]

@@ -578,3 +578,10 @@ class ProviderDataApi:
         raise NotImplementedError(
             "Updating office false balance is currently not supported by the real Provider Data API"
         )
+
+    def get_all_contacts(self) -> list[Contact]:
+        """
+        Get all contacts. Used when assigning contract manager to a new office or re-assign contract manager
+        Returns: List[Contact]
+        """
+        raise NotImplementedError("Getting all contacts is currently not supported by the real Provider Data API")
