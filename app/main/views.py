@@ -88,7 +88,7 @@ class ViewProvider(MethodView):
 
         return office_tables
 
-    def get_chambers_contact_details_table(self, firm, head_office: Office) -> SummaryList:
+    def get_chambers_contact_details_table(self, firm, head_office: Office, include_change_links=True) -> SummaryList:
         """Gets information about the chambers head office"""
         table = SummaryList(additional_classes="chambers-contact-details")
 
@@ -118,12 +118,28 @@ class ViewProvider(MethodView):
             "Address",
             "test",
             html=format_office_address_multi_line_html(head_office),
-            row_action_urls=row_action_urls["address"],
+            row_action_urls=row_action_urls["address"] if include_change_links else None,
         )
-        table.add_row("Email address", head_office.email_address, row_action_urls=row_action_urls["email"])
-        table.add_row("Telephone number", head_office.telephone_number, row_action_urls=row_action_urls["telephone"])
-        table.add_row("DX number", head_office.dx_number, row_action_urls=row_action_urls["dx_number"])
-        table.add_row("DX centre", head_office.dx_centre, row_action_urls=row_action_urls["dx_centre"])
+        table.add_row(
+            "Email address",
+            head_office.email_address,
+            row_action_urls=row_action_urls["email"] if include_change_links else None,
+        )
+        table.add_row(
+            "Telephone number",
+            head_office.telephone_number,
+            row_action_urls=row_action_urls["telephone"] if include_change_links else None,
+        )
+        table.add_row(
+            "DX number",
+            head_office.dx_number,
+            row_action_urls=row_action_urls["dx_number"] if include_change_links else None,
+        )
+        table.add_row(
+            "DX centre",
+            head_office.dx_centre,
+            row_action_urls=row_action_urls["dx_centre"] if include_change_links else None,
+        )
 
         return table
 
@@ -225,7 +241,9 @@ class ViewProvider(MethodView):
             context.update(
                 {
                     "chambers_contact_details_table": self.get_chambers_contact_details_table(
-                        parent_provider, chambers_head_office
+                        parent_provider,
+                        chambers_head_office,
+                        include_change_links=False,
                     )
                 }
             )
