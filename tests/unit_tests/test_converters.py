@@ -21,7 +21,7 @@ class TestFirmConverter:
 
             assert isinstance(result, Firm)
             assert result.firm_id == 1
-            assert result.firm_name == "SMITH & PARTNERS SOLICITORS"
+            assert result.firm_name == "Smith & Partners Solicitors"
 
     def test_to_python_invalid_non_numeric_id(self):
         """Test that non-numeric ID raises NotFound."""

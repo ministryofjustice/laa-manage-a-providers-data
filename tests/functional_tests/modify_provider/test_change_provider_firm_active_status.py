@@ -12,7 +12,7 @@ def navigate_to_provider_change_active_status_page(page: Page):
     page.get_by_role("button", name="Search").click()
 
     # Click on the provider known to have an active office
-    page.get_by_role("link", name="BIRMINGHAM LEGAL AID CENTRE").click()
+    page.get_by_role("link", name="Birmingham Legal Aid Centre").click()
     expect(page.get_by_text("Inactive")).not_to_be_visible()
 
     # Click the Change active status link
@@ -36,7 +36,7 @@ def test_change_provider_from_active_to_inactive_to_active(page: Page):
 
     # ...see the success message on the provider page...
     page.get_by_label("Success").locator("div").filter(
-        has_text="BIRMINGHAM LEGAL AID CENTRE marked as inactive"
+        has_text="Birmingham Legal Aid Centre marked as inactive"
     ).click()
 
     # Inactive -> Active
@@ -47,7 +47,7 @@ def test_change_provider_from_active_to_inactive_to_active(page: Page):
     page.get_by_role("button", name="Save").click()
 
     # ...see the success message on the provider page...
-    page.get_by_label("Success").locator("div").filter(has_text="BIRMINGHAM LEGAL AID CENTRE marked as active").click()
+    page.get_by_label("Success").locator("div").filter(has_text="Birmingham Legal Aid Centre marked as active").click()
 
 
 @pytest.mark.usefixtures("live_server")

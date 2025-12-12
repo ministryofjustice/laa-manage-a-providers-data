@@ -15,7 +15,7 @@ def test_assign_chambers_form_loads_correctly_for_advocate(page: Page):
     navigate_to_assign_chambers_form(page, 4)
 
     # Check page title and heading
-    expect(page.get_by_role("heading", name="Assign chambers for ALAN DAVIES")).to_be_visible()
+    expect(page.get_by_role("heading", name="Assign chambers for Alan Davies")).to_be_visible()
 
     # Check search field is present
     expect(page.get_by_label("Search for a chambers")).to_be_visible()
@@ -33,12 +33,12 @@ def test_assign_chambers_search_functionality(page: Page):
     """Test that searching for chambers returns appropriate results."""
     navigate_to_assign_chambers_form(page, 4)
 
-    # Search for "JOHNSON" which should find JOHNSON LEGAL SERVICES (Chambers)
+    # Search for "JOHNSON" which should find Johnson Legal Services (Chambers)
     page.get_by_label("Search for a chambers").fill("JOHNSON")
     page.get_by_role("button", name="Search").click()
 
     # Should show search results
-    expect(page.get_by_text("JOHNSON LEGAL SERVICES")).to_be_visible()
+    expect(page.get_by_text("Johnson Legal Services")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -50,8 +50,8 @@ def test_assign_chambers_search_by_account_number(page: Page):
     page.get_by_label("Search for a chambers").fill("2")
     page.get_by_role("button", name="Search").click()
 
-    # Should find JOHNSON LEGAL SERVICES (firm_id 2)
-    expect(page.get_by_text("JOHNSON LEGAL SERVICES")).to_be_visible()
+    # Should find Johnson Legal Services (firm_id 2)
+    expect(page.get_by_text("Johnson Legal Services")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -87,7 +87,7 @@ def test_assign_chambers_successful_submission(page: Page):
     page.get_by_role("button", name="Submit").click()
 
     # Should redirect to providers list with success message
-    expect(page.get_by_text("ALAN DAVIES assigned to NORTHERN LEGAL CHAMBERS")).to_be_visible()
+    expect(page.get_by_text("Alan Davies assigned to Northern Legal Chambers")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -125,8 +125,8 @@ def test_assign_chambers_case_insensitive_search(page: Page):
     page.get_by_label("Search for a chambers").fill("johnson")
     page.get_by_role("button", name="Search").click()
 
-    # Should still find JOHNSON LEGAL SERVICES
-    expect(page.get_by_text("JOHNSON LEGAL SERVICES")).to_be_visible()
+    # Should still find Johnson Legal Services
+    expect(page.get_by_text("Johnson Legal Services")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")

@@ -12,7 +12,7 @@ def navigate_to_offices(page: Page):
     page.get_by_role("button", name="Search").click()
 
     # Click on the provider known to have more than one office
-    page.get_by_role("link", name="SMITH & PARTNERS SOLICITORS").click()
+    page.get_by_role("link", name="Smith & Partners Solicitors").click()
     page.get_by_role("link", name="Offices").click()
 
     # Verify the expected offices are present
@@ -35,7 +35,7 @@ def test_reassign_head_office(page: Page):
     page.get_by_role("row", name="Select this row  1A002L 2").get_by_label("Select this row").check()
     page.get_by_role("button", name="Submit").click()
     # ...and see an update message...
-    expect(page.get_by_text("SMITH & PARTNERS SOLICITORS head office reassigned to 1A002L")).to_be_visible()
+    expect(page.get_by_text("Smith & Partners Solicitors head office reassigned to 1A002L")).to_be_visible()
     # ...and the provider account number changed.
     expect(page.get_by_role("definition").filter(has_text="1A002L")).to_be_visible()
 
@@ -61,7 +61,7 @@ def test_reassign_head_office_cancel(page: Page):
     page.get_by_role("link", name="Cancel").click()
     # ...and do not see any change messages...
     expect(page.get_by_text("No change made because 1A001L")).not_to_be_visible()
-    expect(page.get_by_text("SMITH & PARTNERS SOLICITORS head office reassigned to 1A002L")).not_to_be_visible()
+    expect(page.get_by_text("Smith & Partners Solicitors head office reassigned to 1A002L")).not_to_be_visible()
     # ...and the provider account number has not changed.
     expect(page.get_by_role("definition").filter(has_text="1A001L")).to_be_visible()
 

@@ -8,7 +8,7 @@ def test_add_barrister_form_loads_from_chambers(page: Page) -> None:
     # Navigate to a chambers provider and then to add barrister form
     page.get_by_role("button", name="Sign in").click()
     page.get_by_role("button", name="Search").click()
-    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()  # This is a chambers
+    page.get_by_role("link", name="Johnson Legal Services").click()  # This is a chambers
     page.get_by_role("link", name="Barristers and advocates").click()
     page.get_by_role("button", name="Add another barrister").click()
 
@@ -49,7 +49,7 @@ def test_add_barrister_validation_errors(page: Page) -> None:
     # Navigate to chambers and add barrister form
     page.get_by_role("button", name="Sign in").click()
     page.get_by_role("button", name="Search").click()
-    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
+    page.get_by_role("link", name="Johnson Legal Services").click()
     page.get_by_role("link", name="Barristers and advocates").click()
     page.get_by_role("button", name="Add another barrister").click()
 
@@ -67,19 +67,19 @@ def test_barrister_form_displays_chambers_name_as_caption(page: Page) -> None:
     # Navigate to chambers and add barrister form
     page.get_by_role("button", name="Sign in").click()
     page.get_by_role("button", name="Search").click()
-    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
+    page.get_by_role("link", name="Johnson Legal Services").click()
     page.get_by_role("link", name="Barristers and advocates").click()
     page.get_by_role("button", name="Add another barrister").click()
 
     # Check that the chambers name appears as a caption in the form
-    expect(page.locator(".govuk-caption-xl")).to_contain_text("JOHNSON LEGAL SERVICES")
+    expect(page.locator(".govuk-caption-xl")).to_contain_text("Johnson Legal Services")
 
 
 def _test_add_barrister_steps(page: Page) -> None:
     # Navigate to chambers and add barrister form
     page.get_by_role("button", name="Sign in").click()
     page.get_by_role("button", name="Search").click()
-    page.get_by_role("link", name="JOHNSON LEGAL SERVICES").click()
+    page.get_by_role("link", name="Johnson Legal Services").click()
     page.get_by_role("link", name="Barristers and advocates").click()
     page.get_by_role("button", name="Add another barrister").click()
 

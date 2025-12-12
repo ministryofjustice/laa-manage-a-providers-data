@@ -197,6 +197,26 @@
       "zip": "PL12 6QY",
       "startDate": "2025-10-10",
       "endDate": "2025-11-06"
+    },
+    {
+      "bankAccountId": 9,
+      "vendorSiteId": 1448,
+      "bankName": "Crown Financial Services",
+      "bankBranchName": "Birmingham High Street",
+      "sortCode": "404516",
+      "accountNumber": "87654321",
+      "bankAccountName": "Johnson Legal Services Business Account",
+      "currencyCode": "GBP",
+      "accountType": "Business Account",
+      "primaryFlag": "Y",
+      "addressLine1": "8 Canada Square",
+      "addressLine2": "Canary Wharf",
+      "addressLine3": null,
+      "city": "London",
+      "county": "Greater London",
+      "country": "GB",
+      "zip": "E14 5HQ",
+      "startDate": "2020-09-10"
     }
   ]
 }
