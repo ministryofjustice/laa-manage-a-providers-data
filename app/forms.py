@@ -22,6 +22,10 @@ class BaseForm(FlaskForm):
             if value == "":
                 value = None
 
+            if isinstance(value, int):
+                # ints coming from the browser as a string, this makes comparison easier in has_changed.
+                value = str(value)
+
             self._original_data[name] = value
 
     def has_changed(self):
