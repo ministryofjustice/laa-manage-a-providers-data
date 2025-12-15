@@ -56,6 +56,8 @@ STATUS_TABLE_FIELD_CONFIG = {
         {
             "label": "Referred to debt recovery",
             "text_renderer": get_entity_referred_to_debt_recovery_text,
+            "visible": lambda firm: not firm.get("inactive_date"),
+            "change_link": "main.change_firm_debt_recovery",
             "default": "No",
         },
         {
@@ -82,7 +84,9 @@ STATUS_TABLE_FIELD_CONFIG = {
         {"label": "Intervened", "default": "No"},
         {
             "label": "Referred to debt recovery",
+            "visible": lambda firm: not firm.get("inactive_date"),
             "text_renderer": get_entity_referred_to_debt_recovery_text,
+            "change_link": "main.change_firm_debt_recovery",
             "default": "No",
         },
         {
@@ -110,6 +114,8 @@ STATUS_TABLE_FIELD_CONFIG = {
         {
             "label": "Referred to debt recovery",
             "default": "No",
+            "text_renderer": get_entity_referred_to_debt_recovery_text,
+            "change_link": "main.change_office_debt_recovery",
             "visible": lambda office: office.get("inactive_date") is None,
         },  # Show if inactive
         {

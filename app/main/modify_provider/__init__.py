@@ -7,6 +7,7 @@ from .forms import (
     BarristerChangeDetailsForm,
     ChangeAdvocateDetailsForm,
     ChangeChambersDetailsForm,
+    ChangeFirmDebtRecoveryForm,
     ChangeFirmFalseBalanceForm,
     ChangeLegalServicesProviderNameForm,
     ChangeLiaisonManagerForm,
@@ -21,6 +22,7 @@ from .views import (
     BarristerChangeDetailsView,
     ChangeAdvocateDetailsFormView,
     ChangeChambersDetailsFormView,
+    ChangeFirmDebtRecoveryFormView,
     ChangeFirmFalseBalanceFormView,
     ChangeLegalServicesProviderNameFormView,
     ChangeLiaisonManagerFormView,
@@ -94,6 +96,12 @@ def register_views(bp: Blueprint):
         view_class=ChangeFirmFalseBalanceFormView,
         blueprint=bp,
         endpoint="change_firm_false_balance",
+    )
+    register_form_view(
+        form_class=ChangeFirmDebtRecoveryForm,
+        view_class=ChangeFirmDebtRecoveryFormView,
+        blueprint=bp,
+        endpoint="change_firm_debt_recovery",
     )
     register_form_view(
         form_class=ChangePaymentsHoldStatusForm,

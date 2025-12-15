@@ -115,6 +115,7 @@ class Office(BaseModel):
     inactive_date: date | None = Field(alias="inactiveDate", default=None)
     hold_all_payments_flag: YN | None = Field(alias="holdAllPaymentsFlag", default=None)
     hold_reason: str | None = Field(alias="holdReason", min_length=1, default=None)
+    debt_recovery_flag: YesNo = Field(alias="debtRecoveryFlag", default=None)
     contract_manager: str | None = Field(alias="contractManager", default=None)
 
     is_head_office: Optional[bool] = Field(

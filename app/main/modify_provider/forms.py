@@ -14,6 +14,7 @@ from app.main.add_a_new_provider.forms import (
 )
 from app.main.update_office import (
     ChangeOfficeContactDetailsForm,
+    ChangeOfficeDebtRecoveryForm,
     ChangeOfficeFalseBalanceForm,
 )
 from app.main.utils import get_firm_account_number
@@ -82,11 +83,14 @@ class ChangeProviderActiveStatusForm(NoChangesMixin, ChangeForm, BaseForm):
         self.status.errors.append(error_message)
 
 
-class AssignChambersForm(BaseForm):
+class AssignChambersForm(NoChangesMixin, BaseForm):
     url = "provider/<firm('Advocate', 'Barrister'):firm>/assign-chambers"
     template = "add_provider/assign-chambers.html"
     success_url = "main.providers"
     submit_button_text = "Submit"
+    no_changes_error_message = (
+        "You have not changed the chambers they are assigned to. Cancel if you do not want to change it."
+    )
 
     @property
     def title(self):
@@ -170,6 +174,9 @@ class AssignChambersForm(BaseForm):
             )
 
         self.provider.choices = choices
+
+    def attach_no_change_error_to_element(self, error_message):
+        self.provider.errors.append(error_message)
 
 
 class ReassignHeadOfficeForm(BaseForm):
@@ -278,6 +285,13 @@ class ChangeFirmFalseBalanceForm(ChangeOfficeFalseBalanceForm):
     url = "provider/<firm('Barrister','Advocate'):firm>/change-false-balance"
     title = "Do they have a false balance?"
     submit_button_text = "Submit"
+
+
+class ChangeFirmDebtRecoveryForm(ChangeOfficeDebtRecoveryForm):
+    url = "provider/<firm('Barrister','Advocate'):firm>/debt-recovery-unit-referral"
+    title = "Have they have been referred to the Debt Recovery Unit?"
+    no_changes_error_message_for_yes_value = "Select no if they are no longer referred to the Debt Recovery Unit. Cancel if you do not want to change the answer."
+    no_changes_error_message_for_no_value = "Select yes if they have been referred to the Debt Recovery Unit. Cancel if you do not want to change the answer."
 
 
 class ChangePaymentsHoldStatusForm(BaseForm):

@@ -174,6 +174,36 @@ class ChangeOfficeFalseBalanceForm(NoChangesMixin, UpdateOfficeBaseForm):
     )
 
 
+class ChangeOfficeDebtRecoveryForm(NoChangesMixin, UpdateOfficeBaseForm):
+    url = "provider/<firm:firm>/office/<office:office>/debt-recovery-unit-referral"
+    title = "Has this office been referred to the Debt Recovery Unit?"
+    submit_button_text = "Submit"
+    no_changes_error_message_for_yes_value = "Select no if the office is no longer referred to the Debt Recovery Unit. Cancel if you do not want to change the answer."
+    no_changes_error_message_for_no_value = "Select yes if the office has been referred to the Debt Recovery Unit. Cancel if you do not want to change the answer."
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.status.data == "Yes":
+            self.no_changes_error_message = self.no_changes_error_message_for_yes_value
+        else:
+            self.no_changes_error_message = self.no_changes_error_message_for_no_value
+
+    @property
+    def caption(self):
+        return self.firm.firm_name
+
+    status = RadioField(
+        label="",
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
+        choices=YES_NO_CHOICES,
+        validators=[InputRequired("Please select a valid choice.")],
+        default="No",
+    )
+
+    def attach_no_change_error_to_element(self, error_message):
+        self.status.errors.append(error_message)
+
+
 class ChangeOfficePaymentsHoldStatusForm(NoChangesMixin, UpdateOfficeBaseForm):
     title = "Do you want to hold payments?"
     url = "provider/<firm:firm>/office/<office:office>/hold-payments"
