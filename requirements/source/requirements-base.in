@@ -12,3 +12,4 @@ structlog
 pydantic
 email-validator
 Flask-Limiter
+urllib3==2.6.0
