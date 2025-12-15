@@ -78,11 +78,14 @@ class ChangeProviderActiveStatusForm(NoChangesMixin, ChangeForm, BaseForm):
         self.status.errors.append(error_message)
 
 
-class AssignChambersForm(BaseForm):
+class AssignChambersForm(NoChangesMixin, BaseForm):
     url = "provider/<firm('Advocate', 'Barrister'):firm>/assign-chambers"
     template = "add_provider/assign-chambers.html"
     success_url = "main.providers"
     submit_button_text = "Submit"
+    no_changes_error_message = (
+        "You have not changed the chambers they are assigned to. Cancel if you do not want to change it."
+    )
 
     @property
     def title(self):
@@ -166,6 +169,9 @@ class AssignChambersForm(BaseForm):
             )
 
         self.provider.choices = choices
+
+    def attach_no_change_error_to_element(self, error_message):
+        self.provider.errors.append(error_message)
 
 
 class ReassignHeadOfficeForm(BaseForm):

@@ -43,7 +43,7 @@ def navigate_to_provider_page(page: Page, provider_name: str, office_code: str |
     # Click on the first provider
     page.get_by_role("link", name=provider_name).click()
 
-    expect(page.get_by_role("heading", name=provider_name)).to_be_visible()
+    expect(page.get_by_role("heading", name=provider_name, level=1)).to_be_visible()
 
     if not office_code:
         return
