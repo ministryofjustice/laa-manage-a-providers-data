@@ -1,8 +1,8 @@
 from typing import List
 
 from flask import current_app
-from wtforms.fields.choices import RadioField
-from wtforms.fields.simple import StringField
+from wtforms.fields.choices import RadioField, SelectMultipleField
+from wtforms.fields.simple import StringField, TextAreaField
 from wtforms.validators import InputRequired, Optional
 
 from app.constants import OFFICE_ACTIVE_STATUS_CHOICES, PAYMENT_METHOD_CHOICES, YES_NO_CHOICES
@@ -10,11 +10,13 @@ from app.forms import BaseForm, NoChangesMixin
 from app.main.add_a_new_office.forms import OfficeContactDetailsForm
 from app.main.add_a_new_provider import AssignContractManagerForm
 from app.main.forms import BaseBankAccountForm, BaseBankAccountSearchForm
+from app.main.utils import get_office_tags
 from app.models import BankAccount, Firm, Office
-from app.validators import (
-    ValidateVATRegistrationNumber,
-)
-from app.widgets import GovRadioInput, GovTextInput
+from app.utils.formatting import format_office_address_one_line
+from app.validators import ValidateVATRegistrationNumber, ValidationError
+from app.widgets import GovRadioInput, GovTextArea, GovTextInput
+
+from ...components.tables import CheckDataTable, TableStructureItem
 
 
 class UpdateOfficeBaseForm(BaseForm):
@@ -170,3 +172,95 @@ class ChangeOfficeFalseBalanceForm(NoChangesMixin, UpdateOfficeBaseForm):
         validators=[InputRequired("Please select a valid choice.")],
         default="No",
     )
+
+
+class ChangeOfficePaymentsHoldStatusForm(NoChangesMixin, UpdateOfficeBaseForm):
+    title = "Do you want to hold payments?"
+    url = "provider/<firm:firm>/office/<office:office>/hold-payments"
+    yes_no_changes_error_message = (
+        "Select no to remove the hold on payments. Cancel if you do not want to change the answer"
+    )
+    no_no_changes_error_message = "Select yes to put payments on hold. Cancel if you do not want to change the answer."
+    template = ("update_office/hold-payments.html",)
+    submit_button_text = "Submit"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.status.data == "Yes":
+            self.no_changes_error_message = self.yes_no_changes_error_message
+        else:
+            self.no_changes_error_message = self.no_no_changes_error_message
+
+    @property
+    def caption(self):
+        return self.firm.firm_name
+
+    status = RadioField(
+        "",
+        widget=GovRadioInput(
+            heading_class="govuk-fieldset__legend--m",
+        ),
+        choices=YES_NO_CHOICES,
+    )
+    reason = TextAreaField(
+        "Why do you want to hold payments?",
+        widget=GovTextArea(),
+    )
+
+    def validate_reason(self, field):
+        if self.status.data == "Yes" and not field.data:
+            raise ValidationError("Explain why you want to hold all payments")
+
+
+class AllowHeadOfficePaymentsForm(UpdateOfficeBaseForm):
+    url = "provider/<firm:firm>/office/<office:office>/allow-head-office-payments"
+    template = "update_office/hold-payments-head-office-form.html"
+    caption = "Select any other offices you want to apply the intervention for"
+    submit_button_text = "Apply intervention for provider and selected offices"
+
+    offices = SelectMultipleField(
+        label="",
+        validators=[InputRequired("Please select an office or use the cancel button")],
+    )
+
+    @property
+    def title(self):
+        return f"Hold payments to {self.firm.firm_name}"
+
+    def __init__(self, firm: Firm, office: Office, *args, **kwargs):
+        super().__init__(firm, office, *args, **kwargs)
+        table_structure: list[TableStructureItem] = [
+            {"text": "Account number", "id": "firm_office_code"},
+            {"text": "Address", "id": "address"},
+            {"text": "Status", "id": "status", "html_renderer": lambda data: data["status"]},
+        ]
+
+        data = self.get_data()
+        self.offices.choices = [(item["firm_office_code"]) for item in data]
+
+        self.data_table = CheckDataTable(
+            structure=table_structure,
+            data=data,
+            field_name="offices",
+            field_value_key="firm_office_code",
+        )
+
+    def get_data(self):
+        pda = current_app.extensions["pda"]
+        offices = pda.get_provider_offices(firm_id=self.firm.firm_id)
+        data = []
+        for office in offices:
+            data.append(
+                {
+                    "firm_office_code": office.firm_office_code,
+                    "address": format_office_address_one_line(office),
+                    "status": self.get_office_status_tags(office),
+                }
+            )
+        return data
+
+    def get_office_status_tags(self, office: Office):
+        status_tags = get_office_tags(office)
+        if status_tags:
+            return f"<div>{''.join([s.render() for s in status_tags])}</div>"
+        return "<p class='govuk-visually-hidden'>No statuses</p>"

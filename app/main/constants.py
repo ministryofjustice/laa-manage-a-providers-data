@@ -25,12 +25,6 @@ STATUS_TABLE_FIELD_CONFIG = {
             "text_renderer": get_entity_active_text,
             "change_link": "main.change_provider_active_status",
         },
-        {
-            "label": "Payments on hold",
-            "id": "hold_all_payments_flag",
-            "formatter": format_yes_no,
-            "default": "No",
-        },
         {"label": "Intervened", "default": "No"},
         {
             "label": "Referred to debt recovery",
@@ -56,6 +50,7 @@ STATUS_TABLE_FIELD_CONFIG = {
             "id": "hold_all_payments_flag",
             "formatter": format_yes_no,
             "default": "No",
+            "change_link": "main.change_hold_payments_status",
         },
         {"label": "Intervened", "default": "No"},
         {
@@ -82,6 +77,7 @@ STATUS_TABLE_FIELD_CONFIG = {
             "id": "hold_all_payments_flag",
             "formatter": format_yes_no,
             "default": "No",
+            "change_link": "main.change_hold_payments_status",
         },
         {"label": "Intervened", "default": "No"},
         {
@@ -108,6 +104,7 @@ STATUS_TABLE_FIELD_CONFIG = {
             "id": "hold_all_payments_flag",
             "formatter": format_yes_no,
             "default": "No",
+            "change_link": "main.change_office_hold_payments_status",
         },
         {"label": "Intervened", "default": "No"},
         {

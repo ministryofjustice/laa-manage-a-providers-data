@@ -1,0 +1,5 @@
+{% extends 'modify_provider/form.html' %}
+
+{% block renderFields %}
+    {{ form.render_conditional(form.status, form.reason, "Yes") }}
+{% endblock %}

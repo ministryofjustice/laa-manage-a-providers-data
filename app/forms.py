@@ -37,6 +37,20 @@ class BaseForm(FlaskForm):
 
         return form_data != self._original_data
 
+    def render_conditional(self, field, sub_field, conditional_value) -> str:
+        """
+        Make field conditional using govuk-frontend conditional logic
+        :param field: The controlling field
+        :param sub_field: The controlled field
+        :param conditional_value: The value the controlling field should have to show the controlled field
+        :return str: The render field and subfield:
+        """
+
+        sub_field_rendered = sub_field()
+        conditional = {"value": conditional_value, "html": sub_field_rendered}
+        params = {"params": {"items": [{"conditional": conditional}]}}
+        return field(**params)
+
 
 class NoChangesMixin:
     no_changes_error_message = "You have not changed anything. Cancel if you do not want to make a change."

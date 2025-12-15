@@ -850,3 +850,11 @@ class MockProviderDataApi:
 
     def update_office_false_balance(self, firm_id: int, office_code: str, data: dict) -> Office:
         return self.patch_office(firm_id, office_code, data)
+
+    def update_office_hold_payments(self, firm_id: int, office_code: str, data: dict) -> Office:
+        return self.patch_office(firm_id, office_code, data)
+
+    def update_barrister_advocate_hold_payments(self, firm_id, data: dict) -> Firm:
+        firm_details = self._find_firm_data(firm_id)
+        firm_details.update(data)
+        return Firm(**firm_details)

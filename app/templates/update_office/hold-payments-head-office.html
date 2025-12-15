@@ -1,0 +1,17 @@
+{% extends 'update_office/form.html' %}
+{%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
+{%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
+
+{% block pageHeading %}
+    <h1 class="govuk-heading-l">{{ form.title|replace('\n', '<br>')|safe }}</h1>
+
+    {%  if main_table %}
+        {{ govukTable(main_table.to_govuk_params()) }}
+    {% endif %}
+
+    <span class="govuk-caption-m govuk-!-margin-bottom-4">{{ form.caption }}</span>
+{% endblock %}
+
+{% block renderFields %}
+    {{ form.render_conditional(form.status, form.reason, "Yes") }}
+{% endblock %}

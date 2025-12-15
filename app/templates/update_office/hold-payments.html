@@ -1,0 +1,5 @@
+{% extends 'update_office/form.html' %}
+
+{% block renderFields %}
+    {{ form.render_conditional(form.status, form.reason, "Yes") }}
+{% endblock %}
