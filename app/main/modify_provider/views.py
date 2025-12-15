@@ -6,7 +6,11 @@ from flask import Response, current_app, flash, redirect, render_template, reque
 
 from app.forms import BaseForm
 from app.main.modify_provider import AssignChambersForm, ReassignHeadOfficeForm
-from app.main.update_office import ChangeOfficeContactDetailsFormView, ChangeOfficeFalseBalanceFormView
+from app.main.update_office import (
+    ChangeOfficeContactDetailsFormView,
+    ChangeOfficeDebtRecoveryFormView,
+    ChangeOfficeFalseBalanceFormView,
+)
 from app.main.utils import assign_firm_to_a_new_chambers, change_liaison_manager, reassign_head_office
 from app.main.views import AdvocateBarristerOfficeMixin, get_main_table
 from app.models import Contact, Firm, Office
@@ -338,3 +342,17 @@ class ChangeAdvocateDetailsFormView(BaseFormView):
 class ChangeFirmFalseBalanceFormView(AdvocateBarristerOfficeMixin, ChangeOfficeFalseBalanceFormView):
     def get_success_url(self, form):
         return url_for("main.view_provider", firm=form.firm)
+
+
+class ChangeFirmDebtRecoveryFormView(AdvocateBarristerOfficeMixin, ChangeOfficeDebtRecoveryFormView):
+    def get_success_url(self, form: BaseForm):
+        return url_for("main.view_provider", firm=form.firm)
+
+    def get_no_value_success_url(self, form: BaseForm | None = None) -> str:
+        return self.get_success_url(form)
+
+    def get_yes_value_success_message(self, form: BaseForm) -> str:
+        return f"{form.firm.firm_name} is referred to the Debt Recovery Unit."
+
+    def get_no_value_success_message(self, form: BaseForm | None = None) -> str:
+        return f"{form.firm.firm_name} is not referred to the Debt Recovery Unit."
