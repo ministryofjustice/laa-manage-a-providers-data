@@ -176,15 +176,15 @@ class ChangeOfficeDebtRecoveryForm(NoChangesMixin, UpdateOfficeBaseForm):
     url = "provider/<firm:firm>/office/<office:office>/debt-recovery-unit-referral"
     title = "Has this office been referred to the Debt Recovery Unit?"
     submit_button_text = "Submit"
-    yes_no_changes_error_message = "Select no if the office is no longer referred to the Debt Recovery Unit. Cancel if you do not want to change the answer."
-    no_no_changes_error_message = "Select yes if the office has been referred to the Debt Recovery Unit. Cancel if you do not want to change the answer."
+    no_changes_error_message_for_yes_value = "Select no if the office is no longer referred to the Debt Recovery Unit. Cancel if you do not want to change the answer."
+    no_changes_error_message_for_no_value = "Select yes if the office has been referred to the Debt Recovery Unit. Cancel if you do not want to change the answer."
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.status.data == "Yes":
-            self.no_changes_error_message = self.yes_no_changes_error_message
+            self.no_changes_error_message = self.no_changes_error_message_for_yes_value
         else:
-            self.no_changes_error_message = self.no_no_changes_error_message
+            self.no_changes_error_message = self.no_changes_error_message_for_no_value
 
     @property
     def caption(self):
