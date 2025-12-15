@@ -212,11 +212,12 @@ class ChangeOfficePaymentsHoldStatusForm(NoChangesMixin, UpdateOfficeBaseForm):
             raise ValidationError("Explain why you want to hold all payments")
 
 
-class AllowHeadOfficePaymentsForm(UpdateOfficeBaseForm):
-    url = "provider/<firm:firm>/office/<office:office>/allow-head-office-payments"
-    template = "update_office/hold-payments-head-office-form.html"
-    caption = "Select any other offices you want to apply the intervention for"
-    submit_button_text = "Apply intervention for provider and selected offices"
+class ApplyHoldHeadOfficePaymentsForm(UpdateOfficeBaseForm):
+    url = "provider/<firm:firm>/office/<office:office>/apply-hold-payments"
+    template = "update_office/hold-payments-head-office.html"
+    description = "This will hold payments for the head office"
+    caption = "Select any other offices you want to hold payments for. You can only select active offices"
+    submit_button_text = "Hold payments for selected offices"
 
     offices = SelectMultipleField(
         label="",
@@ -226,6 +227,14 @@ class AllowHeadOfficePaymentsForm(UpdateOfficeBaseForm):
     @property
     def title(self):
         return f"Hold payments to {self.firm.firm_name}"
+
+    @property
+    def status(self):
+        return "Yes"  # Head office is always being held
+
+    @property
+    def reason(self):
+        return "Payments hold applied by head office form"  # or get from another field
 
     def __init__(self, firm: Firm, office: Office, *args, **kwargs):
         super().__init__(firm, office, *args, **kwargs)
@@ -245,16 +254,22 @@ class AllowHeadOfficePaymentsForm(UpdateOfficeBaseForm):
             field_value_key="firm_office_code",
         )
 
+        # Here we pre-select the head-office checkbox
+        self.data_table_params = self.data_table.to_govuk_params(selected_value=office.firm_office_code)
+
     def get_data(self):
         pda = current_app.extensions["pda"]
         offices = pda.get_provider_offices(firm_id=self.firm.firm_id)
         data = []
+        print("Offices: ", offices)
+
         for office in offices:
             data.append(
                 {
                     "firm_office_code": office.firm_office_code,
                     "address": format_office_address_one_line(office),
                     "status": self.get_office_status_tags(office),
+                    "is_inactive": office.inactive_date is not None,
                 }
             )
         return data
@@ -264,3 +279,18 @@ class AllowHeadOfficePaymentsForm(UpdateOfficeBaseForm):
         if status_tags:
             return f"<div>{''.join([s.render() for s in status_tags])}</div>"
         return "<p class='govuk-visually-hidden'>No statuses</p>"
+
+
+class RemoveHoldHeadOfficePaymentsForm(ApplyHoldHeadOfficePaymentsForm):
+    url = "provider/<firm:firm>/office/<office:office>/remove-hold-payments"
+    template = "update_office/hold-payments-head-office.html"
+    caption = "Select any other offices you want to allow payments for. You can only select active offices."
+    submit_button_text = "Remove intervention for provider and selected offices"
+
+    @property
+    def title(self):
+        return f"Allow payments to {self.firm.firm_name}"
+
+    @property
+    def status(self):
+        return "No"  # Head office is always being held

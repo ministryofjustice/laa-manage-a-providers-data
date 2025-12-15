@@ -99,5 +99,5 @@ def register_views(bp: Blueprint):
         form_class=ChangePaymentsHoldStatusForm,
         view_class=ChangePaymentsHoldStatusFormView,
         blueprint=bp,
-        endpoint="change_hold_payments_status",
+        endpoint="change_hold_payments_flag",
     )

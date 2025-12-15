@@ -1,4 +1,4 @@
-{% extends 'update_office/form.html' %}
+{% extends 'form.html' %}
 {%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
 {%- from 'govuk_frontend_jinja/components/table/macro.html' import govukTable -%}
 
@@ -13,5 +13,5 @@
 {% endblock %}
 
 {% block renderFields %}
-    {{ form.render_conditional(form.status, form.reason, "Yes") }}
+    {{ govukTable(form.data_table_params) }}
 {% endblock %}

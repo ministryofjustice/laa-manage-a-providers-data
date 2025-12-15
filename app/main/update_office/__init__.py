@@ -1,7 +1,7 @@
 from app.utils import register_form_view
 
 from .forms import (
-    AllowHeadOfficePaymentsForm,
+    ApplyHoldHeadOfficePaymentsForm,
     BankAccountForm,
     BankAccountSearchForm,
     ChangeOfficeActiveStatusForm,
@@ -10,17 +10,19 @@ from .forms import (
     ChangeOfficeFalseBalanceForm,
     ChangeOfficePaymentsHoldStatusForm,
     PaymentMethodForm,
+    RemoveHoldHeadOfficePaymentsForm,
     UpdateVATRegistrationNumberForm,
 )
 from .views import (
     AddBankAccountFormView,
-    AllowHeadOfficePaymentsFormView,
+    ApplyHoldHeadOfficePaymentsFormView,
     ChangeContractManagerFormView,
     ChangeOfficeContactDetailsFormView,
     ChangeOfficeFalseBalanceFormView,
     ChangeOfficePaymentsHoldStatusFormView,
     OfficeActiveStatusFormView,
     PaymentMethodFormView,
+    RemoveHoldHeadOfficePaymentsFormView,
     SearchBankAccountFormView,
     UpdateVATRegistrationNumberFormView,
 )
@@ -79,11 +81,17 @@ def register_views(bp):
         form_class=ChangeOfficePaymentsHoldStatusForm,
         view_class=ChangeOfficePaymentsHoldStatusFormView,
         blueprint=bp,
-        endpoint="change_office_hold_payments_status",
+        endpoint="change_office_hold_payments_flag",
     )
     register_form_view(
-        form_class=AllowHeadOfficePaymentsForm,
-        view_class=AllowHeadOfficePaymentsFormView,
+        form_class=ApplyHoldHeadOfficePaymentsForm,
+        view_class=ApplyHoldHeadOfficePaymentsFormView,
         blueprint=bp,
-        endpoint="allow_office_payments",
+        endpoint="apply_head_office_hold_payments_flag",
+    )
+    register_form_view(
+        form_class=RemoveHoldHeadOfficePaymentsForm,
+        view_class=RemoveHoldHeadOfficePaymentsFormView,
+        blueprint=bp,
+        endpoint="remove_head_office_hold_payments_flag",
     )

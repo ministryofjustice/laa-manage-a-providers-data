@@ -50,7 +50,7 @@ STATUS_TABLE_FIELD_CONFIG = {
             "id": "hold_all_payments_flag",
             "formatter": format_yes_no,
             "default": "No",
-            "change_link": "main.change_hold_payments_status",
+            "change_link": "main.change_hold_payments_flag",
         },
         {"label": "Intervened", "default": "No"},
         {
@@ -77,7 +77,7 @@ STATUS_TABLE_FIELD_CONFIG = {
             "id": "hold_all_payments_flag",
             "formatter": format_yes_no,
             "default": "No",
-            "change_link": "main.change_hold_payments_status",
+            "change_link": "main.change_hold_payments_flag",
         },
         {"label": "Intervened", "default": "No"},
         {
@@ -104,7 +104,7 @@ STATUS_TABLE_FIELD_CONFIG = {
             "id": "hold_all_payments_flag",
             "formatter": format_yes_no,
             "default": "No",
-            "change_link": "main.change_office_hold_payments_status",
+            "change_link": "main.change_office_hold_payments_flag",
         },
         {"label": "Intervened", "default": "No"},
         {
