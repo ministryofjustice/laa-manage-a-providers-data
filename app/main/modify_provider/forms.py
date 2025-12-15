@@ -283,5 +283,5 @@ class ChangeFirmFalseBalanceForm(ChangeOfficeFalseBalanceForm):
 class ChangeFirmDebtRecoveryForm(ChangeOfficeDebtRecoveryForm):
     url = "provider/<firm('Barrister','Advocate'):firm>/debt-recovery-unit-referral"
     title = "Have they have been referred to the Debt Recovery Unit?"
-    yes_no_changes_error_message = "Select no if they are no longer referred to the Debt Recovery Unit. Cancel if you do not want to change the answer."
-    no_no_changes_error_message = "Select yes if they have been referred to the Debt Recovery Unit. Cancel if you do not want to change the answer."
+    no_changes_error_message_for_yes_value = "Select no if they are no longer referred to the Debt Recovery Unit. Cancel if you do not want to change the answer."
+    no_changes_error_message_for_no_value = "Select yes if they have been referred to the Debt Recovery Unit. Cancel if you do not want to change the answer."
