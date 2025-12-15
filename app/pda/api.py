@@ -579,9 +579,8 @@ class ProviderDataApi:
             "Updating office false balance is currently not supported by the real Provider Data API"
         )
 
-    def get_all_contacts(self) -> list[Contact]:
-        """
-        Get all contacts. Used when assigning contract manager to a new office or re-assign contract manager
-        Returns: List[Contact]
-        """
-        raise NotImplementedError("Getting all contacts is currently not supported by the real Provider Data API")
+    def get_list_of_contract_manager_names(self):
+        """Get a list of all known contract managers."""
+        raise NotImplementedError(
+            "Getting list of known contract managers is currently not supported by the real API - see https://dsdmoj.atlassian.net/wiki/spaces/laagetaccess/pages/5912559872/Contract+Manager+list"
+        )

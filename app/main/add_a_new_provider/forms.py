@@ -356,8 +356,7 @@ class AssignContractManagerForm(BaseForm):
 
     def get_contract_managers(self):
         pda = current_app.extensions["pda"]
-        managers = pda.get_all_contacts()
-        return [{"name": f"{manager.first_name} {manager.last_name}"} for manager in managers]
+        return pda.get_list_of_contract_manager_names()
 
 
 class AddBarristerDetailsForm(BaseForm):

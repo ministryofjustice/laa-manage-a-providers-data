@@ -88,7 +88,7 @@ def test_assign_contract_manager_search_functionality(page: Page):
     # Should show search results
     expect(page.get_by_text("1 search result for 'Alice'")).to_be_visible()
     expect(page.get_by_role("radio", name="Select this row")).to_be_visible()
-    expect(page.get_by_text("Alice Brown")).to_be_visible()
+    expect(page.get_by_text("Alice Johnson")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -97,12 +97,12 @@ def test_assign_contract_manager_search_multiple_results(page: Page):
     navigate_to_assign_contract_manager_via_lsp(page)
 
     # Search for a common name
-    page.get_by_role("textbox", name="Search for a contract manager").fill("Davies")
+    page.get_by_role("textbox", name="Search for a contract manager").fill("Smith")
     page.get_by_role("button", name="Search").click()
 
     # Should show multiple search results
-    expect(page.get_by_text("1 search result for 'Davies'")).to_be_visible()
-    expect(page.get_by_text("Alan Davies")).to_be_visible()
+    expect(page.get_by_text("1 search result for 'Smith'")).to_be_visible()
+    expect(page.get_by_text("Robert Smith")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -129,9 +129,9 @@ def test_assign_contract_manager_case_insensitive_search(page: Page):
     page.get_by_role("textbox", name="Search for a contract manager").fill("alice")
     page.get_by_role("button", name="Search").click()
 
-    # Should still find Alice Brown
+    # Should still find Alice Johnson
     expect(page.get_by_text("1 search result for 'alice'")).to_be_visible()
-    expect(page.get_by_text("Alice Brown")).to_be_visible()
+    expect(page.get_by_text("Alice Johnson")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -287,7 +287,7 @@ def test_assign_contract_manager_table_displays_correctly(page: Page):
     # Check table structure and content
     expect(page.get_by_role("table")).to_be_visible()
     expect(page.get_by_role("columnheader", name="Name")).to_be_visible()
-    expect(page.get_by_role("cell", name="Alice Brown")).to_be_visible()
+    expect(page.get_by_role("cell", name="Alice Johnson")).to_be_visible()
     expect(page.get_by_role("radio", name="Select this row")).to_be_visible()
 
 
@@ -302,4 +302,4 @@ def test_assign_contract_manager_partial_name_search(page: Page):
 
     # Should find managers with "John" in their name
     expect(page.get_by_text("1 search result for 'John'")).to_be_visible()
-    expect(page.get_by_text("Sarah Johnson")).to_be_visible()
+    expect(page.get_by_text("Alice Johnson")).to_be_visible()

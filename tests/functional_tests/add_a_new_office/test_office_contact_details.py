@@ -143,7 +143,7 @@ def test_successful_form_submission_minimal(page: Page):
     # Firm in mock data has Mr.Default contract manager, so we get a prompt to set a contract manager for the office
     expect(page.get_by_text("Search for a contract manager")).to_be_visible()
     expect(page.get_by_role("button", name="Unknown: Skip this step")).to_be_visible()
-    page.get_by_role("row", name="Select this row  Alice Brown").get_by_label("Select this row").check()
+    page.get_by_role("row", name="Select this row  Alice Johnson").get_by_label("Select this row").check()
     page.get_by_role("button", name="Submit").click()
 
     # Should redirect to the new office
@@ -180,7 +180,7 @@ def test_successful_form_submission_all_fields(page: Page):
     # Firm in mock data has Mr.Default contract manager, so we get a prompt to set a contract manager for the office
     expect(page.get_by_text("Search for a contract manager")).to_be_visible()
     expect(page.get_by_role("button", name="Unknown: Skip this step")).to_be_visible()
-    page.get_by_role("row", name="Select this row  Alice Brown").get_by_label("Select this row").check()
+    page.get_by_role("row", name="Select this row  Alice Johnson").get_by_label("Select this row").check()
     page.get_by_role("button", name="Submit").click()
 
     # Should redirect to the new office
@@ -216,7 +216,7 @@ def test_optional_fields_not_required(page: Page):
     # Firm in mock data has Mr.Default contract manager, so we get a prompt to set a contract manager for the office
     expect(page.get_by_text("Search for a contract manager")).to_be_visible()
     expect(page.get_by_role("button", name="Unknown: Skip this step")).to_be_visible()
-    page.get_by_role("row", name="Select this row  Alice Brown").get_by_label("Select this row").check()
+    page.get_by_role("row", name="Select this row  Alice Johnson").get_by_label("Select this row").check()
     page.get_by_role("button", name="Submit").click()
 
     # Should redirect to the new office

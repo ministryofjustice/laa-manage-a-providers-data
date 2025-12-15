@@ -659,15 +659,12 @@ class MockProviderDataApi:
         # Find all contacts for this office
         contacts = []
         for contact in self._mock_data["contacts"]:
-            contact_name = f"{contact['firstName']} {contact['lastName']}"
             if contact.get("vendorSiteId") == office_id:
                 try:
                     contacts.append(Contact(**contact))
                 except ValidationError as e:
                     self.logger.error(f"Invalid contact data in mock for office {office_code}: {e}")
                     raise MockPDAError(f"Invalid contact data: {e}")
-            elif contact_name == office_data.get("contractManager"):
-                contacts.append(Contact(**contact))
 
         return contacts
 
@@ -854,5 +851,24 @@ class MockProviderDataApi:
     def update_office_false_balance(self, firm_id: int, office_code: str, data: dict) -> Office:
         return self.patch_office(firm_id, office_code, data)
 
-    def get_all_contacts(self) -> list[Contact]:
-        return [Contact(**contact) for contact in self._mock_data["contacts"]]
+    def update_office_debt_recovery(self, firm_id: int, office_code: str, data: dict) -> Office:
+        office_data = self._find_office_data(firm_id, office_code)
+        office_data.update(data)
+        return Office(**_clean_data(office_data))
+
+    def get_list_of_contract_manager_names(self):
+        # Static list of 12 fake contract managers
+        return [
+            {"name": "Alice Johnson"},
+            {"name": "Robert Smith"},
+            {"name": "Sarah Wilson"},
+            {"name": "Michael Brown"},
+            {"name": "Emma Davis"},
+            {"name": "Lewis Green"},
+            {"name": "Olivia Garcia"},
+            {"name": "William Martinez"},
+            {"name": "Sophia Anderson"},
+            {"name": "David Taylor"},
+            {"name": "Isabella Thomas"},
+            {"name": "Christopher Lee"},
+        ]
