@@ -1,9 +1,8 @@
 from flask import Response, redirect, render_template, url_for
 
 from app.constants import STATUS_CONTRACT_MANAGER_DEFAULT, STATUS_CONTRACT_MANAGER_NAMES
-from app.main.utils import add_new_office
+from app.main.utils import _replicate_office_contacts, add_new_office
 from app.models import Firm, Office
-from app.pda.mock_api import MockProviderDataApi
 from app.views import BaseFormView
 
 
@@ -47,17 +46,13 @@ class OfficeContactDetailsFormView(BaseFormView):
         office = Office(**office_details)
         new_office = add_new_office(office, firm_id=form.firm.firm_id)
 
-        api = self.get_api()
-        if isinstance(api, MockProviderDataApi):
-            from app.main.utils import _replicate_office_contacts
-
-            head_office = api.get_head_office(form.firm.firm_id)
-            _replicate_office_contacts(
-                source_firm_id=form.firm.firm_id,
-                source_office_code=head_office.firm_office_code,
-                target_firm_id=form.firm.firm_id,
-                target_office_code=new_office.firm_office_code,
-            )
+        # The new office should have the same contacts as the firm
+        _replicate_office_contacts(
+            source_firm_id=head_office.firm_office_id,
+            source_office_code=head_office.firm_office_code,
+            target_firm_id=new_office.firm_office_id,
+            target_office_code=new_office.firm_office_code,
+        )
 
         return redirect(self.get_success_url(new_office, form.firm))
 
