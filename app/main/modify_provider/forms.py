@@ -1,9 +1,9 @@
 from flask import current_app
-from wtforms.fields import RadioField, TextAreaField
+from wtforms.fields import RadioField
 from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired, Length
 
-from app.constants import PROVIDER_ACTIVE_STATUS_CHOICES, YES_NO_CHOICES
+from app.constants import PROVIDER_ACTIVE_STATUS_CHOICES
 from app.fields import GovUKTableRadioField
 from app.forms import BaseForm, NoChangesMixin
 from app.main.add_a_new_provider.forms import (
@@ -16,12 +16,12 @@ from app.main.update_office import (
     ChangeOfficeContactDetailsForm,
     ChangeOfficeDebtRecoveryForm,
     ChangeOfficeFalseBalanceForm,
+    ChangeOfficeHoldPaymentsFlagForm,
 )
 from app.main.utils import get_firm_account_number
 from app.models import Firm, Office
 from app.utils.formatting import format_office_address_one_line, normalize_for_search
-from app.validators import ValidationError
-from app.widgets import GovRadioInput, GovTextArea, GovTextInput
+from app.widgets import GovRadioInput, GovTextInput
 
 
 class ChangeForm:
@@ -294,29 +294,11 @@ class ChangeFirmDebtRecoveryForm(ChangeOfficeDebtRecoveryForm):
     no_changes_error_message_for_no_value = "Select yes if they have been referred to the Debt Recovery Unit. Cancel if you do not want to change the answer."
 
 
-class ChangePaymentsHoldStatusForm(BaseForm):
+class ChangeHoldPaymentsFlagForm(ChangeOfficeHoldPaymentsFlagForm):
     title = "Do you want to hold payments?"
     url = "provider/<firm:firm>/hold-payments"
-    no_changes_error_message = "Select yes to put payments on hold. Cancel if you do not want to change the answer."
     template = ("modify_provider/hold-payments.html",)
-    reason = TextAreaField(
-        "Why do you want to hold payments?",
-        widget=GovTextArea(),
-    )
-    status = RadioField(
-        "",
-        widget=GovRadioInput(
-            heading_class="govuk-fieldset__legend--m",
-        ),
-        choices=YES_NO_CHOICES,
-        default="No",
-    )
-    submit_button_text = "Submit"
 
-    def __init__(self, firm: Firm, *args, **kwargs):
+    def __init__(self, firm: Firm, office=None, *args, **kwargs):
         self.firm = firm
-        super().__init__(*args, **kwargs)
-
-    def validate_reason(self, field):
-        if self.status.data == "Yes" and not field.data:
-            raise ValidationError("Explain why you want to hold all payments")
+        super().__init__(firm, office, *args, **kwargs)

@@ -3,10 +3,10 @@ from typing import List
 from flask import current_app
 from wtforms.fields.choices import RadioField, SelectMultipleField
 from wtforms.fields.simple import StringField, TextAreaField
-from wtforms.validators import InputRequired, Optional
+from wtforms.validators import InputRequired, Length, Optional
 
 from app.constants import OFFICE_ACTIVE_STATUS_CHOICES, PAYMENT_METHOD_CHOICES, YES_NO_CHOICES
-from app.forms import BaseForm, NoChangesMixin
+from app.forms import BaseForm, IgnoreReasonIfStatusUnchangedMixin, NoChangesMixin
 from app.main.add_a_new_office.forms import OfficeContactDetailsForm
 from app.main.add_a_new_provider import AssignContractManagerForm
 from app.main.forms import BaseBankAccountForm, BaseBankAccountSearchForm
@@ -204,22 +204,24 @@ class ChangeOfficeDebtRecoveryForm(NoChangesMixin, UpdateOfficeBaseForm):
         self.status.errors.append(error_message)
 
 
-class ChangeOfficePaymentsHoldStatusForm(NoChangesMixin, UpdateOfficeBaseForm):
+class ChangeOfficeHoldPaymentsFlagForm(NoChangesMixin, IgnoreReasonIfStatusUnchangedMixin, UpdateOfficeBaseForm):
     title = "Do you want to hold payments?"
     url = "provider/<firm:firm>/office/<office:office>/hold-payments"
-    yes_no_changes_error_message = (
+    no_changes_error_message_for_no_value = (
         "Select no to remove the hold on payments. Cancel if you do not want to change the answer"
     )
-    no_no_changes_error_message = "Select yes to put payments on hold. Cancel if you do not want to change the answer."
-    template = ("update_office/hold-payments.html",)
+    no_changes_error_message_for_yes_value = (
+        "Select yes to put payments on hold. Cancel if you do not want to change the answer."
+    )
+    template = "update_office/hold-payments.html"
     submit_button_text = "Submit"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.status.data == "Yes":
-            self.no_changes_error_message = self.yes_no_changes_error_message
+            self.no_changes_error_message = self.no_changes_error_message_for_no_value
         else:
-            self.no_changes_error_message = self.no_no_changes_error_message
+            self.no_changes_error_message = self.no_changes_error_message_for_yes_value
 
     @property
     def caption(self):
@@ -235,14 +237,36 @@ class ChangeOfficePaymentsHoldStatusForm(NoChangesMixin, UpdateOfficeBaseForm):
     reason = TextAreaField(
         "Why do you want to hold payments?",
         widget=GovTextArea(),
+        validators=[Length(max=240, message="Why you want to hold all payments must be 240 characters or less")],
     )
 
     def validate_reason(self, field):
         if self.status.data == "Yes" and not field.data:
             raise ValidationError("Explain why you want to hold all payments")
 
+    def validate(self, extra_validators=None):
+        standard_validation = super().validate(extra_validators=extra_validators)
 
-class ApplyHoldHeadOfficePaymentsForm(UpdateOfficeBaseForm):
+        if not standard_validation:
+            return False
+
+        provider_status = getattr(self.firm, "inactive_date")
+
+        if provider_status is not None:
+            if self.has_changed():
+                status_is_changing = self.status.data != self.status.object_data
+                reason_is_changing = self.status.data == "Yes" and self.reason.data != self.reason.object_data
+
+                if status_is_changing or reason_is_changing:
+                    error_message = "Payments cannot be updated because the associated provider is inactive."
+                    self.status.errors.append(error_message)
+
+                    return False
+
+        return standard_validation
+
+
+class ApplyHeadOfficeHoldPaymentsForm(UpdateOfficeBaseForm):
     url = "provider/<firm:firm>/office/<office:office>/apply-hold-payments"
     template = "update_office/hold-payments-head-office.html"
     description = "This will hold payments for the head office"
@@ -311,7 +335,7 @@ class ApplyHoldHeadOfficePaymentsForm(UpdateOfficeBaseForm):
         return "<p class='govuk-visually-hidden'>No statuses</p>"
 
 
-class RemoveHoldHeadOfficePaymentsForm(ApplyHoldHeadOfficePaymentsForm):
+class RemoveHeadOfficeHoldPaymentsForm(ApplyHeadOfficeHoldPaymentsForm):
     url = "provider/<firm:firm>/office/<office:office>/remove-hold-payments"
     template = "update_office/hold-payments-head-office.html"
     caption = "Select any other offices you want to allow payments for. You can only select active offices."

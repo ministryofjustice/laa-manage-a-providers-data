@@ -70,3 +70,31 @@ class NoChangesMixin:
 
     def attach_no_change_error_to_element(self, error_message):
         self.form_errors.append(error_message)
+
+
+class IgnoreReasonIfStatusUnchangedMixin:
+    """
+    A mixin that modifies has_changed() to allow reason-only updates
+    when the 'status' is already 'Yes'.
+
+    Change detection is bypassed if and only if both the 'status' and
+    the pre-populated 'reason' are identical to the submitted data.
+    """
+
+    def has_changed(self):
+        status_field = self.status
+        reason_field = self.reason
+
+        status_changed = status_field.data != status_field.object_data
+        if status_changed:
+            return True
+
+        if status_field.data == "Yes":
+            reason_changed = str(reason_field.data) != str(reason_field.object_data)
+
+            if reason_changed:
+                return True
+            else:
+                return False
+
+        return super().has_changed()

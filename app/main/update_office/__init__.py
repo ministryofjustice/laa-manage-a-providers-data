@@ -1,7 +1,7 @@
 from app.utils import register_form_view
 
 from .forms import (
-    ApplyHoldHeadOfficePaymentsForm,
+    ApplyHeadOfficeHoldPaymentsForm,
     BankAccountForm,
     BankAccountSearchForm,
     ChangeOfficeActiveStatusForm,
@@ -9,22 +9,22 @@ from .forms import (
     ChangeOfficeContractManagerForm,
     ChangeOfficeDebtRecoveryForm,
     ChangeOfficeFalseBalanceForm,
-    ChangeOfficePaymentsHoldStatusForm,
+    ChangeOfficeHoldPaymentsFlagForm,
     PaymentMethodForm,
-    RemoveHoldHeadOfficePaymentsForm,
+    RemoveHeadOfficeHoldPaymentsForm,
     UpdateVATRegistrationNumberForm,
 )
 from .views import (
     AddBankAccountFormView,
-    ApplyHoldHeadOfficePaymentsFormView,
+    ApplyHeadOfficeHoldPaymentsFormView,
     ChangeContractManagerFormView,
     ChangeOfficeContactDetailsFormView,
     ChangeOfficeDebtRecoveryFormView,
     ChangeOfficeFalseBalanceFormView,
-    ChangeOfficePaymentsHoldStatusFormView,
+    ChangeOfficeHoldPaymentsFlagFormView,
     OfficeActiveStatusFormView,
     PaymentMethodFormView,
-    RemoveHoldHeadOfficePaymentsFormView,
+    RemoveHeadOfficeHoldPaymentsFormView,
     SearchBankAccountFormView,
     UpdateVATRegistrationNumberFormView,
 )
@@ -86,20 +86,20 @@ def register_views(bp):
         endpoint="change_office_debt_recovery",
     )
     register_form_view(
-        form_class=ChangeOfficePaymentsHoldStatusForm,
-        view_class=ChangeOfficePaymentsHoldStatusFormView,
+        form_class=ChangeOfficeHoldPaymentsFlagForm,
+        view_class=ChangeOfficeHoldPaymentsFlagFormView,
         blueprint=bp,
         endpoint="change_office_hold_payments_flag",
     )
     register_form_view(
-        form_class=ApplyHoldHeadOfficePaymentsForm,
-        view_class=ApplyHoldHeadOfficePaymentsFormView,
+        form_class=ApplyHeadOfficeHoldPaymentsForm,
+        view_class=ApplyHeadOfficeHoldPaymentsFormView,
         blueprint=bp,
         endpoint="apply_head_office_hold_payments_flag",
     )
     register_form_view(
-        form_class=RemoveHoldHeadOfficePaymentsForm,
-        view_class=RemoveHoldHeadOfficePaymentsFormView,
+        form_class=RemoveHeadOfficeHoldPaymentsForm,
+        view_class=RemoveHeadOfficeHoldPaymentsFormView,
         blueprint=bp,
         endpoint="remove_head_office_hold_payments_flag",
     )

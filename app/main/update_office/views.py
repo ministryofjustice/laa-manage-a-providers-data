@@ -475,10 +475,11 @@ class ChangeOfficeDebtRecoveryFormView(BaseFormView):
             return redirect(self.get_no_value_success_url(form))
 
 
-class ChangeOfficePaymentsHoldStatusFormView(BaseFormView):
+class ChangeOfficeHoldPaymentsFlagFormView(BaseFormView):
     def get(self, *args, **kwargs) -> str:
         firm = kwargs.get("firm")
         office = kwargs.get("office")
+
         apply_path = "main.apply_head_office_hold_payments_flag"
         remove_path = "main.remove_head_office_hold_payments_flag"
 
@@ -511,7 +512,10 @@ class ChangeOfficePaymentsHoldStatusFormView(BaseFormView):
 
     def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
         status = "Yes" if office.hold_all_payments_flag == "Y" else "No"
-        return self.get_form_class()(firm, office, status=status, hold_all_payments_flag=office.hold_all_payments_flag)
+        initial_reason = office.hold_reason if office.hold_all_payments_flag == "Y" else ""
+        return self.get_form_class()(
+            firm, office, status=status, hold_all_payments_flag=office.hold_all_payments_flag, reason=initial_reason
+        )
 
     def form_valid(self, form: BaseForm, **kwargs) -> Response:
         data = build_hold_payments_payload(form)
@@ -528,7 +532,7 @@ class ChangeOfficePaymentsHoldStatusFormView(BaseFormView):
             return f"Office {form.office.firm_office_code} hold removed."
 
 
-class ApplyHoldHeadOfficePaymentsFormView(BaseFormView):
+class ApplyHeadOfficeHoldPaymentsFormView(BaseFormView):
     def get_success_url(self, form):
         return url_for("main.view_office", firm=form.firm, office=form.office)
 
@@ -573,7 +577,7 @@ class ApplyHoldHeadOfficePaymentsFormView(BaseFormView):
         return redirect(self.get_success_url(form))
 
 
-class RemoveHoldHeadOfficePaymentsFormView(ApplyHoldHeadOfficePaymentsFormView):
+class RemoveHeadOfficeHoldPaymentsFormView(ApplyHeadOfficeHoldPaymentsFormView):
     def get_success_message(self, form):
         office_codes = form.data.get("offices", [])
         return f"<b>The following offices payements are no longer on hold: {', '.join(office_codes)}."

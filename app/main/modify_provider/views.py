@@ -363,7 +363,7 @@ class ChangeFirmDebtRecoveryFormView(AdvocateBarristerOfficeMixin, ChangeOfficeD
         return f"{form.firm.firm_name} is not referred to the Debt Recovery Unit."
 
 
-class ChangePaymentsHoldStatusFormView(AdvocateBarristerOfficeMixin, BaseFormView):
+class ChangeHoldPaymentsFlagFormView(AdvocateBarristerOfficeMixin, BaseFormView):
     def get_success_url(self, form):
         return url_for("main.view_provider", firm=form.firm)
 
@@ -373,9 +373,15 @@ class ChangePaymentsHoldStatusFormView(AdvocateBarristerOfficeMixin, BaseFormVie
         else:
             return f"<b>{form.firm.firm_name} hold on payments removed successfully</b>"
 
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update({"cancel_url": self.get_success_url(form)})
+        return context
+
     def get_form_instance(self, firm: Firm, **kwargs) -> BaseForm:
         status = "Yes" if firm.hold_all_payments_flag == "Y" else "No"
-        return self.get_form_class()(firm, status=status)
+        initial_reason = firm.hold_reason if firm.hold_all_payments_flag == "Y" else ""
+        return self.get_form_class()(firm, status=status, reason=initial_reason)
 
     def form_valid(self, form: BaseForm, **kwargs) -> Response:
         data = build_hold_payments_payload(form)

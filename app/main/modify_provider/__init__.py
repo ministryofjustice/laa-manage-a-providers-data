@@ -9,11 +9,11 @@ from .forms import (
     ChangeChambersDetailsForm,
     ChangeFirmDebtRecoveryForm,
     ChangeFirmFalseBalanceForm,
+    ChangeHoldPaymentsFlagForm,
     ChangeLegalServicesProviderNameForm,
     ChangeLiaisonManagerForm,
     ChangeLspDetailsForm,
     ChangeOfficeLiaisonManagerForm,
-    ChangePaymentsHoldStatusForm,
     ChangeProviderActiveStatusForm,
     ReassignHeadOfficeForm,
 )
@@ -24,10 +24,10 @@ from .views import (
     ChangeChambersDetailsFormView,
     ChangeFirmDebtRecoveryFormView,
     ChangeFirmFalseBalanceFormView,
+    ChangeHoldPaymentsFlagFormView,
     ChangeLegalServicesProviderNameFormView,
     ChangeLiaisonManagerFormView,
     ChangeLspDetailsFormView,
-    ChangePaymentsHoldStatusFormView,
     ChangeProviderActiveStatusFormView,
     ReassignHeadOfficeFormView,
 )
@@ -104,8 +104,8 @@ def register_views(bp: Blueprint):
         endpoint="change_firm_debt_recovery",
     )
     register_form_view(
-        form_class=ChangePaymentsHoldStatusForm,
-        view_class=ChangePaymentsHoldStatusFormView,
+        form_class=ChangeHoldPaymentsFlagForm,
+        view_class=ChangeHoldPaymentsFlagFormView,
         blueprint=bp,
         endpoint="change_hold_payments_flag",
     )
