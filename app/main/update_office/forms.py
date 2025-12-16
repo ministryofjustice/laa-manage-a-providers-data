@@ -244,6 +244,7 @@ class ChangeOfficeHoldPaymentsFlagForm(NoChangesMixin, IgnoreReasonIfStatusUncha
         if self.status.data == "Yes" and not field.data:
             raise ValidationError("Explain why you want to hold all payments")
 
+    # Temporary validation for Inactive providers
     def validate(self, extra_validators=None):
         standard_validation = super().validate(extra_validators=extra_validators)
 

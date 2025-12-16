@@ -476,20 +476,26 @@ class ChangeOfficeDebtRecoveryFormView(BaseFormView):
 
 
 class ChangeOfficeHoldPaymentsFlagFormView(BaseFormView):
-    def get_success_url(self, form):
-        apply_path = "main.apply_head_office_hold_payments_flag"
-        remove_path = "main.remove_head_office_hold_payments_flag"
-        head_office = self.get_api().get_head_office(form.firm.firm_id)
+    def _is_hold_enabled(self, form: BaseForm) -> bool:
+        return form.data.get("status") == "Yes"
 
-        if form.office.firm_office_code == head_office.firm_office_code:
-            if form.data.get("status") == "Yes":
-                return url_for(apply_path, firm=form.firm, office=form.office)
-            else:
-                return url_for(remove_path, firm=form.firm, office=form.office)
-        return url_for("main.view_office", firm=form.firm, office=form.office)
+    def get_success_url(self, form):
+        head_office = self.get_api().get_head_office(form.firm.firm_id)
+        is_head_office = form.office.firm_office_code == head_office.firm_office_code
+
+        if not is_head_office:
+            return url_for("main.view_office", firm=form.firm, office=form.office)
+
+        endpoint = (
+            "main.apply_head_office_hold_payments_flag"
+            if self._is_hold_enabled(form)
+            else "main.remove_head_office_hold_payments_flag"
+        )
+
+        return url_for(endpoint, firm=form.firm, office=form.office)
 
     def get_form_valid_success_message(self, form):
-        if form.data.get("status") == "Yes":
+        if self._is_hold_enabled(form):
             return f"<b>{form.firm.firm_name} payments put on hold successfully</b>"
         else:
             return f"<b>{form.firm.firm_name} hold on payments removed successfully</b>"
@@ -497,7 +503,10 @@ class ChangeOfficeHoldPaymentsFlagFormView(BaseFormView):
     def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(form, context, **kwargs)
         context.update(
-            {"cancel_url": self.get_success_url(form), "office_address": format_office_address_one_line(form.office)}
+            {
+                "cancel_url": url_for("main.view_office", firm=form.firm, office=form.office),
+                "office_address": format_office_address_one_line(form.office),
+            }
         )
         return context
 
@@ -516,12 +525,6 @@ class ChangeOfficeHoldPaymentsFlagFormView(BaseFormView):
 
         flash(self.get_form_valid_success_message(form), category="success")
         return redirect(self.get_success_url(form))
-
-    def get_success_message(self, form):
-        if form.data.get("status") == "Yes":
-            return f"Office {form.office.firm_office_code} put on hold."
-        else:
-            return f"Office {form.office.firm_office_code} hold removed."
 
 
 class ApplyHeadOfficeHoldPaymentsFormView(BaseFormView):
