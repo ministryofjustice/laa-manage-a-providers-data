@@ -2,7 +2,7 @@ from typing import List
 
 from flask import current_app
 from wtforms.fields.choices import RadioField, SelectMultipleField
-from wtforms.fields.simple import StringField
+from wtforms.fields.simple import StringField, SubmitField
 from wtforms.validators import InputRequired, Optional
 
 from app.constants import OFFICE_ACTIVE_STATUS_CHOICES, PAYMENT_METHOD_CHOICES, YES_NO_CHOICES
@@ -19,7 +19,7 @@ from app.validators import (
     ValidatePastDate,
     ValidateVATRegistrationNumber,
 )
-from app.widgets import GovDateInput, GovRadioInput, GovTextInput
+from app.widgets import GovDateInput, GovRadioInput, GovSubmitInput, GovTextInput
 
 from ...components.tables import CheckDataTable, TableStructureItem
 from ...fields import GovDateField
@@ -257,17 +257,17 @@ class ChangeOfficeIntervenedForm(NoChangesMixin, UpdateOfficeBaseForm):
 class ApplyHeadOfficeInterventionForm(UpdateOfficeBaseForm):
     url = "provider/<firm:firm>/office/<office:office>/apply-head-office-intervention"
     template = "update_office/intervened-head-office-form.html"
-    caption = "Select any other offices you want to apply the intervention for"
-    submit_button_text = "Apply intervention for provider and selected offices"
+    title = "Select other offices to be intervened"
+    caption = "Select any other offices you want to add the intervention to."
+    submit_button_text = "Set selected offices as intervened"
 
+    skip_button = SubmitField(
+        "Skip this step", widget=GovSubmitInput(classes="govuk-button--secondary govuk-!-margin-left-2")
+    )
     offices = SelectMultipleField(
         label="",
-        validators=[InputRequired("Please select an office or use the cancel button")],
+        validators=[InputRequired("Select an office to intervene or skip this step")],
     )
-
-    @property
-    def title(self):
-        return f"Apply intervention on {self.firm.firm_name}"
 
     def __init__(self, firm: Firm, office: Office, *args, **kwargs):
         super().__init__(firm, office, *args, **kwargs)
@@ -292,13 +292,15 @@ class ApplyHeadOfficeInterventionForm(UpdateOfficeBaseForm):
         offices = pda.get_provider_offices(firm_id=self.firm.firm_id)
         data = []
         for office in offices:
-            data.append(
-                {
-                    "firm_office_code": office.firm_office_code,
-                    "address": format_office_address_one_line(office),
-                    "status": self.get_office_status_tags(office),
-                }
-            )
+            # Exclude the head office from the list
+            if self.office.firm_office_code != office.firm_office_code:
+                data.append(
+                    {
+                        "firm_office_code": office.firm_office_code,
+                        "address": format_office_address_one_line(office),
+                        "status": self.get_office_status_tags(office),
+                    }
+                )
         return data
 
     def get_office_status_tags(self, office: Office):
@@ -311,9 +313,11 @@ class ApplyHeadOfficeInterventionForm(UpdateOfficeBaseForm):
 class RemoveHeadOfficeInterventionForm(ApplyHeadOfficeInterventionForm):
     url = "provider/<firm:firm>/office/<office:office>/remove-head-office-intervention"
     template = "update_office/intervened-head-office-form.html"
-    caption = "Select any other offices you want to remove the intervention for"
-    submit_button_text = "Remove intervention for provider and selected offices"
+    title = "Select other offices to remove intervention from"
+    caption = "Select any other offices you want to remove the intervention from."
+    submit_button_text = "Remove intervention from selected offices"
 
-    @property
-    def title(self):
-        return f"Remove intervention on {self.firm.firm_name}"
+    offices = SelectMultipleField(
+        label="",
+        validators=[InputRequired("Select an office to remove intervention from or skip this step")],
+    )

@@ -16,3 +16,11 @@
 {{ govukTable(form.data_table.to_govuk_params()) }}
 
 {% endblock %}
+
+{%  block formButtons %}
+
+  {{ govukButton({
+    'text': form.submit_button_text
+  }) }}
+  {{ form.skip }}
+{% endblock %}

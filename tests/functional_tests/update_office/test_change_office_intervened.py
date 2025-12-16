@@ -7,7 +7,11 @@ from tests.functional_tests.utils import definition_list_to_dict, navigate_to_pr
 
 
 def change_and_confirm_intervened(
-    page: Page, intervened_date: str | None, office_code: str, fail_on_purpose: bool = False
+    page: Page,
+    intervened_date: str | None,
+    office_code: str,
+    is_head_office: bool = False,
+    fail_on_purpose: bool = False,
 ):
     """
     Helper function to change and confirm and intervention change of an office
@@ -15,6 +19,7 @@ def change_and_confirm_intervened(
         page: Page element
         intervened_date: The date of the intervention or None if removing an intervention
         office_code: The code of the office to intervene
+        is_head_office: Whether the office is head-office
         fail_on_purpose: Set true if when clicking the submit button will fail with the no changes made error
     """
 
@@ -38,12 +43,17 @@ def change_and_confirm_intervened(
     if fail_on_purpose:
         expect(page.get_by_text("There is a problem")).to_be_visible()
     else:
-        message = (
-            f"Office {office_code} marked as intervened."
-            if intervened_date
-            else f"Office {office_code} marked as not intervened."
-        )
-        expect(page.get_by_text(message)).to_be_visible()
+        # Success messages
+        if intervened_date:
+            if is_head_office:
+                expect(page.get_by_text(f"Head office {office_code} set as intervened.")).to_be_visible()
+            else:
+                expect(page.get_by_text(f"Office {office_code} marked as intervened.")).to_be_visible()
+        else:
+            if is_head_office:
+                expect(page.get_by_text(f"Intervention removed from head office {office_code}.")).to_be_visible()
+            else:
+                expect(page.get_by_text(f"Office {office_code} marked as not intervened.")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
@@ -56,45 +66,65 @@ def test_change_office_intervened_default_value(page: Page):
 
 
 @pytest.mark.usefixtures("live_server")
-def test_change_office_intervened_yes(page: Page):
-    """Test changing office intervention from no to yes"""
+def test_change_office_intervened__head_office_intervened(page: Page):
+    """Test setting head office as intervened"""
 
     navigate_to_provider_page(page, provider_name="SMITH & PARTNERS SOLICITORS", office_code="1A001L")
     # Make office intervened
-    change_and_confirm_intervened(page, date.today().strftime("%d/%m/%Y"), office_code="1A001L")
-    # We should then be taken to the Apply intervention to other offices page
-    expect(page.get_by_text("Apply intervention on SMITH & PARTNERS SOLICITORS")).to_be_visible()
-    expect(page.get_by_role("button", name="Apply intervention for provider and selected offices")).to_be_visible()
+    change_and_confirm_intervened(page, date.today().strftime("%d/%m/%Y"), office_code="1A001L", is_head_office=True)
+
+    # We should be taken to the Apply intervention to other offices page
+    expect(page.get_by_text("Select other offices to be intervened")).to_be_visible()
+    expect(page.get_by_role("button", name="Set selected offices as intervened")).to_be_visible()
     # Make sure firms other offices are shown
     table = page.locator(".govuk-table--checkbox")
-    expect(table.get_by_text("1A001L")).to_be_visible()
+    # Head office in the list as the user already selected the head office on the previous screen
+    expect(table.get_by_text("1A001L")).not_to_be_visible()
+    # The firms other offices should be listed
     expect(table.get_by_text("1A002L")).to_be_visible()
     # Make sure no other firms offices are displayed
     expect(table.get_by_text("3A001L")).not_to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
-def test_change_office_intervened_no(page: Page):
-    """Test changing office intervention from yes to no"""
+def test_change_office_intervened__head_office_remove_intervention(page: Page):
+    """Test removing intervention from head office"""
 
     navigate_to_provider_page(page, provider_name="SMITH & PARTNERS SOLICITORS", office_code="1A001L")
     # Make office intervened
-    change_and_confirm_intervened(page, date.today().strftime("%d/%m/%Y"), office_code="1A001L")
+    change_and_confirm_intervened(page, date.today().strftime("%d/%m/%Y"), office_code="1A001L", is_head_office=True)
 
     # Take office out of intervention
     navigate_to_provider_page(page, provider_name="SMITH & PARTNERS SOLICITORS", office_code="1A001L")
-    change_and_confirm_intervened(page, intervened_date=None, office_code="1A001L")
+    change_and_confirm_intervened(page, intervened_date=None, office_code="1A001L", is_head_office=True)
 
-    # We should then be taken to the Apply intervention to other offices page
-    expect(page.get_by_text("Office 1A001L marked as not intervened.")).to_be_visible()
-    expect(page.get_by_text("Remove intervention on SMITH & PARTNERS SOLICITORS")).to_be_visible()
-    expect(page.get_by_role("button", name="Remove intervention for provider and selected offices")).to_be_visible()
+    # We should be taken to the Remove intervention for other offices page
+    expect(page.get_by_text("Select other offices to remove intervention from")).to_be_visible()
+    expect(page.get_by_role("button", name="Remove intervention from selected offices")).to_be_visible()
     # Make sure firms other offices are shown
     table = page.locator(".govuk-table--checkbox")
-    expect(table.get_by_text("1A001L")).to_be_visible()
+    # Head office in the list as the user already selected the head office on the previous screen
+    expect(table.get_by_text("1A001L")).not_to_be_visible()
+    # The firms other offices should be listed
     expect(table.get_by_text("1A002L")).to_be_visible()
     # Make sure no other firms offices are displayed
     expect(table.get_by_text("3A001L")).not_to_be_visible()
+
+
+@pytest.mark.usefixtures("live_server")
+def test_change_office_intervened__office_intervened(page: Page):
+    """Test setting normal office to be intervened"""
+
+    navigate_to_provider_page(page, provider_name="SMITH & PARTNERS SOLICITORS", office_code="1A002L")
+    office_view_url = page.url
+    # Make office intervened
+    change_and_confirm_intervened(page, date.today().strftime("%d/%m/%Y"), office_code="1A002L")
+    # Check we can see the confirmation message for the intervention
+    expect(page.get_by_text("Office 1A002L marked as intervened.")).to_be_visible()
+    # Make sure we are not on the Apply intervention page
+    expect(page.get_by_text("Select other offices to be intervened")).not_to_be_visible()
+    expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS"))
+    assert office_view_url == page.url
 
 
 @pytest.mark.usefixtures("live_server")
