@@ -580,6 +580,12 @@ class ProviderDataApi:
             "Updating office false balance is currently not supported by the real Provider Data API"
         )
 
+    def get_list_of_contract_manager_names(self):
+        """Get a list of all known contract managers."""
+        raise NotImplementedError(
+            "Getting list of known contract managers is currently not supported by the real API - see https://dsdmoj.atlassian.net/wiki/spaces/laagetaccess/pages/5912559872/Contract+Manager+list"
+        )
+
     def update_office_debt_recovery(self, firm_id: int, office_code: str, data: YesNo) -> Office:
         """
         Update an existing office debt recovery.
