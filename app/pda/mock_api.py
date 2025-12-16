@@ -851,6 +851,23 @@ class MockProviderDataApi:
     def update_office_false_balance(self, firm_id: int, office_code: str, data: dict) -> Office:
         return self.patch_office(firm_id, office_code, data)
 
+    def get_list_of_contract_manager_names(self):
+        # Static list of 12 fake contract managers
+        return [
+            {"name": "Alice Johnson"},
+            {"name": "Robert Smith"},
+            {"name": "Sarah Wilson"},
+            {"name": "Michael Brown"},
+            {"name": "Emma Davis"},
+            {"name": "Lewis Green"},
+            {"name": "Olivia Garcia"},
+            {"name": "William Martinez"},
+            {"name": "Sophia Anderson"},
+            {"name": "David Taylor"},
+            {"name": "Isabella Thomas"},
+            {"name": "Christopher Lee"},
+        ]
+
     def update_office_debt_recovery(self, firm_id: int, office_code: str, data: dict) -> Office:
         office_data = self._find_office_data(firm_id, office_code)
         office_data.update(data)
