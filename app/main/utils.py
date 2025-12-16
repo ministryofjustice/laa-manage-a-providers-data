@@ -699,12 +699,15 @@ def get_firm_contract_manager(firm_id: int) -> str | None:
     return head_office.contract_manager
 
 
-def build_hold_payments_payload(form):
-    status = getattr(form.status, "data", form.status)
-    data = {"holdAllPaymentsFlag": "Y" if status == "Yes" else "N"}
-    reason = getattr(form.reason, "data", form.reason)
+def resolve_value(value):
+    return value.data if hasattr(value, "data") else value
 
+
+def build_hold_payments_payload(form):
+    status = resolve_value(form.status)
+    reason = resolve_value(form.reason)
+
+    data = {"holdAllPaymentsFlag": "Y" if status == "Yes" else "N"}
     if status == "Yes" and reason:
         data["holdReason"] = reason
-
     return data

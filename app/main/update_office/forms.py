@@ -269,8 +269,8 @@ class ChangeOfficeHoldPaymentsFlagForm(NoChangesMixin, IgnoreReasonIfStatusUncha
 class ApplyHeadOfficeHoldPaymentsForm(UpdateOfficeBaseForm):
     url = "provider/<firm:firm>/office/<office:office>/apply-hold-payments"
     template = "update_office/hold-payments-head-office.html"
-    description = "This will hold payments for the head office"
-    caption = "Select any other offices you want to hold payments for. You can only select active offices"
+    description = "Select all offices you want to hold payments for."
+    caption = ""
     submit_button_text = "Hold payments for selected offices"
 
     offices = SelectMultipleField(
@@ -278,19 +278,8 @@ class ApplyHeadOfficeHoldPaymentsForm(UpdateOfficeBaseForm):
         validators=[InputRequired("Please select an office or use the cancel button")],
     )
 
-    @property
-    def title(self):
-        return f"Hold payments to {self.firm.firm_name}"
-
-    @property
-    def status(self):
-        return "Yes"  # Head office is always being held
-
-    @property
-    def reason(self):
-        return "Payments hold applied by head office form"  # or get from another field
-
-    def __init__(self, firm: Firm, office: Office, *args, **kwargs):
+    def __init__(self, firm: Firm, office: Office, reason: str | None = None, *args, **kwargs):
+        self._reason = reason
         super().__init__(firm, office, *args, **kwargs)
         table_structure: list[TableStructureItem] = [
             {"text": "Account number", "id": "firm_office_code"},
@@ -308,16 +297,27 @@ class ApplyHeadOfficeHoldPaymentsForm(UpdateOfficeBaseForm):
             field_value_key="firm_office_code",
         )
 
-        # Here we pre-select the head-office checkbox
-        self.data_table_params = self.data_table.to_govuk_params(selected_value=office.firm_office_code)
+    @property
+    def title(self):
+        return f"Hold payments for {self.firm.firm_name} offices"
+
+    @property
+    def status(self):
+        return "Yes"  # Head office is always being held at this level
+
+    @property
+    def reason(self):
+        return self._reason
 
     def get_data(self):
         pda = current_app.extensions["pda"]
         offices = pda.get_provider_offices(firm_id=self.firm.firm_id)
         data = []
-        print("Offices: ", offices)
 
         for office in offices:
+            # Skip head office off the list
+            if office.firm_office_code == self.office.firm_office_code:
+                continue
             data.append(
                 {
                     "firm_office_code": office.firm_office_code,
@@ -347,4 +347,4 @@ class RemoveHeadOfficeHoldPaymentsForm(ApplyHeadOfficeHoldPaymentsForm):
 
     @property
     def status(self):
-        return "No"  # Head office is always being held
+        return "No"  # Head office is always being removed at this level

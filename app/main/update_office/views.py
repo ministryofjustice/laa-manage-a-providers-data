@@ -476,25 +476,16 @@ class ChangeOfficeDebtRecoveryFormView(BaseFormView):
 
 
 class ChangeOfficeHoldPaymentsFlagFormView(BaseFormView):
-    def get(self, *args, **kwargs) -> str:
-        firm = kwargs.get("firm")
-        office = kwargs.get("office")
-
+    def get_success_url(self, form):
         apply_path = "main.apply_head_office_hold_payments_flag"
         remove_path = "main.remove_head_office_hold_payments_flag"
+        head_office = self.get_api().get_head_office(form.firm.firm_id)
 
-        head_office = self.get_api().get_head_office(firm.firm_id)
-        held_payments = head_office.hold_all_payments_flag
-
-        if office.firm_office_code == head_office.firm_office_code:
-            if held_payments is None or held_payments == "N":
-                return redirect(url_for(apply_path, firm=firm, office=office))
+        if form.office.firm_office_code == head_office.firm_office_code:
+            if form.data.get("status") == "Yes":
+                return url_for(apply_path, firm=form.firm, office=form.office)
             else:
-                return redirect(url_for(remove_path, firm=firm, office=office))
-
-        return super().get(*args, **kwargs)
-
-    def get_success_url(self, form):
+                return url_for(remove_path, firm=form.firm, office=form.office)
         return url_for("main.view_office", firm=form.firm, office=form.office)
 
     def get_form_valid_success_message(self, form):
@@ -522,6 +513,7 @@ class ChangeOfficeHoldPaymentsFlagFormView(BaseFormView):
         self.get_api().update_office_hold_payments(
             firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, data=data
         )
+
         flash(self.get_form_valid_success_message(form), category="success")
         return redirect(self.get_success_url(form))
 
@@ -561,7 +553,7 @@ class ApplyHeadOfficeHoldPaymentsFormView(BaseFormView):
 
         context.update(
             {
-                "cancel_url": self.get_success_url(form),
+                "skip_url": self.get_success_url(form),
                 "office_address": format_office_address_one_line(form.office),
             }
         )

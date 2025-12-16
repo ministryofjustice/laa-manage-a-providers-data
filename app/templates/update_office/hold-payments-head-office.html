@@ -13,5 +13,5 @@
 {% endblock %}
 
 {% block renderFields %}
-    {{ govukTable(form.data_table_params) }}
+{{ govukTable(form.data_table.to_govuk_params()) }}
 {% endblock %}
