@@ -6,7 +6,7 @@ from tests.functional_tests.utils import definition_list_to_dict, navigate_to_pr
 
 @pytest.mark.usefixtures("live_server")
 def test_change_chambers_contact_details_address(page: Page) -> None:
-    navigate_to_provider_page(page, provider_name="JOHNSON LEGAL SERVICES")
+    navigate_to_provider_page(page, provider_name="Johnson Legal Services")
     contact_details = definition_list_to_dict(page, dl_selector=".chambers-contact-details")
     assert contact_details["Address"] == "1 Skyscraper,\n1 Some Road,\nLeicester,\nLE1 1AA"
     page.get_by_role("link", name="Change address").click()
@@ -37,7 +37,7 @@ def test_change_chambers_contact_details_address(page: Page) -> None:
 
 @pytest.mark.usefixtures("live_server")
 def test_change_chambers_contact_details_email_address(page: Page) -> None:
-    navigate_to_provider_page(page, provider_name="JOHNSON LEGAL SERVICES")
+    navigate_to_provider_page(page, provider_name="Johnson Legal Services")
     contact_details = definition_list_to_dict(page, dl_selector=".chambers-contact-details")
     assert contact_details["Email address"] == "office1@provider2.uk"
     page.get_by_role("link", name="Change email address").click()
@@ -56,7 +56,7 @@ def test_change_chambers_contact_details_email_address(page: Page) -> None:
 
 @pytest.mark.usefixtures("live_server")
 def test_change_chambers_contact_details_telephone_number(page: Page) -> None:
-    navigate_to_provider_page(page, provider_name="JOHNSON LEGAL SERVICES")
+    navigate_to_provider_page(page, provider_name="Johnson Legal Services")
     contact_details = definition_list_to_dict(page, dl_selector=".chambers-contact-details")
     assert contact_details["Telephone number"] == "555201"
     page.get_by_role("link", name="Change telephone number").click()
@@ -75,7 +75,7 @@ def test_change_chambers_contact_details_telephone_number(page: Page) -> None:
 
 @pytest.mark.usefixtures("live_server")
 def test_change_chambers_contact_details_dx_number(page: Page) -> None:
-    navigate_to_provider_page(page, provider_name="JOHNSON LEGAL SERVICES")
+    navigate_to_provider_page(page, provider_name="Johnson Legal Services")
 
     page.get_by_role("link", name="Enter DX number").click()
 
@@ -93,7 +93,7 @@ def test_change_chambers_contact_details_dx_number(page: Page) -> None:
 
 @pytest.mark.usefixtures("live_server")
 def test_change_chambers_contact_details_dx_centre(page: Page) -> None:
-    navigate_to_provider_page(page, provider_name="JOHNSON LEGAL SERVICES")
+    navigate_to_provider_page(page, provider_name="Johnson Legal Services")
 
     page.get_by_role("link", name="Enter DX centre").click()
 
@@ -111,7 +111,7 @@ def test_change_chambers_contact_details_dx_centre(page: Page) -> None:
 
 @pytest.mark.usefixtures("live_server")
 def test_change_chambers_contact_details_no_changes(page: Page) -> None:
-    navigate_to_provider_page(page, provider_name="JOHNSON LEGAL SERVICES")
+    navigate_to_provider_page(page, provider_name="Johnson Legal Services")
     provider_view_url = page.url
     page.get_by_role("link", name="Change address").click()
     page.get_by_role("button", name="Submit").click()
@@ -124,7 +124,7 @@ def test_change_chambers_contact_details_no_changes(page: Page) -> None:
 
 @pytest.mark.usefixtures("live_server")
 def test_change_chambers_contact_details_cancel(page: Page) -> None:
-    navigate_to_provider_page(page, provider_name="JOHNSON LEGAL SERVICES")
+    navigate_to_provider_page(page, provider_name="Johnson Legal Services")
     provider_view_url = page.url
     page.get_by_role("link", name="Change address").click()
     page.get_by_role("link", name="Cancel").click()

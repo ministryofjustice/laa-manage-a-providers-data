@@ -6,11 +6,11 @@ from playwright.sync_api import Page, expect
 def navigate_to_office(page: Page, provider_name: str, office_code: str | None):
     page.goto(url_for("main.providers", _external=True))
 
-    # Search for "Smith" to find "SMITH & PARTNERS SOLICITORS"
+    # Search for "Smith" to find "Smith & Partners Solicitors"
     page.get_by_role("textbox", name="Find a provider").fill(provider_name)
     page.get_by_role("button", name="Search").click()
 
-    # Click on the first provider (should be "SMITH & PARTNERS SOLICITORS" from fixtures)
+    # Click on the first provider (should be "Smith & Partners Solicitors" from fixtures)
     page.get_by_role("link", name=provider_name).click()
 
     if office_code:
@@ -67,14 +67,14 @@ def _test_change_vat(page, has_vat=True, should_contain_office=False):
 
 @pytest.mark.usefixtures("live_server")
 def test_lsp_change_vat(page: Page):
-    navigate_to_office(page, "SMITH & PARTNERS SOLICITORS", "1A001L")
+    navigate_to_office(page, "Smith & Partners Solicitors", "1A001L")
     _test_change_vat(page, has_vat=True, should_contain_office=True)
 
 
 @pytest.mark.usefixtures("live_server")
 def test_barristers_change_vat(page: Page):
     navigate_to_office(page, "Karen Sillen", office_code=None)
-    _test_change_vat(page, has_vat=False, should_contain_office=False)
+    _test_change_vat(page, has_vat=True, should_contain_office=False)
 
 
 @pytest.mark.usefixtures("live_server")

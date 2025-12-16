@@ -6,6 +6,7 @@ from pydantic import ValidationError
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
+from app.constants import YesNo
 from app.models import BankAccount, Contact, Firm, Office
 from app.pda.errors import ProviderDataApiError
 
@@ -590,3 +591,21 @@ class ProviderDataApi:
         Returns: Office
         """
         raise NotImplementedError("Updating office intervened date is not yet supported by the real Provider Data API")
+
+    def get_list_of_contract_manager_names(self):
+        """Get a list of all known contract managers."""
+        raise NotImplementedError(
+            "Getting list of known contract managers is currently not supported by the real API - see https://dsdmoj.atlassian.net/wiki/spaces/laagetaccess/pages/5912559872/Contract+Manager+list"
+        )
+
+    def update_office_debt_recovery(self, firm_id: int, office_code: str, data: YesNo) -> Office:
+        """
+        Update an existing office debt recovery.
+        Args:
+            firm_id: The advocate firm Id
+            office_code: The code of the office to update
+            data: a dict containing the office fields to update
+
+        Returns: Office
+        """
+        raise NotImplementedError("Updating office debt recovery is currently not supported by the real API")

@@ -193,7 +193,7 @@
   "faxAreaCode": null,
   "faxNumber": null,
   "emailAddress": "office1@provider4.uk",
-  "vatRegistrationNumber": null,
+  "vatRegistrationNumber": "GB178375567",
   "headOffice": "N/A",
   "creationDate": "2024-09-12",
   "lscRegion": "Midlands",
@@ -202,7 +202,8 @@
   "cjsForceName": "Leicestershire",
   "localAuthority": "City of Leicester",
   "policeStationAreaName": "Leicester",
-  "dutySolicitorAreaName": "Leicester"
+  "dutySolicitorAreaName": "Leicester",
+  "paymentMethod": "electronic"
 },
   {
   "_firmId": 5,
@@ -498,7 +499,7 @@
   "faxAreaCode": null,
   "faxNumber": null,
   "emailAddress": "office5@provider2.uk",
-  "vatRegistrationNumber": null,
+  "vatRegistrationNumber": "GB189282939",
   "headOffice": "N/A",
   "creationDate": "2024-09-12",
   "lscRegion": "Midlands",
@@ -508,7 +509,8 @@
   "localAuthority": "City of Leicester",
   "policeStationAreaName": "Leicester",
   "dutySolicitorAreaName": "Leicester",
-  "contractManager": "Mr ISD Default"
+  "contractManager": "Mr ISD Default",
+  "paymentMethod": "electronic"
 },
   {
   "_firmId": 14,
@@ -527,11 +529,13 @@
   "lscRegion": "Nottinghamshire",
   "officeCodeAlt": "Provider 14 Head Office",
   "officeName": "14S785S,4 Seymour Street",
+  "paymentMethod": "electronic",
   "policeStationAreaName": "Aberdeen City",
   "postCode": "L0T 5EW",
   "telephoneAreaCode": "03640",
   "telephoneNumber": "375204",
-  "type": "Legal Services Supplier (Crime/Mediator)"
+  "type": "Legal Services Supplier (Crime/Mediator)",
+  "vatRegistrationNumber": "GB1782776735"
 }
 ]
 }

@@ -25,7 +25,7 @@ def change_and_confirm_false_balance(page: Page, false_balance: str):
 
 @pytest.mark.usefixtures("live_server")
 def test_change_office_office_false_balance_visible_lsp(page: Page):
-    navigate_to_provider_page(page, provider_name="SMITH & PARTNERS SOLICITORS")
+    navigate_to_provider_page(page, provider_name="Smith & Partners Solicitors")
     data = definition_list_to_dict(page, dl_selector=".status-table")
     false_balance = data.get("False balance")
     assert false_balance is None
@@ -33,7 +33,7 @@ def test_change_office_office_false_balance_visible_lsp(page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_change_office_office_false_balance_visible_chambers(page: Page):
-    navigate_to_provider_page(page, provider_name="JOHNSON LEGAL SERVICES")
+    navigate_to_provider_page(page, provider_name="Johnson Legal Services")
     make_inactive(page)
     data = definition_list_to_dict(page, dl_selector=".status-table")
     false_balance = data.get("False balance")
@@ -92,7 +92,7 @@ def test_change_office_office_false_balance_change_barrister(app, page: Page):
 
 @pytest.mark.usefixtures("live_server")
 def test_change_office_office_false_balance_change_office(app, page: Page):
-    navigate_to_provider_page(page, provider_name="SMITH & PARTNERS SOLICITORS", office_code="1A001L")
+    navigate_to_provider_page(page, provider_name="Smith & Partners Solicitors", office_code="1A001L")
 
     data = definition_list_to_dict(page, dl_selector=".status-table")
     assert data.get("Active") == "Made inactive on 25 Sep 2025"

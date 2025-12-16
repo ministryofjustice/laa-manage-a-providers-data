@@ -6,6 +6,7 @@ from flask import Response, abort, current_app, flash, redirect, render_template
 
 from app.constants import (
     DEFAULT_CONTRACT_MANAGER_NAME,
+    STATUS_CONTRACT_MANAGER_DEBT_RECOVERY,
     STATUS_CONTRACT_MANAGER_FALSE_BALANCE,
     STATUS_CONTRACT_MANAGER_INACTIVE,
     STATUS_CONTRACT_MANAGER_NAMES,
@@ -339,7 +340,7 @@ class ChangeContractManagerFormView(BaseFormView):
         if self.change_contract_manager(contract_manager, form.firm, form.office):
             # Flash success
             flash(
-                f"<b>Contract manager for {form.office.firm_office_code} changed to {contract_manager}</b>",
+                f"<b>Contract manager for {form.office.firm_office_code} changed to {contract_manager}.</b>",
                 category="success",
             )
         else:
@@ -431,6 +432,47 @@ class ChangeOfficeFalseBalanceFormView(BaseFormView):
 
         flash(f"<b>False balance status changed to {form.data.get('status', '').lower()}.</b>", category="success")
         return super().form_valid(form, **kwargs)
+
+
+class ChangeOfficeDebtRecoveryFormView(BaseFormView):
+    def get_no_value_success_url(self, form: BaseForm | None = None) -> str:
+        return url_for("main.change_office_contract_manager", firm=form.firm, office=form.office)
+
+    def get_success_url(self, form: BaseForm | None = None) -> str:
+        return url_for("main.view_office", firm=form.firm, office=form.office)
+
+    def get_yes_value_success_message(self, form: BaseForm | None = None) -> str:
+        return f"<b>Office {form.office.firm_office_code} is referred to the Debt Recovery Unit.</b>"
+
+    def get_no_value_success_message(self, form: BaseForm | None = None) -> str:
+        return f"<b>Office {form.office.firm_office_code} is not referred to the Debt Recovery Unit.</b>"
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update({"cancel_url": self.get_success_url(form)})
+        return context
+
+    def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
+        current_status = office.debt_recovery_flag or "No"
+        return self.get_form_class()(firm=firm, office=office, status=current_status, **kwargs)
+
+    def form_valid(self, form: BaseForm) -> Response:
+        status = form.data.get("status")
+        payload = {
+            "debtRecoveryFlag": status,
+            "contractManager": STATUS_CONTRACT_MANAGER_DEBT_RECOVERY
+            if status == "Yes"
+            else DEFAULT_CONTRACT_MANAGER_NAME,
+        }
+        self.get_api().update_office_debt_recovery(
+            firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, data=payload
+        )
+        if status == "Yes":
+            flash(self.get_yes_value_success_message(form), category="success")
+            return redirect(self.get_success_url(form))
+        else:
+            flash(self.get_no_value_success_message(form), category="success")
+            return redirect(self.get_no_value_success_url(form))
 
 
 class ChangeOfficeIntervenedFormView(BaseFormView):
