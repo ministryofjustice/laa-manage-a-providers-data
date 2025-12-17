@@ -490,8 +490,6 @@ class CheckDataTable(DataTable):
 
             # Build checkbox button HTML
             checked_attr = 'checked="checked"' if selected_value and str(selected_value) == checkbox_value else ""
-            is_inactive = row_data.get("is_inactive", False)
-            disabled_attr = 'disabled="disabled"' if is_inactive else ""
 
             checkbox_html = f'''
             <div class="govuk-checkboxes__item govuk-checkboxes--small">
@@ -502,7 +500,6 @@ class CheckDataTable(DataTable):
                     value="{checkbox_value}" 
                     id="{checkbox_id}" 
                     {checked_attr}
-                    {disabled_attr}
                 >
                 <label class="govuk-checkboxes__label govuk-!-padding-0" for="{checkbox_id}">
                     <span class="govuk-visually-hidden">Select this row</span>

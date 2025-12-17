@@ -244,28 +244,6 @@ class ChangeOfficeHoldPaymentsFlagForm(NoChangesMixin, IgnoreReasonIfStatusUncha
         if self.status.data == "Yes" and not field.data:
             raise ValidationError("Explain why you want to hold all payments")
 
-    # Temporary validation for Inactive providers
-    def validate(self, extra_validators=None):
-        standard_validation = super().validate(extra_validators=extra_validators)
-
-        if not standard_validation:
-            return False
-
-        provider_status = getattr(self.firm, "inactive_date")
-
-        if provider_status is not None:
-            if self.has_changed():
-                status_is_changing = self.status.data != self.status.object_data
-                reason_is_changing = self.status.data == "Yes" and self.reason.data != self.reason.object_data
-
-                if status_is_changing or reason_is_changing:
-                    error_message = "Payments cannot be updated because the associated provider is inactive."
-                    self.status.errors.append(error_message)
-
-                    return False
-
-        return standard_validation
-
 
 class ApplyHeadOfficeHoldPaymentsForm(UpdateOfficeBaseForm):
     url = "provider/<firm:firm>/office/<office:office>/apply-hold-payments"
@@ -276,7 +254,7 @@ class ApplyHeadOfficeHoldPaymentsForm(UpdateOfficeBaseForm):
 
     offices = SelectMultipleField(
         label="",
-        validators=[InputRequired("Please select an office or use the cancel button")],
+        validators=[InputRequired("Select an office to hold payments for or skip this step")],
     )
 
     def __init__(self, firm: Firm, office: Office, reason: str | None = None, *args, **kwargs):
@@ -319,12 +297,13 @@ class ApplyHeadOfficeHoldPaymentsForm(UpdateOfficeBaseForm):
             # Skip head office off the list
             if office.firm_office_code == self.office.firm_office_code:
                 continue
+            if office.hold_all_payments_flag == "Y":
+                continue
             data.append(
                 {
                     "firm_office_code": office.firm_office_code,
                     "address": format_office_address_one_line(office),
                     "status": self.get_office_status_tags(office),
-                    "is_inactive": office.inactive_date is not None,
                 }
             )
         return data
@@ -339,13 +318,31 @@ class ApplyHeadOfficeHoldPaymentsForm(UpdateOfficeBaseForm):
 class RemoveHeadOfficeHoldPaymentsForm(ApplyHeadOfficeHoldPaymentsForm):
     url = "provider/<firm:firm>/office/<office:office>/remove-hold-payments"
     template = "update_office/hold-payments-head-office.html"
-    caption = "Select any other offices you want to allow payments for. You can only select active offices."
-    submit_button_text = "Remove intervention for provider and selected offices"
+    description = "Select all offices you want to allow payments for."
+    caption = ""
+    submit_button_text = "Allow payments for selected offices"
 
     @property
     def title(self):
-        return f"Allow payments to {self.firm.firm_name}"
+        return f"Allow payments for {self.firm.firm_name} offices"
 
     @property
     def status(self):
         return "No"  # Head office is always being removed at this level
+
+    def get_data(self):
+        pda = current_app.extensions["pda"]
+        offices = pda.get_provider_offices(firm_id=self.firm.firm_id)
+        data = []
+
+        for office in offices:
+            if office.firm_office_code == self.office.firm_office_code or office.hold_all_payments_flag != "Y":
+                continue
+            data.append(
+                {
+                    "firm_office_code": office.firm_office_code,
+                    "address": format_office_address_one_line(office),
+                    "status": self.get_office_status_tags(office),
+                }
+            )
+        return data
