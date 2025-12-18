@@ -493,14 +493,8 @@ class CheckDataTable(DataTable):
 
             checkbox_html = f'''
             <div class="govuk-checkboxes__item govuk-checkboxes--small">
-                <input 
-                    class="govuk-checkboxes__input" 
-                    type="checkbox" 
-                    name="{self.field_name}" 
-                    value="{checkbox_value}" 
-                    id="{checkbox_id}" 
-                    {checked_attr}
-                >
+                <input class="govuk-checkboxes__input" type="checkbox" name="{self.field_name}" 
+                       value="{checkbox_value}" id="{checkbox_id}" {checked_attr}>
                 <label class="govuk-checkboxes__label govuk-!-padding-0" for="{checkbox_id}">
                     <span class="govuk-visually-hidden">Select this row</span>
                 </label>

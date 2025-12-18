@@ -576,6 +576,13 @@ class ApplyHeadOfficeHoldPaymentsFormView(BaseFormView):
         flash(self.get_success_message(form), category="success")
         return redirect(self.get_success_url(form))
 
+    def post(self, *args, **kwargs):
+        if request.form.get("skip_button"):
+            form = self.get_form_instance(*args, **kwargs)
+            return redirect(self.get_success_url(form))
+
+        return super().post(*args, **kwargs)
+
 
 class RemoveHeadOfficeHoldPaymentsFormView(ApplyHeadOfficeHoldPaymentsFormView):
     def get_success_message(self, form):

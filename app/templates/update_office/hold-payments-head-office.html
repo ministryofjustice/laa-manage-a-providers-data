@@ -11,7 +11,16 @@
 
     <span class="govuk-caption-m govuk-!-margin-bottom-4">{{ form.caption }}</span>
 {% endblock %}
-
 {% block renderFields %}
+
 {{ govukTable(form.data_table.to_govuk_params()) }}
+
+{% endblock %}
+
+{%  block formButtons %}
+
+  {{ govukButton({
+    'text': form.submit_button_text
+  }) }}
+  {{ form.skip }}
 {% endblock %}

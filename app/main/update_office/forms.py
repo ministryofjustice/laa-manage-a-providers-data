@@ -2,7 +2,7 @@ from typing import List
 
 from flask import current_app
 from wtforms.fields.choices import RadioField, SelectMultipleField
-from wtforms.fields.simple import StringField, TextAreaField
+from wtforms.fields.simple import StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired, Length, Optional
 
 from app.constants import OFFICE_ACTIVE_STATUS_CHOICES, PAYMENT_METHOD_CHOICES, YES_NO_CHOICES
@@ -14,7 +14,7 @@ from app.main.utils import get_office_tags
 from app.models import BankAccount, Firm, Office
 from app.utils.formatting import format_office_address_one_line
 from app.validators import ValidateVATRegistrationNumber, ValidationError
-from app.widgets import GovRadioInput, GovTextArea, GovTextInput
+from app.widgets import GovRadioInput, GovSubmitInput, GovTextArea, GovTextInput
 
 from ...components.tables import CheckDataTable, TableStructureItem
 
@@ -255,6 +255,10 @@ class ApplyHeadOfficeHoldPaymentsForm(UpdateOfficeBaseForm):
     offices = SelectMultipleField(
         label="",
         validators=[InputRequired("Select an office to hold payments for or skip this step")],
+    )
+
+    skip_button = SubmitField(
+        "Skip this step", widget=GovSubmitInput(classes="govuk-button--secondary govuk-!-margin-left-2")
     )
 
     def __init__(self, firm: Firm, office: Office, reason: str | None = None, *args, **kwargs):
