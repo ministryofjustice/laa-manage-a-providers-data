@@ -495,10 +495,15 @@ class ChangeOfficeHoldPaymentsFlagFormView(BaseFormView):
         return url_for(endpoint, firm=form.firm, office=form.office)
 
     def get_form_valid_success_message(self, form):
+        head_office = self.get_api().get_head_office(form.firm.firm_id)
+        is_head_office = form.office.firm_office_code == head_office.firm_office_code
+        office_prefix = "head" if is_head_office else ""
+        office_code = form.office.firm_office_code
+
         if self._is_hold_enabled(form):
-            return f"<b>{form.firm.firm_name} payments put on hold successfully</b>"
-        else:
-            return f"<b>{form.firm.firm_name} hold on payments removed successfully</b>"
+            return f"<b>Payments on hold for {office_prefix} office {office_code}.</b>"
+
+        return f"<b>Payments hold removed from {office_prefix} office {office_code}.</b>"
 
     def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(form, context, **kwargs)
