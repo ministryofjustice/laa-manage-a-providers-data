@@ -421,6 +421,11 @@ def get_firm_tags(firm: Firm | dict):
     if firm_data.get("hold_all_payments_flag", "N") == "Y":
         tags.append(Tag(TagType.ON_HOLD))
 
+    if firm_data.get("firm_type") in ["Advocate", "Barrister"]:
+        head_office = _get_firm_head_office(firm_data["firm_id"])
+        if head_office.intervened_date:
+            tags.append(Tag(TagType.INTERVENED))
+
     contract_manager = get_firm_contract_manager(firm_data["firm_id"])
     firm_type = firm_data.get("firm_type")
     if contract_manager == STATUS_CONTRACT_MANAGER_FALSE_BALANCE:
@@ -444,6 +449,8 @@ def get_office_tags(office: Office | dict):
         tags.append(Tag(TagType.INACTIVE))
     if office_data.get("hold_all_payments_flag", "N") == "Y":
         tags.append(Tag(TagType.ON_HOLD))
+    if office_data.get("intervened_date"):
+        tags.append(Tag(TagType.INTERVENED))
 
     if office_data.get("contract_manager") == STATUS_CONTRACT_MANAGER_FALSE_BALANCE:
         tags.append(Tag(TagType.FALSE_BALANCE))
@@ -711,3 +718,14 @@ def get_firm_contract_manager(firm_id: int) -> str | None:
     if not head_office:
         return None
     return head_office.contract_manager
+
+
+def _get_firm_head_office(firm_id: int) -> Office | None:
+    pda = current_app.extensions.get("pda")
+    if not pda:
+        raise RuntimeError("Provider Data API not initialized")
+
+    if not isinstance(firm_id, int):
+        raise ValueError(f"Expected Firm or firm_id (int), got {type(firm_id)}")
+
+    return pda.get_head_office(firm_id)

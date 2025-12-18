@@ -85,6 +85,10 @@ def test_change_office_intervened__head_office_intervened(page: Page):
     # Make sure no other firms offices are displayed
     expect(table.get_by_text("3A001L")).not_to_be_visible()
 
+    # Make sure the office has the intervened tag
+    navigate_to_provider_page(page, provider_name="SMITH & PARTNERS SOLICITORS", office_code="1A001L")
+    expect(page.locator(".govuktag-intervened")).to_be_visible()
+
 
 @pytest.mark.usefixtures("live_server")
 def test_change_office_intervened__head_office_remove_intervention(page: Page):
@@ -110,6 +114,10 @@ def test_change_office_intervened__head_office_remove_intervention(page: Page):
     # Make sure no other firms offices are displayed
     expect(table.get_by_text("3A001L")).not_to_be_visible()
 
+    # Make sure the office does not have the intervened tag
+    navigate_to_provider_page(page, provider_name="SMITH & PARTNERS SOLICITORS", office_code="1A001L")
+    expect(page.locator(".govuktag-intervened")).not_to_be_visible()
+
 
 @pytest.mark.usefixtures("live_server")
 def test_change_office_intervened__office_intervened(page: Page):
@@ -125,6 +133,9 @@ def test_change_office_intervened__office_intervened(page: Page):
     expect(page.get_by_text("Select other offices to be intervened")).not_to_be_visible()
     expect(page.get_by_role("heading", name="SMITH & PARTNERS SOLICITORS"))
     assert office_view_url == page.url
+
+    # Make sure the office has the intervened tag
+    expect(page.locator(".govuktag-intervened")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")

@@ -1,6 +1,7 @@
 from datetime import date
 
 import pytest
+from flask import url_for
 from playwright.sync_api import Page, expect
 
 from tests.functional_tests.utils import definition_list_to_dict, navigate_to_provider_page
@@ -68,13 +69,31 @@ class TestAdvocateIntervened:
         navigate_to_provider_page(page, provider_name=self.provider_name)
         # Make office intervened
         change_and_confirm_intervened(page, date.today().strftime("%d/%m/%Y"), provider_name=self.provider_name)
+        # Make sure the firm has the intervened tag
+        expect(page.locator(".govuktag-intervened")).to_be_visible()
+
+        # Make sure the firm has the intervened tag on the firm listings page
+        page.goto(url_for("main.providers", _external=True))
+        page.locator("#search").fill(self.provider_name)
+        page.get_by_role("button", name="Search").click()
+        expect(page.locator(".govuktag-intervened")).to_be_visible()
 
     @pytest.mark.usefixtures("live_server")
     def test_change_firm_intervened_no(self, page: Page):
         """Test changing firm intervention from yes to no"""
 
         navigate_to_provider_page(page, provider_name=self.provider_name)
+        # Make the firm intervened
         change_and_confirm_intervened(page, date.today().strftime("%d/%m/%Y"), provider_name=self.provider_name)
+        # Remove intervention from firm
+        change_and_confirm_intervened(page, None, provider_name=self.provider_name)
+        expect(page.locator(".govuktag-intervened")).not_to_be_visible()
+
+        # Make sure the firm does not have the intervened tag on the firm listings page
+        page.goto(url_for("main.providers", _external=True))
+        page.locator("#search").fill(self.provider_name)
+        page.get_by_role("button", name="Search").click()
+        expect(page.locator(".govuktag-intervened")).not_to_be_visible()
 
     @pytest.mark.usefixtures("live_server")
     def test_change_firm_intervened_no_changes__no(self, page: Page):
