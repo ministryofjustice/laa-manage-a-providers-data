@@ -10,9 +10,14 @@ from app.main.update_office import (
     ChangeOfficeContactDetailsFormView,
     ChangeOfficeDebtRecoveryFormView,
     ChangeOfficeFalseBalanceFormView,
+    ChangeOfficeHoldPaymentsFlagFormView,
     ChangeOfficeIntervenedFormView,
 )
-from app.main.utils import assign_firm_to_a_new_chambers, change_liaison_manager, reassign_head_office
+from app.main.utils import (
+    assign_firm_to_a_new_chambers,
+    change_liaison_manager,
+    reassign_head_office,
+)
 from app.main.views import AdvocateBarristerOfficeMixin, get_main_table
 from app.models import Contact, Firm, Office
 from app.pda.errors import ProviderDataApiError
@@ -366,3 +371,19 @@ class ChangeFirmIntervenedFormView(AdvocateBarristerOfficeMixin, ChangeOfficeInt
             return f"<b>{form.firm.firm_name} marked as intervened.</b>"
         else:
             return f"<b>{form.firm.firm_name} marked as not intervened.</b>"
+
+
+class ChangeHoldPaymentsFlagFormView(AdvocateBarristerOfficeMixin, ChangeOfficeHoldPaymentsFlagFormView):
+    def get_success_url(self, form: BaseForm):
+        return url_for("main.view_provider", firm=form.firm)
+
+    def get_form_valid_success_message(self, form):
+        if form.data.get("status") == "Yes":
+            return f"<b>{form.firm.firm_name} payments put on hold successfully</b>"
+        else:
+            return f"<b>{form.firm.firm_name} hold on payments removed successfully</b>"
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update({"cancel_url": self.get_success_url(form)})
+        return context

@@ -875,3 +875,6 @@ class MockProviderDataApi:
         office_data = self._find_office_data(firm_id, office_code)
         office_data.update(data)
         return Office(**_clean_data(office_data))
+
+    def update_office_hold_payments(self, firm_id: int, office_code: str, data: dict) -> Office:
+        return self.patch_office(firm_id, office_code, data)

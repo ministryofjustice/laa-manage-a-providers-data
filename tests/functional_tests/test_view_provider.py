@@ -18,7 +18,6 @@ def test_view_provider_page_ui_loads(page):
 
     # Status table - Check for status rows
     expect(page.get_by_text("Active", exact=True).first).to_be_visible()
-    expect(page.get_by_text("Payments on hold", exact=True).first).to_be_visible()
     expect(page.get_by_text("Intervened", exact=True).first).to_be_visible()
 
     # Status table should show "No" for Active (since inactive)

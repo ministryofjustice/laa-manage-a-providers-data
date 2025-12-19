@@ -32,13 +32,12 @@
 
       {% block formPrefix %}{% endblock %}
         {% block renderFields %}
-      {% for field in form %}
-        {% if field.type != 'CSRFToken' and field.type != 'HiddenField' and field.type != "SubmitField" %}
-          {{ field }}
-        {% endif %}
-      {% endfor %}
-            {% endblock %}
-        
+          {% for field in form %}
+            {% if field.type != 'CSRFToken' and field.type != 'HiddenField' and field.type != "SubmitField" %}
+              {{ field }}
+            {% endif %}
+          {% endfor %}
+        {% endblock %}
       {%  block formButtons %}
           {% set submitButtonText = form.submit_button_text or "Continue" %}
           <div class="govuk-button-group">
@@ -48,6 +47,9 @@
           }) }}
           {% if cancel_url %}
               <a class="mapd-cancel-btn govuk-link govuk-link--no-visited-state" href="{{ cancel_url }}">Cancel</a>
+          {% endif %}
+          {% if skip_url %} 
+              <a class="govuk-button govuk-button--secondary" href="{{ skip_url }}">Skip this step</a> 
           {% endif %}
           </div>
       {% endblock %}

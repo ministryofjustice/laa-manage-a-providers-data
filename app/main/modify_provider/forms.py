@@ -16,6 +16,7 @@ from app.main.update_office import (
     ChangeOfficeContactDetailsForm,
     ChangeOfficeDebtRecoveryForm,
     ChangeOfficeFalseBalanceForm,
+    ChangeOfficeHoldPaymentsFlagForm,
     ChangeOfficeIntervenedForm,
 )
 from app.main.utils import get_firm_account_number
@@ -305,3 +306,13 @@ class ChangeFirmDebtRecoveryForm(ChangeOfficeDebtRecoveryForm):
     title = "Have they have been referred to the Debt Recovery Unit?"
     no_changes_error_message_for_yes_value = "Select no if they are no longer referred to the Debt Recovery Unit. Cancel if you do not want to change the answer."
     no_changes_error_message_for_no_value = "Select yes if they have been referred to the Debt Recovery Unit. Cancel if you do not want to change the answer."
+
+
+class ChangeHoldPaymentsFlagForm(ChangeOfficeHoldPaymentsFlagForm):
+    title = "Do you want to hold payments?"
+    url = "provider/<firm('Barrister','Advocate'):firm>/hold-payments"
+    template = ("modify_provider/hold-payments.html",)
+
+    def __init__(self, firm: Firm, office=None, *args, **kwargs):
+        self.firm = firm
+        super().__init__(firm, office, *args, **kwargs)

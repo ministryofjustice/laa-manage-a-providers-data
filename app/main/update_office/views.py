@@ -24,6 +24,20 @@ from app.views import BaseFormView, FullWidthBaseFormView
 logger = logging.getLogger(__name__)
 
 
+def resolve_value(value):
+    return value.data if hasattr(value, "data") else value
+
+
+def build_hold_payments_payload(form):
+    status = resolve_value(form.status)
+    reason = resolve_value(form.reason)
+
+    data = {"holdAllPaymentsFlag": "Y" if status == "Yes" else "N"}
+    if status == "Yes" and reason:
+        data["holdReason"] = reason
+    return data
+
+
 class UpdateVATRegistrationNumberFormView(AdvocateBarristerOfficeMixin, FullWidthBaseFormView):
     template = "update_office/form.html"
     provider_success_url = "main.view_provider_bank_accounts_payment"
@@ -561,7 +575,7 @@ class ApplyHeadOfficeInterventionFormView(BaseFormView):
 
         context.update(
             {
-                "cancel_url": self.get_success_url(form),
+                "skip_url": self.get_success_url(form),
                 "office_address": format_office_address_one_line(form.office),
             }
         )
@@ -577,13 +591,6 @@ class ApplyHeadOfficeInterventionFormView(BaseFormView):
         flash(self.get_success_message(form), category="success")
         return redirect(self.get_success_url(form))
 
-    def post(self, *args, **kwargs):
-        if request.form.get("skip_button"):
-            form = self.get_form_instance(*args, **kwargs)
-            return redirect(self.get_success_url(form))
-
-        return super().post(*args, **kwargs)
-
 
 class RemoveHeadOfficeInterventionFormView(ApplyHeadOfficeInterventionFormView):
     def is_valid_request(self, firm: Firm, office: Office) -> bool:
@@ -595,3 +602,122 @@ class RemoveHeadOfficeInterventionFormView(ApplyHeadOfficeInterventionFormView):
 
     def get_success_message(self, form):
         return "Intervention removed from selected offices."
+
+
+class ChangeOfficeHoldPaymentsFlagFormView(BaseFormView):
+    def _is_hold_enabled(self, form: BaseForm) -> bool:
+        return form.data.get("status") == "Yes"
+
+    def get_success_url(self, form):
+        head_office = self.get_api().get_head_office(form.firm.firm_id)
+        is_head_office = form.office.firm_office_code == head_office.firm_office_code
+
+        if not is_head_office:
+            return url_for("main.view_office", firm=form.firm, office=form.office)
+
+        endpoint = (
+            "main.apply_head_office_hold_payments_flag"
+            if self._is_hold_enabled(form)
+            else "main.remove_head_office_hold_payments_flag"
+        )
+
+        return url_for(endpoint, firm=form.firm, office=form.office)
+
+    def get_form_valid_success_message(self, form):
+        head_office = self.get_api().get_head_office(form.firm.firm_id)
+        is_head_office = form.office.firm_office_code == head_office.firm_office_code
+        office_prefix = "head" if is_head_office else ""
+        office_code = form.office.firm_office_code
+
+        if self._is_hold_enabled(form):
+            return f"<b>Payments on hold for {office_prefix} office {office_code}.</b>"
+
+        return f"<b>Payments hold removed from {office_prefix} office {office_code}.</b>"
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update(
+            {
+                "cancel_url": url_for("main.view_office", firm=form.firm, office=form.office),
+                "office_address": format_office_address_one_line(form.office),
+            }
+        )
+        return context
+
+    def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
+        status = "Yes" if office.hold_all_payments_flag == "Y" else "No"
+        initial_reason = office.hold_reason or ""
+        return self.get_form_class()(
+            firm, office, status=status, hold_all_payments_flag=office.hold_all_payments_flag, reason=initial_reason
+        )
+
+    def form_valid(self, form: BaseForm, **kwargs) -> Response:
+        data = build_hold_payments_payload(form)
+        self.get_api().update_office_hold_payments(
+            firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, data=data
+        )
+
+        flash(self.get_form_valid_success_message(form), category="success")
+        return redirect(self.get_success_url(form))
+
+
+class ApplyHeadOfficeHoldPaymentsFormView(BaseFormView):
+    def get_success_url(self, form):
+        return url_for("main.view_office", firm=form.firm, office=form.office)
+
+    def get_success_message(self, form):
+        offices = form.data.get("offices", [])
+        return f"<b>Payments put on hold successfully for the following offices: {','.join(offices)}.</b>"
+
+    def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
+        status = "Yes" if office.hold_all_payments_flag == "Y" else "No"
+        reason = office.hold_reason or None
+        return self.get_form_class()(firm, office, status=status, reason=reason)
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+
+        if form.firm.is_legal_services_provider or form.firm.is_chambers:
+            context.update(
+                {
+                    "main_table": get_main_table(
+                        form.firm,
+                        head_office=self.get_api().get_head_office(form.firm.firm_id),
+                        parent_firm=None,
+                        include_links=False,
+                    ),
+                }
+            )
+
+        context.update(
+            {
+                "skip_url": self.get_success_url(form),
+                "office_address": format_office_address_one_line(form.office),
+            }
+        )
+        return context
+
+    def form_valid(self, form: BaseForm, **kwargs) -> Response:
+        office_codes = form.data.get("offices", [])
+
+        for office_code in office_codes:
+            data = build_hold_payments_payload(form)
+            print("The data: ", data)
+            self.get_api().update_office_hold_payments(firm_id=form.firm.firm_id, office_code=office_code, data=data)
+        flash(self.get_success_message(form), category="success")
+        return redirect(self.get_success_url(form))
+
+
+class RemoveHeadOfficeHoldPaymentsFormView(ApplyHeadOfficeHoldPaymentsFormView):
+    def get_success_message(self, form):
+        office_codes = form.data.get("offices", [])
+        return f"<b>The following offices payements are no longer on hold: {', '.join(office_codes)}."
+
+    def form_valid(self, form: BaseForm, **kwargs) -> Response:
+        office_codes = form.data.get("offices", [])
+
+        for office_code in office_codes:
+            data = build_hold_payments_payload(form)
+            self.get_api().update_office_hold_payments(firm_id=form.firm.firm_id, office_code=office_code, data=data)
+        flash(self.get_success_message(form), category="success")
+        return redirect(self.get_success_url(form))

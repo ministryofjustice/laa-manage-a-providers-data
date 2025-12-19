@@ -2,8 +2,8 @@ from typing import List
 
 from flask import current_app
 from wtforms.fields.choices import RadioField, SelectMultipleField
-from wtforms.fields.simple import StringField, SubmitField
-from wtforms.validators import InputRequired, Optional
+from wtforms.fields.simple import StringField, TextAreaField
+from wtforms.validators import InputRequired, Length, Optional
 
 from app.constants import OFFICE_ACTIVE_STATUS_CHOICES, PAYMENT_METHOD_CHOICES, YES_NO_CHOICES
 from app.forms import BaseForm, NoChangesMixin
@@ -18,8 +18,9 @@ from app.validators import (
     ValidateIf,
     ValidatePastDate,
     ValidateVATRegistrationNumber,
+    ValidationError,
 )
-from app.widgets import GovDateInput, GovRadioInput, GovSubmitInput, GovTextInput
+from app.widgets import GovDateInput, GovRadioInput, GovTextArea, GovTextInput
 
 from ...components.tables import CheckDataTable, TableStructureItem
 from ...fields import GovDateField
@@ -261,9 +262,6 @@ class ApplyHeadOfficeInterventionForm(UpdateOfficeBaseForm):
     caption = "Select any other offices you want to add the intervention to."
     submit_button_text = "Set selected offices as intervened"
 
-    skip_button = SubmitField(
-        "Skip this step", widget=GovSubmitInput(classes="govuk-button--secondary govuk-!-margin-left-2")
-    )
     offices = SelectMultipleField(
         label="",
         validators=[InputRequired("Select an office to intervene or skip this step")],
@@ -321,3 +319,147 @@ class RemoveHeadOfficeInterventionForm(ApplyHeadOfficeInterventionForm):
         label="",
         validators=[InputRequired("Select an office to remove intervention from or skip this step")],
     )
+
+
+class ChangeOfficeHoldPaymentsFlagForm(NoChangesMixin, UpdateOfficeBaseForm):
+    title = "Do you want to hold payments?"
+    url = "provider/<firm:firm>/office/<office:office>/hold-payments"
+    no_changes_error_message_for_no_value = (
+        "Select no to remove the hold on payments. Cancel if you do not want to change the answer"
+    )
+    no_changes_error_message_for_yes_value = (
+        "Select yes to put payments on hold. Cancel if you do not want to change the answer."
+    )
+    template = "update_office/hold-payments.html"
+    submit_button_text = "Submit"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.status.data == "Yes":
+            self.no_changes_error_message = self.no_changes_error_message_for_no_value
+        else:
+            self.no_changes_error_message = self.no_changes_error_message_for_yes_value
+
+    @property
+    def caption(self):
+        return self.firm.firm_name
+
+    status = RadioField(
+        "",
+        widget=GovRadioInput(
+            heading_class="govuk-fieldset__legend--m",
+        ),
+        choices=YES_NO_CHOICES,
+    )
+    reason = TextAreaField(
+        "Why do you want to hold payments?",
+        widget=GovTextArea(),
+        validators=[Length(max=240, message="Why you want to hold all payments must be 240 characters or less")],
+    )
+
+    def validate_reason(self, field):
+        if self.status.data == "Yes" and not field.data:
+            raise ValidationError("Explain why you want to hold all payments")
+
+
+class ApplyHeadOfficeHoldPaymentsForm(UpdateOfficeBaseForm):
+    url = "provider/<firm:firm>/office/<office:office>/apply-hold-payments"
+    template = "update_office/hold-payments-head-office.html"
+    description = "Select all offices you want to hold payments for."
+    caption = ""
+    submit_button_text = "Hold payments for selected offices"
+
+    offices = SelectMultipleField(
+        label="",
+        validators=[InputRequired("Select an office to hold payments for or skip this step")],
+    )
+
+    def __init__(self, firm: Firm, office: Office, reason: str | None = None, *args, **kwargs):
+        self._reason = reason
+        super().__init__(firm, office, *args, **kwargs)
+        table_structure: list[TableStructureItem] = [
+            {"text": "Account number", "id": "firm_office_code"},
+            {"text": "Address", "id": "address"},
+            {"text": "Status", "id": "status", "html_renderer": lambda data: data["status"]},
+        ]
+
+        data = self.get_data()
+        self.offices.choices = [(item["firm_office_code"]) for item in data]
+
+        self.data_table = CheckDataTable(
+            structure=table_structure,
+            data=data,
+            field_name="offices",
+            field_value_key="firm_office_code",
+        )
+
+    @property
+    def title(self):
+        return f"Hold payments for {self.firm.firm_name} offices"
+
+    @property
+    def status(self):
+        return "Yes"  # Head office is always being held at this level
+
+    @property
+    def reason(self):
+        return self._reason
+
+    def get_data(self):
+        return self._get_data_for_head_apply(include_held=False)
+
+    def _get_data_for_head_apply(self, include_held: bool) -> list:
+        """Return office data for head-office hold/allow screens.
+
+        Args:
+            include_held: if True, include only offices that are currently on hold; if False, include only
+                offices that are not currently on hold.
+        """
+        pda = current_app.extensions["pda"]
+        offices = pda.get_provider_offices(firm_id=self.firm.firm_id)
+        data = []
+
+        for office in offices:
+            # Skip head office off the list
+            if office.firm_office_code == self.office.firm_office_code:
+                continue
+
+            is_held = office.hold_all_payments_flag == "Y"
+            if include_held and not is_held:
+                continue
+            if not include_held and is_held:
+                continue
+
+            data.append(
+                {
+                    "firm_office_code": office.firm_office_code,
+                    "address": format_office_address_one_line(office),
+                    "status": self.get_office_status_tags(office),
+                }
+            )
+        return data
+
+    def get_office_status_tags(self, office: Office):
+        status_tags = get_office_tags(office)
+        if status_tags:
+            return f"<div>{''.join([s.render() for s in status_tags])}</div>"
+        return "<p class='govuk-visually-hidden'>No statuses</p>"
+
+
+class RemoveHeadOfficeHoldPaymentsForm(ApplyHeadOfficeHoldPaymentsForm):
+    url = "provider/<firm:firm>/office/<office:office>/remove-hold-payments"
+    template = "update_office/hold-payments-head-office.html"
+    description = "Select all offices you want to allow payments for."
+    caption = ""
+    submit_button_text = "Allow payments for selected offices"
+
+    @property
+    def title(self):
+        return f"Allow payments for {self.firm.firm_name} offices"
+
+    @property
+    def status(self):
+        return "No"  # Head office is always being removed at this level
+
+    def get_data(self):
+        return self._get_data_for_head_apply(include_held=True)
