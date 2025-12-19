@@ -561,7 +561,7 @@ class ApplyHeadOfficeInterventionFormView(BaseFormView):
 
         context.update(
             {
-                "cancel_url": self.get_success_url(form),
+                "skip_url": self.get_success_url(form),
                 "office_address": format_office_address_one_line(form.office),
             }
         )
@@ -576,13 +576,6 @@ class ApplyHeadOfficeInterventionFormView(BaseFormView):
             self.get_api().update_office_intervened_date(firm_id=form.firm.firm_id, office_code=office_code, data=data)
         flash(self.get_success_message(form), category="success")
         return redirect(self.get_success_url(form))
-
-    def post(self, *args, **kwargs):
-        if request.form.get("skip_button"):
-            form = self.get_form_instance(*args, **kwargs)
-            return redirect(self.get_success_url(form))
-
-        return super().post(*args, **kwargs)
 
 
 class RemoveHeadOfficeInterventionFormView(ApplyHeadOfficeInterventionFormView):
@@ -639,7 +632,7 @@ class ChangeOfficeHoldPaymentsFlagFormView(BaseFormView):
 
     def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
         status = "Yes" if office.hold_all_payments_flag == "Y" else "No"
-        initial_reason = office.hold_reason if office.hold_all_payments_flag == "Y" else ""
+        initial_reason = office.hold_reason or ""
         return self.get_form_class()(
             firm, office, status=status, hold_all_payments_flag=office.hold_all_payments_flag, reason=initial_reason
         )
@@ -664,7 +657,8 @@ class ApplyHeadOfficeHoldPaymentsFormView(BaseFormView):
 
     def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
         status = "Yes" if office.hold_all_payments_flag == "Y" else "No"
-        return self.get_form_class()(firm, office, status=status)
+        reason = office.hold_reason or None
+        return self.get_form_class()(firm, office, status=status, reason=reason)
 
     def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(form, context, **kwargs)
@@ -697,13 +691,6 @@ class ApplyHeadOfficeHoldPaymentsFormView(BaseFormView):
             self.get_api().update_office_hold_payments(firm_id=form.firm.firm_id, office_code=office_code, data=data)
         flash(self.get_success_message(form), category="success")
         return redirect(self.get_success_url(form))
-
-    def post(self, *args, **kwargs):
-        if request.form.get("skip_button"):
-            form = self.get_form_instance(*args, **kwargs)
-            return redirect(self.get_success_url(form))
-
-        return super().post(*args, **kwargs)
 
 
 class RemoveHeadOfficeHoldPaymentsFormView(ApplyHeadOfficeHoldPaymentsFormView):

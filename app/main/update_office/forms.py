@@ -2,7 +2,7 @@ from typing import List
 
 from flask import current_app
 from wtforms.fields.choices import RadioField, SelectMultipleField
-from wtforms.fields.simple import StringField, SubmitField, TextAreaField
+from wtforms.fields.simple import StringField, TextAreaField
 from wtforms.validators import InputRequired, Length, Optional
 
 from app.constants import OFFICE_ACTIVE_STATUS_CHOICES, PAYMENT_METHOD_CHOICES, YES_NO_CHOICES
@@ -20,7 +20,7 @@ from app.validators import (
     ValidateVATRegistrationNumber,
     ValidationError,
 )
-from app.widgets import GovDateInput, GovRadioInput, GovSubmitInput, GovTextArea, GovTextInput
+from app.widgets import GovDateInput, GovRadioInput, GovTextArea, GovTextInput
 
 from ...components.tables import CheckDataTable, TableStructureItem
 from ...fields import GovDateField
@@ -262,9 +262,6 @@ class ApplyHeadOfficeInterventionForm(UpdateOfficeBaseForm):
     caption = "Select any other offices you want to add the intervention to."
     submit_button_text = "Set selected offices as intervened"
 
-    skip_button = SubmitField(
-        "Skip this step", widget=GovSubmitInput(classes="govuk-button--secondary govuk-!-margin-left-2")
-    )
     offices = SelectMultipleField(
         label="",
         validators=[InputRequired("Select an office to intervene or skip this step")],
@@ -375,10 +372,6 @@ class ApplyHeadOfficeHoldPaymentsForm(UpdateOfficeBaseForm):
     offices = SelectMultipleField(
         label="",
         validators=[InputRequired("Select an office to hold payments for or skip this step")],
-    )
-
-    skip_button = SubmitField(
-        "Skip this step", widget=GovSubmitInput(classes="govuk-button--secondary govuk-!-margin-left-2")
     )
 
     def __init__(self, firm: Firm, office: Office, reason: str | None = None, *args, **kwargs):
