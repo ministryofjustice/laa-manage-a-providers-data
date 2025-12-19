@@ -24,9 +24,13 @@ from app.views import BaseFormView, FullWidthBaseFormView
 logger = logging.getLogger(__name__)
 
 
+def resolve_value(value):
+    return value.data if hasattr(value, "data") else value
+
+
 def build_hold_payments_payload(form):
-    status = form.data.get("status")
-    reason = form.data.get("reason")
+    status = resolve_value(form.status)
+    reason = resolve_value(form.reason)
 
     data = {"holdAllPaymentsFlag": "Y" if status == "Yes" else "N"}
     if status == "Yes" and reason:
@@ -698,6 +702,7 @@ class ApplyHeadOfficeHoldPaymentsFormView(BaseFormView):
 
         for office_code in office_codes:
             data = build_hold_payments_payload(form)
+            print("The data: ", data)
             self.get_api().update_office_hold_payments(firm_id=form.firm.firm_id, office_code=office_code, data=data)
         flash(self.get_success_message(form), category="success")
         return redirect(self.get_success_url(form))

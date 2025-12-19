@@ -623,15 +623,3 @@ class ProviderDataApi:
         raise NotImplementedError(
             "Updating office hold payments status is currently not supported by the real Provider Data API"
         )
-
-    def update_barrister_advocate_hold_payments(self, firm_id, data: dict) -> Firm:
-        """
-        Update an existing advocate/barrister payments on hold.
-        Args:
-            firm_id: Firm Id of the firm that the advocate/barrister belongs to
-            data: a dict containing the choise to hold payments
-        Returns: Firm
-        """
-        raise NotImplementedError(
-            "Updating advocate/barrister hold payments status is currently not supported by the real Provider Data API"
-        )
