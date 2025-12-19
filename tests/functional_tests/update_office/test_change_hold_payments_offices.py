@@ -53,7 +53,7 @@ def test_changing_hold_payments_head_office(page: Page):
     expect(page.get_by_role("cell", name="6A002L")).to_be_visible()
 
     # Confirm hold and check Head Office is now on hold
-    page.get_by_role("link", name="Skip this step").click()
+    page.get_by_role("button", name="Skip this step").click()
     page.get_by_text("On hold", exact=True).click()
 
     expect(page.get_by_text("On hold", exact=True)).to_be_visible()

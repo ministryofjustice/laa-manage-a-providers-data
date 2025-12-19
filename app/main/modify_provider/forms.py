@@ -17,6 +17,7 @@ from app.main.update_office import (
     ChangeOfficeDebtRecoveryForm,
     ChangeOfficeFalseBalanceForm,
     ChangeOfficeHoldPaymentsFlagForm,
+    ChangeOfficeIntervenedForm,
 )
 from app.main.utils import get_firm_account_number
 from app.models import Firm, Office
@@ -285,6 +286,19 @@ class ChangeFirmFalseBalanceForm(ChangeOfficeFalseBalanceForm):
     url = "provider/<firm('Barrister','Advocate'):firm>/change-false-balance"
     title = "Do they have a false balance?"
     submit_button_text = "Submit"
+
+
+class ChangeFirmIntervenedForm(ChangeOfficeIntervenedForm):
+    template = "update_office/intervened-form.html"
+    url = "provider/<firm('Barrister','Advocate'):firm>//intervention-status"
+    title = "Have they been intervened?"
+    submit_button_text = "Submit"
+    no_changes_error_message_for_yes_value = (
+        "Select no if they have not been intervened. Cancel if you do not want to change the answer."
+    )
+    no_changes_error_message_for_no_value = (
+        "Select yes if they have been intervened. Cancel if you do not want to change the answer."
+    )
 
 
 class ChangeFirmDebtRecoveryForm(ChangeOfficeDebtRecoveryForm):

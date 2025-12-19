@@ -6,17 +6,24 @@ from wtforms.fields.simple import StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired, Length, Optional
 
 from app.constants import OFFICE_ACTIVE_STATUS_CHOICES, PAYMENT_METHOD_CHOICES, YES_NO_CHOICES
-from app.forms import BaseForm, IgnoreReasonIfStatusUnchangedMixin, NoChangesMixin
+from app.forms import BaseForm, NoChangesMixin
 from app.main.add_a_new_office.forms import OfficeContactDetailsForm
 from app.main.add_a_new_provider import AssignContractManagerForm
 from app.main.forms import BaseBankAccountForm, BaseBankAccountSearchForm
 from app.main.utils import get_office_tags
 from app.models import BankAccount, Firm, Office
 from app.utils.formatting import format_office_address_one_line
-from app.validators import ValidateVATRegistrationNumber, ValidationError
-from app.widgets import GovRadioInput, GovSubmitInput, GovTextArea, GovTextInput
+from app.validators import (
+    ValidateGovDateField,
+    ValidateIf,
+    ValidatePastDate,
+    ValidateVATRegistrationNumber,
+    ValidationError,
+)
+from app.widgets import GovDateInput, GovRadioInput, GovSubmitInput, GovTextArea, GovTextInput
 
 from ...components.tables import CheckDataTable, TableStructureItem
+from ...fields import GovDateField
 
 
 class UpdateOfficeBaseForm(BaseForm):
@@ -204,7 +211,120 @@ class ChangeOfficeDebtRecoveryForm(NoChangesMixin, UpdateOfficeBaseForm):
         self.status.errors.append(error_message)
 
 
-class ChangeOfficeHoldPaymentsFlagForm(NoChangesMixin, IgnoreReasonIfStatusUnchangedMixin, UpdateOfficeBaseForm):
+class ChangeOfficeIntervenedForm(NoChangesMixin, UpdateOfficeBaseForm):
+    template = "update_office/intervened-form.html"
+    url = "provider/<firm:firm>/office/<office:office>/intervention-status"
+    title = "Has this office been intervened?"
+    submit_button_text = "Submit"
+    no_changes_error_message_for_yes_value = (
+        "Select no if this office has not been intervened. Cancel if you do not want to change the answer."
+    )
+    no_changes_error_message_for_no_value = (
+        "Select yes if this office has been intervened. Cancel if you do not want to change the answer."
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.status.data == "Yes":
+            self.no_changes_error_message = self.no_changes_error_message_for_yes_value
+        else:
+            self.no_changes_error_message = self.no_changes_error_message_for_no_value
+
+    @property
+    def caption(self):
+        return self.firm.firm_name
+
+    status = RadioField(
+        label="",
+        widget=GovRadioInput(heading_class="govuk-fieldset__legend--m"),
+        choices=YES_NO_CHOICES,
+        validators=[InputRequired("Please select a valid choice.")],
+        default="No",
+    )
+
+    intervened_date = GovDateField(
+        "Date intervened",
+        widget=GovDateInput(heading_class="govuk-fieldset__legend--m", hint="For example 27 3 2025"),
+        format="%d %m %Y",
+        validators=[
+            ValidateIf("status", "Yes"),
+            InputRequired("Enter the intervention date"),
+            ValidateGovDateField(),
+            ValidatePastDate(),
+        ],
+    )
+
+
+class ApplyHeadOfficeInterventionForm(UpdateOfficeBaseForm):
+    url = "provider/<firm:firm>/office/<office:office>/apply-head-office-intervention"
+    template = "update_office/intervened-head-office-form.html"
+    title = "Select other offices to be intervened"
+    caption = "Select any other offices you want to add the intervention to."
+    submit_button_text = "Set selected offices as intervened"
+
+    skip_button = SubmitField(
+        "Skip this step", widget=GovSubmitInput(classes="govuk-button--secondary govuk-!-margin-left-2")
+    )
+    offices = SelectMultipleField(
+        label="",
+        validators=[InputRequired("Select an office to intervene or skip this step")],
+    )
+
+    def __init__(self, firm: Firm, office: Office, *args, **kwargs):
+        super().__init__(firm, office, *args, **kwargs)
+        table_structure: list[TableStructureItem] = [
+            {"text": "Account number", "id": "firm_office_code"},
+            {"text": "Address", "id": "address"},
+            {"text": "Status", "id": "status", "html_renderer": lambda data: data["status"]},
+        ]
+
+        data = self.get_data()
+        self.offices.choices = [(item["firm_office_code"]) for item in data]
+
+        self.data_table = CheckDataTable(
+            structure=table_structure,
+            data=data,
+            field_name="offices",
+            field_value_key="firm_office_code",
+        )
+
+    def get_data(self):
+        pda = current_app.extensions["pda"]
+        offices = pda.get_provider_offices(firm_id=self.firm.firm_id)
+        data = []
+        for office in offices:
+            # Exclude the head office from the list
+            if self.office.firm_office_code != office.firm_office_code:
+                data.append(
+                    {
+                        "firm_office_code": office.firm_office_code,
+                        "address": format_office_address_one_line(office),
+                        "status": self.get_office_status_tags(office),
+                    }
+                )
+        return data
+
+    def get_office_status_tags(self, office: Office):
+        status_tags = get_office_tags(office)
+        if status_tags:
+            return f"<div>{''.join([s.render() for s in status_tags])}</div>"
+        return "<p class='govuk-visually-hidden'>No statuses</p>"
+
+
+class RemoveHeadOfficeInterventionForm(ApplyHeadOfficeInterventionForm):
+    url = "provider/<firm:firm>/office/<office:office>/remove-head-office-intervention"
+    template = "update_office/intervened-head-office-form.html"
+    title = "Select other offices to remove intervention from"
+    caption = "Select any other offices you want to remove the intervention from."
+    submit_button_text = "Remove intervention from selected offices"
+
+    offices = SelectMultipleField(
+        label="",
+        validators=[InputRequired("Select an office to remove intervention from or skip this step")],
+    )
+
+
+class ChangeOfficeHoldPaymentsFlagForm(NoChangesMixin, UpdateOfficeBaseForm):
     title = "Do you want to hold payments?"
     url = "provider/<firm:firm>/office/<office:office>/hold-payments"
     no_changes_error_message_for_no_value = (

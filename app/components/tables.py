@@ -466,6 +466,7 @@ class CheckDataTable(DataTable):
     ) -> None:
         """
         Initialize CheckboxDataTable.
+
         Args:
             structure: Table structure definition
             data: Table data

@@ -580,6 +580,18 @@ class ProviderDataApi:
             "Updating office false balance is currently not supported by the real Provider Data API"
         )
 
+    def update_office_intervened_date(self, firm_id: int, office_code: str, data: dict) -> Office:
+        """
+        Update an existing office intervened date.
+        Args:
+            firm_id: Firm Id of the firm that the office belongs to
+            office_code: The code of the office to update
+            data: a dict containing the intervened date
+
+        Returns: Office
+        """
+        raise NotImplementedError("Updating office intervened date is not yet supported by the real Provider Data API")
+
     def get_list_of_contract_manager_names(self):
         """Get a list of all known contract managers."""
         raise NotImplementedError(
