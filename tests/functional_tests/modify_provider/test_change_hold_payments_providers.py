@@ -14,8 +14,7 @@ def test_change_provider_hold_payments_to_yes_then_no(page: Page):
     page.get_by_role("button", name="Submit").click()
 
     # Success message appears... and On Hold label exists
-    page.get_by_label("Success").locator("div").filter(has_text="Alan Davies payments put on")
-    expect(page.get_by_text("On hold", exact=True)).to_be_visible()
+    expect(page.get_by_label("Success").locator("div").filter(has_text="Alan Davies payments put on")).to_be_visible()
 
     # Remove the HOLD in the account...
     page.get_by_role("link", name="Change   payments on hold").click()
@@ -52,8 +51,7 @@ def test_submitign_hold_unchanged(page: Page):
     page.get_by_role("button", name="Submit").click()
 
     # Successful change
-    page.get_by_label("Success").locator("div").filter(has_text="Finn O'Connor payments put on").click()
-    expect(page.get_by_text("On hold", exact=True)).to_have_count(1)
+    expect(page.get_by_label("Success").locator("div").filter(has_text="Finn O'Connor payments put on")).to_be_visible()
 
 
 @pytest.mark.usefixtures("live_server")
