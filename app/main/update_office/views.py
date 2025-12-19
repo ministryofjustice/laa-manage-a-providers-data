@@ -14,7 +14,7 @@ from app.constants import (
 from app.forms import BaseForm
 from app.main.forms import NoBankAccountsError
 from app.main.table_builders import get_main_table
-from app.main.utils import build_hold_payments_payload, firm_office_url_for
+from app.main.utils import firm_office_url_for
 from app.main.views import AdvocateBarristerOfficeMixin
 from app.models import BankAccount, Firm, Office
 from app.pda.errors import ProviderDataApiError
@@ -22,6 +22,16 @@ from app.utils.formatting import format_office_address_one_line
 from app.views import BaseFormView, FullWidthBaseFormView
 
 logger = logging.getLogger(__name__)
+
+
+def build_hold_payments_payload(form):
+    status = form.data.get("status")
+    reason = form.data.get("reason")
+
+    data = {"holdAllPaymentsFlag": "Y" if status == "Yes" else "N"}
+    if status == "Yes" and reason:
+        data["holdReason"] = reason
+    return data
 
 
 class UpdateVATRegistrationNumberFormView(AdvocateBarristerOfficeMixin, FullWidthBaseFormView):

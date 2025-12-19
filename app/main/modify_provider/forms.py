@@ -310,7 +310,7 @@ class ChangeFirmDebtRecoveryForm(ChangeOfficeDebtRecoveryForm):
 
 class ChangeHoldPaymentsFlagForm(ChangeOfficeHoldPaymentsFlagForm):
     title = "Do you want to hold payments?"
-    url = "provider/<firm:firm>/hold-payments"
+    url = "provider/<firm('Barrister','Advocate'):firm>/hold-payments"
     template = ("modify_provider/hold-payments.html",)
 
     def __init__(self, firm: Firm, office=None, *args, **kwargs):

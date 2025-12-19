@@ -406,6 +406,15 @@ class ApplyHeadOfficeHoldPaymentsForm(UpdateOfficeBaseForm):
         return self._reason
 
     def get_data(self):
+        return self._get_data_for_head_apply(include_held=False)
+
+    def _get_data_for_head_apply(self, include_held: bool) -> list:
+        """Return office data for head-office hold/allow screens.
+
+        Args:
+            include_held: if True, include only offices that are currently on hold; if False, include only
+                offices that are not currently on hold.
+        """
         pda = current_app.extensions["pda"]
         offices = pda.get_provider_offices(firm_id=self.firm.firm_id)
         data = []
@@ -414,8 +423,13 @@ class ApplyHeadOfficeHoldPaymentsForm(UpdateOfficeBaseForm):
             # Skip head office off the list
             if office.firm_office_code == self.office.firm_office_code:
                 continue
-            if office.hold_all_payments_flag == "Y":
+
+            is_held = office.hold_all_payments_flag == "Y"
+            if include_held and not is_held:
                 continue
+            if not include_held and is_held:
+                continue
+
             data.append(
                 {
                     "firm_office_code": office.firm_office_code,
@@ -448,18 +462,4 @@ class RemoveHeadOfficeHoldPaymentsForm(ApplyHeadOfficeHoldPaymentsForm):
         return "No"  # Head office is always being removed at this level
 
     def get_data(self):
-        pda = current_app.extensions["pda"]
-        offices = pda.get_provider_offices(firm_id=self.firm.firm_id)
-        data = []
-
-        for office in offices:
-            if office.firm_office_code == self.office.firm_office_code or office.hold_all_payments_flag != "Y":
-                continue
-            data.append(
-                {
-                    "firm_office_code": office.firm_office_code,
-                    "address": format_office_address_one_line(office),
-                    "status": self.get_office_status_tags(office),
-                }
-            )
-        return data
+        return self._get_data_for_head_apply(include_held=True)
