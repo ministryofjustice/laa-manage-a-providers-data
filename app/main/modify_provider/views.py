@@ -10,9 +10,9 @@ from app.main.update_office import (
     ChangeOfficeContactDetailsFormView,
     ChangeOfficeDebtRecoveryFormView,
     ChangeOfficeFalseBalanceFormView,
-    ChangeOfficeHoldPaymentsFlagFormView,
     ChangeOfficeIntervenedFormView,
 )
+from app.main.update_office.views import build_hold_payments_payload
 from app.main.utils import (
     assign_firm_to_a_new_chambers,
     change_liaison_manager,
@@ -373,8 +373,9 @@ class ChangeFirmIntervenedFormView(AdvocateBarristerOfficeMixin, ChangeOfficeInt
             return f"<b>{form.firm.firm_name} marked as not intervened.</b>"
 
 
-class ChangeHoldPaymentsFlagFormView(AdvocateBarristerOfficeMixin, ChangeOfficeHoldPaymentsFlagFormView):
-    provider_success_url = "main.view_provider"
+class ChangeHoldPaymentsFlagFormView(AdvocateBarristerOfficeMixin, BaseFormView):
+    def get_success_url(self, form: BaseForm):
+        return url_for("main.view_provider", firm=form.firm)
 
     def get_form_valid_success_message(self, form):
         if form.data.get("status") == "Yes":
@@ -387,13 +388,13 @@ class ChangeHoldPaymentsFlagFormView(AdvocateBarristerOfficeMixin, ChangeOfficeH
         context.update({"cancel_url": self.get_success_url(form)})
         return context
 
-    # def get_form_instance(self, firm: Firm, **kwargs) -> BaseForm:
-    #     status = "Yes" if firm.hold_all_payments_flag == "Y" else "No"
-    #     initial_reason = firm.hold_reason if firm.hold_all_payments_flag == "Y" else ""
-    #     return self.get_form_class()(firm, status=status, reason=initial_reason)
+    def get_form_instance(self, firm: Firm, **kwargs) -> BaseForm:
+        status = "Yes" if firm.hold_all_payments_flag == "Y" else "No"
+        initial_reason = firm.hold_reason if firm.hold_all_payments_flag == "Y" else ""
+        return self.get_form_class()(firm, status=status, reason=initial_reason)
 
-    # def form_valid(self, form: BaseForm, **kwargs) -> Response:
-    #     data = build_hold_payments_payload(form)
-    #     self.get_api().update_barrister_advocate_hold_payments(firm_id=form.firm.firm_id, data=data)
-    #     flash(self.get_form_valid_success_message(form), category="success")
-    #     return redirect(self.get_success_url(form))
+    def form_valid(self, form: BaseForm, **kwargs) -> Response:
+        data = build_hold_payments_payload(form)
+        self.get_api().update_barrister_advocate_hold_payments(firm_id=form.firm.firm_id, data=data)
+        flash(self.get_form_valid_success_message(form), category="success")
+        return redirect(self.get_success_url(form))
