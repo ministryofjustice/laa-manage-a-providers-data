@@ -2,6 +2,7 @@ from app.main.utils import (
     contract_manager_changeable,
     contract_manager_nonstatus_name,
     get_entity_active_text,
+    get_entity_intervened_text,
     get_entity_referred_to_debt_recovery_text,
     get_firm_false_balance_text,
     get_office_false_balance_text,
@@ -57,7 +58,12 @@ STATUS_TABLE_FIELD_CONFIG = {
             "formatter": format_yes_no,
             "default": "No",
         },
-        {"label": "Intervened", "default": "No"},
+        {
+            "label": "Intervened",
+            "default": "No",
+            "text_renderer": get_entity_intervened_text,
+            "change_link": "main.change_firm_intervened",
+        },
         {
             "label": "Referred to debt recovery",
             "text_renderer": get_entity_referred_to_debt_recovery_text,
@@ -85,7 +91,12 @@ STATUS_TABLE_FIELD_CONFIG = {
             "formatter": format_yes_no,
             "default": "No",
         },
-        {"label": "Intervened", "default": "No"},
+        {
+            "label": "Intervened",
+            "default": "No",
+            "text_renderer": get_entity_intervened_text,
+            "change_link": "main.change_firm_intervened",
+        },
         {
             "label": "Referred to debt recovery",
             "visible": lambda firm: not firm.get("inactive_date"),
@@ -113,7 +124,12 @@ STATUS_TABLE_FIELD_CONFIG = {
             "formatter": format_yes_no,
             "default": "No",
         },
-        {"label": "Intervened", "default": "No"},
+        {
+            "label": "Intervened",
+            "default": "No",
+            "text_renderer": get_entity_intervened_text,
+            "change_link": "main.change_office_intervened",
+        },
         {
             "label": "Referred to debt recovery",
             "default": "No",

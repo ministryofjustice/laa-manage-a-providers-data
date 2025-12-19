@@ -10,6 +10,7 @@ from app.main.update_office import (
     ChangeOfficeContactDetailsFormView,
     ChangeOfficeDebtRecoveryFormView,
     ChangeOfficeFalseBalanceFormView,
+    ChangeOfficeIntervenedFormView,
 )
 from app.main.utils import assign_firm_to_a_new_chambers, change_liaison_manager, reassign_head_office
 from app.main.views import AdvocateBarristerOfficeMixin, get_main_table
@@ -340,8 +341,7 @@ class ChangeAdvocateDetailsFormView(BaseFormView):
 
 
 class ChangeFirmFalseBalanceFormView(AdvocateBarristerOfficeMixin, ChangeOfficeFalseBalanceFormView):
-    def get_success_url(self, form):
-        return url_for("main.view_provider", firm=form.firm)
+    provider_success_url = "main.view_provider"
 
 
 class ChangeFirmDebtRecoveryFormView(AdvocateBarristerOfficeMixin, ChangeOfficeDebtRecoveryFormView):
@@ -356,3 +356,13 @@ class ChangeFirmDebtRecoveryFormView(AdvocateBarristerOfficeMixin, ChangeOfficeD
 
     def get_no_value_success_message(self, form: BaseForm | None = None) -> str:
         return f"{form.firm.firm_name} is not referred to the Debt Recovery Unit."
+
+
+class ChangeFirmIntervenedFormView(AdvocateBarristerOfficeMixin, ChangeOfficeIntervenedFormView):
+    provider_success_url = "main.view_provider"
+
+    def get_form_valid_success_message(self, form):
+        if form.data.get("status") == "Yes":
+            return f"<b>{form.firm.firm_name} marked as intervened.</b>"
+        else:
+            return f"<b>{form.firm.firm_name} marked as not intervened.</b>"

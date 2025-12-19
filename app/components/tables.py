@@ -453,3 +453,85 @@ class RadioDataTable(DataTable):
         }
         params.update(kwargs)
         return params
+
+
+class CheckDataTable(DataTable):
+    """Extended DataTable that adds checkbox button functionality."""
+
+    first_cell_is_header = False
+    sortable_table = False  # Disable sorting when using checkbox buttons
+
+    def __init__(
+        self, structure: list[TableStructureItem], data: Data | RowData, field_name: str, field_value_key: str
+    ) -> None:
+        """
+        Initialize CheckboxDataTable.
+
+        Args:
+            structure: Table structure definition
+            data: Table data
+            field_name: Name attribute for checkbox buttons
+            field_value_key: Key in row data to use as checkbox button value
+        """
+        super().__init__(structure, data)
+        self.field_name = field_name
+        self.field_value_key = field_value_key
+
+    def get_rows(self, selected_value: str = None) -> list[Row]:
+        """Generate table rows with checkbox buttons in first column."""
+        rows = []
+
+        for row_data in self.data:
+            # Get the base row from parent class
+            base_row = super()._get_row(row_data)
+
+            # Create checkbox button cell
+            checkbox_value = str(row_data.get(self.field_value_key, ""))
+            checkbox_id = f"{self.field_name}_{checkbox_value}"
+
+            # Build checkbox button HTML
+            checked_attr = 'checked="checked"' if selected_value and str(selected_value) == checkbox_value else ""
+
+            checkbox_html = f'''
+            <div class="govuk-checkboxes__item govuk-checkboxes--small">
+                <input class="govuk-checkboxes__input" type="checkbox" name="{self.field_name}" 
+                       value="{checkbox_value}" id="{checkbox_id}" {checked_attr}>
+                <label class="govuk-checkboxes__label govuk-!-padding-0" for="{checkbox_id}">
+                    <span class="govuk-visually-hidden">Select this row</span>
+                </label>
+            </div>
+            '''
+
+            checkbox_cell = {"html": checkbox_html.strip(), "text": "", "classes": "govuk-table__cell--checkbox"}
+
+            # Prepend checkbox button cell to the row
+            rows.append([checkbox_cell] + base_row)
+
+        return rows
+
+    def get_headings(self) -> list[dict[str, str]]:
+        """Get headings with empty first column for checkbox buttons."""
+        base_headings = super().get_headings()
+        field_id = f"{self.field_name}-select-all"
+        html = f'''
+        <div class="govuk-checkboxes__item govuk-checkboxes--small">
+            <input class="govuk-checkboxes__input mapd-select-all-checkbox" type="checkbox" name="{self.field_name}_select_all" 
+               id="{field_id}" value="1" mapd-select-all-checkbox="{self.field_name}">
+            <label class="govuk-checkboxes__label govuk-!-padding-0" for="{field_id}">
+                <span class="govuk-visually-hidden">Select all</span>
+            </label>
+        </div>
+        '''
+        checkbox_heading = {"html": html, "classes": "govuk-table__header--checkbox", "id": ""}
+        return [checkbox_heading] + base_headings
+
+    def to_govuk_params(self, selected_value: str = None, **kwargs) -> dict[str, Any]:
+        """Convert table to dictionary for template rendering with checkbox buttons."""
+        params = {
+            "head": self.get_headings(),
+            "rows": self.get_rows(selected_value),
+            "firstCellIsHeader": self.first_cell_is_header,
+            "classes": f"{DEFAULT_TABLE_CLASSES} govuk-table--checkbox",
+        }
+        params.update(kwargs)
+        return params

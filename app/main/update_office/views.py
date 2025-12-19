@@ -13,6 +13,7 @@ from app.constants import (
 )
 from app.forms import BaseForm
 from app.main.forms import NoBankAccountsError
+from app.main.table_builders import get_main_table
 from app.main.utils import firm_office_url_for
 from app.main.views import AdvocateBarristerOfficeMixin
 from app.models import BankAccount, Firm, Office
@@ -472,3 +473,125 @@ class ChangeOfficeDebtRecoveryFormView(BaseFormView):
         else:
             flash(self.get_no_value_success_message(form), category="success")
             return redirect(self.get_no_value_success_url(form))
+
+
+class ChangeOfficeIntervenedFormView(BaseFormView):
+    def get_success_url(self, form):
+        head_office = self.get_api().get_head_office(form.firm.firm_id)
+        if form.office.firm_office_code == head_office.firm_office_code:
+            if form.data.get("status") == "Yes":
+                return url_for("main.apply_head_office_intervention", firm=form.firm, office=form.office)
+            else:
+                return url_for("main.remove_head_office_intervention", firm=form.firm, office=form.office)
+        return url_for("main.view_office", firm=form.firm, office=form.office)
+
+    def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
+        status = "Yes" if office.intervened_date else "No"
+        return self.get_form_class()(firm, office, status=status, intervened_date=office.intervened_date)
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+        context.update(
+            {"cancel_url": self.get_success_url(form), "office_address": format_office_address_one_line(form.office)}
+        )
+        return context
+
+    def form_valid(self, form: BaseForm, **kwargs) -> Response:
+        status = form.data.get("status")
+        data = {
+            "intervenedDate": form.data.get("intervened_date") if status == "Yes" else None,
+        }
+        self.get_api().update_office_intervened_date(
+            firm_id=form.firm.firm_id, office_code=form.office.firm_office_code, data=data
+        )
+        flash(self.get_form_valid_success_message(form), category="success")
+        return redirect(self.get_success_url(form))
+
+    def get_form_valid_success_message(self, form):
+        head_office = self.get_api().get_head_office(form.firm.firm_id)
+        is_head_office = form.office.firm_office_code == head_office.firm_office_code
+        if form.data.get("status") == "Yes":
+            if is_head_office:
+                return f"Head office {head_office.firm_office_code} set as intervened."
+            else:
+                return f"Office {form.office.firm_office_code} marked as intervened."
+        else:
+            if is_head_office:
+                return f"Intervention removed from head office {head_office.firm_office_code}."
+            else:
+                return f"Office {form.office.firm_office_code} marked as not intervened."
+
+
+class ApplyHeadOfficeInterventionFormView(BaseFormView):
+    def dispatch_request(self, firm: Firm, office: Office, *args, **kwargs):
+        if not self.is_valid_request(firm=firm, office=office):
+            abort(404)
+        return super().dispatch_request(firm=firm, office=office, *args, **kwargs)
+
+    def is_valid_request(self, firm: Firm, office: Office) -> bool:
+        """Office should have an intervened date"""
+        head_office = self.get_api().get_head_office(firm.firm_id)
+        if office.firm_office_code == head_office.firm_office_code:
+            return office.intervened_date is not None
+        return True
+
+    def get_success_url(self, form):
+        return url_for("main.view_office", firm=form.firm, office=form.office)
+
+    def get_success_message(self, form):
+        return "<b>Selected offices set as intervened.</b>"
+
+    def get_form_instance(self, firm: Firm, office: Office, **kwargs) -> BaseForm:
+        return self.get_form_class()(firm, office)
+
+    def get_context_data(self, form: BaseForm, context=None, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(form, context, **kwargs)
+
+        if form.firm.is_legal_services_provider or form.firm.is_chambers:
+            context.update(
+                {
+                    "main_table": get_main_table(
+                        form.firm,
+                        head_office=self.get_api().get_head_office(form.firm.firm_id),
+                        parent_firm=None,
+                        include_links=False,
+                    ),
+                }
+            )
+
+        context.update(
+            {
+                "cancel_url": self.get_success_url(form),
+                "office_address": format_office_address_one_line(form.office),
+            }
+        )
+        return context
+
+    def form_valid(self, form: BaseForm, **kwargs) -> Response:
+        office_codes = form.data.get("offices", [])
+        for office_code in office_codes:
+            data = {
+                "intervenedDate": form.office.intervened_date,
+            }
+            self.get_api().update_office_intervened_date(firm_id=form.firm.firm_id, office_code=office_code, data=data)
+        flash(self.get_success_message(form), category="success")
+        return redirect(self.get_success_url(form))
+
+    def post(self, *args, **kwargs):
+        if request.form.get("skip_button"):
+            form = self.get_form_instance(*args, **kwargs)
+            return redirect(self.get_success_url(form))
+
+        return super().post(*args, **kwargs)
+
+
+class RemoveHeadOfficeInterventionFormView(ApplyHeadOfficeInterventionFormView):
+    def is_valid_request(self, firm: Firm, office: Office) -> bool:
+        """Office should NOT have an intervened date"""
+        head_office = self.get_api().get_head_office(firm.firm_id)
+        if office.firm_office_code == head_office.firm_office_code:
+            return office.intervened_date is None
+        return True
+
+    def get_success_message(self, form):
+        return "Intervention removed from selected offices."
