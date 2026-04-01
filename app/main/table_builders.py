@@ -196,7 +196,7 @@ def get_sorted_contacts(firm: Firm, office: Office = None) -> List[Contact]:
 
     # Previous contacts ordered by inactive_date first, then creation_date
     other_contacts.sort(
-        key=lambda c: ((c.inactive_date) or (c.creation_date)),
+        key=lambda c: (c.inactive_date) or (c.creation_date),
         reverse=True,
     )
 
