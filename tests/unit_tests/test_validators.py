@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 from unittest.mock import Mock
 
 import pytest
@@ -106,8 +106,8 @@ class TestValidatePastDate:
 
         # Test with future dates
         future_dates = [
-            date(2030, 1, 1),
-            date(2025, 12, 31),
+            date.today() + timedelta(weeks=1),  # Next week
+            date.today() + timedelta(days=31),  # Next month
             date.today().replace(year=date.today().year + 1),  # Next year
         ]
 
