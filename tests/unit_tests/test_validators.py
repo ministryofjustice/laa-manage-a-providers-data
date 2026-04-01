@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 from unittest.mock import Mock
 
 import pytest
@@ -99,24 +99,24 @@ class TestValidatePastDate:
         # Should not raise ValidationError for today
         validator(form, field)
 
-    # def test_invalid_future_dates(self):
-    #     """Test validation rejects future dates."""
-    #     validator = ValidatePastDate()
-    #     form = Mock()
+    def test_invalid_future_dates(self):
+        """Test validation rejects future dates."""
+        validator = ValidatePastDate()
+        form = Mock()
 
-    #     # Test with future dates
-    #     future_dates = [
-    #         date(2030, 1, 1),
-    #         date(2025, 12, 31),
-    #         date.today().replace(year=date.today().year + 1),  # Next year
-    #     ]
+        # Test with future dates
+        future_dates = [
+            date.today() + timedelta(weeks=1),  # Next week
+            date.today() + timedelta(days=31),  # Next month
+            date.today().replace(year=date.today().year + 1),  # Next year
+        ]
 
-    #     for test_date in future_dates:
-    #         field = Mock()
-    #         field.data = test_date
-    #         with pytest.raises(ValidationError) as exc_info:
-    #             validator(form, field)
-    #         assert "Date must be today or in the past" in str(exc_info.value)
+        for test_date in future_dates:
+            field = Mock()
+            field.data = test_date
+            with pytest.raises(ValidationError) as exc_info:
+                validator(form, field)
+            assert "Date must be today or in the past" in str(exc_info.value)
 
     def test_empty_field_data(self):
         """Test that empty field data doesn't raise validation error."""
